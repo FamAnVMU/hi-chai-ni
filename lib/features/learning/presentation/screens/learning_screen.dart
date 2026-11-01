@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../hanzi_writing/hanzi_writing.dart';
 import '../../../placement_test/placement_test.dart';
+import '../../../pronunciation/pronunciation.dart';
+import '../../../shadowing/shadowing.dart';
 
 /// Tab 1: Learning Screen featuring structured lessons and HSK roadmap.
 class LearningScreen extends StatefulWidget {
@@ -143,6 +145,94 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
                   ),
                 ],
               ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+
+            // Pronunciation Lab & Shadowing Quick Access Row
+            Row(
+              children: [
+                Expanded(
+                  child: HiCard(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.record_voice_over_rounded,
+                          color: AppColors.limeGreen,
+                          size: 28,
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          'Luyện phát âm',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'Âm vị & Thanh điệu',
+                          style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        HiButton(
+                          text: 'Luyện âm',
+                          size: HiButtonSize.sm,
+                          variant: HiButtonVariant.secondary,
+                          isFullWidth: true,
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const PronunciationLabScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: HiCard(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.speed_rounded,
+                          color: Colors.blueAccent,
+                          size: 28,
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          'Shadowing',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'Nói đuổi & Nhịp độ',
+                          style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        HiButton(
+                          text: 'Luyện nói',
+                          size: HiButtonSize.sm,
+                          variant: HiButtonVariant.secondary,
+                          isFullWidth: true,
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const ShadowingScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: AppSpacing.lg),
 

@@ -11,8 +11,17 @@ enum AudioPermissionResult {
 class PermissionHelper {
   PermissionHelper._();
 
+  @visibleForTesting
+  static AudioPermissionResult? mockPermissionResult;
+
+  @visibleForTesting
+  static PermissionStatus? mockPermissionStatus;
+
   /// Checks the current microphone permission status without prompting.
   static Future<PermissionStatus> checkMicrophoneStatus() async {
+    if (mockPermissionStatus != null) {
+      return mockPermissionStatus!;
+    }
     return await Permission.microphone.status;
   }
 
@@ -22,6 +31,9 @@ class PermissionHelper {
     BuildContext context, {
     required String featureName,
   }) async {
+    if (mockPermissionResult != null) {
+      return mockPermissionResult!;
+    }
     final currentStatus = await checkMicrophoneStatus();
 
     if (currentStatus.isGranted) {

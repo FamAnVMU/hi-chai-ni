@@ -611,6 +611,48 @@ Trước khi bước vào Giai đoạn 5 (triển khai 22 phân hệ học tập
 - **Hoạt động hoàn toàn Offline (100% Local):**
   - Mọi thao tác vẽ, đánh giá hình học, hoạt họa nét và ghi nhận dữ liệu đều chạy cục bộ trên thiết bị di động, không yêu cầu kết nối mạng.
 
+---
+
+## 17. Kiến Trúc Pronunciation Lab & Shadowing Training (Task 5.5)
+
+### 17.1. Phân Tách Hai Luồng Luyện Tập Riêng Biệt (Không Nhập Nhằng Kết Quả)
+- **Pronunciation Lab (Phòng Luyện Phát Âm):**
+  - **Mục tiêu:** Huấn luyện cấp độ Âm vị (Phoneme) & Từ vựng (Word/Phrase), tập trung vào Thanh điệu (Tones), Âm đầu (Initials: zh/ch, z/c), Vận mẫu (Finals: an/ang, en/eng).
+  - **Dữ liệu Evidence:** Lưu trữ vào `learner_evidence` với `source: 'pronunciation_lab'`, kỹ năng `pronunciation`.
+  - **Duy trì Streak:** Ghi nhận vào `learning_activities` với `activity_type: 'pronunciation'`.
+- **Shadowing (Luyện Nói Đuổi / Nhại Theo):**
+  - **Mục tiêu:** Huấn luyện cấp độ Câu (Sentence) & Đoạn hội thoại (Discourse), tập trung vào Nhịp độ phát ngôn (Speech Pacing Ratio), Độ liền mạch (Fluency Index) và Ngữ điệu tự nhiên.
+  - **Dữ liệu Evidence:** Lưu trữ vào `learner_evidence` với `source: 'shadowing'`, kỹ năng `shadowing`.
+  - **Duy trì Streak:** Ghi nhận vào `learning_activities` với `activity_type: 'shadowing'`.
+  - **Nguyên tắc phân định:** Hai luồng học tách biệt hoàn toàn về định danh bảng ghi, mục tiêu đánh giá và logic tính điểm; không trộn lẫn kết quả câu dài vào bài luyện thanh điệu đơn lẻ.
+
+### 17.2. Quản Lý Vòng Đời Audio & Quyền Microphone Chuẩn Android
+- **Audio Service Layer (`lib/core/audio/`):**
+  - `AudioPlayerService` và `AudioRecorderService` cung cấp giao diện chuẩn cho việc phát mẫu, lặp (Looping), đổi tốc độ ($0.5\times - 2.0\times$) và thu âm WAV thời gian thực.
+- **Tích hợp An Toàn Vòng Đời (`AppLifecycleManager`):**
+  - Đăng ký phiên thu âm với `AppLifecycleManager.instance.registerAudioSession`.
+  - Khi ứng dụng chuyển sang trạng thái nền (`paused`, `inactive`, `hidden`), hệ thống tự động ngắt và giải phóng microphone ngay lập tức, ngăn ngừa hiện tượng chiếm dụng tài nguyên ngầm và tuân thủ tuyệt đối chính sách bảo mật microphone của Google Play.
+- **Microphone Permission Handling (`PermissionHelper`):**
+  - Giải thích rõ ràng mục đích sử dụng quyền thu âm thông qua Rational Dialog trước khi xin quyền từ hệ thống.
+  - Hỗ trợ mock quyền trong môi trường kiểm thử không có giao diện native OS.
+
+### 17.3. Liêm Chính Học Thuật Trong Đánh Giá Phát Âm
+- **Không Giả Lập Điểm Số (No Fake Tone Scoring):**
+  - Hệ thống chỉ chấm điểm thanh điệu (Tone Accuracy) và âm đầu/cuối khi mô hình âm học phía backend/local thực sự phân tích đường nét cao độ F0 (Pitch Contour).
+  - Khi provider chỉ hỗ trợ nhận dạng văn bản ASR thông thường (`hasAcousticModel: false`), cờ `isAcousticallyAnalyzed` được gán `false`, `toneAccuracy` là `null`, và ứng dụng hiển thị thông báo minh bạch: *"Mô hình chỉ hỗ trợ nhận dạng văn bản ASR. Chưa hỗ trợ bộ phân tích âm học đường nét cao độ (F0) và thanh điệu."*
+- **Không Giả Lập Nhận Xét Accent Bản Xứ (No Fake Accent Scoring):**
+  - Trong luồng Shadowing, hệ thống đánh giá khách quan dựa trên tỷ lệ nhịp độ thời gian:
+    $$\text{Pacing Ratio} = \frac{\text{Thời lượng người học}}{\text{Thời lượng mẫu}}$$
+    và chỉ số đối sánh timeline trực quan. Tuyệt đối không đưa ra các nhận xét cảm tính hoặc chấm điểm giả mạo về "giọng chuẩn bản xứ".
+
+### 17.4. Bảo Vệ Quyền Riêng Tư & Quản Lý File Thu Âm
+- **Mặc định lưu trữ cục bộ (Local-First Storage):**
+  - File thu âm được lưu tạm thời trong thư mục cục bộ của ứng dụng, không gửi ra ngoài internet nếu không có sự đồng ý của người dùng.
+- **Tính năng Xóa File Bản Thu Linh Hoạt (`deleteRecordingAudio`):**
+  - Cho phép người học xóa file âm thanh thu âm bất kỳ lúc nào để giải phóng dung lượng bộ nhớ.
+  - Tùy chọn `retainEvidence: true` cho phép xóa file vật lý trên đĩa nhưng vẫn bảo toàn số liệu thống kê học tập (cập nhật metadata `audio_deleted: true, audio_local_path: null`).
+
+
 
 
 
