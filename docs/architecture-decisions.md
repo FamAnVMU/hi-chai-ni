@@ -784,3 +784,55 @@ Trước khi bước vào Giai đoạn 5 (triển khai 22 phân hệ học tập
   - Tạo các chỉ mục tối ưu truy vấn: `idx_grammar_progress_status` và `idx_grammar_items_hsk`.
   - Phiên bản Database: Nâng cấp tự động lên **v6** (`hi_chinese.db`), tương thích ngược 100% với các phiên bản trước.
 
+---
+
+## 21. Kiến Trúc Practice Engine Dùng Chung Cho Các Module Học
+
+### 21.1. Phân Tách Domain Entities Rõ Ràng & Chuẩn Hóa 7 Dạng Bài Tập
+Hệ thống bài tập thực hành được trừu tượng hóa để dùng chung trên toàn bộ các kỹ năng (Từ vựng, Ngữ pháp, Đọc hiểu, Nghe hiểu, Viết), phân tách triệt để 5 thực thể cốt lõi:
+1. **`ExerciseDefinition`:** Định nghĩa câu hỏi bất biến (ID, Type, Skill, HSK Level, Prompt, Stimulus, Payloads, Rubric, Explanation, Metadata).
+2. **`ExerciseAnswer`:** Dữ liệu câu trả lời của học viên ứng với từng dạng bài (chỉ số lựa chọn, cặp ghép, từ điền, trật tự token, boolean, token lỗi, hoặc câu trả lời tự do).
+3. **`ScoringResult`:** Kết quả đánh giá độc lập (điểm số [0.0 - 1.0], độ tin cậy [0.0 - 1.0], cờ `needsHumanReview`, loại bộ chấm `evaluatorType`, phản hồi sư phạm `feedbackVi`, và chi tiết `breakdown`).
+4. **`ExerciseAttempt`:** Bản ghi một lần làm bài của học viên cho 1 bài tập trong một phiên học cụ thể, có thời lượng `durationMs` và timestamp UTC.
+5. **`PracticeSession`:** Phiên làm bài tập đa câu hỏi, hỗ trợ lưu trạng thái tức thì, tạm dừng và tiếp tục phiên dang dở (`currentIndex`, `status: inProgress/completed`).
+
+### 21.2. Hỗ Trợ 7 Dạng Bài Tập Tối Thiểu
+- **Trắc nghiệm (`multipleChoice`):** Lựa chọn 1 đáp án đúng trong 4 lựa chọn A, B, C, D.
+- **Chọn nghĩa / Pinyin (`selectMeaningOrPinyin`):** Quan sát chữ Hán/câu mục tiêu (`stimulus`), chọn Pinyin hoặc nghĩa tiếng Việt tương ứng.
+- **Ghép cặp (`matchingPairs`):** Giao diện tương tác 2 cột trái - phải. Chấm điểm tỷ lệ (partial credit) dựa trên số cặp ghép chính xác.
+- **Điền từ / Điền chỗ trống (`fillInTheBlank`):** Hiển thị câu có chỗ trống nổi bật. Hỗ trợ chọn từ ngân hàng từ vựng có sẵn (`blankOptions`) hoặc nhập tự do, chuẩn hóa khoảng trắng và dấu câu.
+- **Sắp xếp từ thành câu (`reorderWords`):** Hai khu vực: ngân hàng từ xáo trộn và câu đang ghép. Chạm để thêm hoặc xóa từ, kiểm tra trật tự cú pháp theo câu đích và danh sách các cách diễn đạt được chấp nhận.
+- **Đúng/Sai hoặc Phát hiện lỗi (`trueFalseOrErrorDetection`):**
+  - Chế độ Đúng/Sai: Phán đoán nhận định ngôn ngữ / ngữ nghĩa.
+  - Chế độ Phát hiện lỗi: Câu được chia thành các chip từ có thể chạm vào; học viên tìm đúng từ sai ngữ pháp trong câu.
+- **Câu trả lời ngắn có đáp án / Rubric (`shortAnswer`):** Đánh giá theo rubric từ khóa cốt lõi; minh bạch độ tin cậy và gắn cờ xem xét nếu chỉ đạt một phần.
+
+### 21.3. Cơ Chế Kiểm Thẩm Định Dữ Liệu & Randomization Có Seed
+- **`ExerciseValidator`:** Tự động thẩm định tính toàn vẹn cấu trúc của dữ liệu bài tập trước khi đưa vào luồng học:
+  - Bắt lỗi options < 2 hoặc `correctOptionIndex` vượt giới hạn.
+  - Bắt lỗi thiếu cặp ghép (< 2 cặp) hoặc giá trị rỗng.
+  - Bắt lỗi câu điền từ thiếu ký hiệu chỗ trống (`___`) hoặc thiếu đáp án đích.
+  - Bắt lỗi bài tập sắp xếp có dưới 2 tokens hoặc thiếu câu đích.
+  - Bắt lỗi bài tập phát hiện lỗi nhưng token lỗi không nằm trong câu đề bài.
+- **Randomization có Seed tái lập (Deterministic Reproducibility):**
+  - Các hàm `getShuffledOptions({int? seed})`, `getShuffledMatchingColumns({int? seed})`, và `getShuffledTokens({int? seed})` nhận tham số `seed` tùy chọn qua `Random(seed)`.
+  - Đảm bảo trong unit tests hoặc khi chia sẻ bài tập giữa người học, thứ tự xáo trộn có thể tái lập 100% chuẩn xác.
+
+### 21.4. Chống Gửi Lặp (Debouncing & Idempotency) & Tiếp Tục Phiên Dang Dở
+- **Chống Submit trùng lặp:**
+  - Ở tầng UI: Nút nộp bài tự động disable và chuyển trạng thái `isSubmitting = true`. Sau khi có kết quả chấm, nút lập tức chuyển thành *"Câu tiếp theo"* hoặc *"Hoàn thành phiên"*.
+  - Ở tầng SQLite: Ràng buộc `UNIQUE (session_id, exercise_id)` trên bảng `practice_attempts`. Nếu thao tác gửi bị lặp lại, `recordAttempt` trả về bản ghi attempt hiện có, **tuyệt đối không tính điểm hai lần hay tạo thêm bản ghi**.
+- **Tiếp tục phiên dang dở (Session Resumption):**
+  - Trạng thái phiên làm bài được đồng bộ vào bảng `practice_sessions` tại mỗi câu hỏi.
+  - Khi học viên thoát ứng dụng hoặc bị gián đoạn, `getActiveSession` khôi phục chính xác bài tập đang làm dở kèm toàn bộ các attempt đã làm trước đó.
+
+### 21.5. Cơ Sở Dữ Liệu SQLite & Migration v7
+- **3 Bảng mới được thêm vào schema SQLite:**
+  - `practice_exercises`: Danh mục bài tập tương tác offline (hỗ trợ lưu payload JSON linh hoạt cho mọi dạng bài tập).
+  - `practice_sessions`: Lưu phiên làm bài, vị trí câu hỏi hiện tại, trạng thái, và điểm số tổng kết.
+  - `practice_attempts`: Lưu chi tiết từng lượt làm bài, câu trả lời, điểm số, cờ tin cậy rubric, và thời lượng làm bài.
+- **Lưu vết bằng chứng nguyên tử (Atomic Session Completion):**
+  - Khi hoàn tất phiên làm bài, `completeSession` thực thi transaction khép kín: tính điểm bình quân, cập nhật trạng thái session thành `completed`, ghi nhận `learner_evidence` (content_type: `'practice'`) và chuỗi hoạt động `learning_activities`.
+- **Phiên bản Database:** Nâng cấp tự động lên **v7** (`hi_chinese.db`), tương thích ngược 100% với các phiên bản trước.
+
+

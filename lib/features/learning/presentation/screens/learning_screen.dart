@@ -8,6 +8,7 @@ import '../../../reading/reading.dart';
 import '../../../dictionary/dictionary.dart';
 import '../../../roadmap/roadmap.dart';
 import '../../../grammar/grammar.dart';
+import '../../../practice/practice.dart';
 
 /// Tab 1: Learning Screen featuring structured lessons and HSK roadmap.
 class LearningScreen extends StatefulWidget {
@@ -413,6 +414,53 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) => const GrammarListScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+
+            // Practice Engine Banner Card
+            HiCard(
+              backgroundColor: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.quiz_rounded,
+                    color: Colors.deepPurpleAccent,
+                    size: AppDimensions.iconLg,
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Luyện tập tương tác (Practice Engine)',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '7 dạng bài tập chuẩn mực: trắc nghiệm, ghép cặp, điền từ...',
+                          style: theme.textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  HiButton(
+                    text: 'Luyện tập',
+                    size: HiButtonSize.sm,
+                    variant: HiButtonVariant.primary,
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const PracticeSessionScreen(),
                         ),
                       );
                     },
