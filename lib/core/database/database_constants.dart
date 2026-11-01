@@ -2,7 +2,7 @@ class DatabaseConstants {
   DatabaseConstants._();
 
   static const String databaseName = 'hi_chinese.db';
-  static const int currentDatabaseVersion = 1;
+  static const int currentDatabaseVersion = 2;
 
   // Table names
   static const String tableVocabularies = 'vocabularies';
@@ -15,4 +15,5 @@ class DatabaseConstants {
   static const String tableChatSessions = 'chat_sessions';
   static const String tableChatMessages = 'chat_messages';
   static const String tableLearningActivities = 'learning_activities';
+  static const String tableSeedHistory = 'seed_history';
 }

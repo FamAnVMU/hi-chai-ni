@@ -34,6 +34,15 @@ class VocabularyDao {
     return results.isNotEmpty ? results.first : null;
   }
 
+  Future<Map<String, dynamic>?> getVocabularyWithSenses(String id) async {
+    final vocab = await getVocabularyById(id);
+    if (vocab == null) return null;
+    final senses = await getSensesByVocabularyId(id);
+    final result = Map<String, dynamic>.from(vocab);
+    result['senses'] = senses;
+    return result;
+  }
+
   Future<List<Map<String, dynamic>>> getSensesByVocabularyId(String vocabId) async {
     return await _db.query(
       DatabaseConstants.tableVocabularySenses,

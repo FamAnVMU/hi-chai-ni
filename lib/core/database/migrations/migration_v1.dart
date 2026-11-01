@@ -3,6 +3,8 @@ import '../database_constants.dart';
 import 'migration.dart';
 
 class MigrationV1 implements Migration {
+  const MigrationV1();
+
   @override
   int get version => 1;
 

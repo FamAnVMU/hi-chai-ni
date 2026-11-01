@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'migration.dart';
 import 'migration_v1.dart';
+import 'migration_v2.dart';
 
 class MigrationException implements Exception {
   final String message;
@@ -19,7 +20,10 @@ class MigrationEngine {
   final List<Migration> _migrations;
 
   MigrationEngine({List<Migration>? migrations})
-      : _migrations = migrations ?? [MigrationV1()];
+      : _migrations = migrations ?? [
+          const MigrationV1(),
+          const MigrationV2(),
+        ];
 
   List<Migration> get registeredMigrations => List.unmodifiable(_migrations);
 

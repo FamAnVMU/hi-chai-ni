@@ -1,0 +1,2676 @@
+{
+  "bundleName": "hsk_seed_fixture_v1",
+  "version": 1,
+  "syllabusVersion": "HSK2.0_2012_curated",
+  "source": "halo_chinese_verified_knowledge_registry",
+  "metadata": {
+    "description": "Verified curated HSK seed fixture extracted from legacy audited knowledge registry.",
+    "note": "Initial verified dataset fixture. 1,200+ HSK 1-6 complete dataset requires verified Hanban/CTI standard wordlist.",
+    "vocabCount": 84,
+    "grammarCount": 19,
+    "readingCount": 5
+  },
+  "vocabularies": [
+    {
+      "id": "VOC_HSK1_0001",
+      "simplified": "不知道",
+      "traditional": "不知道",
+      "pinyin": "bù zhī dào",
+      "pinyinClean": "buzhidao",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 1000,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0001_1",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Khái niệm từ ai_tutor: 不知道",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0001_2",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "không biết",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0002",
+      "simplified": "两",
+      "traditional": "兩",
+      "pinyin": "liǎng",
+      "pinyinClean": "liang",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 999,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0002_1",
+          "partOfSpeech": "Số từ",
+          "meaningVi": "hai, một đôi (dùng trước lượng từ)",
+          "examples": [
+            {
+              "zh": "服务员，请给我来两杯咖啡。",
+              "pinyin": "Fúwùyuán, qǐng gěi wǒ lái liǎng bēi kāfēi.",
+              "vi": "Phục vụ ơi, làm ơn cho tôi hai tách cà phê."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0003",
+      "simplified": "中国",
+      "traditional": "中國",
+      "pinyin": "zhōng guó",
+      "pinyinClean": "zhongguo",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 998,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0003_1",
+          "partOfSpeech": "Danh từ riêng",
+          "meaningVi": "Trung Quốc",
+          "examples": [
+            {
+              "zh": "我想去中国留学学习汉语。",
+              "pinyin": "Wǒ xiǎng qù zhōngguó liúxué xuéxí hànyǔ.",
+              "vi": "Tôi muốn sang Trung Quốc du học để học tiếng Hán."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0004",
+      "simplified": "临时词",
+      "traditional": "临时词",
+      "pinyin": "lín shí cí",
+      "pinyinClean": "linshici",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 997,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0004_1",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Từ tạm thời",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0004_2",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Từ tạm thời",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0004_3",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Từ tạm thời",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0004_4",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Từ tạm thời",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0004_5",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Từ tạm thời",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0004_6",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Từ tạm thời",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0004_7",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Từ tạm thời",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0004_8",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Từ tạm thời",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0004_9",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Từ tạm thời",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0004_10",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Từ tạm thời",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0004_11",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Từ tạm thời",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0004_12",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Từ tạm thời",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0004_13",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Từ tạm thời",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0004_14",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Từ tạm thời",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0004_15",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Từ tạm thời",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0004_16",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Từ tạm thời",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0004_17",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Từ tạm thời",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0004_18",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Từ tạm thời",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0004_19",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Từ tạm thời",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0005",
+      "simplified": "买",
+      "traditional": "買",
+      "pinyin": "mǎi",
+      "pinyinClean": "mai",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 996,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0005_1",
+          "partOfSpeech": "Động từ",
+          "meaningVi": "mua (thanh 3, đầu chữ có dấu móc lượn vào)",
+          "examples": [
+            {
+              "zh": "我想去超市买点儿新鲜水果。",
+              "pinyin": "Wǒ xiǎng qù chāoshì mǎi diǎnr xīnxiān shuǐguǒ.",
+              "vi": "Tôi muốn đi siêu thị mua một ít hoa quả tươi."
+            }
+          ]
+        },
+        {
+          "id": "SNS_VOC_HSK1_0005_2",
+          "partOfSpeech": "động từ",
+          "meaningVi": "Mua hàng",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0006",
+      "simplified": "买单",
+      "traditional": "買單",
+      "pinyin": "mǎidān",
+      "pinyinClean": "maidan",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 995,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0006_1",
+          "partOfSpeech": "động từ",
+          "meaningVi": "thanh toán, trả tiền",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0007",
+      "simplified": "二",
+      "traditional": "二",
+      "pinyin": "èr",
+      "pinyinClean": "er",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 994,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0007_1",
+          "partOfSpeech": "Số từ",
+          "meaningVi": "hai, số 2 (dùng đếm số thứ tự, số điện thoại, phép tính)",
+          "examples": [
+            {
+              "zh": "一、二、三，请看镜头！",
+              "pinyin": "Yī, èr, sān, qǐng kàn jìngtóu!",
+              "vi": "Một, hai, ba, xin hãy nhìn vào ống kính!"
+            },
+            {
+              "zh": "第二课的内容很有趣。",
+              "pinyin": "Dì èr kè de nèiróng hěn yǒuqù.",
+              "vi": "Nội dung bài thứ hai rất thú vị."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0008",
+      "simplified": "会",
+      "traditional": "會",
+      "pinyin": "huì",
+      "pinyinClean": "hui",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 993,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0008_1",
+          "partOfSpeech": "Động từ năng nguyện / Danh từ",
+          "meaningVi": "Biết làm một việc gì đó nhờ học tập rèn luyện",
+          "examples": [
+            {
+              "zh": "只要努力，你一定会学好汉语。",
+              "pinyin": "Zhǐyào nǔlì, nǐ yídìng huì xué hǎo hànyǔ.",
+              "vi": "Chỉ cần nỗ lực, bạn nhất định sẽ học giỏi tiếng Hán."
+            }
+          ]
+        },
+        {
+          "id": "SNS_VOC_HSK1_0008_2",
+          "partOfSpeech": "Động từ năng nguyện / Danh từ",
+          "meaningVi": "Biểu thị sự việc có khả năng xảy ra trong tương lai (sẽ)",
+          "examples": [
+            {
+              "zh": "明天会下雨吗？",
+              "pinyin": "Míngtiān huì xiàyǔ ma?",
+              "vi": "Ngày mai trời có mưa không?"
+            }
+          ]
+        },
+        {
+          "id": "SNS_VOC_HSK1_0008_3",
+          "partOfSpeech": "Động từ năng nguyện / Danh từ",
+          "meaningVi": "Cuộc họp, hội nghị (Danh từ)",
+          "examples": [
+            {
+              "zh": "我们正在开会。",
+              "pinyin": "Wǒmen zhèngzài kāihuì.",
+              "vi": "Chúng tôi đang họp."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0009",
+      "simplified": "会议",
+      "traditional": "会议",
+      "pinyin": "huì yì",
+      "pinyinClean": "huiyi",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 992,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0009_1",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "cuộc họp, hội nghị",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0010",
+      "simplified": "但是",
+      "traditional": "但是",
+      "pinyin": "dàn shì",
+      "pinyinClean": "danshi",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 991,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0010_1",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "Khái niệm từ ai_tutor: 但是",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0010_2",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "nhưng, nhưng mà",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0011",
+      "simplified": "你好",
+      "traditional": "你好",
+      "pinyin": "nǐ hǎo",
+      "pinyinClean": "nihao",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 990,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0011_1",
+          "partOfSpeech": "Thán từ chào hỏi",
+          "meaningVi": "xin chào",
+          "examples": [
+            {
+              "zh": "你好！很高兴在这里见到你。",
+              "pinyin": "Nǐ hǎo! Hěn gāoxìng zài zhèlǐ jiàn dào nǐ.",
+              "vi": "Xin chào! Rất vui được gặp bạn ở đây."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0012",
+      "simplified": "再见",
+      "traditional": "再見",
+      "pinyin": "zài jiàn",
+      "pinyinClean": "zaijian",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 989,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0012_1",
+          "partOfSpeech": "Động từ",
+          "meaningVi": "tạm biệt (hẹn gặp lại)",
+          "examples": [
+            {
+              "zh": "时间不早了，我们明天见，再见！",
+              "pinyin": "Shíjiān bù zǎo le, wǒmen míngtiān jiàn, zàijiàn!",
+              "vi": "Không còn sớm nữa rồi, mai chúng ta gặp lại, tạm biệt nhé!"
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0013",
+      "simplified": "医生",
+      "traditional": "醫生",
+      "pinyin": "yī shēng",
+      "pinyinClean": "yisheng",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 988,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0013_1",
+          "partOfSpeech": "Danh từ",
+          "meaningVi": "bác sĩ",
+          "examples": [
+            {
+              "zh": "我的理想是长大以后当一名优秀的医生。",
+              "pinyin": "Wǒ de lǐxiǎng shì zhǎngdà yǐhòu dāng yì míng yōuxiù de yīshēng.",
+              "vi": "Lý tưởng của tôi là sau này lớn lên làm một bác sĩ ưu tú."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0014",
+      "simplified": "卖",
+      "traditional": "賣",
+      "pinyin": "mài",
+      "pinyinClean": "mai",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 987,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0014_1",
+          "partOfSpeech": "Động từ",
+          "meaningVi": "bán (thanh 4, trên đầu có bộ 十)",
+          "examples": [
+            {
+              "zh": "这双鞋子已经卖完了。",
+              "pinyin": "Zhè shuāng xiézi yǐjīng mài wán le.",
+              "vi": "Đôi giày này đã bán hết sạch rồi."
+            }
+          ]
+        },
+        {
+          "id": "SNS_VOC_HSK1_0014_2",
+          "partOfSpeech": "động từ",
+          "meaningVi": "Bán hàng",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0015",
+      "simplified": "可以",
+      "traditional": "可以",
+      "pinyin": "kě yǐ",
+      "pinyinClean": "keyi",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 986,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0015_1",
+          "partOfSpeech": "Động từ năng nguyện / Tính từ",
+          "meaningVi": "có thể (được phép, khả thi, tàm tạm khá tốt)",
+          "examples": [
+            {
+              "zh": "请问，我可以坐在这里吗？",
+              "pinyin": "Qǐngwèn, wǒ kěyǐ zuò zài zhèlǐ ma?",
+              "vi": "Xin hỏi, tôi có thể ngồi ở đây được không?"
+            },
+            {
+              "zh": "这家餐馆的味道还可以。",
+              "pinyin": "Zhè jiā cānguǎn de wèidào hái kěyǐ.",
+              "vi": "Hương vị của quán ăn này cũng tạm được (khá ổn)."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0016",
+      "simplified": "多少",
+      "traditional": "多少",
+      "pinyin": "duōshao",
+      "pinyinClean": "duoshao",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 985,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0016_1",
+          "partOfSpeech": "pronoun",
+          "meaningVi": "bao nhiêu",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0017",
+      "simplified": "多少钱",
+      "traditional": "多少钱",
+      "pinyin": "duōshao qián",
+      "pinyinClean": "duoshao qian",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 984,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0017_1",
+          "partOfSpeech": "phrase",
+          "meaningVi": "bao nhiêu tiền",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0018",
+      "simplified": "天气",
+      "traditional": "天氣",
+      "pinyin": "tiān qì",
+      "pinyinClean": "tianqi",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 983,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0018_1",
+          "partOfSpeech": "Danh từ",
+          "meaningVi": "thời tiết",
+          "examples": [
+            {
+              "zh": "今天天气晴朗，非常适合出去散步。",
+              "pinyin": "Jīntiān tiānqì qínglǎng, fēicháng shìhé chūqù sànbù.",
+              "vi": "Hôm nay thời tiết nắng ráo trong xanh, rất thích hợp ra ngoài đi dạo."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0019",
+      "simplified": "学习",
+      "traditional": "學習",
+      "pinyin": "xué xí",
+      "pinyinClean": "xuexi",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 982,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0019_1",
+          "partOfSpeech": "Động từ / Danh từ",
+          "meaningVi": "Thu nhận kiến thức hoặc kỹ năng qua sách vở, thầy cô hoặc kinh nghiệm",
+          "examples": [
+            {
+              "zh": "我每天坚持学习中文两个小时。",
+              "pinyin": "Wǒ měitiān jiānchí xuéxí zhōngwén liǎng gè xiǎoshí.",
+              "vi": "Tôi kiên trì học tiếng Trung hai tiếng mỗi ngày."
+            },
+            {
+              "zh": "好的学习习惯非常重要。",
+              "pinyin": "Hǎo de xuéxí xíguàn fēicháng zhòngyào.",
+              "vi": "Thói quen học tập tốt là vô cùng quan trọng."
+            }
+          ]
+        },
+        {
+          "id": "SNS_VOC_HSK1_0019_2",
+          "partOfSpeech": "Động từ / Danh từ",
+          "meaningVi": "Noi gương, học hỏi kinh nghiệm tốt từ người khác",
+          "examples": [
+            {
+              "zh": "我们应该向他学习这种认真的精神。",
+              "pinyin": "Wǒmen yīnggāi xiàng tā xuéxí zhè zhǒng rènzhēn de jīngshén.",
+              "vi": "Chúng ta nên học tập tinh thần nghiêm túc này của anh ấy."
+            }
+          ]
+        },
+        {
+          "id": "SNS_VOC_HSK1_0019_3",
+          "partOfSpeech": "Động từ / Danh từ",
+          "meaningVi": "học tập, rèn luyện kiến thức kỹ năng",
+          "examples": [
+            {
+              "zh": "我每天坚持学习中文两个小时。",
+              "pinyin": "Wǒ měitiān jiānchí xuéxí zhōngwén liǎng gè xiǎoshí.",
+              "vi": "Tôi kiên trì học tiếng Trung hai tiếng mỗi ngày."
+            },
+            {
+              "zh": "好的学习习惯非常重要。",
+              "pinyin": "Hǎo de xuéxí xíguàn fēicháng zhòngyào.",
+              "vi": "Thói quen học tập tốt là vô cùng quan trọng."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0020",
+      "simplified": "工作",
+      "traditional": "工作",
+      "pinyin": "gōng zuò",
+      "pinyinClean": "gongzuo",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 981,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0020_1",
+          "partOfSpeech": "Động từ / Danh từ",
+          "meaningVi": "làm việc, công việc",
+          "examples": [
+            {
+              "zh": "他每天努力工作，希望早点儿买房子。",
+              "pinyin": "Tā měitiān nǔlì gōngzuò, xīwàng zǎo diǎnr mǎi fángzi.",
+              "vi": "Anh ấy nỗ lực làm việc mỗi ngày, hy vọng sớm mua được nhà."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0021",
+      "simplified": "怎么",
+      "traditional": "怎麼",
+      "pinyin": "zěnme",
+      "pinyinClean": "zenme",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 980,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0021_1",
+          "partOfSpeech": "đại từ nghi vấn",
+          "meaningVi": "Như thế nào, làm sao",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0022",
+      "simplified": "打",
+      "traditional": "打",
+      "pinyin": "dǎ",
+      "pinyinClean": "da",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 979,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0022_1",
+          "partOfSpeech": "động từ",
+          "meaningVi": "Đánh, đập (tác động lực)",
+          "examples": [
+            {
+              "zh": "别打人。",
+              "pinyin": "Bié dǎ rén.",
+              "vi": "Đừng đánh người."
+            }
+          ]
+        },
+        {
+          "id": "SNS_VOC_HSK1_0022_2",
+          "partOfSpeech": "động từ",
+          "meaningVi": "Gọi điện thoại (打电话)",
+          "examples": [
+            {
+              "zh": "我给他打电话。",
+              "pinyin": "Wǒ gěi tā dǎ diànhuà.",
+              "vi": "Tôi gọi điện cho anh ấy."
+            }
+          ]
+        },
+        {
+          "id": "SNS_VOC_HSK1_0022_3",
+          "partOfSpeech": "động từ",
+          "meaningVi": "Chơi bóng, thể thao bằng tay (打篮球)",
+          "examples": [
+            {
+              "zh": "下午我们去打篮球。",
+              "pinyin": "Xiàwǔ wǒmen qù dǎ lánqiú.",
+              "vi": "Chiều nay chúng ta đi chơi bóng rổ."
+            }
+          ]
+        },
+        {
+          "id": "SNS_VOC_HSK1_0022_4",
+          "partOfSpeech": "động từ",
+          "meaningVi": "Gọi điện thoại (打电话)",
+          "examples": [
+            {
+              "zh": "我给他打电话。",
+              "pinyin": "Wǒ gěi tā dǎ diànhuà.",
+              "vi": "Tôi gọi điện cho anh ấy."
+            }
+          ]
+        },
+        {
+          "id": "SNS_VOC_HSK1_0022_5",
+          "partOfSpeech": "động từ",
+          "meaningVi": "Chơi bóng, thể thao bằng tay (打篮球)",
+          "examples": [
+            {
+              "zh": "下午我们去打篮球。",
+              "pinyin": "Xiàwǔ wǒmen qù dǎ lánqiú.",
+              "vi": "Chiều nay chúng ta đi chơi bóng rổ."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0023",
+      "simplified": "探索",
+      "traditional": "探索",
+      "pinyin": "tàn suǒ",
+      "pinyinClean": "tansuo",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 978,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0023_1",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "thám hiểm, tìm tòi, khám phá",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0024",
+      "simplified": "推迟",
+      "traditional": "推迟",
+      "pinyin": "tuī chí",
+      "pinyinClean": "tuichi",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 977,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0024_1",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "hoãn lại, lùi lịch",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0025",
+      "simplified": "昨天",
+      "traditional": "昨天",
+      "pinyin": "zuótiān",
+      "pinyinClean": "zuotian",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 976,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0025_1",
+          "partOfSpeech": "danh từ chỉ thời gian",
+          "meaningVi": "hôm qua",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0026",
+      "simplified": "朋友",
+      "traditional": "朋友",
+      "pinyin": "péng you",
+      "pinyinClean": "pengyou",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 975,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0026_1",
+          "partOfSpeech": "Danh từ",
+          "meaningVi": "bạn bè, người bạn",
+          "examples": [
+            {
+              "zh": "有朋自远方来，不亦乐乎？",
+              "pinyin": "Yǒu péng zì yuǎnfāng lái, bù yì yuè hū?",
+              "vi": "Có bạn từ phương xa tới thăm, chẳng phải vui mừng lắm sao?"
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0027",
+      "simplified": "未见词",
+      "traditional": "未见词",
+      "pinyin": "wèi jiàn cí",
+      "pinyinClean": "weijianci",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 974,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0027_1",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "từ chưa từng học",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0028",
+      "simplified": "机场",
+      "traditional": "机场",
+      "pinyin": "jī chǎng",
+      "pinyinClean": "jichang",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 973,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0028_1",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "sân bay",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0029",
+      "simplified": "水果",
+      "traditional": "水果",
+      "pinyin": "shuǐguǒ",
+      "pinyinClean": "shuiguo",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 972,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0029_1",
+          "partOfSpeech": "danh từ",
+          "meaningVi": "hoa quả",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0030",
+      "simplified": "电脑",
+      "traditional": "电脑",
+      "pinyin": "diàn nǎo",
+      "pinyinClean": "diannao",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 971,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0030_1",
+          "partOfSpeech": "danh từ",
+          "meaningVi": "Máy vi tính, máy tính",
+          "examples": []
+        },
+        {
+          "id": "SNS_VOC_HSK1_0030_2",
+          "partOfSpeech": "danh từ",
+          "meaningVi": "Máy tính để bàn hoặc xách tay",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0031",
+      "simplified": "看",
+      "traditional": "看",
+      "pinyin": "kàn",
+      "pinyinClean": "kan",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 970,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0031_1",
+          "partOfSpeech": "Động từ",
+          "meaningVi": "Dùng mắt để hướng vào một vật",
+          "examples": [
+            {
+              "zh": "你看这件衣服好看吗？",
+              "pinyin": "Nǐ kàn zhè jiàn yīfu hǎokàn ma?",
+              "vi": "Bạn xem bộ quần áo này có đẹp không?"
+            }
+          ]
+        },
+        {
+          "id": "SNS_VOC_HSK1_0031_2",
+          "partOfSpeech": "Động từ",
+          "meaningVi": "Đọc (sách, báo, tài liệu)",
+          "examples": [
+            {
+              "zh": "他正在安静地看书。",
+              "pinyin": "Tā zhèngzài ānjìng de kànshū.",
+              "vi": "Anh ấy đang yên lặng đọc sách."
+            }
+          ]
+        },
+        {
+          "id": "SNS_VOC_HSK1_0031_3",
+          "partOfSpeech": "Động từ",
+          "meaningVi": "Thăm hỏi người quen hoặc đến bác sĩ khám bệnh",
+          "examples": [
+            {
+              "zh": "周末我去医院看望生病的老师。",
+              "pinyin": "Zhōumò wǒ qù yīyuàn kànwàng shēngbìng de lǎoshī.",
+              "vi": "Cuối tuần tôi đi bệnh viện thăm thầy giáo bị ốm."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0032",
+      "simplified": "看见",
+      "traditional": "看見",
+      "pinyin": "kàn jiàn",
+      "pinyinClean": "kanjian",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 969,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0032_1",
+          "partOfSpeech": "Động từ (kết cấu động bổ)",
+          "meaningVi": "nhìn thấy, trông thấy (có kết quả)",
+          "examples": [
+            {
+              "zh": "你看见我的手机了吗？",
+              "pinyin": "Nǐ kànjiàn wǒ de shǒujī le ma?",
+              "vi": "Bạn có nhìn thấy điện thoại của tôi ở đâu không?"
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0033",
+      "simplified": "知道",
+      "traditional": "知道",
+      "pinyin": "zhī dào",
+      "pinyinClean": "zhidao",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 968,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0033_1",
+          "partOfSpeech": "Động từ",
+          "meaningVi": "biết (thông tin, sự việc, sự thực)",
+          "examples": [
+            {
+              "zh": "你知道今天下午几点开会吗？",
+              "pinyin": "Nǐ zhīdào jīntiān xiàwǔ jǐ diǎn kāihuì ma?",
+              "vi": "Bạn có biết chiều nay mấy giờ họp không?"
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0034",
+      "simplified": "结账",
+      "traditional": "結賬",
+      "pinyin": "jiézhàng",
+      "pinyinClean": "jiezhang",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 967,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0034_1",
+          "partOfSpeech": "động từ",
+          "meaningVi": "thanh toán, tính tiền",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0035",
+      "simplified": "能",
+      "traditional": "能",
+      "pinyin": "néng",
+      "pinyinClean": "neng",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 966,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0035_1",
+          "partOfSpeech": "Động từ năng nguyện",
+          "meaningVi": "có thể (năng lực bẩm sinh, điều kiện khách quan cho phép)",
+          "examples": [
+            {
+              "zh": "我现在嗓子疼，不能大声说话。",
+              "pinyin": "Wǒ xiànzài sǎngzi téng, bù néng dà shēng shuōhuà.",
+              "vi": "Bây giờ họng tôi bị đau, không thể nói lớn tiếng được."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0036",
+      "simplified": "苹果",
+      "traditional": "蘋果",
+      "pinyin": "píng guǒ",
+      "pinyinClean": "pingguo",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 965,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0036_1",
+          "partOfSpeech": "Danh từ",
+          "meaningVi": "quả táo",
+          "examples": [
+            {
+              "zh": "一天一苹果，医生远离我。",
+              "pinyin": "Yì tiān yì píngguǒ, yīshēng yuǎnlí wǒ.",
+              "vi": "Mỗi ngày ăn một quả táo, bác sĩ tránh xa tôi (ngạn ngữ phương Tây)."
+            }
+          ]
+        },
+        {
+          "id": "SNS_VOC_HSK1_0036_2",
+          "partOfSpeech": "Danh từ",
+          "meaningVi": "Tôi muốn mua hai cân táo.",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0037",
+      "simplified": "西瓜",
+      "traditional": "西瓜",
+      "pinyin": "xīguā",
+      "pinyinClean": "xigua",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 964,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0037_1",
+          "partOfSpeech": "danh từ",
+          "meaningVi": "dưa hấu",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0038",
+      "simplified": "认识",
+      "traditional": "認識",
+      "pinyin": "rèn shí",
+      "pinyinClean": "renshi",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 963,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0038_1",
+          "partOfSpeech": "Động từ / Danh từ",
+          "meaningVi": "quen biết, nhận biết, nhận diện mặt người/chữ",
+          "examples": [
+            {
+              "zh": "很高兴认识你，我是阮明安。",
+              "pinyin": "Hěn gāoxìng rènshí nǐ, wǒ shì Ruǎn Míng'ān.",
+              "vi": "Rất vui được quen biết bạn, tôi là Nguyễn Minh An."
+            },
+            {
+              "zh": "这个汉字我认识，但不会写。",
+              "pinyin": "Zhè gè hànzì wǒ rènshí, dàn bú huì xiě.",
+              "vi": "Chữ Hán này tôi nhận mặt được, nhưng không biết viết."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0039",
+      "simplified": "词典词",
+      "traditional": "词典词",
+      "pinyin": "cí diǎn cí",
+      "pinyinClean": "cidianci",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 962,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0039_1",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "từ vựng tra cứu từ điển",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0040",
+      "simplified": "谢谢",
+      "traditional": "謝謝",
+      "pinyin": "xiè xie",
+      "pinyinClean": "xiexie",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 961,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0040_1",
+          "partOfSpeech": "Động từ",
+          "meaningVi": "cảm ơn",
+          "examples": [
+            {
+              "zh": "非常感谢你的热情帮助！",
+              "pinyin": "Fēicháng gǎnxiè nǐ de rèqíng bāngzhù!",
+              "vi": "Vô cùng cảm ơn sự giúp đỡ nhiệt tình của bạn!"
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0041",
+      "simplified": "超市",
+      "traditional": "超市",
+      "pinyin": "chāoshì",
+      "pinyinClean": "chaoshi",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 960,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0041_1",
+          "partOfSpeech": "danh từ",
+          "meaningVi": "siêu thị",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0042",
+      "simplified": "钱",
+      "traditional": "钱",
+      "pinyin": "qián",
+      "pinyinClean": "qian",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 959,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0042_1",
+          "partOfSpeech": "noun",
+          "meaningVi": "tiền",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK1_0043",
+      "simplified": "高兴",
+      "traditional": "高兴",
+      "pinyin": "gāoxìng",
+      "pinyinClean": "gaoxing",
+      "hskLevel": 1,
+      "hskVersion": "3.0",
+      "frequency": 958,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK1_0043_1",
+          "partOfSpeech": "tính từ",
+          "meaningVi": "vui vẻ",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK2_0044",
+      "simplified": "一点儿",
+      "traditional": "一點兒",
+      "pinyin": "yī diǎnr",
+      "pinyinClean": "yidianr",
+      "hskLevel": 2,
+      "hskVersion": "3.0",
+      "frequency": 957,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK2_0044_1",
+          "partOfSpeech": "Cụm từ / Số lượng từ",
+          "meaningVi": "một chút, một ít (đứng sau tính từ hoặc trước danh từ)",
+          "examples": [
+            {
+              "zh": "请说得慢一点儿，我刚学中文。",
+              "pinyin": "Qǐng shuō de màn yìdiǎnr, wǒ gāng xué zhōngwén.",
+              "vi": "Xin hãy nói chậm lại một chút, tôi vừa mới học tiếng Trung."
+            },
+            {
+              "zh": "我想买一点儿茶叶。",
+              "pinyin": "Wǒ xiǎng mǎi yìdiǎnr cháyè.",
+              "vi": "Tôi muốn mua một ít lá trà."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK2_0045",
+      "simplified": "一碗",
+      "traditional": "一碗",
+      "pinyin": "yī wǎn",
+      "pinyinClean": "yi wan",
+      "hskLevel": 2,
+      "hskVersion": "3.0",
+      "frequency": 956,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK2_0045_1",
+          "partOfSpeech": "measure_word",
+          "meaningVi": "một bát, một chén",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK2_0046",
+      "simplified": "为什么",
+      "traditional": "為什麼",
+      "pinyin": "wèishénme",
+      "pinyinClean": "weishenme",
+      "hskLevel": 2,
+      "hskVersion": "3.0",
+      "frequency": 955,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK2_0046_1",
+          "partOfSpeech": "đại từ nghi vấn",
+          "meaningVi": "Tại sao, vì sao",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK2_0047",
+      "simplified": "图书馆",
+      "traditional": "图书馆",
+      "pinyin": "túshūguǎn",
+      "pinyinClean": "tushuguan",
+      "hskLevel": 2,
+      "hskVersion": "3.0",
+      "frequency": 954,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK2_0047_1",
+          "partOfSpeech": "từ vựng",
+          "meaningVi": "thư viện",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK2_0048",
+      "simplified": "复习",
+      "traditional": "複習",
+      "pinyin": "fù xí",
+      "pinyinClean": "fuxi",
+      "hskLevel": 2,
+      "hskVersion": "3.0",
+      "frequency": 953,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK2_0048_1",
+          "partOfSpeech": "Động từ",
+          "meaningVi": "ôn tập, ôn lại bài cũ",
+          "examples": [
+            {
+              "zh": "温故而知新，每天都要复习。",
+              "pinyin": "Wēn gù ér zhī xīn, měitiān dōu yào fùxí.",
+              "vi": "Ôn cũ biết mới, ngày nào cũng phải ôn tập."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK2_0049",
+      "simplified": "帮助",
+      "traditional": "幫助",
+      "pinyin": "bāng zhù",
+      "pinyinClean": "bangzhu",
+      "hskLevel": 2,
+      "hskVersion": "3.0",
+      "frequency": 952,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK2_0049_1",
+          "partOfSpeech": "Động từ / Danh từ",
+          "meaningVi": "giúp đỡ, sự trợ giúp",
+          "examples": [
+            {
+              "zh": "同学之间应该互相关心，互相帮助。",
+              "pinyin": "Tóngxué zhījiān yīnggāi hùxiāng guānxīn, hùxiāng bāngzhù.",
+              "vi": "Giữa các bạn học nên quan tâm lẫn nhau, giúp đỡ lẫn nhau."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK2_0050",
+      "simplified": "开始",
+      "traditional": "開始",
+      "pinyin": "kāi shǐ",
+      "pinyinClean": "kaishi",
+      "hskLevel": 2,
+      "hskVersion": "3.0",
+      "frequency": 951,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK2_0050_1",
+          "partOfSpeech": "Động từ / Danh từ",
+          "meaningVi": "bắt đầu, khởi đầu",
+          "examples": [
+            {
+              "zh": "良好的开端是成功的一半。",
+              "pinyin": "Liánghǎo de kāiduān shì chénggōng de yíbàn.",
+              "vi": "Khởi đầu tốt đẹp là một nửa của thành công."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK2_0051",
+      "simplified": "得",
+      "traditional": "得",
+      "pinyin": "de / děi / dé",
+      "pinyinClean": "dedeide",
+      "hskLevel": 2,
+      "hskVersion": "3.0",
+      "frequency": 950,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK2_0051_1",
+          "partOfSpeech": "Đa âm tiết: Trợ từ / Động từ năng nguyện / Động từ",
+          "meaningVi": "Đọc là de (thanh nhẹ): Trợ từ kết cấu đứng sau động từ để dẫn ra bổ ngữ trạng thái/mức độ",
+          "examples": [
+            {
+              "zh": "你得认真准备才能取得好成绩。",
+              "pinyin": "Nǐ děi rènzhēn zhǔnbèi cái néng qǔdé hǎo chéngjì.",
+              "vi": "Bạn phải chuẩn bị nghiêm túc thì mới có thể đạt được thành tích tốt."
+            }
+          ]
+        },
+        {
+          "id": "SNS_VOC_HSK2_0051_2",
+          "partOfSpeech": "Đa âm tiết: Trợ từ / Động từ năng nguyện / Động từ",
+          "meaningVi": "Đọc là děi (thanh 3): Phải, cần phải (khẩu ngữ tương đương 必须)",
+          "examples": [
+            {
+              "zh": "时间不早了，我得走了。",
+              "pinyin": "Shíjiān bù zǎo le, wǒ děi zǒu le.",
+              "vi": "Thời gian không còn sớm nữa, tôi phải đi rồi."
+            }
+          ]
+        },
+        {
+          "id": "SNS_VOC_HSK2_0051_3",
+          "partOfSpeech": "Đa âm tiết: Trợ từ / Động từ năng nguyện / Động từ",
+          "meaningVi": "Đọc là dé (thanh 2): Đạt được, nhận được giải thưởng hoặc điểm số",
+          "examples": [
+            {
+              "zh": "他在比赛中得了一等奖。",
+              "pinyin": "Tā zài bǐsài zhōng dé le yī děng jiǎng.",
+              "vi": "Anh ấy đã đạt giải nhất trong cuộc thi."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK2_0052",
+      "simplified": "时间",
+      "traditional": "時間",
+      "pinyin": "shí jiān",
+      "pinyinClean": "shijian",
+      "hskLevel": 2,
+      "hskVersion": "3.0",
+      "frequency": 949,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK2_0052_1",
+          "partOfSpeech": "Danh từ",
+          "meaningVi": "thời gian",
+          "examples": [
+            {
+              "zh": "一寸光阴一寸金，寸金难买寸光阴。",
+              "pinyin": "Yí cùn guāngyīn yí cùn jīn, cùn jīn nán mǎi cùn guāngyīn.",
+              "vi": "Tấc bóng thời gian tấc vàng ròng, tấc vàng khó mua tấc thời gian."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK2_0053",
+      "simplified": "有点儿",
+      "traditional": "有點兒",
+      "pinyin": "yǒu diǎnr",
+      "pinyinClean": "youdianr",
+      "hskLevel": 2,
+      "hskVersion": "3.0",
+      "frequency": 948,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK2_0053_1",
+          "partOfSpeech": "Phó từ",
+          "meaningVi": "hơi, có chút (thường mang sắc thái không vừa ý, đứng trước tính từ)",
+          "examples": [
+            {
+              "zh": "今天工作了一整天，我现在有点儿累。",
+              "pinyin": "Jīntiān gōngzuò le yì zhěng tiān, wǒ xiànzài yǒudiǎnr lèi.",
+              "vi": "Hôm nay làm việc cả ngày ròng, bây giờ tôi thấy hơi mệt."
+            }
+          ]
+        },
+        {
+          "id": "SNS_VOC_HSK2_0053_2",
+          "partOfSpeech": "phó từ",
+          "meaningVi": "hơi (thường dùng cho điều không ưng ý)",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK2_0054",
+      "simplified": "点餐",
+      "traditional": "點餐",
+      "pinyin": "diǎn cān",
+      "pinyinClean": "diancan",
+      "hskLevel": 2,
+      "hskVersion": "3.0",
+      "frequency": 947,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK2_0054_1",
+          "partOfSpeech": "động từ",
+          "meaningVi": "Gọi món, gọi thức ăn",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK2_0055",
+      "simplified": "练习",
+      "traditional": "練習",
+      "pinyin": "liàn xí",
+      "pinyinClean": "lianxi",
+      "hskLevel": 2,
+      "hskVersion": "3.0",
+      "frequency": 946,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK2_0055_1",
+          "partOfSpeech": "Động từ / Danh từ",
+          "meaningVi": "luyện tập, bài tập rèn luyện",
+          "examples": [
+            {
+              "zh": "学完生词以后，我们应该多做练习。",
+              "pinyin": "Xué wán shēngcí yǐhòu, wǒmen yīnggāi duō zuò liànxí.",
+              "vi": "Sau khi học xong từ mới, chúng ta nên làm nhiều bài tập."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK2_0056",
+      "simplified": "行",
+      "traditional": "行",
+      "pinyin": "xíng / háng",
+      "pinyinClean": "xinghang",
+      "hskLevel": 2,
+      "hskVersion": "3.0",
+      "frequency": 945,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK2_0056_1",
+          "partOfSpeech": "Đa âm tiết: Động từ / Danh từ / Lượng từ",
+          "meaningVi": "Đọc là xíng: được, chấp thuận, làm được",
+          "examples": [
+            {
+              "zh": "行行出状元 (háng háng chū zhuàngyuan)。",
+              "pinyin": "Háng háng chū zhuàngyuan.",
+              "vi": "Ngành nghề nào cũng có thể xuất hiện nhân tài kiệt xuất."
+            }
+          ]
+        },
+        {
+          "id": "SNS_VOC_HSK2_0056_2",
+          "partOfSpeech": "Đa âm tiết: Động từ / Danh từ / Lượng từ",
+          "meaningVi": "Đọc là xíng: đi bộ, di chuyển (hành trình)",
+          "examples": [
+            {
+              "zh": "千里之行，始于足下。",
+              "pinyin": "Qiān lǐ zhī xíng, shǐ yú zú xià.",
+              "vi": "Hành trình ngàn dặm bắt đầu từ một bước chân."
+            }
+          ]
+        },
+        {
+          "id": "SNS_VOC_HSK2_0056_3",
+          "partOfSpeech": "Đa âm tiết: Động từ / Danh từ / Lượng từ",
+          "meaningVi": "Đọc là háng: ngành nghề, ngân hàng (nghiệp, hàng)",
+          "examples": [
+            {
+              "zh": "我要去中国银行换钱。",
+              "pinyin": "Wǒ yào qù Zhōngguó Yínháng huàn qián.",
+              "vi": "Tôi phải đến Ngân hàng Trung Quốc đổi tiền."
+            }
+          ]
+        },
+        {
+          "id": "SNS_VOC_HSK2_0056_4",
+          "partOfSpeech": "Đa âm tiết: Động từ / Danh từ / Lượng từ",
+          "meaningVi": "Đọc là háng: hàng, dòng (Lượng từ)",
+          "examples": [
+            {
+              "zh": "第一行写名字。",
+              "pinyin": "Dì yī háng xiě míngzì.",
+              "vi": "Dòng thứ nhất viết tên."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK2_0057",
+      "simplified": "觉得",
+      "traditional": "覺得",
+      "pinyin": "jué de",
+      "pinyinClean": "juede",
+      "hskLevel": 2,
+      "hskVersion": "3.0",
+      "frequency": 944,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK2_0057_1",
+          "partOfSpeech": "Động từ",
+          "meaningVi": "cảm thấy, thấy rằng (cảm nhận trực giác, quan điểm cá nhân)",
+          "examples": [
+            {
+              "zh": "你觉得这道中国菜味道怎么样？",
+              "pinyin": "Nǐ juéde zhè dào zhōngguó cài wèidào zěnmeyàng?",
+              "vi": "Bạn cảm thấy mùi vị món ăn Trung Quốc này như thế nào?"
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0058",
+      "simplified": "不很好",
+      "traditional": "不很好",
+      "pinyin": "bù hěn hǎo",
+      "pinyinClean": "buhenhao",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 943,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0058_1",
+          "partOfSpeech": "phó từ + tính từ",
+          "meaningVi": "không rất tốt (dùng sai cấu trúc phủ định với 很)",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0059",
+      "simplified": "东西",
+      "traditional": "东西",
+      "pinyin": "dōngxi",
+      "pinyinClean": "dongxi",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 942,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0059_1",
+          "partOfSpeech": "danh từ",
+          "meaningVi": "đồ đạc, đồ vật",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0060",
+      "simplified": "买东西",
+      "traditional": "买东西",
+      "pinyin": "mǎi dōngxi",
+      "pinyinClean": "maidongxi",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 941,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0060_1",
+          "partOfSpeech": "cụm động - tân",
+          "meaningVi": "mua sắm",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0061",
+      "simplified": "了解",
+      "traditional": "了解",
+      "pinyin": "liǎo jiě",
+      "pinyinClean": "liaojie",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 940,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0061_1",
+          "partOfSpeech": "Động từ",
+          "meaningVi": "hiểu rõ, thấu hiểu tường tận, tìm hiểu",
+          "examples": [
+            {
+              "zh": "通过这次旅行，我对中国传统文化有了更深的了解。",
+              "pinyin": "Tōngguò zhè cì lǚxíng, wǒ duì zhōngguó chuántǒng wénhuà yǒu le gèng shēn de liǎojiě.",
+              "vi": "Qua chuyến du lịch lần này, tôi đã hiểu sâu sắc hơn về văn hóa truyền thống Trung Quốc."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0062",
+      "simplified": "今天",
+      "traditional": "今天",
+      "pinyin": "jīntiān",
+      "pinyinClean": "jintian",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 939,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0062_1",
+          "partOfSpeech": "danh từ chỉ thời gian",
+          "meaningVi": "hôm nay",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0063",
+      "simplified": "八点",
+      "traditional": "八点",
+      "pinyin": "bā diǎn",
+      "pinyinClean": "badian",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 938,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0063_1",
+          "partOfSpeech": "cụm từ chỉ thời gian",
+          "meaningVi": "tám giờ",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0064",
+      "simplified": "刚",
+      "traditional": "剛",
+      "pinyin": "gāng",
+      "pinyinClean": "gang",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 937,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0064_1",
+          "partOfSpeech": "Phó từ",
+          "meaningVi": "vừa mới (phó từ chỉ thời gian gần, đứng ngay trước động từ)",
+          "examples": [
+            {
+              "zh": "我刚到北京，天气很舒服。",
+              "pinyin": "Wǒ gāng dào Běijīng, tiānqì hěn shūfu.",
+              "vi": "Tôi vừa mới đến Bắc Kinh, thời tiết rất dễ chịu."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0065",
+      "simplified": "刚才",
+      "traditional": "剛才",
+      "pinyin": "gāng cái",
+      "pinyinClean": "gangcai",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 936,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0065_1",
+          "partOfSpeech": "Danh từ thời gian",
+          "meaningVi": "vừa nãy, lúc nãy (danh từ chỉ thời gian)",
+          "examples": [
+            {
+              "zh": "刚才有人给你打了一个电话。",
+              "pinyin": "Gāngcái yǒurén gěi nǐ dǎ le yí gè diànhuà.",
+              "vi": "Vừa nãy có người gọi điện thoại cho bạn đấy."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0066",
+      "simplified": "北京烤鸭",
+      "traditional": "北京烤鸭",
+      "pinyin": "Běijīng kǎoyā",
+      "pinyinClean": "beijingkaoya",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 935,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0066_1",
+          "partOfSpeech": "danh từ/tân ngữ",
+          "meaningVi": "vịt quay Bắc Kinh",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0067",
+      "simplified": "去",
+      "traditional": "去",
+      "pinyin": "qù",
+      "pinyinClean": "qu",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 934,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0067_1",
+          "partOfSpeech": "động từ",
+          "meaningVi": "đi",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0068",
+      "simplified": "吃",
+      "traditional": "吃",
+      "pinyin": "chī",
+      "pinyinClean": "chi",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 933,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0068_1",
+          "partOfSpeech": "động từ",
+          "meaningVi": "ăn",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0069",
+      "simplified": "味道",
+      "traditional": "味道",
+      "pinyin": "wèidao",
+      "pinyinClean": "weidao",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 932,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0069_1",
+          "partOfSpeech": "danh từ",
+          "meaningVi": "mùi vị",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0070",
+      "simplified": "和",
+      "traditional": "和",
+      "pinyin": "hé",
+      "pinyinClean": "he",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 931,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0070_1",
+          "partOfSpeech": "liên từ",
+          "meaningVi": "và",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0071",
+      "simplified": "商店",
+      "traditional": "商店",
+      "pinyin": "shāngdiàn",
+      "pinyinClean": "shangdian",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 930,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0071_1",
+          "partOfSpeech": "danh từ địa điểm",
+          "meaningVi": "cửa hàng, tiệm tạp hóa",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0072",
+      "simplified": "喝",
+      "traditional": "喝",
+      "pinyin": "hē",
+      "pinyinClean": "he",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 929,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0072_1",
+          "partOfSpeech": "động từ",
+          "meaningVi": "uống",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0073",
+      "simplified": "很",
+      "traditional": "很",
+      "pinyin": "hěn",
+      "pinyinClean": "hen",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 928,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0073_1",
+          "partOfSpeech": "Phó từ mức độ",
+          "meaningVi": "Rất",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0074",
+      "simplified": "很好",
+      "traditional": "很好",
+      "pinyin": "hěn hǎo",
+      "pinyinClean": "henhao",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 927,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0074_1",
+          "partOfSpeech": "cụm hình dung từ",
+          "meaningVi": "rất tốt, rất đẹp",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0075",
+      "simplified": "我",
+      "traditional": "我",
+      "pinyin": "wǒ",
+      "pinyinClean": "wo",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 926,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0075_1",
+          "partOfSpeech": "đại từ",
+          "meaningVi": "tôi, mình",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0076",
+      "simplified": "打算",
+      "traditional": "打算",
+      "pinyin": "dǎsuàn",
+      "pinyinClean": "dasuan",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 925,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0076_1",
+          "partOfSpeech": "động từ",
+          "meaningVi": "dự định",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0077",
+      "simplified": "牛奶",
+      "traditional": "牛奶",
+      "pinyin": "niúnǎi",
+      "pinyinClean": "niunai",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 924,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0077_1",
+          "partOfSpeech": "danh từ",
+          "meaningVi": "sữa bò",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0078",
+      "simplified": "牛肉面",
+      "traditional": "牛肉面",
+      "pinyin": "niúròumiàn",
+      "pinyinClean": "niuroumian",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 923,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0078_1",
+          "partOfSpeech": "noun",
+          "meaningVi": "mì thịt bò",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0079",
+      "simplified": "用",
+      "traditional": "用",
+      "pinyin": "yòng",
+      "pinyinClean": "yong",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 922,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0079_1",
+          "partOfSpeech": "động từ",
+          "meaningVi": "dùng, sử dụng",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0080",
+      "simplified": "筷子",
+      "traditional": "筷子",
+      "pinyin": "kuàizi",
+      "pinyinClean": "kuaizi",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 921,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0080_1",
+          "partOfSpeech": "danh từ",
+          "meaningVi": "đũa",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0081",
+      "simplified": "认为",
+      "traditional": "認為",
+      "pinyin": "rèn wéi",
+      "pinyinClean": "renwei",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 920,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0081_1",
+          "partOfSpeech": "Động từ",
+          "meaningVi": "cho rằng, nhận định rằng (lý tính, trang trọng)",
+          "examples": [
+            {
+              "zh": "我们认为健康比金钱更加宝贵。",
+              "pinyin": "Wǒmen rènwéi jiànkāng bǐ jīnqián gèngjiā bǎoguì.",
+              "vi": "Chúng tôi cho rằng sức khỏe quý giá hơn tiền bạc rất nhiều."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0082",
+      "simplified": "说",
+      "traditional": "说",
+      "pinyin": "shuō",
+      "pinyinClean": "shuo",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 919,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0082_1",
+          "partOfSpeech": "động từ",
+          "meaningVi": "nói",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK3_0083",
+      "simplified": "面包",
+      "traditional": "面包",
+      "pinyin": "miànbāo",
+      "pinyinClean": "mianbao",
+      "hskLevel": 3,
+      "hskVersion": "3.0",
+      "frequency": 918,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK3_0083_1",
+          "partOfSpeech": "danh từ",
+          "meaningVi": "bánh mì",
+          "examples": []
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    },
+    {
+      "id": "VOC_HSK4_0084",
+      "simplified": "观看",
+      "traditional": "觀看",
+      "pinyin": "guān kàn",
+      "pinyinClean": "guankan",
+      "hskLevel": 4,
+      "hskVersion": "3.0",
+      "frequency": 917,
+      "senses": [
+        {
+          "id": "SNS_VOC_HSK4_0084_1",
+          "partOfSpeech": "Động từ",
+          "meaningVi": "xem, theo dõi (sự kiện, tiết mục biểu diễn, thi đấu)",
+          "examples": [
+            {
+              "zh": "数万名观众在现场观看了这场精彩的开幕式。",
+              "pinyin": "Shù wàn míng guānzhòng zài xiànchǎng guānkàn le zhè chǎng jīngcǎi de kāimùshì.",
+              "vi": "Hàng vạn khán giả đã theo dõi trực tiếp lễ khai mạc đặc sắc này tại hiện trường."
+            }
+          ]
+        }
+      ],
+      "source": "halo_chinese_verified_knowledge_registry",
+      "syllabusVersion": "HSK2.0_2012"
+    }
+  ],
+  "grammarItems": [
+    {
+      "id": "GRA_HSK1_0001",
+      "code": "gra_cấu_trúc_câu_hỏi_với_怎么_phương_thức_hành",
+      "hskLevel": 1,
+      "title": "Cấu trúc câu hỏi với 怎么 (Phương thức hành động)",
+      "pattern": "Chủ ngữ + 怎么 + Động từ + (Tân ngữ)?",
+      "explanationVi": "Làm thế nào để thực hiện một hành động (phương thức, cách thức)",
+      "examples": []
+    },
+    {
+      "id": "GRA_HSK1_0002",
+      "code": "gra_câu_chữ_是_câu_phán_đoán",
+      "hskLevel": 1,
+      "title": "Câu chữ 是 (Câu phán đoán)",
+      "pattern": "Chủ ngữ + 是 + Danh từ/Cụm danh từ",
+      "explanationVi": "A là B (Khẳng định tính chất, thân phận, nghề nghiệp)",
+      "examples": []
+    },
+    {
+      "id": "GRA_HSK1_0003",
+      "code": "gra_phân_biệt_怎么_và_为什么",
+      "hskLevel": 1,
+      "title": "Phân biệt 怎么 và 为什么",
+      "pattern": "为什么 + [Chủ ngữ] + [Động từ/Tính từ]?",
+      "explanationVi": "Hỏi nguyên nhân tại sao lại thế này/thế kia",
+      "examples": []
+    },
+    {
+      "id": "GRA_HSK1_0004",
+      "code": "gra_trật_tự_từ_chỉ_thời_gian_và_địa_điểm_tro",
+      "hskLevel": 1,
+      "title": "Trật tự từ chỉ thời gian và địa điểm trong câu",
+      "pattern": "Chủ ngữ + Thời gian + Địa điểm + Động từ + Tân ngữ",
+      "explanationVi": "Quy định vị trí của trạng ngữ thời gian và địa điểm trước động từ.",
+      "examples": []
+    },
+    {
+      "id": "GRA_HSK1_0005",
+      "code": "gra_cách_dùng_的_de_với_tính_từ",
+      "hskLevel": 1,
+      "title": "Cách dùng 的 (de) với tính từ",
+      "pattern": "Tính từ + 便宜 (rẻ)",
+      "explanationVi": "Biểu thị mức độ giá cả",
+      "examples": []
+    },
+    {
+      "id": "GRA_HSK1_0006",
+      "code": "gra_trật_tự_từ_chỉ_thời_gian_và_địa_điểm",
+      "hskLevel": 1,
+      "title": "Trật tự từ chỉ thời gian và địa điểm",
+      "pattern": "Chủ ngữ + Thời gian + Địa điểm + Động từ + Tân ngữ",
+      "explanationVi": "Biểu thị ai làm gì ở đâu vào lúc nào",
+      "examples": []
+    },
+    {
+      "id": "GRA_HSK1_0007",
+      "code": "gra_phân_biệt_有点儿_và_比较",
+      "hskLevel": 1,
+      "title": "Phân biệt 有点儿 và 比较",
+      "pattern": "有点儿 + Tính từ mang nghĩa không vừa ý / 比较 + Tính từ khách quan",
+      "explanationVi": "Biểu mức độ của tính từ",
+      "examples": []
+    },
+    {
+      "id": "GRA_HSK1_0008",
+      "code": "gra_cấu_trúc_了",
+      "hskLevel": 1,
+      "title": "Cấu trúc 了",
+      "pattern": "Cấu trúc chuẩn",
+      "explanationVi": "Trợ từ động thái biểu thị hành động đã hoàn thành",
+      "examples": []
+    },
+    {
+      "id": "GRA_HSK1_0009",
+      "code": "gra_phủ_định_của_tính_từ_với_很",
+      "hskLevel": 1,
+      "title": "Phủ định của tính từ với 很",
+      "pattern": "S + 不太 + Tính từ",
+      "explanationVi": "Biểu thị mức độ không quá/không lắm (tránh dùng 不很 trực tiếp với tính từ đơn tiết)",
+      "examples": []
+    },
+    {
+      "id": "GRA_HSK2_0010",
+      "code": "gra_cấu_trúc_câu_chữ_把",
+      "hskLevel": 2,
+      "title": "Cấu trúc câu chữ 把",
+      "pattern": "Cấu trúc chuẩn",
+      "explanationVi": "Câu chữ 把 biểu thị sự tác động làm thay đổi trạng thái của tân ngữ",
+      "examples": []
+    },
+    {
+      "id": "GRA_HSK3_0011",
+      "code": "gra_trật_tự_từ_chỉ_thời_gian_trong_câu",
+      "hskLevel": 3,
+      "title": "Trật tự từ chỉ thời gian trong câu",
+      "pattern": "Chủ ngữ + Thời gian + Động từ/Tân ngữ (hoặc Thời gian đứng trước Chủ ngữ)",
+      "explanationVi": "Biểu thị thời gian xảy ra hành động",
+      "examples": []
+    },
+    {
+      "id": "GRA_HSK3_0012",
+      "code": "gra_trật_tự_từ_chỉ_thời_gian_trong_câu_tiếng",
+      "hskLevel": 3,
+      "title": "Trật tự từ chỉ thời gian trong câu tiếng Trung",
+      "pattern": "Chủ ngữ + Thời gian + Động từ/Cụm động từ chỉ hành động",
+      "explanationVi": "Trạng ngữ chỉ thời gian phải đặt trước động từ (thường đứng trước hoặc sau chủ ngữ, nhưng tuyệt đối không đứng ở cuối câu sau tân ngữ)",
+      "examples": []
+    },
+    {
+      "id": "GRA_HSK3_0013",
+      "code": "gra_cấu_trúc_liệt_kê_hành_động_với_和",
+      "hskLevel": 3,
+      "title": "Cấu trúc liệt kê hành động với 和",
+      "pattern": "Chủ ngữ + Động từ 1 + Tân ngữ 1 + 和 + Động từ 2 + Tân ngữ 2",
+      "explanationVi": "Diễn tả hai hành động hoặc sự vật đi liền nhau",
+      "examples": []
+    },
+    {
+      "id": "GRA_HSK3_0014",
+      "code": "gra_cấu_trúc_liệt_kê_hành_động_đối_tượng_với",
+      "hskLevel": 3,
+      "title": "Cấu trúc liệt kê hành động/đối tượng với 和",
+      "pattern": "A + 和 + B",
+      "explanationVi": "Dùng '和' để nối các danh từ hoặc cụm danh từ, cấu trúc 'chubg ngữ + động từ 1 + A + 和 + động từ 2 + B' có thể gây lúng túng nếu không tách câu rõ ràng.",
+      "examples": []
+    },
+    {
+      "id": "GRA_HSK3_0015",
+      "code": "gra_phủ_định_của_tính_từ_phó_từ_mức_độ",
+      "hskLevel": 3,
+      "title": "Phủ định của tính từ/phó từ mức độ",
+      "pattern": "Chủ ngữ + 不 + Tính từ (thay vì 不 + 很 + Tính từ)",
+      "explanationVi": "Diễn đạt mức độ không đạt đến mức 'rất'",
+      "examples": []
+    },
+    {
+      "id": "GRA_HSK3_0016",
+      "code": "gra_phủ_định_của_tính_từ_phó_từ_mức_độ_很",
+      "hskLevel": 3,
+      "title": "Phủ định của tính từ/phó từ mức độ 很",
+      "pattern": "Chủ ngữ + 不 + Tính từ (KHÔNG dùng 不很 + Tính từ)",
+      "explanationVi": "Biểu thị mức độ không cao lắm hoặc dùng cấu trúc bổ ngữ",
+      "examples": []
+    },
+    {
+      "id": "GRA_HSK3_0017",
+      "code": "gra_biểu_thị_hành_động_hoàn_thành_với_了",
+      "hskLevel": 3,
+      "title": "Biểu thị hành động hoàn thành với 了",
+      "pattern": "Chủ ngữ + Động từ + 了 + Tân ngữ",
+      "explanationVi": "Diễn tả hành động đã xảy ra và hoàn thành trong quá khứ.",
+      "examples": []
+    },
+    {
+      "id": "GRA_HSK3_0018",
+      "code": "gra_phủ_định_của_tính_từ_đi_với_很",
+      "hskLevel": 3,
+      "title": "Phủ định của tính từ đi với 很",
+      "pattern": "S + 不 + Tính từ (không dùng 很)",
+      "explanationVi": "Biểu thị mức độ phủ định thông thường của tính từ",
+      "examples": []
+    },
+    {
+      "id": "GRA_HSK3_0019",
+      "code": "gra_phủ_định_của_tính_từ_với_不",
+      "hskLevel": 3,
+      "title": "Phủ định của tính từ với 不",
+      "pattern": "Chủ ngữ + 不 + Tính từ",
+      "explanationVi": "Biểu thị tính chất không đạt mức độ nào đó (Lưu ý: Tính từ đơn tiết như 好 thường không đi trực tiếp với 不 trong câu vị ngữ đơn thuần kiểu '不很好')",
+      "examples": []
+    }
+  ],
+  "readingPassages": [
+    {
+      "id": "RDG_1_reading_hsk1_friend",
+      "hskLevel": 1,
+      "title": "我的中国朋友",
+      "contentZh": "我有一个好朋友，他叫李明。他是中国人，今年二十岁。李明很喜欢学习英语，我也喜欢学习汉语。我们常常一起去图书馆看书，一起喝茶。",
+      "pinyin": "Wǒ yǒu yí gè hǎo péngyou, tā jiào Lǐ Míng. Tā shì Zhōngguó rén, jīnnián èrshí suì. Lǐ Míng hěn xǐhuan xuéxí Yīngyǔ, wǒ yě xǐhuan xuéxí Hànyǔ. Wǒmen chángcháng yìqǐ qù túshūguǎn kàn shū, yìqǐ hē chá.",
+      "translationVi": "Tôi có một người bạn tốt, anh ấy tên là Lý Minh. Anh ấy là người Trung Quốc, năm nay hai mươi tuổi. Lý Minh rất thích học tiếng Anh, tôi cũng thích học tiếng Trung. Chúng tôi thường cùng nhau đến thư viện đọc sách, cùng nhau uống trà.",
+      "questions": [
+        {
+          "id": "q_hsk1_friend_1",
+          "type": "single_choice",
+          "question": "李明今年多大？(Lý Minh năm nay bao nhiêu tuổi?)",
+          "options": [
+            "十八岁 (18 tuổi)",
+            "二十岁 (20 tuổi)",
+            "二十二岁 (22 tuổi)",
+            "三十岁 (30 tuổi)"
+          ],
+          "answer": 1,
+          "explanationVi": "Trong bài có câu: \"他是中国人，今年二十岁。\" nên đáp án là 20 tuổi.",
+          "citationText": "他是中国人，今年二十岁。"
+        },
+        {
+          "id": "q_hsk1_friend_2",
+          "type": "true_false",
+          "question": "李明不喜欢学习英语。(Lý Minh không thích học tiếng Anh.)",
+          "options": [
+            "Đúng (正确)",
+            "Sai (错误)"
+          ],
+          "answer": 1,
+          "explanationVi": "Bài nêu rõ: \"李明很喜欢学习英语\", do đó nhận định này là Sai.",
+          "citationText": "李明很喜欢学习英语"
+        },
+        {
+          "id": "q_hsk1_friend_3",
+          "type": "free_text_vi",
+          "question": "Hai người bạn thường làm những việc gì cùng nhau tại thư viện?",
+          "answer": "Đọc sách và uống trà",
+          "explanationVi": "Bài đọc viết: \"我们常常一起去图书馆看书，一起喝茶。\"",
+          "citationText": "我们常常一起去图书馆看书，一起喝茶。"
+        }
+      ]
+    },
+    {
+      "id": "RDG_2_reading_hsk2_restaurant",
+      "hskLevel": 2,
+      "title": "在饭馆点菜",
+      "contentZh": "服务员：两位好，请问你们想吃点儿什么？\n王明：请给我们一份菜单。你们这里有什么特色菜？\n服务员：北京烤鸭和宫保鸡丁非常有名，很多客人都喜欢。\n李华：那我们要一只烤鸭，一份宫保鸡丁，再来两碗米饭。\n服务员：好的，请问喝什么饮料？\n王明：请给我们一壶热茉莉花茶，谢谢！",
+      "pinyin": "Fúwùyuán: Liǎng wèi hǎo, qǐngwèn nǐmen xiǎng chī diǎnr shénme?\nWáng Míng: Qǐng gěi wǒmen yí fèn càidān. Nǐmen zhèlǐ yǒu shénme tèsè cài?\nFúwùyuán: Běijīng kǎoyā hé Gōngbǎo jīdīng fēicháng yǒumíng, hěn duō kèrén dōu xǐhuan.\nLǐ Huá: Nà wǒmen yào yì zhī kǎoyā, yí fèn Gōngbǎo jīdīng, zài lái liǎng wǎn mǐfàn.\nFúwùyuán: Hǎo de, qǐngwèn hē shénme yǐnliào?\nWáng Míng: Qǐng gěi wǒmen yì hú rè mòlìhuā chá, xièxie!",
+      "translationVi": "Phục vụ: Xin chào hai vị, xin hỏi hai vị muốn dùng món gì ạ?\nVương Minh: Xin cho chúng tôi một cuốn thực đơn. Ở đây có món đặc sản gì thế?\nPhục vụ: Vịt quay Bắc Kinh và Gà xào Cung Bảo rất nổi tiếng, nhiều khách đều thích.\nLý Hoa: Vậy cho chúng tôi một con vịt quay, một phần gà Cung Bảo, thêm hai bát cơm trắng nữa nhé.\nPhục vụ: Vâng ạ, xin hỏi hai vị uống đồ uống gì?\nVương Minh: Xin cho chúng tôi một ấm trà lài nóng, cảm ơn!",
+      "questions": [
+        {
+          "id": "q_hsk2_res_1",
+          "type": "single_choice",
+          "question": "服务员推荐了什么菜？(Phục vụ đã giới thiệu những món ăn nào?)",
+          "options": [
+            "饺子和牛肉面 (Sủi cảo và mì bò)",
+            "北京烤鸭和宫保鸡丁 (Vịt quay Bắc Kinh và Gà Cung Bảo)",
+            "火锅和炒饭 (Lẩu và cơm chiên)",
+            "鱼香肉丝和春卷 (Thịt băm hương cá và nem rán)"
+          ],
+          "answer": 1,
+          "explanationVi": "Phục vụ nói: \"北京烤鸭和宫保鸡丁非常有名\".",
+          "citationText": "北京烤鸭和宫保鸡丁非常有名，很多客人都喜欢。"
+        },
+        {
+          "id": "q_hsk2_res_2",
+          "type": "fill_blank",
+          "question": "他们点了两碗什么？(Họ đã gọi hai bát món gì?)",
+          "options": [
+            "米饭 (Cơm)",
+            "面条 (Mì)",
+            "汤 (Canh)",
+            "粥 (Cháo)"
+          ],
+          "answer": 0,
+          "explanationVi": "Trong bài có câu: \"再来两碗米饭\".",
+          "citationText": "再来两碗米饭。"
+        },
+        {
+          "id": "q_hsk2_res_3",
+          "type": "free_text_vi",
+          "question": "Hai vị khách đã gọi loại đồ uống gì và nhiệt độ thế nào?",
+          "answer": "Trà hoa lài nóng (một ấm)",
+          "explanationVi": "Bài đọc viết: \"请给我们一壶热茉莉花茶\".",
+          "citationText": "请给我们一壶热茉莉花茶，谢谢！"
+        }
+      ]
+    },
+    {
+      "id": "RDG_3_reading_hsk3_travel_beijing",
+      "hskLevel": 3,
+      "title": "我的北京旅行日记",
+      "contentZh": "上个周末，我和同学坐高铁去北京旅行。北京的天气非常晴朗，空气也很新鲜。第一天，我们去了故宫。故宫以前是皇帝住的地方，红色的墙和黄色的瓦非常壮观。我们在里面走了整整四个小时，拍了很多漂亮的照片。虽然脚有点儿累，但是我们心里非常高兴。晚上，我们在王府井大街品尝了正宗的老北京炸酱面，味道特别棒！",
+      "pinyin": "Shàng gè zhōumò, wǒ hé tóngxué zuò gāotiě qù Běijīng lǚxíng. Běijīng de tiānqì fēicháng qínglǎng, kōngqì yě hěn xīnxian. Dì-yī tiān, wǒmen qù le Gùgōng. Gùgōng yǐqián shì huángdì zhù de dìfang, hóngsè de qiáng hé huángsè de wǎ fēicháng zhuàngguān. Wǒmen zài lǐmiàn zǒu le zhěngzhěng sì gè xiǎoshí, pāi le hěn duō piàoliang de zhàopiàn. Suīrán jiǎo yǒudiǎnr lèi, dànshì wǒmen xīnlǐ fēicháng gāoxìng. Wǎnshang, wǒmen zài Wángfǔjǐng Dàjiē pǐncháng le zhèngzōng de lǎo Běijīng zhájiàngmiàn, wèidao tèbié bàng!",
+      "translationVi": "Cuối tuần trước, tôi và bạn học đi tàu cao tốc đến Bắc Kinh du lịch. Thời tiết Bắc Kinh rất trong xanh, không khí cũng rất trong lành. Ngày đầu tiên, chúng tôi đến Cố Cung. Cố Cung trước đây là nơi hoàng đế sinh sống, tường màu đỏ và ngói màu vàng vô cùng hùng vĩ. Chúng tôi đi dạo bên trong suốt bốn tiếng đồng hồ, chụp rất nhiều ảnh đẹp. Mặc dù chân có chút mỏi mệt, nhưng trong lòng chúng tôi vô cùng vui sướng. Buổi tối, chúng tôi thưởng thức món mì tương đen Bắc Kinh chính hiệu tại phố Vương Phủ Tỉnh, hương vị tuyệt vời khó quên!",
+      "questions": [
+        {
+          "id": "q_hsk3_bj_1",
+          "type": "single_choice",
+          "question": "作者和同学是怎么去北京的？(Tác giả và bạn học đi Bắc Kinh bằng phương tiện gì?)",
+          "options": [
+            "坐飞机 (Đi máy bay)",
+            "坐高铁 (Đi tàu cao tốc)",
+            "坐公共汽车 (Đi xe buýt)",
+            "开车 (Tự lái xe)"
+          ],
+          "answer": 1,
+          "explanationVi": "Bài đọc viết: \"上个周末，我和同学坐高铁去北京旅行。\"",
+          "citationText": "上个周末，我和同学坐高铁去北京旅行。"
+        },
+        {
+          "id": "q_hsk3_bj_2",
+          "type": "single_choice",
+          "question": "他们在王府井吃了什么？(Họ đã ăn gì ở Vương Phủ Tỉnh?)",
+          "options": [
+            "北京烤鸭 (Vịt quay Bắc Kinh)",
+            "老北京炸酱面 (Mì tương đen Bắc Kinh)",
+            "火锅 (Lẩu)",
+            "包子 (Bánh bao)"
+          ],
+          "answer": 1,
+          "explanationVi": "Bài đọc viết: \"我们在王府井大街品尝了正宗的老北京炸酱面\".",
+          "citationText": "我们在王府井大街品尝了正宗的老北京炸酱面，味道特别棒！"
+        },
+        {
+          "id": "q_hsk3_bj_3",
+          "type": "true_false",
+          "question": "故宫以前是普通老百姓住的地方。(Cố Cung trước đây là nơi dân thường sinh sống.)",
+          "options": [
+            "Đúng (正确)",
+            "Sai (错误)"
+          ],
+          "answer": 1,
+          "explanationVi": "Bài đọc ghi rõ Cố Cung là nơi hoàng đế ở: \"故宫以前是皇帝住的地方\".",
+          "citationText": "故宫以前是皇帝住的地方"
+        }
+      ]
+    },
+    {
+      "id": "RDG_4_reading_hsk4_mid_autumn",
+      "hskLevel": 4,
+      "title": "中秋节与月饼的文化意义",
+      "contentZh": "农历八月十五是中国传统的节日——中秋节。因为这一天的月亮最圆、最明亮，所以中国人把圆月看作是团圆的象征。无论人们在多远的地方工作或学习，到了中秋节，大家都会尽量赶回家里与亲人团聚。吃月饼是中秋节最重要的习俗之一。月饼通常是圆形的，里面有豆沙、莲蓉或者蛋黄等各种馅料。亲朋好友之间互相赠送月饼，表达美好的祝福。正如中国古诗所写：“但愿人长久，千里共婵娟”，中秋节承载着人们对美好生活和远方亲人的深切思念。",
+      "pinyin": "Nónglì bā yuè shíwǔ shì Zhōngguó chuántǒng de jiérì —— Zhōngqiūjié. Yīnwèi zhè yì tiān de yuèliang zuì yuán, zuì míngliàng, suǒyǐ Zhōngguó rén bǎ yuányuè kànzuò shì tuányuán de xiàngzhēng. Wúlùn rénmen zài duō yuǎn de dìfang gōngzuò huò xuéxí, dào le Zhōngqiūjié, dàjiā dōu huì jǐnliàng gǎnhuí jiā lǐ yǔ qīnrén tuánjù. Chī yuèbǐng shì Zhōngqiūjié zuì zhòngyào de xísú zhī yī. Yuèbǐng tōngcháng shì yuánxíng de, lǐmiàn yǒu dòushā, liánróng huòzhě dànhuáng děng gèzhǒng xiànliào. Qīnpéng hǎoyǒu zhījiān hùxiāng zèngsòng yuèbǐng, biǎodá měihǎo de zhùfú. Zhèngrú Zhōngguó gǔshī suǒ xiě: “Dànyuàn rén chángjiǔ, qiānlǐ gòng chánjuān”, Zhōngqiūjié chéngzàizhe rénmen duì měihǎo shēnghuó hé yuǎnfāng qīnrén de shēnqiè sīniàn.",
+      "translationVi": "Ngày 15 tháng 8 âm lịch là một ngày lễ truyền thống của Trung Quốc - Tết Trung Thu. Bởi vì trăng vào ngày này tròn nhất và sáng nhất, nên người Trung Quốc coi vầng trăng tròn là biểu tượng của sự đoàn viên sum họp. Bất kể mọi người làm việc hay học tập ở nơi xa xôi đến đâu, đến Tết Trung Thu, ai nấy đều cố gắng trở về nhà để sum vầy bên người thân. Ăn bánh Trung Thu là một trong những phong tục quan trọng nhất của ngày Tết này. Bánh Trung Thu thường có hình tròn, bên trong chứa nhiều loại nhân như đậu đỏ, hạt sen hay lòng đỏ trứng muối. Bạn bè và người thân tặng bánh Trung Thu cho nhau để gửi gắm những lời chúc tốt đẹp nhất. Đúng như câu thơ cổ: \"Nguyện người trường cửu, nghìn dặm cùng ngắm ánh trăng\", Tết Trung Thu mang chở nỗi nhớ nhung sâu sắc của con người hướng về cuộc sống êm ấm và người thân nơi phương xa.",
+      "questions": [
+        {
+          "id": "q_hsk4_mid_1",
+          "type": "single_choice",
+          "question": "中国人为什么把圆月看作团圆的象征？(Vì sao người Trung Quốc coi trăng tròn là biểu tượng đoàn viên?)",
+          "options": [
+            "因为中秋节的月亮最圆、最明亮 (Vì trăng ngày Trung Thu tròn nhất, sáng nhất)",
+            "因为月亮上有漂亮的嫦娥 (Vì trên cung trăng có nàng Hằng Nga xinh đẹp)",
+            "因为大家都喜欢在月亮下吃晚饭 (Vì mọi người thích ăn tối dưới ánh trăng)",
+            "因为八月份的天气最凉爽 (Vì thời tiết tháng 8 mát mẻ nhất)"
+          ],
+          "answer": 0,
+          "explanationVi": "Bài đọc viết: \"因为这一天的月亮最圆、最明亮，所以中国人把圆月看作是团圆的象征。\"",
+          "citationText": "因为这一天的月亮最圆、最明亮，所以中国人把圆月看作是团圆的象征。"
+        },
+        {
+          "id": "q_hsk4_mid_2",
+          "type": "main_idea",
+          "question": "Bài đọc trên chủ yếu truyền tải ý nghĩa gì về Tết Trung Thu?",
+          "options": [
+            "Giải thích cách làm các loại nhân bánh Trung Thu truyền thống",
+            "Tôn vinh giá trị đoàn viên gia đình và tình cảm gắn kết thân nhân qua biểu tượng trăng tròn và bánh Trung Thu",
+            "Khuyên mọi người không nên đi làm xa quê hương",
+            "Giới thiệu sự tích cổ tích thần thoại về mặt trăng"
+          ],
+          "answer": 1,
+          "explanationVi": "Cốt lõi bài văn nhấn mạnh: \"中秋节承载着人们对美好生活和远方亲人的深切思念\" và tinh thần sum họp đoàn viên.",
+          "citationText": "中秋节承载着人们对美好生活和远方亲人的深切思念。"
+        },
+        {
+          "id": "q_hsk4_mid_3",
+          "type": "free_text_zh",
+          "question": "文中引用了哪句著名的古诗？(Đoạn văn trích dẫn câu thơ cổ nổi tiếng nào?)",
+          "answer": "但愿人长久，千里共婵娟",
+          "explanationVi": "Đoạn văn trích dẫn thơ Tô Thức: “但愿人长久，千里共婵娟”。",
+          "citationText": "但愿人长久，千里共婵娟"
+        }
+      ]
+    },
+    {
+      "id": "RDG_5_reading_hsk5_idiom_rabbit",
+      "hskLevel": 5,
+      "title": "成语故事：守株待兔",
+      "contentZh": "战国时期，宋国有一个农夫。有一天，他正在田里辛勤地耕地，忽然看见一只飞奔的野兔惊慌失措地跑过来。野兔一不小心，重重地撞在田边的一棵大树桩上，当场折断了脖子死去了。农夫急忙跑过去，毫不费力地捡起这只又肥又大的野兔。他高兴极了，心想：“种庄稼多辛苦啊，要是每天都能白白捡到一只兔子，那该多舒服啊！”从此以后，这个农夫放下了手里的农具，不再耕作。他整天坐在树桩旁边痴痴地守着，满心希望还能有兔子撞死在这里。结果，田地荒芜了，杂草丛生，他再也没有等到第二只兔子，反而成了全天下人的笑柄。这个成语告诫人们：切不可心存侥幸，企图不劳而获；更不能把偶然事件当成必然规律。",
+      "pinyin": "Zhànguó shíqī, Sòng guó yǒu yí gè nóngfū. Yǒu yì tiān, tā zhèngzài tián lǐ xīnqín de gēngdì, hūrán kànjiàn yì zhī fēibēn de yětù jīnghuāngshīcuò de pǎoguòlái. Yětù yí bù xiǎoxīn, zhòngzhòng de zhuàng zài tiánbiān de yì kē dà shùzhuāng shàng, dāngchǎng zhéduàn le bózǐ sǐqù le. Nóngfū jímáng pǎoguòqù, háobù fèilì de jiǎnqǐ zhè zhī yòu féi yòu dà de yětù. Tā gāoxìng jíle, xīnxǐang: “Zhòng zhuāngjia duō xīnkǔ a, yàoshi měitiān dōu néng báibái jiǎndào yì zhī tùzi, nà gāi duō shūfu a!” Cóngcǐ yǐhòu, zhè gè nóngfū fàngxià le shǒu lǐ de nóngjù, búzài gēngzuò. Tā zhěngtiān zuò zài shùzhuāng pángbiān chīchī de shǒuzhe, mǎnxīn xīwàng hái néng yǒu tùzi zhuàngsǐ zài zhèlǐ. Jiéguǒ, tiándì huāngwú le, zácǎo cóngshēng, tā zài yě méiyǒu děngdào dì-èr zhī tùzi, fǎn'ér chéng le quántiānxià rén de xiàobǐng. Zhè gè chéngyǔ gàojiè rénmen: qiè bù kě xīncún jiǎoxìng, qǐtú bùláo'érhuò; gèng bù néng bǎ ǒurán shìjiàn dàngchéng bìrán guīlǜ.",
+      "translationVi": "Thời Chiến Quốc, nước Tống có một người nông dân. Một ngày nọ, khi anh ta đang cần mẫn cày bừa trên đồng ruộng, bỗng thấy một con thỏ rừng hớt hải lao tới. Thỏ rừng không cẩn thận đâm sầm vào gốc cây to bên bờ ruộng, gãy cổ chết ngay tại chỗ. Người nông dân vội vàng chạy lại, chẳng tốn chút sức lực nào nhặt được con thỏ vừa béo vừa to. Anh ta mừng rỡ vô cùng, thầm nghĩ: \"Trồng trọt vất vả thế này, nếu ngày nào cũng nhặt không được một con thỏ thì sướng biết bao!\". Từ đó về sau, người nông dân bỏ rơi nông cụ, không chịu cày cấy nữa. Anh ta suốt ngày ngồi ngẩn ngơ bên gốc cây trông ngóng, hy vọng sẽ có con thỏ khác đâm đầu vào chết ở đó. Kết quả là đồng ruộng hoang tàn, cỏ dại mọc đầy, anh ta chẳng bao giờ đợi được con thỏ thứ hai, trái lại còn biến thành trò cười cho thiên hạ. Thành ngữ này răn dạy con người: Tuyệt đối không được ôm tâm lý may rủi, mưu cầu không làm mà hưởng; càng không thể coi một sự việc ngẫu nhiên là quy luật tất nhiên.",
+      "questions": [
+        {
+          "id": "q_hsk5_rabbit_1",
+          "type": "single_choice",
+          "question": "农夫为什么不再种地了？(Tại sao người nông dân không chịu cày cấy nữa?)",
+          "options": [
+            "因为他的身体生了重病 (Vì anh ta bị bệnh nặng)",
+            "因为他希望每天坐在树桩旁白白捡到兔子 (Vì muốn ngồi ôm gốc cây nhặt không thỏ mỗi ngày)",
+            "因为兔子把他的庄稼全都吃光了 (Vì thỏ đã ăn sạch mùa màng của anh ta)",
+            "因为国王命令他去当兵 (Vì nhà vua ra lệnh cho anh ta đi lính)"
+          ],
+          "answer": 1,
+          "explanationVi": "Bài đọc viết anh ta không muốn trồng trọt nữa mà chỉ muốn nhặt thỏ: \"要是每天都能白白捡到一只兔子，那该多舒服啊！从此以后，这个农夫放下了手里的农具，不再耕作。\"",
+          "citationText": "要是每天都能白白捡到一只兔子，那该多舒服啊！从此以后，这个农夫放下了手里的农具，不再耕作。"
+        },
+        {
+          "id": "q_hsk5_rabbit_2",
+          "type": "main_idea",
+          "question": "Thành ngữ \"守株待兔\" (Ôm cây đợi thỏ) mang ý nghĩa phê phán thái độ gì?",
+          "options": [
+            "Phê phán những người không biết cách bảo vệ động vật hoang dã",
+            "Phê phán tư tưởng may rủi, lười biếng, muốn không làm mà hưởng và lấy chuyện ngẫu nhiên làm quy luật",
+            "Phê phán người nông dân không biết cách nấu thịt thỏ",
+            "Khuyên nhủ mọi người nên trồng nhiều cây cối ven bờ ruộng"
+          ],
+          "answer": 1,
+          "explanationVi": "Bài học nêu rõ: \"切不可心存侥幸，企图不劳而获；更不能把偶然事件当成必然规律。\"",
+          "citationText": "这个成语告诫人们：切不可心存侥幸，企图不劳而获；更不能把偶然事件当成必然规律。"
+        }
+      ]
+    }
+  ]
+}
