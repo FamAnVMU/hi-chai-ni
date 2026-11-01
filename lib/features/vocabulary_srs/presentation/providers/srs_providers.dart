@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/database/app_database.dart';
 import '../../data/srs_repository.dart';
+import '../../domain/srs_models.dart';
 
 /// Provider exposing the SrsRepository instance tied to the active database.
 final srsRepositoryProvider = Provider<SrsRepository>((ref) {
@@ -32,4 +33,98 @@ class SrsDueCountNotifier extends AsyncNotifier<int> {
 
 final srsDueCountProvider = AsyncNotifierProvider<SrsDueCountNotifier, int>(
   SrsDueCountNotifier.new,
+);
+
+/// State management for the active SRS Flashcard study session.
+class SrsStudySessionNotifier extends AsyncNotifier<SrsStudySession> {
+  @override
+  Future<SrsStudySession> build() async {
+    final repo = ref.watch(srsRepositoryProvider);
+    final cards = await repo.getDueFlashcards(limit: 25);
+    return SrsStudySession(queue: cards);
+  }
+
+  void flipCard() {
+    final current = state.value;
+    if (current == null || current.isCompleted) return;
+    state = AsyncValue.data(
+      current.copyWith(isAnswerRevealed: !current.isAnswerRevealed),
+    );
+  }
+
+  void togglePinyinVisibility() {
+    final current = state.value;
+    if (current == null) return;
+    state = AsyncValue.data(
+      current.copyWith(isPinyinVisibleOnFront: !current.isPinyinVisibleOnFront),
+    );
+  }
+
+  Future<void> submitRating(SrsRating rating) async {
+    final current = state.value;
+    if (current == null || current.isCompleted || current.isProcessingReview) {
+      return;
+    }
+
+    final card = current.currentCard;
+    if (card == null) return;
+
+    // Lock against duplicate rapid taps
+    state = AsyncValue.data(current.copyWith(isProcessingReview: true));
+
+    try {
+      final repo = ref.read(srsRepositoryProvider);
+      await repo.recordReviewAndProgress(
+        item: card,
+        rating: rating,
+      );
+
+      final isSuccess = rating != SrsRating.again;
+      state = AsyncValue.data(
+        current.copyWith(
+          currentIndex: current.currentIndex + 1,
+          isAnswerRevealed: false,
+          isProcessingReview: false,
+          hasSavedOffline: true,
+          completedReviewsCount: current.completedReviewsCount + 1,
+          correctReviewsCount: current.correctReviewsCount + (isSuccess ? 1 : 0),
+        ),
+      );
+
+      // Refresh badge count
+      ref.read(srsDueCountProvider.notifier).refreshCount();
+    } catch (e) {
+      // Revert processing flag and record error
+      state = AsyncValue.data(
+        current.copyWith(
+          isProcessingReview: false,
+          errorMessage: e.toString(),
+        ),
+      );
+    }
+  }
+
+  Future<void> loadMoreCards({int limit = 15, int? hskLevel}) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final repo = ref.read(srsRepositoryProvider);
+      final cards = await repo.getDueFlashcards(limit: limit, hskLevel: hskLevel);
+      return SrsStudySession(queue: cards);
+    });
+  }
+
+  void restoreSessionIndex(int index) {
+    final current = state.value;
+    if (current == null) return;
+    if (index >= 0 && index < current.queue.length) {
+      state = AsyncValue.data(
+        current.copyWith(currentIndex: index, isAnswerRevealed: false),
+      );
+    }
+  }
+}
+
+final srsStudySessionProvider =
+    AsyncNotifierProvider<SrsStudySessionNotifier, SrsStudySession>(
+  SrsStudySessionNotifier.new,
 );

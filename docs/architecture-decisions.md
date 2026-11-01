@@ -509,5 +509,52 @@ Trước khi bước vào Giai đoạn 5 (triển khai 22 phân hệ học tập
 - **Đồng bộ bằng chứng học tập (Evidence Sync):**
   - Khi hoàn thành bài test, kết quả được ghi nhận vào `learner_evidence` với nguồn `cat_placement_test` và `learning_activities`, kích hoạt cập nhật lộ trình gợi ý trên Trang Chủ.
 
+---
+
+## 15. Kiến Trúc Giao Diện Flashcard & Ôn Tập SRS SM-2 (Task 5.3)
+
+### 15.1. Mô Hình Thẻ Lật 3D (3D Flipping Flashcard) & Khả Năng Tiếp Cận (WCAG 2.2 AA)
+- **Hiệu ứng lật 3D mượt mà:**
+  - Sử dụng `AnimationController` với đường cong `Curves.easeInOutCubic` kết hợp phép biến đổi hình học không gian 3D `Transform(transform: Matrix4.identity()..setEntry(3, 2, 0.001)..rotateY(angle))` tạo hiệu ứng lật thẻ vật lý tự nhiên.
+  - Phân tách góc quay $\pi/2$ giữa mặt trước và mặt sau, ngăn chặn hiện tượng chớp nháy (visual flicker) hoặc lộ ngược văn bản mặt sau.
+- **Mặt trước (Front Face):**
+  - Chữ Hán nổi bật với cỡ chữ lớn ($56\text{pt}$), font Noto Sans SC / Heiti SC fallback.
+  - Nút chuyển đổi ẩn/hiện Pinyin (`Ẩn Pinyin` / `Hiện Pinyin`) phục vụ nhu cầu học phân hóa (học nhận diện mặt chữ thuần túy vs. học kèm ngữ âm).
+  - Huy hiệu cấp độ HSK và số nét bút thuận (`stroke_count`).
+  - Gợi ý chạm trực quan và nút bấm lật thẻ rõ ràng cho người dùng điều khiển cảm ứng.
+- **Mặt sau (Back Face):**
+  - Phiên âm Pinyin đầy đủ dấu thanh kết hợp `RubyText`.
+  - Định nghĩa nghĩa tiếng Việt (`meaning_vi`) và loại từ (`part_of_speech`).
+  - Khối ví dụ câu song ngữ kèm Pinyin và bản dịch tiếng Việt.
+  - Nút phát âm âm học chuẩn bản xứ (có cơ chế phản hồi thân thiện khi thẻ chưa có audio gốc, không làm gián đoạn trải nghiệm).
+  - Nút tra cứu nhanh tức thời mở `QuickDictionarySheet` với từ vựng được điền sẵn.
+- **Chuẩn tiếp cận (Accessibility):**
+  - Toàn bộ 2 mặt thẻ được bọc trong các nút `Semantics` thông báo rõ ràng mặt trước, mặt sau và hướng dẫn thao tác cho màn hình đọc (TalkBack / Screen Readers).
+
+### 15.2. Tính Toán Trước Khoảng Cách Ôn Tập (SM-2 Interval Previews)
+- **4 Lựa chọn đánh giá chuẩn SM-2:**
+  1. `Again (Quên)`: Quality 1, đặt lại khoảng cách ôn về 1 ngày / lặp lại ngay (`< 10 phút`).
+  2. `Hard (Khó)`: Quality 3, tăng khoảng cách nhẹ hoặc giữ nguyên mức an toàn, hệ số dễ EF giảm $0.14$.
+  3. `Good (Nhớ)`: Quality 4, áp dụng công thức $I_n = \text{round}(I_{n-1} \times EF)$, giữ nguyên EF.
+  4. `Easy (Dễ)`: Quality 5, thưởng khoảng cách bước nhảy lớn kết hợp hệ số thưởng `easyBonusMultiplier`, EF tăng $0.10$.
+- **Dự báo thời gian ôn tập không tác dụng phụ (`Sm2Engine.previewIntervals`):**
+  - Tính toán trước khoảng cách ngày cho cả 4 lựa chọn trực tiếp từ trạng thái `SrsCardState` hiện thời.
+  - Hiển thị nhãn thời gian ước tính (ví dụ: `< 10 phút`, `2 ngày`, `4 ngày`, `8 ngày`) ngay trên thanh nút bấm `FlashcardRatingBar`.
+- **Tách bạch trách nhiệm:**
+  - Tầng Presentation tuyệt đối không tự tính toán công thức SM-2 mà chỉ ủy quyền cho `Sm2Engine` và `SrsRepository`.
+
+### 15.3. Liêm Chính Dữ Liệu, Chống Tap Lặp & Bảo Toàn Trạng Thái
+- **Chặn bấm lặp kép (Anti-Spam / Debounce Lockout):**
+  - Bảo vệ 2 lớp: Ở tầng UI, cờ `isProcessingReview` vô hiệu hóa thanh nút bấm ngay khi chạm; ở tầng Repository, `_inFlightContentIds` và ngưỡng debounce $100\text{ms} - 800\text{ms}$ loại trừ triệt để lỗi ghi đè dữ liệu thẻ.
+- **Giao dịch nguyên tử (Atomic SQLite Transaction):**
+  - Cập nhật đồng thời bảng `srs_items` và chèn bản ghi nhật ký bất biến `learner_evidence` (`source: 'srs_flashcard'`).
+  - Tự động ghi nhận một bản ghi vào `learning_activities` (`activity_type: 'srs_review'`), nuôi dưỡng chuỗi ngày học (`streak`) trên Trang Chủ mà không cần thao tác thủ công.
+- **Xử lý hàng đợi rỗng & Tiếp tục học:**
+  - `FlashcardEmptyState` hiển thị lời chúc mừng khi hoàn thành tất cả thẻ cần ôn trong ngày kèm thống kê số thẻ đã ôn và tỷ lệ nhớ.
+  - Hỗ trợ nút "Học thêm 15 từ mới", tự động truy vấn từ vựng chưa học từ bảng `vocabularies` và khởi tạo thẻ SRS mới trên SQLite hoàn toàn offline.
+- **Bảo toàn trạng thái khi App Pause / Resume:**
+  - Sử dụng `AppLifecycleListener` để tự động làm mới số lượng thẻ cần ôn khi người dùng quay lại từ background.
+  - Kết hợp `AutomaticKeepAliveClientMixin` trong `ReviewScreen` giúp giữ nguyên vị trí thẻ đang xem khi chuyển đổi qua lại giữa các tab trên thanh điều hướng.
+
 
 

@@ -5,15 +5,20 @@
 /// - [good]: quality = 4 (correct recall after a normal hesitation)
 /// - [easy]: quality = 5 (effortless, immediate recall)
 enum SrsRating {
-  again(quality: 1, label: 'Again'),
-  hard(quality: 3, label: 'Hard'),
-  good(quality: 4, label: 'Good'),
-  easy(quality: 5, label: 'Easy');
+  again(quality: 1, label: 'Again', labelVi: 'Quên'),
+  hard(quality: 3, label: 'Hard', labelVi: 'Khó'),
+  good(quality: 4, label: 'Good', labelVi: 'Nhớ'),
+  easy(quality: 5, label: 'Easy', labelVi: 'Dễ');
 
   final int quality;
   final String label;
+  final String labelVi;
 
-  const SrsRating({required this.quality, required this.label});
+  const SrsRating({
+    required this.quality,
+    required this.label,
+    required this.labelVi,
+  });
 
   static SrsRating fromQuality(int quality) {
     if (quality <= 2) return SrsRating.again;
@@ -213,4 +218,162 @@ class SrsReviewResult {
   @override
   String toString() =>
       'SrsReviewResult(rating=${rating.label}, interval: ${previousIntervalDays}d -> ${newIntervalDays}d, EF: ${previousEaseFactor.toStringAsFixed(2)} -> ${newEaseFactor.toStringAsFixed(2)}, dueAt: $scheduledDueAt)';
+}
+
+/// Rich flashcard item joining vocabulary, senses, and live SRS state.
+class SrsFlashcardItem {
+  final String id;
+  final String simplified;
+  final String? traditional;
+  final String pinyin;
+  final int hskLevel;
+  final int? strokeCount;
+  final String? radicals;
+  final String? audioUri;
+  final String? partOfSpeech;
+  final String meaningVi;
+  final String? exampleCn;
+  final String? examplePinyin;
+  final String? exampleVi;
+  final SrsCardState srsState;
+  final Map<SrsRating, int> estimatedIntervalDays;
+
+  const SrsFlashcardItem({
+    required this.id,
+    required this.simplified,
+    this.traditional,
+    required this.pinyin,
+    required this.hskLevel,
+    this.strokeCount,
+    this.radicals,
+    this.audioUri,
+    this.partOfSpeech,
+    required this.meaningVi,
+    this.exampleCn,
+    this.examplePinyin,
+    this.exampleVi,
+    required this.srsState,
+    required this.estimatedIntervalDays,
+  });
+
+  factory SrsFlashcardItem.fromDatabaseRow({
+    required Map<String, dynamic> row,
+    required SrsCardState srsState,
+    required Map<SrsRating, int> estimatedIntervalDays,
+  }) {
+    return SrsFlashcardItem(
+      id: row['id'] as String,
+      simplified: row['simplified'] as String,
+      traditional: row['traditional'] as String?,
+      pinyin: row['pinyin'] as String,
+      hskLevel: (row['hsk_level'] as num).toInt(),
+      strokeCount: (row['stroke_count'] as num?)?.toInt(),
+      radicals: row['radicals'] as String?,
+      audioUri: row['audio_uri'] as String?,
+      partOfSpeech: row['part_of_speech'] as String?,
+      meaningVi: row['meaning_vi'] as String? ?? 'Chưa có định nghĩa',
+      exampleCn: row['example_cn'] as String?,
+      examplePinyin: row['example_pinyin'] as String?,
+      exampleVi: row['example_vi'] as String?,
+      srsState: srsState,
+      estimatedIntervalDays: estimatedIntervalDays,
+    );
+  }
+
+  SrsFlashcardItem copyWith({
+    String? id,
+    String? simplified,
+    String? traditional,
+    String? pinyin,
+    int? hskLevel,
+    int? strokeCount,
+    String? radicals,
+    String? audioUri,
+    String? partOfSpeech,
+    String? meaningVi,
+    String? exampleCn,
+    String? examplePinyin,
+    String? exampleVi,
+    SrsCardState? srsState,
+    Map<SrsRating, int>? estimatedIntervalDays,
+  }) {
+    return SrsFlashcardItem(
+      id: id ?? this.id,
+      simplified: simplified ?? this.simplified,
+      traditional: traditional ?? this.traditional,
+      pinyin: pinyin ?? this.pinyin,
+      hskLevel: hskLevel ?? this.hskLevel,
+      strokeCount: strokeCount ?? this.strokeCount,
+      radicals: radicals ?? this.radicals,
+      audioUri: audioUri ?? this.audioUri,
+      partOfSpeech: partOfSpeech ?? this.partOfSpeech,
+      meaningVi: meaningVi ?? this.meaningVi,
+      exampleCn: exampleCn ?? this.exampleCn,
+      examplePinyin: examplePinyin ?? this.examplePinyin,
+      exampleVi: exampleVi ?? this.exampleVi,
+      srsState: srsState ?? this.srsState,
+      estimatedIntervalDays: estimatedIntervalDays ?? this.estimatedIntervalDays,
+    );
+  }
+}
+
+/// Snapshot of an ongoing interactive study session.
+class SrsStudySession {
+  final List<SrsFlashcardItem> queue;
+  final int currentIndex;
+  final bool isAnswerRevealed;
+  final bool isPinyinVisibleOnFront;
+  final bool isProcessingReview;
+  final bool hasSavedOffline;
+  final int completedReviewsCount;
+  final int correctReviewsCount;
+  final String? errorMessage;
+
+  const SrsStudySession({
+    this.queue = const [],
+    this.currentIndex = 0,
+    this.isAnswerRevealed = false,
+    this.isPinyinVisibleOnFront = true,
+    this.isProcessingReview = false,
+    this.hasSavedOffline = true,
+    this.completedReviewsCount = 0,
+    this.correctReviewsCount = 0,
+    this.errorMessage,
+  });
+
+  bool get isEmpty => queue.isEmpty;
+  bool get isCompleted => queue.isNotEmpty && currentIndex >= queue.length;
+  SrsFlashcardItem? get currentCard =>
+      (currentIndex >= 0 && currentIndex < queue.length) ? queue[currentIndex] : null;
+
+  int get remainingCards => (queue.length - currentIndex).clamp(0, queue.length);
+
+  double get progressRatio => queue.isEmpty ? 1.0 : (currentIndex / queue.length).clamp(0.0, 1.0);
+
+  double get accuracyRate =>
+      completedReviewsCount == 0 ? 1.0 : (correctReviewsCount / completedReviewsCount);
+
+  SrsStudySession copyWith({
+    List<SrsFlashcardItem>? queue,
+    int? currentIndex,
+    bool? isAnswerRevealed,
+    bool? isPinyinVisibleOnFront,
+    bool? isProcessingReview,
+    bool? hasSavedOffline,
+    int? completedReviewsCount,
+    int? correctReviewsCount,
+    String? errorMessage,
+  }) {
+    return SrsStudySession(
+      queue: queue ?? this.queue,
+      currentIndex: currentIndex ?? this.currentIndex,
+      isAnswerRevealed: isAnswerRevealed ?? this.isAnswerRevealed,
+      isPinyinVisibleOnFront: isPinyinVisibleOnFront ?? this.isPinyinVisibleOnFront,
+      isProcessingReview: isProcessingReview ?? this.isProcessingReview,
+      hasSavedOffline: hasSavedOffline ?? this.hasSavedOffline,
+      completedReviewsCount: completedReviewsCount ?? this.completedReviewsCount,
+      correctReviewsCount: correctReviewsCount ?? this.correctReviewsCount,
+      errorMessage: errorMessage,
+    );
+  }
 }

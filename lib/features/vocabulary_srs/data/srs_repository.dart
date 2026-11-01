@@ -199,6 +199,133 @@ class SrsRepository {
     );
   }
 
+  /// Retrieves rich flashcard items due for study, seamlessly pulling from
+  /// unlearned vocabularies when due cards in SRS items are fewer than [limit].
+  Future<List<SrsFlashcardItem>> getDueFlashcards({
+    int limit = 30,
+    int? hskLevel,
+    DateTime? asOf,
+  }) async {
+    final asOfUtc = (asOf ?? DateTime.now()).toUtc().toIso8601String();
+
+    String whereClause =
+        's.content_type = ? AND s.due_at <= ? AND s.deleted_at IS NULL AND v.deleted_at IS NULL';
+    final List<dynamic> whereArgs = ['vocabulary', asOfUtc];
+
+    if (hskLevel != null) {
+      whereClause += ' AND v.hsk_level = ?';
+      whereArgs.add(hskLevel);
+    }
+
+    final query = '''
+      SELECT s.*, 
+             v.simplified, v.traditional, v.pinyin, v.hsk_level, v.stroke_count, v.radicals, v.audio_uri,
+             vs.part_of_speech, vs.meaning_vi, vs.example_cn, vs.example_pinyin, vs.example_vi
+      FROM ${DatabaseConstants.tableSrsItems} s
+      INNER JOIN ${DatabaseConstants.tableVocabularies} v ON s.content_id = v.id
+      LEFT JOIN ${DatabaseConstants.tableVocabularySenses} vs ON vs.vocabulary_id = v.id
+      WHERE $whereClause
+      GROUP BY s.id
+      ORDER BY s.due_at ASC
+      LIMIT $limit
+    ''';
+
+    final rows = await _db.rawQuery(query, whereArgs);
+    final results = <SrsFlashcardItem>[];
+
+    for (final row in rows) {
+      final srsState = SrsCardState.fromMap(row);
+      final intervals = _engine.previewIntervals(srsState);
+      results.add(SrsFlashcardItem.fromDatabaseRow(
+        row: row,
+        srsState: srsState,
+        estimatedIntervalDays: intervals,
+      ));
+    }
+
+    // 2. If fewer than limit, pull unlearned words from vocabularies
+    if (results.length < limit) {
+      final remaining = limit - results.length;
+      final newWhere = hskLevel != null ? 'AND v.hsk_level = ?' : '';
+      final newVocabsQuery = '''
+        SELECT v.*, vs.part_of_speech, vs.meaning_vi, vs.example_cn, vs.example_pinyin, vs.example_vi
+        FROM ${DatabaseConstants.tableVocabularies} v
+        LEFT JOIN ${DatabaseConstants.tableVocabularySenses} vs ON vs.vocabulary_id = v.id
+        WHERE v.deleted_at IS NULL
+          AND NOT EXISTS (
+            SELECT 1 FROM ${DatabaseConstants.tableSrsItems} s 
+            WHERE s.content_id = v.id AND s.deleted_at IS NULL
+          )
+        $newWhere
+        GROUP BY v.id
+        ORDER BY v.frequency_rank ASC
+        LIMIT $remaining
+      ''';
+
+      final newRows = await _db.rawQuery(
+        newVocabsQuery,
+        hskLevel != null ? [hskLevel] : [],
+      );
+
+      for (final row in newRows) {
+        final vocabId = row['id'] as String;
+        final srsState = await getOrCreateCardState(contentId: vocabId);
+        final intervals = _engine.previewIntervals(srsState);
+        results.add(SrsFlashcardItem.fromDatabaseRow(
+          row: row,
+          srsState: srsState,
+          estimatedIntervalDays: intervals,
+        ));
+      }
+    }
+
+    return results;
+  }
+
+  /// Records an interactive flashcard review turn, updating SRS state atomically,
+  /// logging learner evidence, and logging a learning activity for the home streak engine.
+  Future<SrsReviewResult> recordReviewAndProgress({
+    required SrsFlashcardItem item,
+    required SrsRating rating,
+    int durationMs = 0,
+    DateTime? reviewTime,
+  }) async {
+    final result = await processReview(
+      contentId: item.id,
+      rating: rating,
+      durationMs: durationMs,
+      reviewTime: reviewTime,
+      source: 'srs_flashcard',
+      additionalMetadata: {
+        'simplified': item.simplified,
+        'pinyin': item.pinyin,
+        'meaning_vi': item.meaningVi,
+        'hsk_level': item.hskLevel,
+      },
+    );
+
+    try {
+      final now = reviewTime?.toUtc() ?? DateTime.now().toUtc();
+      final dateStr =
+          '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+      await _db.insert(
+        DatabaseConstants.tableLearningActivities,
+        {
+          'id': 'ACT_${now.microsecondsSinceEpoch}_${item.id}',
+          'activity_type': 'srs_review',
+          'duration_seconds': (durationMs / 1000).ceil().clamp(1, 300),
+          'items_count': 1,
+          'activity_date': dateStr,
+          'created_at': now.toIso8601String(),
+        },
+      );
+    } catch (_) {
+      // Non-critical if table has constraint, review state is already committed atomically
+    }
+
+    return result;
+  }
+
   /// Retrieves the number of cards due for review, with in-memory TTL caching
   /// to eliminate redundant SQLite queries on repeated UI widget evaluations.
   Future<int> getDueCardsCount({

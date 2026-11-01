@@ -5,14 +5,15 @@ import '../../../../core/theme/theme.dart';
 
 /// Interactive modal bottom sheet for instant offline dictionary lookup.
 class QuickDictionarySheet extends StatefulWidget {
-  const QuickDictionarySheet({super.key});
+  final String? initialWord;
+  const QuickDictionarySheet({super.key, this.initialWord});
 
-  static Future<void> show(BuildContext context) {
+  static Future<void> show(BuildContext context, {String? initialWord}) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => const QuickDictionarySheet(),
+      builder: (_) => QuickDictionarySheet(initialWord: initialWord),
     );
   }
 
@@ -29,7 +30,13 @@ class _QuickDictionarySheetState extends State<QuickDictionarySheet> {
   @override
   void initState() {
     super.initState();
-    _performSearch('你好'); // Pre-populate with common greeting as sample
+    final word = widget.initialWord?.trim();
+    if (word != null && word.isNotEmpty) {
+      _searchController.text = word;
+      _performSearch(word);
+    } else {
+      _performSearch('你好'); // Pre-populate with common greeting as sample
+    }
   }
 
   @override

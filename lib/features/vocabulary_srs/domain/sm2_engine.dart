@@ -190,4 +190,45 @@ class Sm2Engine {
     if (!isDue(state, now: currentTime)) return 0;
     return currentTime.difference(state.dueAt).inDays;
   }
+
+  /// Previews scheduled intervals for all 4 ratings without side effects.
+  Map<SrsRating, int> previewIntervals(SrsCardState currentState, {DateTime? reviewTime}) {
+    return {
+      SrsRating.again: calculateNextState(
+        currentState: currentState,
+        rating: SrsRating.again,
+        reviewTime: reviewTime,
+      ).newIntervalDays,
+      SrsRating.hard: calculateNextState(
+        currentState: currentState,
+        rating: SrsRating.hard,
+        reviewTime: reviewTime,
+      ).newIntervalDays,
+      SrsRating.good: calculateNextState(
+        currentState: currentState,
+        rating: SrsRating.good,
+        reviewTime: reviewTime,
+      ).newIntervalDays,
+      SrsRating.easy: calculateNextState(
+        currentState: currentState,
+        rating: SrsRating.easy,
+        reviewTime: reviewTime,
+      ).newIntervalDays,
+    };
+  }
+
+  /// Formats interval in days into a user-friendly Vietnamese explanation for the rating buttons.
+  static String formatIntervalExplanation(SrsRating rating, int days) {
+    if (rating == SrsRating.again) {
+      return '< 10 phút';
+    }
+    if (days <= 1) {
+      return '1 ngày';
+    }
+    if (days < 30) {
+      return '$days ngày';
+    }
+    final months = (days / 30).round();
+    return '$months tháng';
+  }
 }

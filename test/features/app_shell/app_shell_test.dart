@@ -7,6 +7,7 @@ import 'package:hi_chinese/features/app_shell/presentation/providers/app_shell_p
 import 'package:hi_chinese/features/app_shell/presentation/screens/app_shell.dart';
 import 'package:hi_chinese/features/home/home.dart';
 import 'package:hi_chinese/features/app_shell/presentation/widgets/hi_bottom_nav_bar.dart';
+import 'package:hi_chinese/features/vocabulary_srs/vocabulary_srs.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +26,12 @@ void main() {
       overrides: [
         appStartupProvider.overrideWith(
           () => _MockAppStartupNotifier(startupState),
+        ),
+        srsStudySessionProvider.overrideWith(
+          () => _MockSrsStudySessionNotifier(),
+        ),
+        srsDueCountProvider.overrideWith(
+          () => _MockSrsDueCountNotifier(),
         ),
       ],
       child: Consumer(
@@ -93,7 +100,7 @@ void main() {
 
       expect(find.text('Ôn Tập Ngắt Quãng (SM-2)'), findsOneWidget);
       expect(find.text('Cần ôn hôm nay'), findsOneWidget);
-      expect(find.text('Hiện đáp án & Pinyin'), findsOneWidget);
+      expect(find.text('Xem đáp án (Lật thẻ)'), findsOneWidget);
     });
 
     testWidgets('Tapping Profile tab switches to ProfileScreen with settings', (tester) async {
@@ -281,4 +288,36 @@ class _MockAppStartupNotifier extends AppStartupNotifier {
   Future<void> initialize() async {
     onRetry?.call();
   }
+}
+
+class _MockSrsStudySessionNotifier extends SrsStudySessionNotifier {
+  @override
+  Future<SrsStudySession> build() async {
+    final card = SrsFlashcardItem(
+      id: 'VOCAB_TEST',
+      simplified: '银行',
+      pinyin: 'yínháng',
+      hskLevel: 2,
+      meaningVi: 'Ngân hàng',
+      srsState: SrsCardState(
+        id: 'SRS_TEST',
+        contentId: 'VOCAB_TEST',
+        dueAt: DateTime.fromMillisecondsSinceEpoch(0),
+        createdAt: DateTime.fromMillisecondsSinceEpoch(0),
+        updatedAt: DateTime.fromMillisecondsSinceEpoch(0),
+      ),
+      estimatedIntervalDays: const {
+        SrsRating.again: 1,
+        SrsRating.hard: 2,
+        SrsRating.good: 4,
+        SrsRating.easy: 8,
+      },
+    );
+    return SrsStudySession(queue: [card]);
+  }
+}
+
+class _MockSrsDueCountNotifier extends SrsDueCountNotifier {
+  @override
+  Future<int> build() async => 5;
 }
