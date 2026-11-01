@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../placement_test/placement_test.dart';
 
 /// Tab 1: Learning Screen featuring structured lessons and HSK roadmap.
 class LearningScreen extends StatefulWidget {
@@ -46,6 +47,53 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
                     ),
                   );
                 }).toList(),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+
+            // Placement Test Banner Card
+            HiCard(
+              backgroundColor: theme.colorScheme.primaryContainer.withAlpha(80),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.auto_awesome_rounded,
+                    color: AppColors.limeGreen,
+                    size: AppDimensions.iconLg,
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Khảo sát năng lực đầu vào',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Kiểm tra thích ứng 6 kỹ năng để chọn lớp HSK',
+                          style: theme.textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  HiButton(
+                    text: 'Làm bài',
+                    size: HiButtonSize.sm,
+                    variant: HiButtonVariant.primary,
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const PlacementTestIntroScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: AppSpacing.lg),

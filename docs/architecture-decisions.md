@@ -459,5 +459,55 @@ Trước khi bước vào Giai đoạn 5 (triển khai 22 phân hệ học tập
 - Nút "Từ điển tra cứu" trong lưới Truy Cập Nhanh (Quick Actions Grid) mở trực tiếp `QuickDictionarySheet`.
 - Cho phép tra cứu chữ Hán, Pinyin và tiếng Việt tức thì trên hơn 1,200 từ vựng HSK hoàn toàn offline, hiển thị kết hợp chữ `RubyText`, nghĩa tiếng Việt và câu ví dụ mà không tốn tài nguyên mạng.
 
+---
+
+## 14. Kiến Trúc Bài Kiểm Tra Thích Ứng Đầu Vào (CAT Placement Test) Cho 6 Kỹ Năng (Task 5.2)
+
+### 14.1. Động Cơ Toán Học 2PL IRT (Item Response Theory) & Định Tuyến Thích Ứng
+- **Mô hình 2-Tham số Logistic (2PL IRT):**
+  - Xác suất trả lời đúng của học viên có năng lực $\theta$ với câu hỏi $i$ có độ khó $b_i$ và độ phân biệt $a_i$:
+    $$P_i(\theta) = \frac{1}{1 + e^{-D \cdot a_i (\theta - b_i)}} \quad (D = 1.702)$$
+  - Lượng thông tin Fisher (Fisher Information):
+    $$I_i(\theta) = a_i^2 \cdot P_i(\theta) \cdot (1 - P_i(\theta))$$
+  - Chọn câu hỏi tiếp theo có $I_i(\theta)$ cực đại tại mức năng lực $\theta$ hiện thời trong danh sách các câu hỏi chưa làm của kỹ năng mục tiêu.
+- **Cập nhật năng lực (Theta Update & Step Bounding):**
+  - Sử dụng thuật toán Newton-Raphson xấp xỉ có ràng buộc biên bước nhảy $|\Delta\theta| \le 0.8$ nhằm ngăn chặn hiện tượng bất ổn định toán học khi học viên trả lời đúng hoặc sai một chuỗi liên tiếp ở đầu bài thi.
+  - Sau mỗi câu trả lời, sai số chuẩn đo lường được tính tự động:
+    $$SE(\theta) = \frac{1}{\sqrt{\sum_{k} I_k(\theta)}}$$
+- **Quy tắc dừng linh hoạt (Adaptive Stopping Rules):**
+  - Số câu tối thiểu: 12 câu (đảm bảo độ phủ mẫu trên các kỹ năng chính).
+  - Số câu tối đa: 30 câu (ngăn ngừa quá tải tâm lý và mỏi mệt).
+  - Điều kiện hội tụ: $SE(\theta) \le 0.35$ (tương đương độ tin cậy > 88%).
+  - Dừng sớm theo kỹ năng: Nếu học viên trả lời sai 3 câu liên tiếp ở một kỹ năng, hệ thống tự động khóa kỹ năng đó và chuyển sang kỹ năng tiếp theo để bảo vệ trải nghiệm của người học sơ cấp.
+
+### 14.2. Nguyên Tắc Đánh Giá 6 Kỹ Năng & Liêm Chính Dữ Liệu
+1. **Từ vựng, Ngữ pháp, Đọc hiểu, Nghe hiểu:**
+   - Được đo lường qua các câu hỏi đa dạng (trắc nghiệm, câu hỏi kèm phát âm ngữ âm chuẩn).
+2. **Kỹ năng Viết (Writing) — Không trộn điểm:**
+   - Hệ thống tách bạch tuyệt đối 3 chỉ số thành phần:
+     1. Nhận diện chữ Hán (`charRecognitionRate`).
+     2. Nhập Pinyin kèm thanh điệu chuẩn (`pinyinInputAccuracy`).
+     3. Thứ tự nét bút thuận (`strokeOrderScore`).
+   - Không gộp thành một điểm số bình quân duy nhất làm sai lệch năng lực chữ viết.
+3. **Kỹ năng Nói / Phát âm (Speaking) — Nguyên tắc chống phán đoán giả:**
+   - Tuyệt đối không đánh giá thanh điệu và ngữ điệu nếu chỉ dựa vào transcript của nhận dạng giọng nói ASR.
+   - Nếu không có tín hiệu audio phân tích âm học thực hoặc học viên nhấn "Bỏ qua", hệ thống ghi nhận rõ ràng: **"Chưa đủ dữ liệu đánh giá phát âm"** (`SpeakingEvaluationMode.insufficientData`).
+   - **Tuyệt đối không chấm 0 điểm** đối với kỹ năng thiếu dữ liệu.
+4. **Xử lý kỹ năng bị bỏ qua:**
+   - Bất kỳ kỹ năng nào người học chủ động bỏ qua sẽ được gán `isAssessed = false`, hiển thị nhãn `Chưa đánh giá` trên biểu đồ Radar và bảng điểm.
+5. **Tuyên bố pháp lý bắt buộc (Legal Disclaimer):**
+   - HSK chỉ là thang quy chiếu nội bộ phục vụ cá nhân hóa lộ trình học tại ứng dụng HI Chinese.
+   - Ứng dụng luôn hiển thị cảnh báo: *"Kết quả kiểm tra thích ứng chỉ mang tính tham chiếu nội bộ... không tương đương chứng chỉ HSK chính thức."*
+
+### 14.3. Lưu Trữ SQLite & Khả Năng Tiếp Tục Làm Bài (Persistence & Resume)
+- **Cơ sở dữ liệu (Migration V3):**
+  - Bảng `placement_test_sessions`: Lưu trữ `session_id`, `status` (`in_progress`, `completed`, `abandoned`), `current_step`, `estimated_theta`, `confidence_interval`, `overall_hsk_band`, `diagnostic_report_json`.
+  - Bảng `placement_test_responses`: Append-only lưu lại từng lượt trả lời gồm `item_id`, `skill`, `user_answer`, `is_correct`, `response_time_ms`, `timestamp`.
+- **Khôi phục trạng thái (Resume on Restart):**
+  - Khi người dùng thoát ứng dụng đột ngột hoặc tắt máy giữa bài thi, phiên `in_progress` được lưu trữ an toàn trong SQLite.
+  - Khi mở lại, màn hình `PlacementTestIntroScreen` hiển thị nút "Tiếp tục bài kiểm tra dang dở", khôi phục đúng bước câu hỏi, lịch sử điểm số và ma trận câu hỏi đã làm mà không làm mất dữ liệu.
+- **Đồng bộ bằng chứng học tập (Evidence Sync):**
+  - Khi hoàn thành bài test, kết quả được ghi nhận vào `learner_evidence` với nguồn `cat_placement_test` và `learning_activities`, kích hoạt cập nhật lộ trình gợi ý trên Trang Chủ.
+
 
 
