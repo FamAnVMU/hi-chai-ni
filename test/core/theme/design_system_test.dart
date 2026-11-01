@@ -381,8 +381,9 @@ void main() {
       expect(find.text('1. Theme Mode Switcher (Chế độ giao diện)'), findsOneWidget);
       expect(find.text('2. Bảng Màu Semantic (Color Tokens)'), findsOneWidget);
       expect(find.text('3. Typography & Đa Ngữ (Việt - Trung)'), findsOneWidget);
-      expect(find.text('学'), findsOneWidget);
-      expect(find.text('xué'), findsOneWidget);
+      expect(find.text('3.1. Component RubyText (Chữ Hán kèm Pinyin)'), findsOneWidget);
+      expect(find.text('学'), findsAtLeastNWidgets(1));
+      expect(find.text('xué'), findsAtLeastNWidgets(1));
     });
   });
 }

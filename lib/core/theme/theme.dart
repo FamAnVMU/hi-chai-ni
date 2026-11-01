@@ -23,3 +23,4 @@ export 'components/hi_error_state.dart';
 export 'components/hi_loading_indicator.dart';
 export 'components/hi_snackbar.dart';
 export 'components/hi_text_field.dart';
+export 'components/ruby_text/ruby_text.dart';

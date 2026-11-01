@@ -158,6 +158,7 @@ Tất cả thành phần đều nằm tại `lib/core/theme/components/` và đ�
 | **`HiLoadingIndicator`**| `hi_loading_indicator.dart`| Vòng quay tiến trình màu Lime kèm thông điệp hướng dẫn; thanh tiến trình `HiLinearProgress`. |
 | **`HiEmptyState`** | `hi_empty_state.dart` | Khung hiển thị khi danh sách trống kèm hình minh họa và nút hành động. |
 | **`HiErrorState`** | `hi_error_state.dart` | Khung thông báo lỗi kết nối / hệ thống kèm nút thử lại (`onRetry`). |
+| **`RubyText`** | `ruby_text/ruby_text.dart` | Hiển thị chữ Hán kèm Pinyin phía trên, tự động xuống dòng theo cụm từ (không ngắt rời pinyin và hanzi), căn chỉnh dấu câu theo baseline, hỗ trợ tap callback tra nghĩa và phát âm. |
 
 ---
 

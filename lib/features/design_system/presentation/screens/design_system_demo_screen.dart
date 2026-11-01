@@ -13,6 +13,10 @@ class DesignSystemDemoScreen extends ConsumerStatefulWidget {
 
 class _DesignSystemDemoScreenState extends ConsumerState<DesignSystemDemoScreen> {
   bool _isButtonLoading = false;
+  bool _showPinyinInRuby = true;
+  bool _showTraditionalInRuby = false;
+  String? _activeRubyWordId = 'w2';
+  bool _isAudioPlaying = false;
   final TextEditingController _inputController = TextEditingController(text: 'Xin chào / 你好');
   final TextEditingController _pwdController = TextEditingController(text: 'secret_api_key_123');
   String _selectedChip = 'HSK 1';
@@ -142,6 +146,155 @@ class _DesignSystemDemoScreenState extends ConsumerState<DesignSystemDemoScreen>
                       '“Học tiếng Trung mỗi ngày cùng trợ lý AI cá nhân hoá, '
                       'luyện phát âm, nhớ từ vựng với phương pháp lặp lại ngắt quãng SM-2.”',
                       style: theme.textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xxl),
+
+              // 3.1 RUBY TEXT COMPONENT (HANZI + PINYIN)
+              _buildSectionHeader('3.1. Component RubyText (Chữ Hán kèm Pinyin)'),
+              HiCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Tương tác & Xuống dòng chuẩn',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Text('Pinyin', style: theme.textTheme.labelSmall),
+                            Switch(
+                              value: _showPinyinInRuby,
+                              onChanged: (val) {
+                                setState(() {
+                                  _showPinyinInRuby = val;
+                                });
+                              },
+                            ),
+                            const SizedBox(width: AppSpacing.xs),
+                            Text('Phồn thể', style: theme.textTheme.labelSmall),
+                            Switch(
+                              value: _showTraditionalInRuby,
+                              onChanged: (val) {
+                                setState(() {
+                                  _showTraditionalInRuby = val;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      'Nhấn vào từng từ để xem nghĩa và kiểm tra âm thanh:',
+                      style: theme.textTheme.bodySmall,
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    RubyText(
+                      showPinyin: _showPinyinInRuby,
+                      showTraditional: _showTraditionalInRuby,
+                      activeWordId: _activeRubyWordId,
+                      isAudioLoading: _isAudioPlaying,
+                      onSegmentTap: (segment) {
+                        setState(() {
+                          _activeRubyWordId = segment.wordId;
+                        });
+                        HiSnackBar.showInfo(
+                          context,
+                          'Từ: ${segment.text} [${segment.pinyin ?? ''}] - Nghĩa: ${segment.meaning ?? "Chưa có"}',
+                        );
+                      },
+                      onPronounceTap: (segment) async {
+                        setState(() {
+                          _activeRubyWordId = segment.wordId;
+                          _isAudioPlaying = true;
+                        });
+                        await Future<void>.delayed(const Duration(milliseconds: 600));
+                        if (!context.mounted) return;
+                        setState(() {
+                          _isAudioPlaying = false;
+                        });
+                        HiSnackBar.showSuccess(
+                          context,
+                          'Đang phát âm thanh mẫu cho: ${segment.text}',
+                        );
+                      },
+                      segments: [
+                        RubySegment.word(
+                          hanzi: '我们',
+                          pinyin: 'wǒmen',
+                          wordId: 'w1',
+                          meaning: 'chúng tôi, chúng ta',
+                          traditionalText: '我們',
+                        ),
+                        RubySegment.word(
+                          hanzi: '去',
+                          pinyin: 'qù',
+                          wordId: 'w2',
+                          meaning: 'đi',
+                        ),
+                        RubySegment.word(
+                          hanzi: '银行',
+                          pinyin: 'yínháng',
+                          wordId: 'w3',
+                          meaning: 'ngân hàng (đa âm tự: 行 = háng)',
+                          traditionalText: '銀行',
+                        ),
+                        RubySegment.punctuation('，'),
+                        RubySegment.word(
+                          hanzi: '再去',
+                          pinyin: 'zài qù',
+                          wordId: 'w4',
+                          meaning: 'lại đi',
+                        ),
+                        RubySegment.word(
+                          hanzi: '骑',
+                          pinyin: 'qí',
+                          wordId: 'w5',
+                          meaning: 'cưỡi, đạp',
+                          traditionalText: '騎',
+                        ),
+                        RubySegment.word(
+                          hanzi: '自行车',
+                          pinyin: 'zìxíngchē',
+                          wordId: 'w6',
+                          meaning: 'xe đạp (đa âm tự: 行 = xíng)',
+                          traditionalText: '自行車',
+                        ),
+                        RubySegment.punctuation('！'),
+                      ],
+                    ),
+                    const Divider(height: AppSpacing.xxl),
+                    Text(
+                      'Câu trích Luận Ngữ (Xuống dòng nhiều câu & dấu câu):',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    RubyText.fromAnnotatedString(
+                      annotatedText:
+                          '学[xué:học]而[ér:và]时[shí:thường xuyên]习[xí:ôn tập]之[zhī:nó]，'
+                          '不[bù:không]亦[yì:cũng]说[yuè:vui vẻ]乎[hū:sao]？'
+                          '有[yǒu:có]朋[péng:bạn]自[zì:từ]远[yuǎn:xa]方[fāng:phương]来[lái:đến]，'
+                          '不[bù:không]亦[yì:cũng]乐[lè:vui]乎[hū:sao]！',
+                      showPinyin: _showPinyinInRuby,
+                      showTraditional: _showTraditionalInRuby,
+                      onSegmentTap: (segment) {
+                        HiSnackBar.showInfo(
+                          context,
+                          'Chữ Hán: ${segment.text} | Pinyin: ${segment.pinyin} | Nghĩa: ${segment.meaning}',
+                        );
+                      },
                     ),
                   ],
                 ),
