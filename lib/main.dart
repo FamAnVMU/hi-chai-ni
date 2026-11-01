@@ -5,6 +5,7 @@ import 'core/constants/app_constants.dart';
 import 'core/theme/theme.dart';
 import 'core/utils/app_lifecycle_manager.dart';
 import 'core/utils/permission_helper.dart';
+import 'features/app_shell/presentation/screens/app_shell.dart';
 import 'features/design_system/presentation/screens/design_system_demo_screen.dart';
 import 'features/settings/settings.dart';
 
@@ -52,7 +53,7 @@ class HiChineseApp extends ConsumerWidget {
       themeMode: themeMode,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      home: const HiChineseSkeletonScreen(),
+      home: const AppShell(),
     );
   }
 }
