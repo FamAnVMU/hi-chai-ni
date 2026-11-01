@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/constants/app_constants.dart';
 import 'core/utils/app_lifecycle_manager.dart';
 import 'core/utils/permission_helper.dart';
+import 'features/settings/settings.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -152,6 +153,17 @@ class _HiChineseSkeletonScreenState extends State<HiChineseSkeletonScreen> {
         ),
         centerTitle: true,
         backgroundColor: const Color(0xFF1A2418),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings, color: Color(0xFFA3D635)),
+            tooltip: 'Cài Đặt AI & Kết Nối',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const AiSettingsScreen()),
+              );
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(

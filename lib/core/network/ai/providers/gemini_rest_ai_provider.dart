@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../interfaces/ai_provider.dart';
@@ -8,6 +9,7 @@ import '../models/ai_model_config.dart';
 import '../models/ai_request.dart';
 import '../models/ai_response.dart';
 import '../models/cancel_token.dart';
+import '../models/connection_test_result.dart';
 import '../security/ai_credential_storage.dart';
 
 /// Production-ready Google Gemini AI REST provider.
@@ -52,6 +54,156 @@ class GeminiRestAiProvider implements AiProvider {
     } catch (_) {
       return false;
     }
+  }
+
+  @override
+  Future<ConnectionTestResult> testConnection({String? modelId}) async {
+    final effectiveModel = modelId ?? AiModelRegistry.modelGemini35FlashLite;
+    final stopwatch = Stopwatch()..start();
+
+    final apiKey = await credentialStorage.getApiKey();
+    if (apiKey == null || apiKey.trim().isEmpty) {
+      return ConnectionTestResult.failure(
+        providerName: 'Google Gemini REST',
+        modelTested: effectiveModel,
+        latencyMs: 0,
+        errorType: ConnectionErrorType.emptyCredentials,
+        errorMessage: 'Chưa cấu hình API Key.',
+      );
+    }
+
+    try {
+      final customProxy = await credentialStorage.getCustomProxyUrl();
+      final base = customProxy?.isNotEmpty == true ? customProxy! : _baseUrl;
+      final uri = Uri.parse('$base/models/$effectiveModel:generateContent');
+
+      final requestBody = json.encode({
+        'contents': [
+          {
+            'role': 'user',
+            'parts': [
+              {'text': 'Hi'}
+            ],
+          }
+        ],
+        'generationConfig': {
+          'maxOutputTokens': 5,
+        },
+      });
+
+      final response = await _client.post(
+        uri,
+        headers: {
+          'x-goog-api-key': apiKey,
+          'Content-Type': 'application/json',
+        },
+        body: requestBody,
+      ).timeout(const Duration(seconds: 15));
+
+      stopwatch.stop();
+      final latencyMs = stopwatch.elapsedMilliseconds;
+
+      if (response.statusCode == 200) {
+        try {
+          final data = json.decode(response.body) as Map<String, dynamic>;
+          final candidates = data['candidates'] as List<dynamic>?;
+          if (candidates != null && candidates.isNotEmpty) {
+            return ConnectionTestResult.success(
+              providerName: 'Google Gemini REST',
+              modelTested: effectiveModel,
+              latencyMs: latencyMs,
+            );
+          } else {
+            return ConnectionTestResult.failure(
+              providerName: 'Google Gemini REST',
+              modelTested: effectiveModel,
+              latencyMs: latencyMs,
+              errorType: ConnectionErrorType.malformedResponse,
+              errorMessage: 'Phản hồi từ máy chủ không chứa candidate hợp lệ.',
+            );
+          }
+        } catch (_) {
+          return ConnectionTestResult.failure(
+            providerName: 'Google Gemini REST',
+            modelTested: effectiveModel,
+            latencyMs: latencyMs,
+            errorType: ConnectionErrorType.malformedResponse,
+            errorMessage: 'Không thể giải mã dữ liệu JSON từ phản hồi máy chủ.',
+          );
+        }
+      }
+
+      final sanitizedBody = AiCredentialStorage.sanitizeSecret(response.body, apiKey);
+      final errorType = _classifyConnectionStatusCode(response.statusCode, sanitizedBody);
+
+      return ConnectionTestResult.failure(
+        providerName: 'Google Gemini REST',
+        modelTested: effectiveModel,
+        latencyMs: latencyMs,
+        errorType: errorType,
+        errorMessage: 'HTTP ${response.statusCode}: ${_extractErrorMessage(sanitizedBody)}',
+      );
+    } on TimeoutException {
+      stopwatch.stop();
+      return ConnectionTestResult.failure(
+        providerName: 'Google Gemini REST',
+        modelTested: effectiveModel,
+        latencyMs: stopwatch.elapsedMilliseconds,
+        errorType: ConnectionErrorType.timeout,
+        errorMessage: 'Yêu cầu kết nối quá thời gian chờ (15s).',
+      );
+    } on SocketException catch (e) {
+      stopwatch.stop();
+      return ConnectionTestResult.failure(
+        providerName: 'Google Gemini REST',
+        modelTested: effectiveModel,
+        latencyMs: stopwatch.elapsedMilliseconds,
+        errorType: ConnectionErrorType.networkError,
+        errorMessage: 'Lỗi mạng hoặc không thể phân giải DNS: ${e.message}',
+      );
+    } catch (e) {
+      stopwatch.stop();
+      final sanitizedError = AiCredentialStorage.sanitizeSecret(e.toString(), apiKey);
+      final isNetwork = sanitizedError.toLowerCase().contains('clientexception') ||
+          sanitizedError.toLowerCase().contains('failed host lookup') ||
+          sanitizedError.toLowerCase().contains('connection refused') ||
+          sanitizedError.toLowerCase().contains('network is unreachable');
+
+      return ConnectionTestResult.failure(
+        providerName: 'Google Gemini REST',
+        modelTested: effectiveModel,
+        latencyMs: stopwatch.elapsedMilliseconds,
+        errorType: isNetwork ? ConnectionErrorType.networkError : ConnectionErrorType.unknown,
+        errorMessage: sanitizedError,
+      );
+    }
+  }
+
+  ConnectionErrorType _classifyConnectionStatusCode(int code, String body) {
+    if (code == 401) return ConnectionErrorType.unauthorized;
+    if (code == 403) {
+      if (body.toLowerCase().contains('app check') || body.toLowerCase().contains('appcheck')) {
+        return ConnectionErrorType.appCheckFailed;
+      }
+      return ConnectionErrorType.unauthorized;
+    }
+    if (code == 400 && body.contains('API_KEY_INVALID')) {
+      return ConnectionErrorType.unauthorized;
+    }
+    if (code == 429) return ConnectionErrorType.quotaExceeded;
+    if (code == 404) return ConnectionErrorType.modelUnavailable;
+    return ConnectionErrorType.unknown;
+  }
+
+  String _extractErrorMessage(String body) {
+    try {
+      final jsonMap = json.decode(body) as Map<String, dynamic>;
+      if (jsonMap.containsKey('error')) {
+        final errorObj = jsonMap['error'] as Map<String, dynamic>;
+        return errorObj['message'] as String? ?? body;
+      }
+    } catch (_) {}
+    return body;
   }
 
   @override

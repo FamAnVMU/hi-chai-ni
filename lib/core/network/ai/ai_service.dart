@@ -4,6 +4,7 @@ import 'models/ai_model_config.dart';
 import 'models/ai_request.dart';
 import 'models/ai_response.dart';
 import 'models/cancel_token.dart';
+import 'models/connection_test_result.dart';
 import 'providers/gemini_rest_ai_provider.dart';
 import 'security/ai_credential_storage.dart';
 
@@ -56,6 +57,12 @@ class AiService {
   /// Verifies whether the current API key is valid.
   Future<bool> verifyCredentials() async {
     return await provider.verifyCredentials();
+  }
+
+  /// Performs a live connection test to verify provider availability, latency, and credentials.
+  Future<ConnectionTestResult> testConnection({String? modelId}) async {
+    final effectiveModel = modelId ?? modelRegistry.activeDefaultModelId;
+    return await provider.testConnection(modelId: effectiveModel);
   }
 }
 

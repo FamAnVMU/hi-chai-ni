@@ -5,6 +5,7 @@ import '../models/ai_model_config.dart';
 import '../models/ai_request.dart';
 import '../models/ai_response.dart';
 import '../models/cancel_token.dart';
+import '../models/connection_test_result.dart';
 
 /// Full-featured mock AI provider for testing, CI/CD, and offline demonstration.
 class MockAiProvider implements AiProvider {
@@ -24,11 +25,82 @@ class MockAiProvider implements AiProvider {
 
   String? customTextResponse;
   List<String>? customStreamChunks;
+  ConnectionTestResult? customConnectionResult;
+  ConnectionErrorType? simulateConnectionError;
 
   @override
   Future<bool> verifyCredentials() async {
     if (simulateUnauthorized) return false;
     return true;
+  }
+
+  @override
+  Future<ConnectionTestResult> testConnection({String? modelId}) async {
+    final effectiveModel = modelId ?? AiModelRegistry.modelGemini35FlashLite;
+
+    if (customConnectionResult != null) {
+      return customConnectionResult!;
+    }
+
+    if (simulatedLatency > Duration.zero) {
+      await Future<void>.delayed(simulatedLatency);
+    }
+
+    if (simulateUnauthorized) {
+      return ConnectionTestResult.failure(
+        providerName: 'Mock AI Provider',
+        modelTested: effectiveModel,
+        latencyMs: simulatedLatency.inMilliseconds,
+        errorType: ConnectionErrorType.unauthorized,
+        errorMessage: 'HTTP 401: Invalid API Key.',
+      );
+    }
+
+    if (simulateRateLimit) {
+      return ConnectionTestResult.failure(
+        providerName: 'Mock AI Provider',
+        modelTested: effectiveModel,
+        latencyMs: simulatedLatency.inMilliseconds,
+        errorType: ConnectionErrorType.quotaExceeded,
+        errorMessage: 'HTTP 429: Resource has been exhausted (rate limit).',
+      );
+    }
+
+    if (simulateNetworkError) {
+      return ConnectionTestResult.failure(
+        providerName: 'Mock AI Provider',
+        modelTested: effectiveModel,
+        latencyMs: simulatedLatency.inMilliseconds,
+        errorType: ConnectionErrorType.networkError,
+        errorMessage: 'SocketException: Failed to connect to host.',
+      );
+    }
+
+    if (simulateTimeout) {
+      return ConnectionTestResult.failure(
+        providerName: 'Mock AI Provider',
+        modelTested: effectiveModel,
+        latencyMs: simulatedLatency.inMilliseconds,
+        errorType: ConnectionErrorType.timeout,
+        errorMessage: 'Connection timed out.',
+      );
+    }
+
+    if (simulateConnectionError != null) {
+      return ConnectionTestResult.failure(
+        providerName: 'Mock AI Provider',
+        modelTested: effectiveModel,
+        latencyMs: simulatedLatency.inMilliseconds,
+        errorType: simulateConnectionError!,
+        errorMessage: 'Simulated connection error: ${simulateConnectionError!.name}',
+      );
+    }
+
+    return ConnectionTestResult.success(
+      providerName: 'Mock AI Provider',
+      modelTested: effectiveModel,
+      latencyMs: simulatedLatency.inMilliseconds == 0 ? 45 : simulatedLatency.inMilliseconds,
+    );
   }
 
   @override

@@ -3,6 +3,7 @@ export 'models/ai_request.dart';
 export 'models/ai_response.dart';
 export 'models/ai_model_config.dart';
 export 'models/cancel_token.dart';
+export 'models/connection_test_result.dart';
 export 'interfaces/ai_provider.dart';
 export 'security/ai_credential_storage.dart';
 export 'providers/mock_ai_provider.dart';
