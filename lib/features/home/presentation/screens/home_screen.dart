@@ -4,6 +4,7 @@ import '../../../../core/theme/theme.dart';
 import '../../../design_system/presentation/screens/design_system_demo_screen.dart';
 import '../../../settings/presentation/screens/ai_settings_screen.dart';
 import 'package:hi_chinese/features/app_shell/presentation/providers/app_shell_providers.dart';
+import 'package:hi_chinese/features/vocabulary_srs/vocabulary_srs.dart';
 
 /// Tab 0: Home Screen featuring quick stats, daily roadmap, and quick actions.
 class HomeScreen extends ConsumerStatefulWidget {
@@ -22,6 +23,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with AutomaticKeepAlive
     super.build(context);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final dueCountAsync = ref.watch(srsDueCountProvider);
+    final dueCount = dueCountAsync.asData?.value ?? 0;
 
     return Scaffold(
       appBar: AppBar(
@@ -119,15 +122,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with AutomaticKeepAlive
                           ),
                         ),
                         const SizedBox(width: AppSpacing.xs),
-                        const HiChip(
-                          label: '12 từ',
-                          status: HiChipStatus.warning,
+                        HiChip(
+                          label: dueCount > 0 ? '$dueCount từ' : 'Đã hoàn thành',
+                          status: dueCount > 0 ? HiChipStatus.warning : HiChipStatus.success,
                         ),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      'Hôm nay có 12 thẻ từ vựng cần củng cố trí nhớ dài hạn theo thuật toán SM-2.',
+                      dueCount > 0
+                          ? 'Hôm nay có $dueCount thẻ từ vựng cần củng cố trí nhớ dài hạn theo thuật toán SM-2.'
+                          : 'Tuyệt vời! Bạn đã hoàn thành tất cả thẻ cần ôn tập của ngày hôm nay.',
                       style: theme.textTheme.bodyMedium,
                     ),
                     const SizedBox(height: AppSpacing.md),

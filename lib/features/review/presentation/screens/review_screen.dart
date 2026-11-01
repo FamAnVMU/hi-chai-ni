@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../vocabulary_srs/vocabulary_srs.dart';
 
 /// Tab 3: Spaced Repetition System (SRS SM-2) Review Screen.
-class ReviewScreen extends StatefulWidget {
+class ReviewScreen extends ConsumerStatefulWidget {
   const ReviewScreen({super.key});
 
   @override
-  State<ReviewScreen> createState() => _ReviewScreenState();
+  ConsumerState<ReviewScreen> createState() => _ReviewScreenState();
 }
 
-class _ReviewScreenState extends State<ReviewScreen> with AutomaticKeepAliveClientMixin {
+class _ReviewScreenState extends ConsumerState<ReviewScreen> with AutomaticKeepAliveClientMixin {
   bool _isAnswerRevealed = false;
   int _currentCardIndex = 0;
 
@@ -47,6 +49,8 @@ class _ReviewScreenState extends State<ReviewScreen> with AutomaticKeepAliveClie
       _isAnswerRevealed = false;
       _currentCardIndex = (_currentCardIndex + 1) % _sampleReviewCards.length;
     });
+
+    ref.read(srsDueCountProvider.notifier).refreshCount();
   }
 
   @override
@@ -54,6 +58,12 @@ class _ReviewScreenState extends State<ReviewScreen> with AutomaticKeepAliveClie
     super.build(context);
     final theme = Theme.of(context);
     final card = _sampleReviewCards[_currentCardIndex];
+    final dueCountAsync = ref.watch(srsDueCountProvider);
+    final dueCountStr = dueCountAsync.when(
+      data: (count) => count.toString(),
+      loading: () => '...',
+      error: (_, _) => '0',
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -68,7 +78,7 @@ class _ReviewScreenState extends State<ReviewScreen> with AutomaticKeepAliveClie
               // Stats Row
               Row(
                 children: [
-                  _buildStatCard(title: 'Cần ôn hôm nay', value: '12', color: AppColors.limeGreen),
+                  _buildStatCard(title: 'Cần ôn hôm nay', value: dueCountStr, color: AppColors.limeGreen),
                   const SizedBox(width: AppSpacing.sm),
                   _buildStatCard(title: 'Đã thuộc', value: '128', color: Colors.blueAccent),
                   const SizedBox(width: AppSpacing.sm),

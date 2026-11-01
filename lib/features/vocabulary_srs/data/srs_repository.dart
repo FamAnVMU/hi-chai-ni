@@ -205,12 +205,13 @@ class SrsRepository {
     String contentType = 'vocabulary',
     DateTime? asOf,
     Duration ttl = const Duration(seconds: 60),
+    bool forceRefresh = false,
   }) async {
     final now = DateTime.now();
     final cacheKey = contentType;
 
-    // Use cache only when asOf is not explicitly customized
-    if (asOf == null) {
+    // Use cache only when asOf is not explicitly customized and not forceRefresh
+    if (asOf == null && !forceRefresh) {
       final cached = _dueCountCache[cacheKey];
       if (cached != null && cached.expiresAt.isAfter(now)) {
         return cached.count;

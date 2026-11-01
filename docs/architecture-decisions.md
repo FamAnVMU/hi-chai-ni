@@ -354,3 +354,80 @@ Nhằm chuẩn bị nền tảng hiệu năng cao cho Giai đoạn 4 (các modul
 ### 8.5. Quản Lý Vòng Đời Kết Nối & Giải Phóng Tài Nguyên (Resource Lifecycle)
 - Chuẩn hóa phương thức `dispose()` trên các interface `AiProvider`, `GeminiRestAiProvider` và `AiService` để giải phóng HTTP Client connection pool và socket ngầm khi ứng dụng hủy dịch vụ hoặc thay đổi cấu hình API key, ngăn chặn hoàn toàn rò rỉ bộ nhớ (memory leaks).
 
+---
+
+## 9. Material 3 Design System & Phân Cấp Màu Ngữ Nghĩa (Task 4.1)
+
+### 9.1. Quy Chuẩn Màu Sắc (Color Tokens & WCAG 2.2 AA)
+- **Quy tắc hạt nhân:** Không bao giờ dùng màu Lime Green (`#A3D635`) làm nền đại trà cho mọi thành phần hoặc bề mặt màn hình lớn.
+- **Phân cấp ngữ nghĩa (Semantic Hierarchy):**
+  - **Lime Green (`#A3D635`):** Đóng vai trò **Primary Action Accent** trong Dark Theme (Hero buttons, active tab indicators, glowing accents).
+  - **Dark Forest Palette:** `#121811` (Scaffold background), `#1A2418` (Surface/AppBar/Dialog), `#243022` (Card surface), `#2E3D2B` (Border).
+  - **Off-white (`#F6FAF2`):** Scaffold background trong Light Theme kết hợp thẻ trắng `#FFFFFF`.
+- **Kiểm định tỷ lệ tương phản chuẩn W3C:**
+  $$\text{Contrast Ratio} = \frac{L_1 + 0.05}{L_2 + 0.05}$$
+  - Nút chính Dark Theme (chữ Dark Forest `#121811` trên nền Lime Green `#A3D635`): Tỷ lệ tương phản **10.8:1** (Vượt xa chuẩn AA 4.5:1 và AAA 7.0:1).
+  - Nút chính Light Theme (chữ trắng trên nền `#53740A`): Tỷ lệ tương phản **5.0:1** (Đạt chuẩn AA).
+  - Chữ trên Surface Dark Theme (`#E2E4DC` trên `#1A2418`): Tỷ lệ tương phản **> 12.0:1**.
+
+### 9.2. Phông Chữ Bản Địa Hoá & Không Tải Font Runtime (Offline-First Typography)
+- Loại bỏ hoàn toàn sự phụ thuộc vào các thư viện tải font online runtime (như `google_fonts`) nhằm triệt tiêu độ trễ mạng và nguy cơ layout shift.
+- Áp dụng chuỗi font fallback hệ thống bản địa:
+  `['Noto Sans SC', 'PingFang SC', 'Heiti SC', 'Roboto', 'sans-serif']`.
+  Bảo đảm hiển thị sắc nét đồng thời chữ Hán (Giản thể & Phồn thể) và các dấu thanh tiếng Việt có dấu mũ/móc phức tạp (`ệ`, `ẩ`, `ỹ`, `ớ`, `ừ`).
+- Thiết lập các kiểu chữ học tập đặc thù trong `AppTypography`:
+  - `hanziLarge`: 40sp, weight: 600.
+  - `hanziMedium`: 24sp, weight: 500.
+  - `hanziSmall`: 18sp, weight: 400.
+  - `pinyin`: 14sp, letterSpacing: 0.5, height: 1.4.
+
+---
+
+## 10. Kiến Trúc Component `RubyText` & An Toàn Đa Âm Tự (Task 4.2)
+
+### 10.1. Nguyên Tắc Phòng Ngừa Sai Lệch Đa Âm Tự (Polyphone Defense)
+- Tuyệt đối không tự suy luận pinyin từ chuỗi Hán tự bằng thuật toán đơn giản hoặc regex (tránh sai kinh điển như chữ `行` trong `银行 yínháng` vs `自行车 zìxíngchē`, hoặc chữ `得` trong `跑得快 de` vs `你得走 děi`).
+- Mọi Pinyin hiển thị phải được truyền vào từ dataset / từ điển SQLite đã được kiểm duyệt. Nếu không có pinyin, segment hiển thị Hán tự thuần mà không đoán mò.
+
+### 10.2. Xuống Dòng Ở Ranh Giới Từ & Căn Chân Dấu Câu (Word-Level Wrapping & Baseline Alignment)
+- Thay vì dùng `Text.rich` hoặc các ký tự Unicode ruby giả lập, `RubyText` sử dụng `Wrap` trong đó mỗi `RubySegment` là một khối nguyên tử (atomic widget).
+- Khi dòng chạm lề màn hình, toàn bộ cụm Hán tự và Pinyin của từ đó sẽ xuống dòng cùng nhau, **Pinyin không bao giờ bị trôi hoặc ngắt lẻ sang dòng khác**.
+- Đối với từ ghép nhiều chữ (như `你好` - `nǐ hǎo`), nếu số lượng âm tiết cách nhau bởi khoảng trắng khớp với số chữ Hán, component căn chỉnh từng âm tiết trực tiếp trên đầu từng chữ Hán tương ứng bên trong một `Row` bất biến, giúp từ vựng hiển thị cân xứng hoàn hảo.
+- Căn chân dấu câu: Dấu câu tiếng Trung (`，`, `。`, `！`, `？`, `、`, `：`, `；`) sử dụng `WrapCrossAlignment.end` để tự động nằm ngang bằng chân (baseline) với chữ Hán, không bị lơ lửng trên không trung.
+
+---
+
+## 11. App Shell 5 Tab, Quản Lý Trạng Thái & Điều Hướng Cử Chỉ Android (Task 4.3)
+
+### 11.1. Cấu Trúc 5 Tab & Nút Trung Tâm Nổi Bật
+- **5 Tab cốt lõi:** 0: Trang chủ, 1: Học tập, 2: AI Tutor (Nút trung tâm nổi bật), 3: Ôn tập, 4: Cá nhân.
+- **Nút AI Tutor:** Thiết kế nổi bật dạng viên thuốc (`AppRadius.borderFull`) với màu Lime Green rực rỡ, tích hợp `Semantics` label và diện tích chạm $\ge 48\times 48\text{ dp}$.
+- **Tối ưu điện thoại & SafeArea:** Sử dụng `MediaQuery.paddingOf(context).bottom` kết hợp `SafeArea(bottom: true)`, tự động thích ứng với thanh điều hướng cử chỉ (Gesture Navigation bar) và tai thỏ camera trên các dòng máy Android.
+
+### 11.2. Bảo Toàn Trạng Thái Cuộn & Dữ Liệu Qua `IndexedStack`
+- 5 tab được duy trì đồng thời trong bộ nhớ bằng `IndexedStack` và `AutomaticKeepAliveClientMixin`.
+- Chuyển đổi qua lại giữa các tab giữ nguyên 100% vị trí cuộn danh sách và nội dung đang nhập dở trong các trường văn bản.
+
+### 11.3. Kiểm Soát Nút Back Của Android Qua `PopScope`
+- **Bảo vệ dữ liệu chưa lưu:** Tích hợp `hasUnsavedChangesProvider`, tự động hiển thị hộp thoại cảnh báo `HiDialog` xác nhận nếu người dùng nhấn Back khi đang làm bài kiểm tra hoặc nhập liệu dở dang.
+- **Quy tắc điều hướng chuẩn Android:** Nhấn Back từ bất kỳ tab phụ nào (Học tập, AI Tutor, Ôn tập, Cá nhân) sẽ tự động quay về Tab Trang chủ (Tab 0) trước khi thoát ứng dụng.
+
+---
+
+## 12. Tối Ưu Hóa & Chuẩn Bị Toàn Diện Trước Giai Đoạn 5 (Pre-Stage 5 Optimizations)
+
+Trước khi bước vào Giai đoạn 5 (triển khai 22 phân hệ học tập chuyên sâu: Flashcard tương tác, Luyện viết chữ Hán Canvas, Phòng âm học Shadowing, Khảo sát năng lực CAT), hệ thống đã được tối ưu hóa đồng bộ:
+
+### 12.1. Tự Động Checkpoint SQLite Khi Ứng Dụng Chuyển Background
+- Mở rộng `AppLifecycleManager`: Khi nhận sự kiện vòng đời `AppLifecycleState.paused`, `inactive`, hoặc `hidden` (người dùng thoát ra màn hình chính, có cuộc gọi đến hoặc khóa màn hình), hệ thống tự động kích hoạt `AppDatabase.instance.checkpoint(truncate: false)` chạy ngầm không gây block giao diện.
+- **Ý nghĩa:** Chuyển sạch các trang nhật ký WAL vào tệp DB chính, triệt tiêu nguy cơ mất mát dữ liệu do Android OOM Killer và giúp ứng dụng khởi động lạnh (Cold Boot) cực nhanh ở lần mở tiếp theo.
+
+### 12.2. Reactive Riverpod Binding Cho Huy Hiệu Ôn Tập (SRS Due Counter)
+- Thiết lập `srsDueCountProvider` (`AsyncNotifierProvider`) gắn kết trực tiếp `SrsRepository.getDueCardsCount(forceRefresh: true)`.
+- Kết nối phản ứng tức thời giữa Tab Trang chủ và Tab Ôn tập: Ngay khi người dùng đánh giá thẻ SRS tại `ReviewScreen`, số lượng thẻ đến hạn trên thẻ cảnh báo của `HomeScreen` và badge của `ReviewScreen` được cập nhật đồng thời mà không cần reload màn hình.
+
+### 12.3. Tách Biệt Toàn Diện Trạng Thái Khởi Động (`appStartupProvider`)
+- Giữ tệp `main.dart` hoàn toàn tinh gọn (< 70 dòng), chuyển toàn bộ logic kết nối SQLite, chạy migrations v1-v2 và PRAGMAs sang `AppStartupNotifier`.
+- Hỗ trợ màn hình Splash loader chuẩn `HiLoadingIndicator` và màn hình xử lý lỗi khởi động có nút Retry `HiErrorState`.
+
+

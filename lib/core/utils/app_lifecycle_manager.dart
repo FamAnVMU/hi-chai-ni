@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../database/app_database.dart';
 
 typedef AudioSessionStopCallback = void Function(String reason);
 
@@ -52,8 +53,10 @@ class AppLifecycleManager with WidgetsBindingObserver {
       case AppLifecycleState.inactive:
       case AppLifecycleState.hidden:
         // App backgrounded, incoming phone call, or screen locked:
-        // Force-stop all recording sessions immediately to protect user privacy.
+        // 1. Force-stop all recording sessions immediately to protect user privacy.
         _stopAllActiveAudioSessions('App backgrounded or focus lost ($state)');
+        // 2. Perform background SQLite WAL checkpoint to flush dirty pages to disk safely
+        _triggerBackgroundCheckpoint();
         break;
       case AppLifecycleState.detached:
         _stopAllActiveAudioSessions('App detached / terminated');
@@ -71,6 +74,17 @@ class AppLifecycleManager with WidgetsBindingObserver {
       } catch (_) {
         // Silently isolate callback errors to ensure all callbacks execute
       }
+    }
+  }
+
+  void _triggerBackgroundCheckpoint() {
+    try {
+      final db = AppDatabase.instance;
+      if (db.isOpen) {
+        db.checkpoint(truncate: false).catchError((_) {});
+      }
+    } catch (_) {
+      // Non-fatal background flush
     }
   }
 }
