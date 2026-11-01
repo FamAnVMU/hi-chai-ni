@@ -39,6 +39,23 @@ migrate_working_dir/
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
 
-# Keystore files
+# Signing & Keystore files
 *.keystore
 *.jks
+key.properties
+*.p8
+*.p12
+*.pem
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Local SQLite & Cache
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+/backups/
