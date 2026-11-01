@@ -8,7 +8,9 @@ import '../../../../core/database/dao/learner_evidence_dao.dart';
 import '../../../../core/network/ai/ai_service.dart';
 import '../../../../core/network/ai/models/ai_model_config.dart';
 import '../../../../core/network/ai/models/cancel_token.dart';
+import '../../domain/context/learner_context_service.dart';
 import '../../domain/context/tutor_context_builder.dart';
+import '../../domain/models/learning_evidence_proposal.dart';
 import '../../domain/models/tutor_chat_turn.dart';
 import '../../domain/models/tutor_correction.dart';
 import '../../domain/models/tutor_persona.dart';
@@ -55,12 +57,20 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
   final AppDatabase database;
   final AiService aiService;
   final TutorContextBuilder contextBuilder;
+  final LearnerContextService learnerContextService;
+  final LearningEvidenceValidator evidenceValidator;
 
   AiTutorRepositoryImpl({
     required this.database,
     required this.aiService,
     TutorContextBuilder? contextBuilder,
-  }) : contextBuilder = contextBuilder ?? const TutorContextBuilder();
+    LearnerContextService? learnerContextService,
+    LearningEvidenceValidator? evidenceValidator,
+  })  : contextBuilder = contextBuilder ?? const TutorContextBuilder(),
+        learnerContextService =
+            learnerContextService ?? const LearnerContextService(),
+        evidenceValidator =
+            evidenceValidator ?? const LearningEvidenceValidator();
 
   Future<DatabaseExecutor> _getDb() async {
     return database.isOpen ? database.database : await database.open();
@@ -145,12 +155,21 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
     });
     await chatDao.touchSession(sessionId);
 
-    // 2. Fetch history and build prompt request
+    // 2. Build learner context from DB (runs concurrently with nothing — serial here for simplicity)
+    final learnerContext = await learnerContextService.buildContext(
+      db,
+      sessionId: sessionId,
+      hskLevel: learnerHskLevel,
+      learnerName: learnerName,
+    );
+
+    // 3. Fetch history and build prompt request
     final rawHistory = await chatDao.getMessagesBySessionId(sessionId);
     // Remove the message we just inserted so the context builder can append it cleanly
-    final historyExcludingLast = rawHistory.isNotEmpty && rawHistory.last['id'] == userMessageId
-        ? rawHistory.sublist(0, rawHistory.length - 1)
-        : rawHistory;
+    final historyExcludingLast =
+        rawHistory.isNotEmpty && rawHistory.last['id'] == userMessageId
+            ? rawHistory.sublist(0, rawHistory.length - 1)
+            : rawHistory;
 
     final request = contextBuilder.buildRequest(
       userInput: userText,
@@ -160,19 +179,23 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
       learnerHskLevel: learnerHskLevel,
       learnerName: learnerName,
       weakSrsWords: weakSrsWords,
+      learnerContext: learnerContext,
     );
 
-    // 3. Dispatch to AI service
+    // 4. Dispatch to AI service
     final aiResponse = await aiService.generateText(
       request,
       taskType: AiTaskType.chatTutor,
       cancelToken: cancelToken,
     );
 
-    // 4. Parse response
-    final tutorResponse = TutorResponseParser.parse(aiResponse.text);
+    // 5. Parse response (pass sessionId so proposals can be attributed)
+    final tutorResponse = TutorResponseParser.parse(
+      aiResponse.text,
+      sessionId: sessionId,
+    );
 
-    // 5. Persist assistant reply to SQLite
+    // 6. Persist assistant reply to SQLite
     final assistantMessageId = 'msg_${DateTime.now().millisecondsSinceEpoch}_assistant';
     await chatDao.insertMessage({
       'id': assistantMessageId,
@@ -187,11 +210,14 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
     });
     await chatDao.touchSession(sessionId);
 
-    // 6. Record learner evidence if an evaluation was performed
+    // 7. Record evaluation evidence (dialogue-level)
     await _recordEvidenceIfNeeded(
       sessionId: sessionId,
       evaluation: tutorResponse.evaluation,
     );
+
+    // 8. Validate and persist AI evidence proposals
+    await _applyValidatedProposals(tutorResponse.evidenceProposals);
 
     return tutorResponse;
   }
@@ -232,7 +258,15 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
           });
           await chatDao.touchSession(sessionId);
 
-          // 2. Fetch history and build request
+          // 2. Build learner context
+          final learnerContext = await learnerContextService.buildContext(
+            db,
+            sessionId: sessionId,
+            hskLevel: learnerHskLevel,
+            learnerName: learnerName,
+          );
+
+          // 3. Fetch history and build request
           final rawHistory = await chatDao.getMessagesBySessionId(sessionId);
           final historyExcludingLast =
               rawHistory.isNotEmpty && rawHistory.last['id'] == userMessageId
@@ -247,9 +281,10 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
             learnerHskLevel: learnerHskLevel,
             learnerName: learnerName,
             weakSrsWords: weakSrsWords,
+            learnerContext: learnerContext,
           );
 
-          // 3. Stream from AI service
+          // 4. Stream from AI service
           final stream = aiService.streamText(
             request,
             taskType: AiTaskType.chatTutor,
@@ -263,11 +298,14 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
             controller.add(chunk.text);
           }
 
-          // 4. On stream completion, parse full accumulated text
+          // 5. On stream completion, parse full accumulated text
           final fullText = accumulatedBuffer.toString();
-          final tutorResponse = TutorResponseParser.parse(fullText);
+          final tutorResponse = TutorResponseParser.parse(
+            fullText,
+            sessionId: sessionId,
+          );
 
-          // 5. Save assistant turn to SQLite
+          // 6. Save assistant turn to SQLite
           final assistantMessageId =
               'msg_${DateTime.now().millisecondsSinceEpoch}_assistant';
           await chatDao.insertMessage({
@@ -283,11 +321,12 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
           });
           await chatDao.touchSession(sessionId);
 
-          // 6. Record learner evidence
+          // 7. Record evaluation evidence and validated proposals
           await _recordEvidenceIfNeeded(
             sessionId: sessionId,
             evaluation: tutorResponse.evaluation,
           );
+          await _applyValidatedProposals(tutorResponse.evidenceProposals);
 
           onComplete?.call(tutorResponse);
           await controller.close();
@@ -303,6 +342,10 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
 
     return controller.stream;
   }
+
+  // ---------------------------------------------------------------------------
+  // Evidence helpers
+  // ---------------------------------------------------------------------------
 
   Future<void> _recordEvidenceIfNeeded({
     required String sessionId,
@@ -328,6 +371,59 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
       });
     } catch (e) {
       debugPrint('[AiTutorRepository] Warning: failed to append learner evidence: $e');
+    }
+  }
+
+  /// Validates AI-proposed evidence and writes only passing proposals to DB.
+  ///
+  /// Policy: AI proposes → validator filters → repository writes.
+  /// Rejected proposals are logged but never written.
+  Future<void> _applyValidatedProposals(
+    List<LearningEvidenceProposal> proposals,
+  ) async {
+    if (proposals.isEmpty) return;
+
+    final valid = evidenceValidator.filterValid(
+      proposals,
+      onRejected: (proposal, reason) {
+        debugPrint(
+          '[AiTutorRepository] Evidence proposal rejected '
+          '(${proposal.contentId}/${proposal.eventType}): $reason',
+        );
+      },
+    );
+
+    if (valid.isEmpty) return;
+
+    try {
+      final db = await _getDb();
+      final evidenceDao = LearnerEvidenceDao(db);
+
+      for (final proposal in valid) {
+        final nowUtc = DateTime.now().toUtc().toIso8601String();
+        await evidenceDao.appendEvidence({
+          'id': 'ev_proposal_${DateTime.now().microsecondsSinceEpoch}',
+          'srs_item_id': null,
+          'content_id': proposal.contentId,
+          'content_type': proposal.contentType,
+          'source': proposal.source,
+          'score': proposal.confidence,
+          'duration_ms': 0,
+          'metadata_json': jsonEncode({
+            'event_type': proposal.eventType,
+            'task_context': proposal.taskContext,
+            'session_id': proposal.sessionId,
+            'proposed_at': proposal.proposedAt.toIso8601String(),
+          }),
+          'created_at': nowUtc,
+        });
+      }
+
+      debugPrint(
+        '[AiTutorRepository] Applied ${valid.length}/${proposals.length} evidence proposals.',
+      );
+    } catch (e) {
+      debugPrint('[AiTutorRepository] Warning: failed to apply evidence proposals: $e');
     }
   }
 }

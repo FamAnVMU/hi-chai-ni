@@ -1,4 +1,5 @@
 import '../../../../core/network/ai/models/ai_request.dart';
+import '../models/learner_context.dart';
 import '../models/tutor_persona.dart';
 import '../models/tutor_scenario.dart';
 import '../prompts/tutor_system_prompt_builder.dart';
@@ -6,6 +7,9 @@ import '../prompts/tutor_system_prompt_builder.dart';
 /// Context Builder for AI Tutor chat turns.
 /// Assembles system prompts, persona settings, active recall SRS vocabulary,
 /// and applies a bounded sliding window to SQLite chat history.
+///
+/// Accepts an optional pre-fetched [LearnerContext] from [LearnerContextService]
+/// to inject confirmed vocabulary, recurring errors, and skill mastery into the prompt.
 class TutorContextBuilder {
   final int maxHistoryTurns;
 
@@ -23,8 +27,13 @@ class TutorContextBuilder {
     String learnerName = 'Học viên',
     List<String> weakSrsWords = const [],
     String? customLearningGoal,
+
+    /// Optional learner context pre-fetched by the repository.
+    /// When provided, overrides [learnerHskLevel] and [learnerName] from profile
+    /// and enriches the system prompt with pedagogical history.
+    LearnerContext? learnerContext,
   }) {
-    // 1. Build the pedagogical system prompt with anti-hypercorrection guardrails
+    // 1. Build the pedagogical system prompt with anti-hypercorrection and anti-injection guardrails
     final systemPrompt = TutorSystemPromptBuilder.build(
       TutorPromptOptions(
         persona: persona,
@@ -33,6 +42,7 @@ class TutorContextBuilder {
         learnerName: learnerName,
         weakSrsWords: weakSrsWords,
         customLearningGoal: customLearningGoal,
+        learnerContext: learnerContext,
       ),
     );
 

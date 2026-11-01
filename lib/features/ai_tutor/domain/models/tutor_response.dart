@@ -1,3 +1,4 @@
+import 'learning_evidence_proposal.dart';
 import 'tutor_correction.dart';
 
 /// Full structured AI Tutor response turn.
@@ -20,6 +21,9 @@ class TutorResponse {
   /// Target vocabulary words introduced or reinforced in this turn.
   final List<String> targetVocabulary;
 
+  /// Evidence proposals from the AI (must be validated before writing to DB).
+  final List<LearningEvidenceProposal> evidenceProposals;
+
   /// Token usage metadata if available.
   final int tokensUsed;
 
@@ -30,6 +34,7 @@ class TutorResponse {
     this.evaluation,
     this.followUpSuggestions = const [],
     this.targetVocabulary = const [],
+    this.evidenceProposals = const [],
     this.tokensUsed = 0,
   });
 
@@ -41,6 +46,7 @@ class TutorResponse {
       'evaluation': evaluation?.toMap(),
       'follow_up_suggestions': followUpSuggestions,
       'target_vocabulary': targetVocabulary,
+      'evidence_proposals': evidenceProposals.map((e) => e.toMap()).toList(),
       'tokens_used': tokensUsed,
     };
   }
@@ -59,6 +65,14 @@ class TutorResponse {
           const [],
       targetVocabulary: (map['target_vocabulary'] as List<dynamic>?)
               ?.map((e) => e.toString())
+              .toList() ??
+          const [],
+      evidenceProposals: (map['evidence_proposals'] as List<dynamic>?)
+              ?.whereType<Map<String, dynamic>>()
+              .map((m) => LearningEvidenceProposal.fromMap(
+                    m,
+                    sessionId: map['session_id'] as String? ?? '',
+                  ))
               .toList() ??
           const [],
       tokensUsed: (map['tokens_used'] as num?)?.toInt() ?? 0,

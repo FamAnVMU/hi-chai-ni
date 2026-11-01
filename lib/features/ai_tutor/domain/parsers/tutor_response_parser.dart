@@ -1,4 +1,5 @@
 import 'dart:convert';
+import '../models/learning_evidence_proposal.dart';
 import '../models/tutor_response.dart';
 
 /// Fault-tolerant parser for AI Tutor responses.
@@ -7,13 +8,18 @@ class TutorResponseParser {
   TutorResponseParser._();
 
   /// Parses raw LLM text into a structured [TutorResponse].
-  static TutorResponse parse(String rawText) {
+  ///
+  /// [sessionId] is needed to populate [LearningEvidenceProposal.sessionId].
+  static TutorResponse parse(String rawText, {String sessionId = ''}) {
     final cleaned = _extractJsonBlock(rawText.trim());
 
     try {
       final decoded = jsonDecode(cleaned);
       if (decoded is Map<String, dynamic>) {
-        return TutorResponse.fromMap(decoded);
+        // Inject sessionId into the map so fromMap can pass it to proposals
+        final mapWithSession = Map<String, dynamic>.from(decoded)
+          ..['session_id'] = sessionId;
+        return TutorResponse.fromMap(mapWithSession);
       }
     } catch (_) {
       // Fallback if model output is not valid JSON
@@ -83,6 +89,7 @@ class TutorResponseParser {
       evaluation: null,
       followUpSuggestions: const [],
       targetVocabulary: const [],
+      evidenceProposals: const [],
     );
   }
 
