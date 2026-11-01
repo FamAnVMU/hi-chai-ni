@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hi_chinese/core/constants/app_constants.dart';
 import 'package:hi_chinese/core/startup/app_startup_provider.dart';
+import 'package:hi_chinese/features/home/home.dart';
 import 'package:hi_chinese/core/utils/app_lifecycle_manager.dart';
 import 'package:hi_chinese/main.dart';
 
@@ -37,7 +38,7 @@ void main() {
     expect(find.text('AI Tutor'), findsAtLeastNWidgets(1));
     expect(find.text('Ôn tập'), findsOneWidget);
     expect(find.text('Cá nhân'), findsOneWidget);
-    expect(find.textContaining('Chuỗi học 5 ngày liên tiếp!'), findsOneWidget);
+    expect(find.byType(HomeScreen), findsOneWidget);
   });
 
   test('AppLifecycleManager halts active audio sessions on app pause', () {

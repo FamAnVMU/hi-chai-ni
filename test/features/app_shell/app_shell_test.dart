@@ -5,6 +5,7 @@ import 'package:hi_chinese/core/startup/app_startup_provider.dart';
 import 'package:hi_chinese/core/theme/theme.dart';
 import 'package:hi_chinese/features/app_shell/presentation/providers/app_shell_providers.dart';
 import 'package:hi_chinese/features/app_shell/presentation/screens/app_shell.dart';
+import 'package:hi_chinese/features/home/home.dart';
 import 'package:hi_chinese/features/app_shell/presentation/widgets/hi_bottom_nav_bar.dart';
 
 void main() {
@@ -51,7 +52,7 @@ void main() {
       expect(find.text('Cá nhân'), findsOneWidget);
 
       // Home Screen content is active
-      expect(find.textContaining('Chuỗi học 5 ngày liên tiếp!'), findsOneWidget);
+      expect(find.byType(HomeScreen), findsOneWidget);
     });
 
     testWidgets('Tapping Learning tab switches to LearningScreen', (tester) async {
@@ -124,7 +125,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 200));
 
       // Verifies we returned to Home tab
-      expect(find.textContaining('Chuỗi học 5 ngày liên tiếp!'), findsOneWidget);
+      expect(find.byType(HomeScreen), findsOneWidget);
     });
 
     testWidgets('Back button with unsaved changes shows confirmation dialog', (tester) async {

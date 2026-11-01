@@ -430,4 +430,34 @@ Trước khi bước vào Giai đoạn 5 (triển khai 22 phân hệ học tập
 - Giữ tệp `main.dart` hoàn toàn tinh gọn (< 70 dòng), chuyển toàn bộ logic kết nối SQLite, chạy migrations v1-v2 và PRAGMAs sang `AppStartupNotifier`.
 - Hỗ trợ màn hình Splash loader chuẩn `HiLoadingIndicator` và màn hình xử lý lỗi khởi động có nút Retry `HiErrorState`.
 
+---
+
+## 13. Kiến Trúc Trang Chủ & Chuỗi Học Tập Tính Toán Theo Múi Giờ (Task 5.1)
+
+### 13.1. Thuật Toán Tính Chuỗi Học Tập (Timezone-Aware Streak Engine)
+- **Định nghĩa "Ngày học có ý nghĩa":**
+  - Chỉ tính khi có hoạt động học tập thực tế trong bảng `learner_evidence` (đánh giá thẻ Flashcard, trả lời bài tập, đàm thoại AI) hoặc `learning_activities` (`duration_seconds >= 30` hoặc `items_count >= 1`).
+  - Mở ứng dụng (App Open) thuần túy **không được ghi nhận** và **tuyệt đối không làm tăng streak**.
+  - Dữ liệu mẫu (với `source IN ('sample_data', 'seed')`) được lọc bỏ triệt để khỏi mọi truy vấn thống kê.
+- **Quy tắc tính toán ngày dương lịch địa phương:**
+  - Mọi mốc thời gian được lưu trữ dưới dạng chuẩn ISO-8601 UTC trong SQLite.
+  - Khi tính chuỗi, hệ thống chuyển đổi timestamp UTC sang ngày lịch địa phương (`DateTime.toLocal()` hoặc `timeZoneOffset` cụ thể), loại bỏ triệt để lỗi chệch múi giờ khi người dùng di chuyển hoặc thay đổi DST.
+  - **Học qua nửa đêm (Midnight crossover):** Một phiên học bắt đầu lúc 23:55 (Ngày 1) và kết thúc bài học tiếp theo lúc 00:05 (Ngày 2) được ghi nhận chính xác cho cả 2 ngày dương lịch liên tiếp, duy trì và nâng chuỗi học tập xứng đáng.
+  - **Bảo toàn chuỗi chờ học trong ngày:** Nếu người học chưa học hôm nay nhưng hôm qua có học, chuỗi vẫn được giữ nguyên kèm lời nhắc động viên ("Học ngay hôm nay để giữ chuỗi!"). Chỉ khi cả hôm nay và hôm qua đều không có hoạt động học tập có ý nghĩa thì chuỗi mới bị ngắt (reset về 0), nhưng kỷ lục chuỗi cao nhất (`bestStreak`) vẫn được bảo lưu vĩnh viễn.
+
+### 13.2. Cấu Trúc Bảng Điều Khiển Trang Chủ (Home Dashboard Data Flow)
+- `HomeRepository`: Assembles trực tiếp từ SQLite WAL:
+  - Contextual greeting theo giờ địa phương (Sáng/Chiều/Tối).
+  - Chuỗi học tập và tiến độ mục tiêu ngày (`LearningStreak`).
+  - Số thẻ SRS đến hạn hôm nay (`SrsRepository.getDueCardsCount(forceRefresh: true)`).
+  - Lộ trình HSK và tỷ lệ từ vựng đã học / thành thạo (`RoadmapProgress`).
+  - Danh sách 5 hoạt động học gần đây nhất kèm thời gian tương đối (`RecentActivityItem`).
+- **Phòng thủ trạng thái lỗi trong Riverpod:**
+  - Xử lý điều kiện `dashboardAsync.hasError && !dashboardAsync.hasValue` hiển thị ngay `HiErrorState` kèm nút "Thử lại", ngăn chặn hiện tượng treo màn hình skeleton loading khi SQLite gặp lỗi truy vấn lần đầu.
+
+### 13.3. Tích Hợp Tra Cứu Từ Điển Offline Tức Thì (Quick Dictionary Modal)
+- Nút "Từ điển tra cứu" trong lưới Truy Cập Nhanh (Quick Actions Grid) mở trực tiếp `QuickDictionarySheet`.
+- Cho phép tra cứu chữ Hán, Pinyin và tiếng Việt tức thì trên hơn 1,200 từ vựng HSK hoàn toàn offline, hiển thị kết hợp chữ `RubyText`, nghĩa tiếng Việt và câu ví dụ mà không tốn tài nguyên mạng.
+
+
 
