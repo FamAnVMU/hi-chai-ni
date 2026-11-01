@@ -7,6 +7,7 @@ import '../../../shadowing/shadowing.dart';
 import '../../../reading/reading.dart';
 import '../../../dictionary/dictionary.dart';
 import '../../../roadmap/roadmap.dart';
+import '../../../grammar/grammar.dart';
 
 /// Tab 1: Learning Screen featuring structured lessons and HSK roadmap.
 class LearningScreen extends StatefulWidget {
@@ -371,6 +372,53 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: AppSpacing.lg),
+
+            // Grammar Module Banner Card
+            HiCard(
+              backgroundColor: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.auto_stories_rounded,
+                    color: AppColors.limeGreen,
+                    size: AppDimensions.iconLg,
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Ngữ pháp tiếng Hán',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Cấu trúc câu, ví dụ đối chiếu L1 & bài tập áp dụng',
+                          style: theme.textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  HiButton(
+                    text: 'Học ngữ pháp',
+                    size: HiButtonSize.sm,
+                    variant: HiButtonVariant.primary,
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const GrammarListScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: AppSpacing.lg),
 

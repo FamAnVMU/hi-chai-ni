@@ -734,3 +734,53 @@ Trước khi bước vào Giai đoạn 5 (triển khai 22 phân hệ học tập
   - `lesson_progress`: Lưu trạng thái tiến độ cá nhân của từng bài học kèm điểm số và số lượng bằng chứng.
   - `roadmap_snapshots`: Lưu vết các snapshot lộ trình đã tính toán (JSON đề xuất và JSON độ thành thạo 6 kỹ năng) phục vụ truy xuất offline tức thì.
 - **Phiên bản Database:** Nâng cấp tự động lên **v5** (`hi_chinese.db`) với cơ chế migration an toàn, bảo toàn 100% dữ liệu người dùng.
+
+---
+
+## 20. Kiến Trúc Grammar Module (Cấu Trúc Ngữ Pháp, Đối Chiếu L1 & Chấm Điểm Rubric Minh Bạch)
+
+### 20.1. Mô Hình Ngữ Pháp Sư Phạm & Tính Chuẩn Xác Ngôn Ngữ
+- **Nguồn tài liệu chuẩn hóa:** Toàn bộ điểm ngữ pháp được biên soạn dựa trên giáo trình chuẩn HSK Standard Course (BLCU) và ngữ pháp tiếng Hán hiện đại. Tuyệt đối không tự bịa đặt ngữ pháp hoặc sử dụng cấu trúc không được kiểm chứng.
+- **Phân rã cấu trúc sư phạm (`GrammarItem`):**
+  - `id`: Định danh ổn định (ví dụ: `GRM_HSK1_01_SHI`, `GRM_HSK2_01_BI_COMPARISON`, `GRM_HSK2_02_BA_SENTENCE`).
+  - `structure`: Công thức mẫu ngữ pháp chính quy (ví dụ: `Chủ ngữ + 是 + Danh từ`, `A + 比 + B + Tính từ`, `Chủ ngữ + 把 + Tân ngữ + Động từ + Thành phần khác`).
+  - `meaningVi`: Ý nghĩa ngữ pháp và chức năng biểu đạt bằng tiếng Việt.
+  - `usageConditionsVi`: Điều kiện sử dụng và các giới hạn ngữ cảnh (ví dụ: không dùng phó từ mức độ trước `是`, điều kiện của động từ sau `把`).
+  - `sentencePositionVi`: Vị trí tương đối của cấu trúc/từ loại trong câu.
+  - `explanationVi`: Giải thích bản chất ngữ nghĩa, so sánh với tiếng Việt.
+  - `tags`: Nhãn phân loại theo chủ đề ngữ pháp (ví dụ: `câu_phán_đoán`, `câu_so_sánh`, `câu_chữ_bả`).
+  - `relatedVocabIds`, `relatedGrammarIds`, `prerequisiteGrammarIds`: Quan hệ phụ thuộc và mạng lưới liên kết tri thức.
+
+### 20.2. Phân Tích Đối Chiếu & Lỗi Chuyển Di Âm Tính (L1 Negative Transfer Analysis)
+- **Đặc thù người học Việt Nam:** Người học tiếng Trung từ tiếng Việt thường mắc các lỗi sai do áp dụng trật tự cú pháp tiếng Việt vào tiếng Trung (Negative Transfer):
+  - Lỗi dùng `是` trước tính từ: *"我好"* hoặc sai lầm *"我是好"* thay vì cấu trúc đúng *"我很好"*.
+  - Lỗi vị trí cụm giới từ chỉ địa điểm: nói *"học ở trường"* thay vì *"ở trường học"* (`在学校学习`).
+  - Lỗi câu chữ `把`: quên thành phần bắt buộc ở sau động từ (bổ ngữ, trợ từ kết quả `了`).
+  - Lỗi câu so sánh `比`: chèn thêm phó từ mức độ *"很"* sau chữ `比`.
+- **Cấu trúc `ContrastiveExample`:**
+  - `incorrectSentence`: Câu sai điển hình mà học viên hay viết/nói.
+  - `correctSentence`: Câu chuẩn ngữ pháp tiếng Hán.
+  - `explanationVi`: Phân tích nguồn gốc lỗi sai do chuyển di từ tiếng Việt.
+  - `errorType`: Phân loại lỗi (`word_order`, `copula_misuse`, `particle_omission`, `modifier_placement`).
+
+### 20.3. Động Cơ Chấm Bài Tập Deterministic & Rubric Minh Bạch (GrammarEvaluationEngine)
+- **Đa dạng dạng bài tập áp dụng (`GrammarExerciseType`):**
+  - **Trắc nghiệm (`multipleChoice`):** Chấm điểm tuyệt đối (deterministic) dựa trên `correctAnswerIndex`.
+  - **Sắp xếp trật tự từ (`reorderWords`):** Tách từ khóa, chuẩn hóa khoảng trắng/dấu câu (`_normalizeChinese`), so khớp chuỗi chuẩn và danh sách đáp án chấp nhận được (`acceptableAnswers`).
+  - **Dịch câu mở (`openTranslation`):**
+    - So khớp chính xác hoặc qua `acceptableAnswers`: Đạt điểm `1.0`, độ tin cậy `1.0`.
+    - Phân tích từ khóa khung cấu trúc (`rubricKeywords`):
+      - Khớp đầy đủ từ khóa cấu trúc (ratio = 1.0): Điểm `0.85`, độ tin cậy `0.85` (Đạt chuẩn tự động).
+      - Khớp một phần từ khóa cấu trúc ($0.5 \le \text{ratio} < 1.0$): Điểm `0.50`, độ tin cậy `0.65` (< 0.8), tự động bật cờ **`needsHumanReview = true`** và thông báo minh bạch *"Đã dùng được một số từ khóa ngữ pháp nhưng cấu trúc chưa hoàn chỉnh. [Cần xem lại kết quả]"*.
+      - Thiếu hoàn toàn cấu trúc mục tiêu (ratio < 0.5): Điểm `0.10`, độ tin cậy `0.90`, `needsHumanReview = false`.
+
+### 20.4. Nguyên Tắc Liêm Chính Sư Phạm & SQLite Database Migration v6
+- **Nguyên tắc Academic Honesty:**
+  - Mở bài học xem lý thuyết (`exercisesCount == 0`) **tuyệt đối không tạo `LearnerEvidence`** và không ghi nhận chuỗi hoạt động `learning_activities`.
+  - Chỉ khi người học hoàn thành ít nhất 1 bài tập áp dụng có điểm số thực nghiệm (`exercisesCount > 0`), hệ thống mới thực thi transaction nguyên tử ghi nhận tiến độ vào `grammar_progress`, `learner_evidence` (content_type: `'grammar'`) và `learning_activities` (type: `'grammar'`).
+- **SQLite Database Migration v6:**
+  - Mở rộng bảng `grammar_items` với các cột sư phạm mới: `title`, `structure`, `meaning_vi`, `usage_conditions_vi`, `sentence_position_vi`, `source`, `tags_json`, `related_vocab_ids_json`, `related_grammar_ids_json`, `prerequisite_grammar_ids_json`, `contrastive_examples_json`, `exercises_json`.
+  - Bổ sung bảng `grammar_progress`: `id`, `grammar_id`, `hsk_level`, `status`, `mastery_score`, `exercises_completed`, `last_studied_at`, `created_at`, `updated_at`.
+  - Tạo các chỉ mục tối ưu truy vấn: `idx_grammar_progress_status` và `idx_grammar_items_hsk`.
+  - Phiên bản Database: Nâng cấp tự động lên **v6** (`hi_chinese.db`), tương thích ngược 100% với các phiên bản trước.
+

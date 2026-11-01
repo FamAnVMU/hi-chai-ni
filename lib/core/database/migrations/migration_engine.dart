@@ -6,6 +6,7 @@ import 'migration_v2.dart';
 import 'migration_v3.dart';
 import 'migration_v4.dart';
 import 'migration_v5.dart';
+import 'migration_v6.dart';
 
 class MigrationException implements Exception {
   final String message;
@@ -29,6 +30,7 @@ class MigrationEngine {
           const MigrationV3(),
           const MigrationV4(),
           const MigrationV5(),
+          const MigrationV6(),
         ];
 
   List<Migration> get registeredMigrations => List.unmodifiable(_migrations);

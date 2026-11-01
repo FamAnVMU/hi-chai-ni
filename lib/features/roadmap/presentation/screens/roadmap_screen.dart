@@ -4,6 +4,7 @@ import '../../../../core/theme/theme.dart';
 import '../../../hanzi_writing/hanzi_writing.dart';
 import '../../../pronunciation/pronunciation.dart';
 import '../../../reading/reading.dart';
+import '../../../grammar/grammar.dart';
 import '../../../review/presentation/screens/review_screen.dart';
 import '../../domain/catalog/curriculum_catalog.dart';
 import '../../domain/models/roadmap_models.dart';
@@ -527,8 +528,12 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
               MaterialPageRoute(builder: (_) => const ReadingPassageListScreen()),
             );
             break;
-          case SkillDimension.vocabulary:
           case SkillDimension.grammar:
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const GrammarListScreen()),
+            );
+            break;
+          case SkillDimension.vocabulary:
           case SkillDimension.listening:
             Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const ReviewScreen()),
