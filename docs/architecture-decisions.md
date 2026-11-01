@@ -556,5 +556,61 @@ Trước khi bước vào Giai đoạn 5 (triển khai 22 phân hệ học tập
   - Sử dụng `AppLifecycleListener` để tự động làm mới số lượng thẻ cần ôn khi người dùng quay lại từ background.
   - Kết hợp `AutomaticKeepAliveClientMixin` trong `ReviewScreen` giúp giữ nguyên vị trí thẻ đang xem khi chuyển đổi qua lại giữa các tab trên thanh điều hướng.
 
+---
+
+## 16. Kiến Trúc Luyện Viết Chữ Hán Bằng Canvas & CustomPainter (Task 5.4)
+
+### 16.1. Khung Canvas Thư Pháp Ô Mễ (米字格), CustomPainter Độc Lập & Tối Ưu Hiệu Năng 60–120fps
+- **Kiến trúc Canvas 2 lớp phân tách:**
+  - Lớp tĩnh (`MizigePainter`): Vẽ khung viền ngoài bo góc và hệ lưới chữ Mễ chuẩn thư pháp cổ điển (đường ngang, đường dọc, hai đường chéo nét đứt). Tách rời hoàn toàn khỏi tương tác vẽ để tránh repaint lặp lại.
+  - Lớp động (`HanziPainter`): Vẽ các nét chữ do người dùng tạo ra, nét đang vẽ (`activeStroke`), chữ mẫu mờ (watermark) và highlight nét gợi ý.
+- **Tối ưu hóa hiệu năng cực đại (Zero Parent Rebuilds):**
+  - Bọc canvas trong `RepaintBoundary` kết hợp `AnimatedBuilder` lắng nghe `HanziCanvasController` (`ChangeNotifier`).
+  - Các sự kiện cảm ứng chạm (`PointerDownEvent`, `PointerMoveEvent`, `PointerUpEvent`, `PointerCancelEvent`) chỉ kích hoạt repaint nội bộ canvas mà không bao giờ trigger build lại màn hình bên ngoài, duy trì khung hình mượt mà 60–120fps trên thiết bị di động.
+- **Khử rung lắc cảm ứng (Micro-Jitter Filtering):**
+  - Thuật toán loại bỏ các điểm di chuyển có khoảng cách Euclidean nhỏ hơn $1.5\text{px}$, giúp làm mịn đường cong chữ Hán và giảm tiêu hao bộ nhớ.
+- **Hỗ trợ bút Stylus & ngón tay:**
+  - Nhận diện giá trị áp lực cảm ứng `event.pressure` (nằm trong dải $0.2 - 2.0$), tự động điều biến độ dày nét vẽ tạo cảm giác đè bút thư pháp chân thực.
+- **Bố cục co giãn thích ứng (Adaptive Layout):**
+  - Sử dụng `LayoutBuilder` tự động thích ứng kích thước ô vẽ (từ 240dp đến 340dp) trên các màn hình hẹp (320dp width) mà không gây lỗi tràn viền `RenderFlex`.
+
+### 16.2. Chế Độ Luyện Tập Linh Hoạt & Thanh Điều Khiển Tiện Ích
+- **Chế độ Tô mẫu (Tracing Mode):**
+  - Hiển thị chữ Hán hình mờ bán trong suốt (Watermark) với tone màu Lime Green chuẩn Design System.
+  - Hỗ trợ làm nổi bật (highlight) nét chữ cần viết tiếp theo, dẫn dắt trực quan từng bước cho người mới học.
+- **Chế độ Tự viết (Freeform Mode):**
+  - Ẩn hoàn toàn chữ mẫu, để lại ô lưới 米字格 giúp học viên tự kiểm tra trí nhớ về kết cấu không gian và tỷ lệ chữ.
+- **Thanh công cụ điều khiển (`WritingToolbar`):**
+  - Chuyển đổi tức thời giữa 2 chế độ `Tracing` và `Freeform`.
+  - 3 Mức độ dày nét vẽ tiêu chuẩn (`StrokeWidthPreset`): Mảnh ($4.0\text{px}$), Vừa ($7.0\text{px}$), Đậm ($11.0\text{px}$).
+  - Nút Hoàn tác (`Undo`): Xóa nét vừa vẽ gần nhất mà không làm mất các nét trước đó.
+  - Nút Xóa hết (`Reset`): Làm sạch khung vẽ để viết lại từ đầu.
+  - Nút Xem hoạt họa (`Replay`): Hiển thị tuần tự từng nét bút kèm tên gọi Hán Việt chuẩn (ví dụ: Nét Ngang, Nét Sổ, Nét Phẩy, Nét Mác).
+
+### 16.3. Thuật Toán Đánh Giá Thứ Tự Nét (Stroke Order Evaluator) & Tính Liêm Chính Học Thuật
+- **Cơ sở quy chuẩn quốc gia:**
+  - Đối chiếu thứ tự nét bút thuận theo quy chuẩn quốc gia Trung Quốc GB/T 13000 và tiêu chuẩn Hanban (先横后竖, 先撇后捺, 从上到下, 从左到右, 先外后内, 先里头后封口).
+- **Thuật toán so khớp vector hình học thuần túy (Deterministic Geometric Matching):**
+  - Chuẩn hóa tọa độ nét người dùng về không gian đơn vị $[0.0, 1.0] \times [0.0, 1.0]$.
+  - So khớp vector chỉ phương giữa nét vẽ và nét chuẩn bằng phép đo góc $\Delta\theta$ và độ tương đồng Cosine Similarity:
+    $$\cos(\theta) = \frac{\vec{u} \cdot \vec{v}}{\|\vec{u}\| \|\vec{v}\|}$$
+  - Phát hiện chính xác lỗi viết ngược chiều (ví dụ: nét sổ viết từ dưới lên, nét ngang viết từ phải sang trái khi $\cos < -0.3$).
+  - Kiểm tra bán kính sai số vùng xuất phát (Tolerance radius $\le 0.35$).
+- **Liêm chính học thuật (No Fake OCR):**
+  - Tuyệt đối không tuyên bố là mô hình nhận dạng chữ viết AI (OCR) khi chỉ dựa vào đối chiếu tọa độ thô.
+  - `WritingEvaluationSheet` hiển thị rõ ràng tỷ lệ % độ chuẩn xác nét, phân tích chi tiết từng nét đúng/sai/ngược và tuyên bố phương pháp luận minh bạch.
+- **Xử lý trung thực khi chữ thiếu dữ liệu nét chuẩn:**
+  - Khi một chữ chưa có dữ liệu vector nét chuẩn trong hệ thống, ứng dụng hiển thị biểu ngữ thông báo rõ ràng cho người học và cho phép tự do luyện viết trên ô lưới mà không phạt điểm hay đánh giá sai.
+
+### 16.4. Lưu Trữ Vector Metadata Tinh Gọn Trên SQLite Cục Bộ
+- **Lưu trữ nguyên tử, không làm phình cơ sở dữ liệu:**
+  - Kết quả luyện viết được lưu vào bảng `learner_evidence` (`source: 'hanzi_writing'`) với `content_id` là chữ Hán tương ứng.
+  - Tuyệt đối không lưu các file ảnh raw bitmap nặng nề làm chậm cơ sở dữ liệu SQLite; chỉ lưu trữ metadata JSON gọn nhẹ ($< 1\text{KB}$) gồm tỷ lệ chính xác, số nét chuẩn, chế độ viết và danh sách nhận xét.
+- **Tích hợp chuỗi ngày học (Streak Integration):**
+  - Tự động ghi một bản ghi vào bảng `learning_activities` (`activity_type: 'hanzi_writing'`), kích hoạt và duy trì chuỗi học tập (`streak`) trên Trang Chủ.
+- **Hoạt động hoàn toàn Offline (100% Local):**
+  - Mọi thao tác vẽ, đánh giá hình học, hoạt họa nét và ghi nhận dữ liệu đều chạy cục bộ trên thiết bị di động, không yêu cầu kết nối mạng.
+
+
 
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../hanzi_writing/hanzi_writing.dart';
 import '../../../placement_test/placement_test.dart';
 
 /// Tab 1: Learning Screen featuring structured lessons and HSK roadmap.
@@ -89,6 +90,53 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) => const PlacementTestIntroScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+
+            // Hanzi Writing Practice Banner Card
+            HiCard(
+              backgroundColor: theme.colorScheme.surfaceContainerHighest.withAlpha(90),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.brush_rounded,
+                    color: AppColors.limeGreen,
+                    size: AppDimensions.iconLg,
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Luyện viết chữ Hán',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Tập vẽ nét bút thuận trên ô Mizige (米字格)',
+                          style: theme.textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  HiButton(
+                    text: 'Luyện viết',
+                    size: HiButtonSize.sm,
+                    variant: HiButtonVariant.secondary,
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const HanziWritingScreen(),
                         ),
                       );
                     },
