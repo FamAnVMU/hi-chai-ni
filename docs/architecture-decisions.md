@@ -244,3 +244,42 @@ dev_dependencies:
 - **Compile SDK:** 36 (Android 16 preview / Android 15 chuẩn).
 - **Target SDK:** API Level 34+ (Tuân thủ chính sách Google Play Store mới nhất).
 
+
+
+---
+
+## 6. Thiết Kế Tầng AI Service & Text Streaming (Task 3.1)
+
+### 6.1. Xác Minh Trạng Thái Model Trực Tiếp Từ Tài Liệu Google Gemini (Q1 2026)
+- **Tài liệu chính thức Google Gemini Deprecations & Releases:**
+  - Google thông báo chính thức: *"To ensure reliable performance for everyone, we are limiting access to the 2.5 models to users who have actively used them in the past. For any new projects, use our latest models: 3.5 Flash-Lite or 3.8 Flash."*
+  - Các model preview cũ như `gemini-2.5-flash-preview-09-25` có ngày shutdown là tháng 2/2026.
+- **Quyết định định tuyến model (Model Routing):**
+  - **Model mặc định cho Chat Tutor & Tra từ điển:** `gemini-3.5-flash-lite` (nhanh, chi phí tối ưu, độ trễ thấp).
+  - **Model cho Sửa ngữ pháp & Đọc hiểu:** `gemini-3.8-flash` (độ chính xác cao, hiểu ngữ cảnh phức tạp).
+  - **Model cho Phân tích sư phạm chuyên sâu:** `gemini-3.1-pro-preview`.
+  - Tuyệt đối KHÔNG hardcode cố định model ID lỗi thời; toàn bộ model được quản lý tập trung qua `AiModelRegistry` và cho phép tùy biến qua Settings.
+
+### 6.2. Đánh Giá SDK & Lựa Chọn Kiến Trúc Provider-Independent
+1. **`google_generative_ai` (Dart SDK cũ):** Đã bị Google đánh dấu ngừng duy trì, không tương thích với các chuẩn streaming và tool calling hiện đại. Loại bỏ hoàn toàn.
+2. **`firebase_ai` (Firebase AI Logic):** Là giải pháp được khuyến cáo cho các ứng dụng có backend Firebase và App Check nhằm che giấu API key của nhà phát triển. Tuy nhiên, với HI Chinese là ứng dụng ưu tiên **Offline-first**, việc ép buộc người dùng cài đặt Firebase Core và cấu hình Google Services sẽ phá vỡ tính độc lập.
+3. **Quyết định: Provider Pattern độc lập SDK (`AiProvider`):**
+   - Định nghĩa interface `AiProvider` với hai phương thức cốt lõi: `generateText()` và `streamText()`.
+   - Triển khai `GeminiRestAiProvider`: Gọi trực tiếp REST API `POST /v1beta/models/{model}:generateContent` và Server-Sent Events (SSE) `POST /v1beta/models/{model}:streamGenerateContent?alt=sse` bằng `http.Client`. Hỗ trợ đổi Base URL sang Backend Proxy khi cần.
+   - Triển khai `MockAiProvider`: Mô phỏng 100% các tình huống (streaming nhiều chunk, timeout, lỗi 429 rate limit, 401 unauthorized, rớt mạng, cancellation) phục vụ test offline và CI/CD mà không tốn phí hoặc phụ thuộc mạng.
+
+### 6.3. Kiến Trúc Bảo Mật & Mô Hình BYOK (Bring Your Own Key)
+- **Cảnh báo bảo mật từ Google:** Tuyệt đối không bao giờ nhúng Gemini API key bí mật của nhà phát triển vào file APK/client di động vì kẻ xấu có thể decompile mã nguồn hoặc trích xuất từ bộ nhớ RAM.
+- **Giải pháp bảo vệ của HI Chinese:**
+  - Áp dụng mô hình **BYOK (Bring Your Own Key)**: Người dùng tự nhập API key cá nhân của họ trong phần Cài đặt hoặc cấu hình URL Proxy cá nhân.
+  - Lưu trữ mã hóa tại thiết bị (Encryption at Rest) bằng `FlutterSecureStorage` trên nền tảng Android KeyStore với thuật toán AES-256 GCM.
+  - **Ranh giới bảo mật:** `FlutterSecureStorage` bảo vệ key không bị các ứng dụng khác đọc lén từ file hệ thống, nhưng khi key được nạp vào RAM trong quá trình gọi API, thiết bị Android đã bị root hoặc can thiệp bộ nhớ vẫn có thể bị trích xuất. Giao diện ứng dụng và tài liệu sẽ thông báo minh bạch điều này cho người học.
+  - **Chính sách Zero-Log:** Tuyệt đối không log API key trong mã nguồn, console log hay crash analytics. Cung cấp hàm `getMaskedApiKey()` hiển thị dạng `AIzaSy...4xQ1` trên UI.
+  - Hỗ trợ người dùng kiểm tra kết nối (`verifyCredentials`), thay đổi hoặc xóa bỏ API key tức thì.
+
+### 6.4. Text Streaming, Timeout, Bounded Retries & Cancellation
+- **Streaming mượt mà (Non-blocking):** Nhận stream qua `LineSplitter` xử lý từng dòng SSE (`data: {...}`), giải mã token tăng dần và đẩy ra `Stream<AiStreamChunk>` mà không làm block UI isolate.
+- **Hỗ trợ Cancellation (`CancelToken`):** Cho phép người dùng bấm nút "Dừng tạo câu trả lời" bất kỳ lúc nào; `CancelToken` sẽ hủy ngay `StreamSubscription` và ngắt kết nối HTTP socket bên dưới.
+- **Chính sách Thử lại Giới hạn (Bounded Retries):**
+  - Chỉ tự động thử lại tối đa 2 lần với thuật toán Exponential Backoff (500ms $\to$ 1000ms) khi gặp lỗi mạng tạm thời hoặc lỗi máy chủ Google (500, 503).
+  - **Tuyệt đối KHÔNG retry** khi gặp lỗi xác thực (401, 403), dữ liệu sai (400), vượt hạn mức (429) hoặc sau khi người dùng đã bấm Cancel, ngăn ngừa việc gọi lặp vô tận gây tính phí tài khoản.
