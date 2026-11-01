@@ -6,6 +6,7 @@ export 'migrations/migration_v1.dart';
 export 'migrations/migration_v2.dart';
 export 'migrations/migration_v3.dart';
 export 'migrations/migration_v4.dart';
+export 'migrations/migration_v5.dart';
 export 'migrations/migration_engine.dart';
 export 'dao/vocabulary_dao.dart';
 export 'dao/srs_dao.dart';

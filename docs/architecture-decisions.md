@@ -695,3 +695,42 @@ Trước khi bước vào Giai đoạn 5 (triển khai 22 phân hệ học tập
 
 
 
+
+
+---
+
+## 19. Kiến Trúc Lộ Trình Học Thích Ứng (Adaptive Learning Roadmap)
+
+### 19.1. Phân Tách Giáo Trình Bất Biến & Tiến Độ Cá Nhân (Decoupling Content from Progress)
+- **Thiết kế Domain Model độc lập:**
+  - `CurriculumCatalog`: Tập hợp các cấp độ (`CurriculumLevel`), chương học (`CurriculumUnit`), và bài học (`CurriculumLesson`) bất biến (immutable), xác định rõ ràng kỹ năng chủ đạo (`primarySkill`), thời lượng ước tính (`estimatedMinutes`), điều kiện tiên quyết (`prerequisiteLessonIds`, `prerequisiteSkills`), và tham chiếu tài nguyên (`contentReferences`).
+  - `LessonProgress`: Trạng thái tiến độ cá nhân của từng học viên lưu riêng biệt trong SQLite (`tableLessonProgress`), với các trạng thái rõ ràng: `locked` (chưa đủ điều kiện tiên quyết), `available` (sẵn sàng học), `inProgress` (đang học dở), `completed` (đã hoàn tất với bằng chứng thực nghiệm), `skipped` (học viên chủ động bỏ qua).
+- **Quy tắc giải quyết điều kiện tiên quyết (Prerequisites Resolution):**
+  - Một bài học chỉ được chuyển từ `locked` sang `available` khi **tất cả** các bài học trong `prerequisiteLessonIds` đều đạt trạng thái `isCompleted`.
+
+### 19.2. Thuật Toán Thích Ứng Đa Nguồn & Xử Lý Bằng Chứng Mâu Thuẫn (Conflicting Evidence Resolution)
+- **Tổng hợp năng lực 6 kỹ năng (Skill Mastery):**
+  - Đánh giá liên tục năng lực của học viên trên 6 chiều kích: Từ vựng (Vocabulary), Ngữ pháp (Grammar), Đọc hiểu (Reading), Nghe hiểu (Listening), Nói & Phát âm (Speaking), và Viết chữ Hán (Writing).
+- **Trọng số thực nghiệm gần nhất (Recent Empirical Weighting):**
+  - Khi có sự mâu thuẫn giữa điểm số Placement Test ban đầu và kết quả luyện tập gần đây (ví dụ: bài test ban đầu đạt 90% nhưng 3 bài nghe gần đây chỉ đạt 35%), bộ máy áp dụng công thức trọng số thời gian: **70% bằng chứng thực nghiệm gần nhất + 30% baseline điểm kiểm tra**.
+  - Tự động phát hiện lỗ hổng kiến thức để hạ cấp độ bài học và đề xuất bài củng cố kịp thời, nhưng **tuyệt đối không xóa lịch sử học tập** của học viên.
+- **Phân loại độ ưu tiên đề xuất minh bạch (Reasoned Pedagogical Recommendations):**
+  - `urgent` (Khẩn cấp / Cần củng cố): Kỹ năng có độ thành thạo thấp (< 55%), phát hiện lỗ hổng kiến thức, hoặc có thẻ SRS bị lapse/quên nhiều lần.
+  - `recommended` (Khuyên dùng tiếp theo): Tiến trình học tuần tự tiêu chuẩn sau khi đã hoàn thành các bài tiên quyết.
+  - `enrichment` (Mở rộng nâng cao): Bài tập nâng cao hoặc mở rộng kỹ năng bổ trợ.
+- **Kiểm soát quá tải nhận thức (Cognitive Overload Guard):**
+  - Bộ máy luôn giới hạn danh sách đề xuất ở tối đa **Top 3 bài học**, đi kèm lý do sư phạm minh bạch (`reason`) và danh sách bằng chứng thực tế (`supportingEvidence`).
+
+### 19.3. Nguyên Tắc Liêm Chính Sư Phạm & Lưu Vết Nguyên Tử (Academic Honesty & Atomic Progress State)
+- **Không tự động hoàn thành ảo:**
+  - Thao tác mở bài học (`startLesson`) chỉ chuyển trạng thái sang `inProgress`, **tuyệt đối không đánh dấu hoàn tất**.
+  - Chỉ khi người học hoàn thành bài học với điểm số thực nghiệm (`completeLesson`), hệ thống mới chuyển sang `completed`.
+- **Giao dịch nguyên tử (Atomic SQLite Transaction):**
+  - Quá trình hoàn tất một bài học được thực thi trong transaction khép kín: cập nhật `lesson_progress`, đồng thời ghi nhận `learner_evidence` (loại nội dung, điểm số, thời lượng) và nuôi dưỡng chuỗi hoạt động `learning_activities` (loại `lesson`).
+
+### 19.4. Cơ Sở Dữ Liệu SQLite & Migration v5
+- **3 Bảng mới được thêm vào schema SQLite:**
+  - `learner_goals`: Lưu mục tiêu học tập đang kích hoạt (`target_hsk_level`, `purpose`, `timeframe`, `daily_minutes`, `is_active`).
+  - `lesson_progress`: Lưu trạng thái tiến độ cá nhân của từng bài học kèm điểm số và số lượng bằng chứng.
+  - `roadmap_snapshots`: Lưu vết các snapshot lộ trình đã tính toán (JSON đề xuất và JSON độ thành thạo 6 kỹ năng) phục vụ truy xuất offline tức thì.
+- **Phiên bản Database:** Nâng cấp tự động lên **v5** (`hi_chinese.db`) với cơ chế migration an toàn, bảo toàn 100% dữ liệu người dùng.

@@ -6,6 +6,7 @@ import '../../../pronunciation/pronunciation.dart';
 import '../../../shadowing/shadowing.dart';
 import '../../../reading/reading.dart';
 import '../../../dictionary/dictionary.dart';
+import '../../../roadmap/roadmap.dart';
 
 /// Tab 1: Learning Screen featuring structured lessons and HSK roadmap.
 class LearningScreen extends StatefulWidget {
@@ -94,6 +95,53 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) => const PlacementTestIntroScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+
+            // Adaptive Roadmap Banner Card
+            HiCard(
+              backgroundColor: AppColors.limeGreen.withAlpha(20),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.map_rounded,
+                    color: AppColors.limeGreen,
+                    size: AppDimensions.iconLg,
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Lộ trình thích ứng cá nhân',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Đề xuất thông minh theo điểm thực tế & tiên quyết',
+                          style: theme.textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  HiButton(
+                    text: 'Xem lộ trình',
+                    size: HiButtonSize.sm,
+                    variant: HiButtonVariant.primary,
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const RoadmapScreen(),
                         ),
                       );
                     },
