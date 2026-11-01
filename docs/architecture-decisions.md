@@ -283,3 +283,41 @@ dev_dependencies:
 - **Chính sách Thử lại Giới hạn (Bounded Retries):**
   - Chỉ tự động thử lại tối đa 2 lần với thuật toán Exponential Backoff (500ms $\to$ 1000ms) khi gặp lỗi mạng tạm thời hoặc lỗi máy chủ Google (500, 503).
   - **Tuyệt đối KHÔNG retry** khi gặp lỗi xác thực (401, 403), dữ liệu sai (400), vượt hạn mức (429) hoặc sau khi người dùng đã bấm Cancel, ngăn ngừa việc gọi lặp vô tận gây tính phí tài khoản.
+
+
+---
+
+## 7. Thiết Kế Bộ Não AI Tutor & Context Builder (Task 3.2)
+
+### 7.1. Nguyên Tắc Sư Phạm 3 Bước & Rào Chắn Chống Sửa Nhầm (Anti-Hypercorrection)
+- **Vấn đề sư phạm phổ biến ở các LLM thông thường:**
+  - Khi được yêu cầu làm gia sư ngôn ngữ, LLM thường có xu hướng "bới lông tìm vết" (hypercorrection), cố tình thay thế từ ngữ của người học bằng các từ đồng nghĩa hoa mỹ dù câu người học đã đúng ngữ pháp 100%. Điều này làm người mới học bị nản chí và hoang mang.
+- **Rào chắn chống sửa nhầm (Anti-Hypercorrection Guardrail):**
+  - Prompt hệ thống quy định nghiêm ngặt: Nếu câu của học viên đã đúng ngữ pháp và tự nhiên theo chuẩn Hán ngữ hiện đại, AI **tuyệt đối không được cố tình tìm lỗi**.
+  - Mô hình bắt buộc trả về `is_correct: true`, `corrected_text: null`, `error_category: "none"` kèm lời khích lệ ngắn gọn, ấm áp và tiếp nối dòng chảy đàm thoại.
+- **Quy trình phản hồi sư phạm 3 bước khi phát hiện lỗi thật sự:**
+  1. **Bước 1 (Khích lệ):** Xác nhận ý định giao tiếp, ghi nhận nỗ lực của học viên để duy trì tâm lý thoải mái.
+  2. **Bước 2 (Phân tích chi tiết kèm Pinyin):** Chỉ rõ căn nguyên của lỗi bằng tiếng Việt (chọn sai từ, sai trật tự câu S-V-O, thiếu lượng từ, nhầm lẫn thanh điệu). Kèm Pinyin cho cả từ sai và từ đúng.
+  3. **Bước 3 (Mẫu câu chuẩn tự nhiên):** Đưa ra câu diễn đạt chuẩn mực nhất của người bản xứ kèm chữ Hán, Pinyin và bản dịch tiếng Việt.
+
+### 7.2. Phân Hệ Hình Tượng Gia Sư (Personas) & Tình Huống Hội Thoại (Scenarios)
+- **3 Persona sư phạm chuyên biệt:**
+  1. **Cô giáo Kiều Kiều (乔乔老师 - Qiaoqiao):** Trợ giảng kiên nhẫn, ấm áp, ngôn ngữ đơn giản HSK 1-3, lý tưởng cho người mới bắt đầu.
+  2. **Thầy Lão Vương (老王老师 - Lao Wang):** Nghiêm cẩn, chính xác, sử dụng từ ngữ HSK 4-6, thành ngữ (成语) và ngữ cảnh thương mại/công việc.
+  3. **Bạn cùng phòng Tiểu Minh (小明 - Xiao Ming):** Đồng trang lứa, giàu khẩu ngữ đời sống (口语), tiếng lóng giới trẻ lành mạnh và văn hóa hiện đại.
+- **Hệ thống Scenario nhập vai:** Hỗ trợ từ hội thoại tự do (`free_chat`) đến các tình huống thực tế sinh động: Gọi món nhà hàng (`restaurant`), Mua sắm & Trả giá (`shopping`), Hỏi đường (`asking_directions`), Nhận phòng khách sạn (`hotel_checkin`), Sân bay (`airport`), Phỏng vấn xin việc (`job_interview`).
+
+### 7.3. Context Builder, Giới Hạn Cửa Sổ Ngữ Cảnh & Kích Hoạt Trí Nhớ Chủ Động (Active Recall)
+- **Cơ chế Sliding Window (Cửa sổ trượt có chặn):**
+  - Chỉ trích xuất tối đa N tin nhắn gần nhất từ SQLite (`maxHistoryTurns = 10`), đảm bảo cặp hội thoại user-model hợp lệ và không làm phình to token context window, giữ cho chi phí và thời gian phản hồi ở mức tối thiểu.
+- **Tích hợp Active Recall với Bộ não SRS:**
+  - Context Builder truy vấn các từ vựng người học đang yếu hoặc đến hạn ôn tập từ SQLite (`srs_items` có ease factor thấp) và lồng ghép chỉ thị vào System Prompt.
+  - AI Tutor sẽ khéo léo lồng ghép 1-2 từ vựng này vào câu hỏi tiếp theo, kích thích phản xạ ghi nhớ của người học mà không tạo cảm giác gượng gạo.
+
+### 7.4. Phân Tích Cú Pháp Phản Hồi Bền Vững (Fault-Tolerant Parser)
+- `TutorResponseParser` hỗ trợ:
+  1. Giải mã chuỗi JSON thuần và JSON bọc trong Markdown code block (` ```json ... ``` `).
+  2. Ánh xạ linh hoạt `error_category` giữa cả chuẩn snake_case của prompt và camelCase của Dart enum.
+  3. Cơ chế cứu nguy tự động (Fallback): Nếu AI trả về text không cấu trúc, parser sử dụng regex chữ Hán và thanh điệu Pinyin để bóc tách câu thoại, đảm bảo UI không bao giờ bị crash.
+- **Lưu vết học tập (Learner Evidence):**
+  - Mọi lượt đánh giá có lỗi sai (`is_correct: false`) đều được tự động lưu vào bảng `learner_evidence` dạng append-only, phục vụ chẩn đoán lỗ hổng kiến thức và điều chỉnh lộ trình học thích ứng.

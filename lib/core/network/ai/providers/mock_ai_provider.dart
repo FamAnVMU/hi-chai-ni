@@ -22,6 +22,9 @@ class MockAiProvider implements AiProvider {
   String defaultMockReply =
       '你好！我是你的中文AI助教。很高兴与你一起学习中文！(Xin chào! Tôi là trợ lý AI tiếng Trung của bạn.)';
 
+  String? customTextResponse;
+  List<String>? customStreamChunks;
+
   @override
   Future<bool> verifyCredentials() async {
     if (simulateUnauthorized) return false;
@@ -61,7 +64,9 @@ class MockAiProvider implements AiProvider {
       throw const AiCancelledException();
     }
 
-    final text = simulateEmptyResponse ? '' : defaultMockReply;
+    final text = simulateEmptyResponse
+        ? ''
+        : (customTextResponse ?? defaultMockReply);
 
     return AiTextResponse(
       text: text,
@@ -99,6 +104,23 @@ class MockAiProvider implements AiProvider {
     if (simulateTimeout) {
       await Future<void>.delayed(timeout + const Duration(milliseconds: 50));
       throw AiTimeoutException('Streaming timed out.', duration: timeout);
+    }
+
+    if (customStreamChunks != null) {
+      for (int i = 0; i < customStreamChunks!.length; i++) {
+        if (cancelToken?.isCancelled ?? false) {
+          throw const AiCancelledException();
+        }
+        if (streamChunkDelay > Duration.zero) {
+          await Future<void>.delayed(streamChunkDelay);
+        }
+        yield AiStreamChunk(
+          index: i,
+          text: customStreamChunks![i],
+          finishReason: (i == customStreamChunks!.length - 1) ? 'STOP' : null,
+        );
+      }
+      return;
     }
 
     final sourceText = simulateEmptyResponse ? '' : defaultMockReply;
