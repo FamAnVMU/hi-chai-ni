@@ -1,8 +1,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Internet permission for Gemini AI & Dictionary synchronization when online -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    
+    <!-- Audio recording permission for Pronunciation, Shadowing and Gemini Live Voice -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Microphone hardware is optional so tablets or devices without mic can still install the app -->
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
+
     <application
-        android:label="hi_chinese"
+        android:label="HI Chinese"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="false">
         <activity
             android:name=".MainActivity"
             android:exported="true"

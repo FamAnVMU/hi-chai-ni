@@ -196,3 +196,51 @@ dev_dependencies:
   - `flutter pub get`: Thành công 100%.
   - `flutter analyze`: **0 cảnh báo / 0 lỗi**.
   - `flutter test`: **Toàn bộ test vượt qua**.
+
+---
+
+## 5. Cấu Hình Nền Tảng Android Native & Chính Sách Quyền (Task 1.3)
+
+### 5.1. Khai Báo Quyền & Nguyên Tắc Tối Thiểu (Least Privilege)
+- **Khai báo trong `AndroidManifest.xml`:**
+  - `android.permission.INTERNET`: Cần thiết cho việc kết nối API Google Gemini (AI Tutor) và đồng bộ từ điển trực tuyến khi có mạng.
+  - `android.permission.RECORD_AUDIO`: Dành riêng cho chức năng Luyện phát âm (Pronunciation), Nhại giọng (Shadowing) và Đàm thoại thời gian thực (Gemini Live Voice).
+  - `<uses-feature android:name="android.hardware.microphone" android:required="false" />`: Đánh dấu phần cứng micro là tùy chọn, cho phép các thiết bị máy tính bảng Android hoặc thiết bị không có micro vẫn có thể cài đặt và sử dụng các tính năng học từ vựng, ngữ pháp, đọc hiểu offline.
+- **Tuyệt đối không xin quyền lưu trữ rộng:**
+  - Không sử dụng `MANAGE_EXTERNAL_STORAGE`, `READ_EXTERNAL_STORAGE` hay `WRITE_EXTERNAL_STORAGE`.
+  - Toàn bộ cơ sở dữ liệu SQLite (`hi_chinese.db`), cache âm thanh và file bài học được lưu trữ độc quyền trong App-Specific Internal Storage (`Context.getFilesDir()`), an toàn và tự động dọn dẹp khi gỡ cài đặt.
+
+### 5.2. Luồng Yêu Cầu Quyền Micro Theo Ngữ Cảnh (Contextual Permission Flow)
+- **Quy tắc:** Tuyệt đối KHÔNG xin quyền Micro khi người dùng vừa mở ứng dụng.
+- **Quy trình:**
+  1. Khi người dùng chủ động nhấn vào tính năng cần ghi âm (Luyện nói, AI Voice Chat), ứng dụng kiểm tra `Permission.microphone.status`.
+  2. Nếu quyền chưa được cấp (`isDenied`), hiển thị **Hộp thoại Giải thích Ngữ cảnh (Rationale Dialog)** thông báo rõ:
+     - Mục đích sử dụng micro: Nhận diện phát âm Hán ngữ và đối thoại với AI.
+     - Cam kết quyền riêng tư: Ứng dụng chỉ thu âm khi người dùng giữ nút nói và tuyệt đối không bao giờ thu âm ngầm trong nền.
+  3. Nếu người dùng chọn "Tiếp tục", ứng dụng mới kích hoạt hộp thoại xin quyền của hệ điều hành Android (`Permission.microphone.request()`).
+  4. Nếu quyền bị từ chối vĩnh viễn (`isPermanentlyDenied`), hiển thị hộp thoại hướng dẫn người dùng bấm nút mở trực tiếp Cài đặt ứng dụng qua `openAppSettings()`.
+
+### 5.3. Vòng Đời Ứng Dụng (Lifecycle) & An Toàn Thu Âm
+- Triển khai `AppLifecycleManager` kế thừa `WidgetsBindingObserver` để giám sát trạng thái `didChangeAppLifecycleState`.
+- **Chính sách ngắt micro nền:**
+  - Khi ứng dụng chuyển sang `AppLifecycleState.paused`, `inactive` hoặc `hidden` (do người dùng chuyển sang app khác, có cuộc gọi đến, hoặc khóa màn hình):
+    - Hệ thống ngay lập tức kích hoạt callback hủy phiên ghi âm và giải phóng micro về cho hệ điều hành Android.
+    - Cập nhật giao diện về trạng thái dừng an toàn (idle).
+    - Ngăn chặn hoàn toàn hành vi chạy ngầm micro âm thầm.
+
+### 5.4. Giao Diện Edge-to-Edge & Vùng An Toàn (Safe Area)
+- **Edge-to-Edge System UI:** Kích hoạt `SystemUiMode.edgeToEdge` kết hợp `SystemUiOverlayStyle` với thanh trạng thái (Status Bar) và thanh điều hướng (Navigation Bar) trong suốt (`Colors.transparent`), icon sáng trên nền Dark Forest.
+- **Tránh White Flash khi mở app:** Cấu hình `splash_bg` (`#121811`) cho `launch_background.xml` và `NormalTheme` trong Android native, đảm bảo trải nghiệm mở app tối màu mượt mà, không giật màn hình trắng.
+- **Xử lý tai thỏ (Notch/Cutout) & Phím điều hướng cử chỉ:** Bọc layout với `SafeArea` và `SingleChildScrollView`, tự động thích ứng với tai thỏ trên đỉnh và thanh cử chỉ (gesture pill) ở cạnh dưới màn hình.
+- **Xử lý bàn phím:** Cấu hình `android:windowSoftInputMode="adjustResize"` giúp giao diện tự động co lại khi bàn phím ảo xuất hiện, không che khuất ô nhập liệu hay nút bấm.
+- **Khóa xoay màn hình:** Khóa cố định chiều dọc (`DeviceOrientation.portraitUp`, `DeviceOrientation.portraitDown`) để tối ưu hóa trải nghiệm học tập di động một tay.
+
+### 5.5. Cấu Hình Bảo Mật Mạng (Network Security)
+- Thiết lập `android:usesCleartextTraffic="false"` trên thẻ `<application>`.
+- Chặn đứng mọi kết nối HTTP không mã hóa, chỉ cho phép HTTPS và WSS an toàn cho các tác vụ mạng và AI.
+
+### 5.6. Phiên Bản Android Đã Xác Minh
+- **Min SDK:** 24 (Android 7.0 Nougat) — đảm bảo hỗ trợ Android KeyStore AES-256 GCM và SQLite WAL.
+- **Compile SDK:** 36 (Android 16 preview / Android 15 chuẩn).
+- **Target SDK:** API Level 34+ (Tuân thủ chính sách Google Play Store mới nhất).
+
