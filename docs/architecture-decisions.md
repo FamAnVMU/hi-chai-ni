@@ -652,6 +652,45 @@ Trước khi bước vào Giai đoạn 5 (triển khai 22 phân hệ học tập
   - Cho phép người học xóa file âm thanh thu âm bất kỳ lúc nào để giải phóng dung lượng bộ nhớ.
   - Tùy chọn `retainEvidence: true` cho phép xóa file vật lý trên đĩa nhưng vẫn bảo toàn số liệu thống kê học tập (cập nhật metadata `audio_deleted: true, audio_local_path: null`).
 
+---
+
+## 18. Kiến Trúc Đọc Hiểu Tương Tác & Từ Điển Thông Minh (Task 5.6)
+
+### 18.1. Cơ Sở Dữ Liệu & Migration v4
+- **Bổ sung 3 bảng mới trên SQLite cục bộ:**
+  - `dictionary_history`: Lưu vết lịch sử tra cứu gần đây, hỗ trợ xóa nhanh và tự động loại bỏ trùng lặp.
+  - `user_saved_words`: Lưu từ vựng yêu thích (bookmark) kèm ghi chú cá nhân (`custom_note`).
+  - `reading_progress`: Lưu trữ trạng thái đọc dở dang (vị trí cuộn `last_scroll_offset`, thời lượng đọc `reading_time_seconds`, câu trả lời trắc nghiệm `answers_json`, điểm số `score` và trạng thái hoàn thành `is_completed`).
+- **Nguyên tắc an toàn dữ liệu:**
+  - `MigrationV4` tuân thủ nghiêm ngặt phương châm không bao giờ drop bảng khi nâng cấp schema, liên kết foreign key chặt chẽ với bảng `vocabularies` và `reading_passages`.
+
+### 18.2. Bộ Máy Tìm Kiếm Từ Điển Đa Chế Độ (Multi-Mode Dictionary Search)
+- **Hỗ trợ toàn diện các dạng đầu vào:**
+  1. *Chữ Hán Giản thể & Phồn thể:* Khớp chính xác (Exact match) và khớp tiền tố (Prefix match).
+  2. *Pinyin có dấu & Pinyin số:* Chuyển đổi linh hoạt `nǐ hǎo`, `ni3 hao3` về chuẩn so sánh `ni hao`.
+  3. *Pinyin không dấu liền khối (Tone-free Compact Pinyin):* Khớp các từ ghép như `nihao` $\rightarrow$ `nǐ hǎo`, `xue` $\rightarrow$ `xuéxí`.
+  4. *Nghĩa tiếng Việt:* Truy vấn trực tiếp trong bảng `vocabulary_senses.meaning_vi`.
+- **Thứ tự ưu tiên hiển thị (Relevance Ranking):**
+  - Khớp chính xác chữ Hán $\rightarrow$ Khớp tiền tố chữ Hán $\rightarrow$ Khớp chính xác Pinyin $\rightarrow$ Khớp tiền tố Pinyin $\rightarrow$ Khớp nghĩa tiếng Việt $\rightarrow$ Sắp xếp theo HSK level và tần suất sử dụng.
+- **Tính năng Từ Điển Chi Tiết:**
+  - Hiển thị đầy đủ các định nghĩa (Senses), từ loại (Part of speech), câu ví dụ song ngữ (Hán - Pinyin - Việt).
+  - Nút phát âm âm thanh: Sử dụng `AudioPlayerService` khi có `audio_uri`; khi thiếu audio hiển thị thông báo rõ ràng, không lỗi ngầm.
+  - Ưu tiên 100% dữ liệu offline cục bộ; AI chỉ đóng vai trò phân tích ngữ cảnh nâng cao ("Hỏi AI giải thích ngữ cảnh").
+
+### 18.3. Luyện Đọc Hiểu Tương Tác & Giao Diện RubyText
+- **4 Chế Độ Hiển Thị Linh Hoạt (ReadingDisplayMode):**
+  - `full`: Hiển thị đầy đủ Chữ Hán, Pinyin và Bản dịch tiếng Việt.
+  - `hanziAndPinyin`: Hiển thị Chữ Hán và Pinyin (ẩn bản dịch).
+  - `hanziOnly`: Chỉ hiển thị chữ Hán (thử thách đọc không Pinyin).
+  - `hanziAndTranslation`: Hiển thị Chữ Hán và bản dịch (ẩn Pinyin để rèn nhận diện mặt chữ).
+- **Tra Từ Tức Thì Tại Chỗ (Tap-to-Lookup):**
+  - Tích hợp `RubyText` nhận diện callback `onSegmentTap`, truyền đúng `RubySegment` mang `wordId` và chỉ số `offset`.
+  - Mở tức thời `DictionaryDetailSheet` hiển thị nghĩa từ và phân tích ngữ cảnh câu đọc.
+- **Đánh Giá Đọc Hiểu Thực Chất (Comprehension Questions):**
+  - Bộ câu hỏi kiểm tra ngữ nghĩa, sự kiện và nhân vật trong bài đọc (Single Choice, True/False) kèm trích dẫn văn bản (`citationText`) và giải thích chi tiết (`explanationVi`).
+  - Ghi nhận nguyên tử vào `learner_evidence` (`source: 'reading_comprehension'`) và nuôi dưỡng chuỗi `learning_activities` (`activity_type: 'reading'`) khi hoàn thành bài đọc.
+
+
 
 
 

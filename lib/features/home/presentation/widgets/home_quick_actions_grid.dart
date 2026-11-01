@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/theme.dart';
-import '../../../dictionary/presentation/widgets/quick_dictionary_sheet.dart';
+import '../../../dictionary/dictionary.dart';
 
 /// Clean 2x2 grid providing instant single-tap access to primary learning surfaces.
 class HomeQuickActionsGrid extends StatelessWidget {
@@ -64,7 +64,9 @@ class HomeQuickActionsGrid extends StatelessWidget {
                 iconColor: Colors.blueAccent,
                 title: 'Từ điển tra cứu',
                 subtitle: 'Tra offline tức thì',
-                onTap: () => QuickDictionarySheet.show(context),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const DictionaryScreen()),
+                ),
               ),
             ),
             const SizedBox(width: AppSpacing.sm),

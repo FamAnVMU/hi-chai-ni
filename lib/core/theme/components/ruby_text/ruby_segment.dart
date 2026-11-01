@@ -15,8 +15,11 @@ class RubySegment {
   /// pinyin must come from a verified dataset rather than naive auto-inference.
   final String? pinyin;
 
-  /// Optional vocabulary or sense ID linking back to the SQLite dictionary
+  /// Optional word ID linking back to the SQLite dictionary
   final String? wordId;
+
+  /// Optional character offset in the source text
+  final int? offset;
 
   /// Optional Vietnamese/English meaning or gloss for tooltips / word inspection
   final String? meaning;
@@ -31,6 +34,7 @@ class RubySegment {
     required this.text,
     this.pinyin,
     this.wordId,
+    this.offset,
     this.meaning,
     this.traditionalText,
     bool? isPunctuation,
@@ -41,6 +45,7 @@ class RubySegment {
     required String hanzi,
     required String pinyin,
     String? wordId,
+    int? offset,
     String? meaning,
     String? traditionalText,
   }) {
@@ -48,6 +53,7 @@ class RubySegment {
       text: hanzi,
       pinyin: pinyin.trim(),
       wordId: wordId,
+      offset: offset,
       meaning: meaning,
       traditionalText: traditionalText,
       isPunctuation: false,
@@ -55,11 +61,12 @@ class RubySegment {
   }
 
   /// Factory constructor for punctuation marks
-  factory RubySegment.punctuation(String punctuation) {
+  factory RubySegment.punctuation(String punctuation, {int? offset}) {
     return RubySegment(
       text: punctuation,
       pinyin: null,
       wordId: null,
+      offset: offset,
       meaning: null,
       traditionalText: null,
       isPunctuation: true,
@@ -67,11 +74,12 @@ class RubySegment {
   }
 
   /// Factory constructor for unannotated plain text or whitespace
-  factory RubySegment.plainText(String plainText) {
+  factory RubySegment.plainText(String plainText, {int? offset}) {
     return RubySegment(
       text: plainText,
       pinyin: null,
       wordId: null,
+      offset: offset,
       meaning: null,
       traditionalText: null,
       isPunctuation: false,
@@ -89,46 +97,61 @@ class RubySegment {
     final matches = pattern.allMatches(annotatedText);
 
     for (final match in matches) {
+      final startOffset = match.start;
       if (match.group(1) != null && match.group(2) != null) {
-        // Annotated word: hanzi[pinyin] or hanzi[pinyin:meaning]
+        // Annotated word: hanzi[pinyin] or hanzi[pinyin:meaning] or hanzi[pinyin:meaning:wordId]
         final hanzi = match.group(1)!;
-        final rawAnnotation = match.group(2)!;
+        String rawAnnotation = match.group(2)!;
         String pinyin = rawAnnotation;
         String? meaning;
+        String? wordId;
+
+        if (rawAnnotation.contains('#')) {
+          final hashParts = rawAnnotation.split('#');
+          rawAnnotation = hashParts[0];
+          if (hashParts.length > 1) wordId = hashParts[1].trim();
+        }
 
         if (rawAnnotation.contains(':')) {
           final parts = rawAnnotation.split(':');
           pinyin = parts[0].trim();
-          meaning = parts.sublist(1).join(':').trim();
+          if (parts.length > 2) {
+            meaning = parts[1].trim();
+            wordId = parts[2].trim();
+          } else {
+            meaning = parts[1].trim();
+          }
         }
 
         segments.add(RubySegment.word(
           hanzi: hanzi,
           pinyin: pinyin,
           meaning: meaning,
+          wordId: wordId,
+          offset: startOffset,
         ));
       } else if (match.group(3) != null) {
         // Punctuation or whitespace
         final val = match.group(3)!;
         if (punctuationRegex.hasMatch(val.trim())) {
-          segments.add(RubySegment.punctuation(val));
+          segments.add(RubySegment.punctuation(val, offset: startOffset));
         } else {
-          segments.add(RubySegment.plainText(val));
+          segments.add(RubySegment.plainText(val, offset: startOffset));
         }
       } else if (match.group(4) != null) {
         // Unannotated text
         final val = match.group(4)!;
         if (punctuationRegex.hasMatch(val)) {
-          segments.add(RubySegment.punctuation(val));
+          segments.add(RubySegment.punctuation(val, offset: startOffset));
         } else {
-          segments.add(RubySegment.plainText(val));
+          segments.add(RubySegment.plainText(val, offset: startOffset));
         }
       }
     }
 
     // Fallback if regex did not match anything
     if (segments.isEmpty && annotatedText.isNotEmpty) {
-      segments.add(RubySegment.plainText(annotatedText));
+      segments.add(RubySegment.plainText(annotatedText, offset: 0));
     }
 
     return segments;
@@ -139,6 +162,7 @@ class RubySegment {
       'text': text,
       if (pinyin != null) 'pinyin': pinyin,
       if (wordId != null) 'word_id': wordId,
+      if (offset != null) 'offset': offset,
       if (meaning != null) 'meaning': meaning,
       if (traditionalText != null) 'traditional_text': traditionalText,
       'is_punctuation': isPunctuation,
@@ -150,6 +174,7 @@ class RubySegment {
       text: map['text'] as String,
       pinyin: map['pinyin'] as String?,
       wordId: map['word_id'] as String?,
+      offset: map['offset'] as int?,
       meaning: map['meaning'] as String?,
       traditionalText: map['traditional_text'] as String?,
       isPunctuation: map['is_punctuation'] as bool? ?? false,
@@ -160,6 +185,7 @@ class RubySegment {
     String? text,
     String? pinyin,
     String? wordId,
+    int? offset,
     String? meaning,
     String? traditionalText,
     bool? isPunctuation,
@@ -168,6 +194,7 @@ class RubySegment {
       text: text ?? this.text,
       pinyin: pinyin ?? this.pinyin,
       wordId: wordId ?? this.wordId,
+      offset: offset ?? this.offset,
       meaning: meaning ?? this.meaning,
       traditionalText: traditionalText ?? this.traditionalText,
       isPunctuation: isPunctuation ?? this.isPunctuation,

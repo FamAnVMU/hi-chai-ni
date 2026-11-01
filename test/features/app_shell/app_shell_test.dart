@@ -72,7 +72,7 @@ void main() {
 
       // Verifies LearningScreen is displayed
       expect(find.text('Lộ Trình Học Tập'), findsOneWidget);
-      expect(find.text('Chương 1: Khởi Đầu & Phát Âm Cơ Bản'), findsOneWidget);
+      expect(find.text('Khảo sát năng lực đầu vào'), findsOneWidget);
     });
 
     testWidgets('Tapping center prominent AI Tutor button switches to AiTutorTabScreen', (tester) async {

@@ -4,6 +4,8 @@ import '../../../hanzi_writing/hanzi_writing.dart';
 import '../../../placement_test/placement_test.dart';
 import '../../../pronunciation/pronunciation.dart';
 import '../../../shadowing/shadowing.dart';
+import '../../../reading/reading.dart';
+import '../../../dictionary/dictionary.dart';
 
 /// Tab 1: Learning Screen featuring structured lessons and HSK roadmap.
 class LearningScreen extends StatefulWidget {
@@ -224,6 +226,94 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (_) => const ShadowingScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+
+            // Reading Comprehension & Smart Dictionary Quick Access Row
+            Row(
+              children: [
+                Expanded(
+                  child: HiCard(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.menu_book_rounded,
+                          color: AppColors.limeGreen,
+                          size: 28,
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          'Luyện đọc hiểu',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'Tương tác & Tra từ',
+                          style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        HiButton(
+                          text: 'Đọc hiểu',
+                          size: HiButtonSize.sm,
+                          variant: HiButtonVariant.secondary,
+                          isFullWidth: true,
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const ReadingPassageListScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: HiCard(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.search_rounded,
+                          color: Colors.amber,
+                          size: 28,
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          'Từ điển',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'Tra cứu offline',
+                          style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        HiButton(
+                          text: 'Tra từ',
+                          size: HiButtonSize.sm,
+                          variant: HiButtonVariant.secondary,
+                          isFullWidth: true,
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const DictionaryScreen(),
                               ),
                             );
                           },
