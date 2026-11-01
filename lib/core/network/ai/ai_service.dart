@@ -64,6 +64,11 @@ class AiService {
     final effectiveModel = modelId ?? modelRegistry.activeDefaultModelId;
     return await provider.testConnection(modelId: effectiveModel);
   }
+
+  /// Disposes underlying provider resources and client connections.
+  void dispose() {
+    provider.dispose();
+  }
 }
 
 // ==================== RIVERPOD PROVIDERS ====================

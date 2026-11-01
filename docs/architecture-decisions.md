@@ -321,3 +321,36 @@ dev_dependencies:
   3. Cơ chế cứu nguy tự động (Fallback): Nếu AI trả về text không cấu trúc, parser sử dụng regex chữ Hán và thanh điệu Pinyin để bóc tách câu thoại, đảm bảo UI không bao giờ bị crash.
 - **Lưu vết học tập (Learner Evidence):**
   - Mọi lượt đánh giá có lỗi sai (`is_correct: false`) đều được tự động lưu vào bảng `learner_evidence` dạng append-only, phục vụ chẩn đoán lỗ hổng kiến thức và điều chỉnh lộ trình học thích ứng.
+
+---
+
+## 8. Tối Ưu Hóa Hệ Thống Toàn Diện Trước Giai Đoạn 4 (System Optimization)
+
+Nhằm chuẩn bị nền tảng hiệu năng cao cho Giai đoạn 4 (các module học tập tương tác UI, Flashcard SRS, Hanzi animation và đàm thoại thời gian thực), hệ thống đã trải qua đợt tối ưu hóa toàn diện trên cả 3 tầng cốt lõi:
+
+### 8.1. Tinh Chỉnh SQLite I/O & Quản Lý Bộ Nhớ Đệm (PRAGMA Tuning)
+- **Tăng dung lượng Page Cache (`PRAGMA cache_size = -8000;`):** Cấp phát 8MB bộ nhớ RAM làm cache cho SQLite engine, giúp các thao tác tra cứu từ vựng và bảng SRS diễn ra trong vài micro-giây mà không đọc lặp lại bộ nhớ flash.
+- **Lưu trữ bảng tạm trên RAM (`PRAGMA temp_store = MEMORY;`):** Chuyển toàn bộ các bảng tạm thời gian thực thi, các phép sắp xếp `ORDER BY` và chỉ mục nội bộ lên RAM, giảm thiểu tối đa hao mòn I/O đĩa trên thiết bị di động.
+- **Cơ chế WAL Checkpoint chủ động & Tối ưu hóa Bộ lập kế hoạch truy vấn (`PRAGMA optimize;`):**
+  - Bổ sung hàm `AppDatabase.checkpoint({bool truncate = false})` giúp chủ động chuyển đổi các trang log WAL về tệp DB chính định kỳ hoặc khi ứng dụng vào trạng thái nhàn rỗi.
+  - Bổ sung `AppDatabase.optimize()` và tự động kích hoạt `PRAGMA optimize;` trước khi đóng DB để cập nhật thống kê bộ lập kế hoạch truy vấn SQLite (Cost-based Query Planner).
+
+### 8.2. Hệ Thống Chỉ Mục Phức Hợp Hiệu Năng Cao (Composite Indexing)
+- **`idx_evidence_type_score` (`learner_evidence (content_type, score, created_at)`):**
+  - Tối ưu hóa triệt để truy vấn tìm kiếm lỗi lặp (`_loadRecurringErrors`) và kiểm đếm bằng chứng học tập mà không cần quét toàn bộ bảng log lịch sử.
+- **`idx_chat_messages_lookup` (`chat_messages (session_id, role, created_at)`):**
+  - Tối ưu hóa trích xuất tóm tắt và tin nhắn lịch sử gần nhất theo phiên trò chuyện với độ phức tạp $O(\log N)$.
+
+### 8.3. Bộ Đệm Tính Toán SRS (Due Count Memoization & Cache Invalidation)
+- **Vấn đề:** Các widget hiển thị số lượng thẻ đến hạn ôn tập (Badges trên tab học tập, thanh điều hướng, màn hình Home) thường được render lại liên tục khi người dùng chuyển màn hình, gây lãng phí CPU và I/O đĩa.
+- **Giải pháp:** Bổ sung cơ chế Memoization có thời hạn (TTL 60s) cho `SrsRepository.getDueCardsCount()`.
+- **Tự động hủy cache (Auto-Invalidation):** Ngay khi người dùng hoàn thành một lượt ôn tập (`processReview()`), cache đếm hạn sẽ tự động bị xóa bỏ để tính toán lại ngay tức thì, đảm bảo tính nhất quán dữ liệu 100%.
+
+### 8.4. Bộ Nhớ Đệm Ngữ Cảnh Người Học (Session-Scoped Context Caching)
+- **Giảm tải truy vấn trong hội thoại đàm thoại:**
+  - `LearnerContextService` tích hợp bộ đệm theo phiên (`sessionId`) với TTL 30s. Trong các lượt trao đổi chat liên tiếp nhanh chóng, AI Tutor tái sử dụng ngữ cảnh học viên đã phân tích thay vì thực thi đồng thời 5 câu lệnh SQL song song.
+  - Tự động hủy cache khi có sự kiện ghi nhận lỗi sai hoặc đề xuất bằng chứng học tập mới (`_applyValidatedProposals`), bảo đảm AI luôn phản hồi theo dữ liệu học tập cập nhật nhất.
+
+### 8.5. Quản Lý Vòng Đời Kết Nối & Giải Phóng Tài Nguyên (Resource Lifecycle)
+- Chuẩn hóa phương thức `dispose()` trên các interface `AiProvider`, `GeminiRestAiProvider` và `AiService` để giải phóng HTTP Client connection pool và socket ngầm khi ứng dụng hủy dịch vụ hoặc thay đổi cấu hình API key, ngăn chặn hoàn toàn rò rỉ bộ nhớ (memory leaks).
+

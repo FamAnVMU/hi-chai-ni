@@ -29,6 +29,9 @@ class MockAiProvider implements AiProvider {
   ConnectionErrorType? simulateConnectionError;
 
   @override
+  void dispose() {}
+
+  @override
   Future<bool> verifyCredentials() async {
     if (simulateUnauthorized) return false;
     return true;

@@ -33,6 +33,11 @@ class GeminiRestAiProvider implements AiProvider {
   String get providerName => 'gemini_rest_ai_provider';
 
   @override
+  void dispose() {
+    _client.close();
+  }
+
+  @override
   Future<bool> verifyCredentials() async {
     final apiKey = await credentialStorage.getApiKey();
     if (apiKey == null || apiKey.isEmpty) return false;

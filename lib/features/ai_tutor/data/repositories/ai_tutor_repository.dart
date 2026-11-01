@@ -369,6 +369,9 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
         'metadata_json': jsonEncode(evaluation.toMap()),
         'created_at': nowUtc,
       });
+
+      // Invalidate context cache so subsequent turns immediately reflect new evidence
+      LearnerContextService.invalidateCache(sessionId);
     } catch (e) {
       debugPrint('[AiTutorRepository] Warning: failed to append learner evidence: $e');
     }
@@ -422,6 +425,7 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
       debugPrint(
         '[AiTutorRepository] Applied ${valid.length}/${proposals.length} evidence proposals.',
       );
+      LearnerContextService.invalidateCache();
     } catch (e) {
       debugPrint('[AiTutorRepository] Warning: failed to apply evidence proposals: $e');
     }

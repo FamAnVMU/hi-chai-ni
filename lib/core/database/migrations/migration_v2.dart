@@ -30,5 +30,13 @@ class MigrationV2 implements Migration {
     await db.execute('''
       CREATE INDEX IF NOT EXISTS idx_seed_history_status ON seed_history(status);
     ''');
+
+    // Performance composite indexes for rapid retrieval in AI Tutor & Context Builder
+    await db.execute('''
+      CREATE INDEX IF NOT EXISTS idx_evidence_type_score ON learner_evidence (content_type, score, created_at);
+    ''');
+    await db.execute('''
+      CREATE INDEX IF NOT EXISTS idx_chat_messages_lookup ON chat_messages (session_id, role, created_at);
+    ''');
   }
 }

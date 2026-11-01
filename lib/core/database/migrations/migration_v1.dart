@@ -125,6 +125,7 @@ class MigrationV1 implements Migration {
     ''');
     await db.execute('CREATE INDEX idx_evidence_content ON ${DatabaseConstants.tableLearnerEvidence} (content_id, content_type);');
     await db.execute('CREATE INDEX idx_evidence_created_at ON ${DatabaseConstants.tableLearnerEvidence} (created_at);');
+    await db.execute('CREATE INDEX idx_evidence_type_score ON ${DatabaseConstants.tableLearnerEvidence} (content_type, score, created_at);');
 
     // 7. Mastery Snapshots table (Calculated aggregated mastery state per HSK level)
     await db.execute('''
@@ -172,6 +173,7 @@ class MigrationV1 implements Migration {
       );
     ''');
     await db.execute('CREATE INDEX idx_chat_messages_session ON ${DatabaseConstants.tableChatMessages} (session_id, created_at);');
+    await db.execute('CREATE INDEX idx_chat_messages_lookup ON ${DatabaseConstants.tableChatMessages} (session_id, role, created_at);');
 
     // 10. Learning Activities table (Daily streaks & study duration)
     await db.execute('''

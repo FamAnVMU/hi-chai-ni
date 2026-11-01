@@ -31,4 +31,7 @@ abstract class AiProvider {
 
   /// Performs a live connection test round-trip with real latency measurement and error categorization.
   Future<ConnectionTestResult> testConnection({String? modelId});
+
+  /// Releases underlying HTTP client connection pools and socket resources.
+  void dispose();
 }

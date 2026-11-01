@@ -74,6 +74,12 @@ class AppDatabase {
 
           // Normal synchronous mode provides durability with low disk I/O latency in WAL mode
           await db.execute('PRAGMA synchronous = NORMAL;');
+
+          // 3. Cache size: 8MB in-memory page cache (-8000 pages of 1KB each)
+          await db.execute('PRAGMA cache_size = -8000;');
+
+          // 4. In-memory temporary store for sorting and indexing operations
+          await db.execute('PRAGMA temp_store = MEMORY;');
         },
         onCreate: (db, ver) async {
           debugPrint('[AppDatabase] Creating initial database schema (v$ver)...');
@@ -119,13 +125,34 @@ class AppDatabase {
     );
   }
 
+  /// Manually executes a WAL checkpoint to flush transaction logs into the main database file.
+  Future<void> checkpoint({bool truncate = false}) async {
+    final mode = truncate ? 'TRUNCATE' : 'PASSIVE';
+    try {
+      await database.rawQuery('PRAGMA wal_checkpoint($mode);');
+    } catch (e) {
+      debugPrint('[AppDatabase] Warning: wal_checkpoint($mode) failed: $e');
+    }
+  }
+
+  /// Runs SQLite cost-based query planner optimization.
+  /// Recommended by SQLite documentation prior to closing or during idle periods.
+  Future<void> optimize() async {
+    try {
+      await database.execute('PRAGMA optimize;');
+    } catch (e) {
+      debugPrint('[AppDatabase] Warning: PRAGMA optimize failed: $e');
+    }
+  }
+
   /// Flushes pending WAL checkpoints and closes the database connection.
   Future<void> close() async {
     if (_db != null && _db!.isOpen) {
       try {
+        await _db!.execute('PRAGMA optimize;');
         await _db!.rawQuery('PRAGMA wal_checkpoint(TRUNCATE);');
       } catch (e) {
-        debugPrint('[AppDatabase] Warning: wal_checkpoint on close: $e');
+        debugPrint('[AppDatabase] Warning on close: $e');
       }
       await _db!.close();
       _db = null;

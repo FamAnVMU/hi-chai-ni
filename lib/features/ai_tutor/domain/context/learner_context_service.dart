@@ -32,6 +32,18 @@ class LearnerContextService {
   /// Minimum occurrences of an error pattern to include in context.
   static const int _minErrorOccurrences = 2;
 
+  // In-memory cache for session learner contexts to avoid redundant DB joins during multi-turn chat
+  static final Map<String, ({LearnerContext context, DateTime expiresAt})> _cache = {};
+
+  /// Clears in-memory cache for a given session or all sessions.
+  static void invalidateCache([String? sessionId]) {
+    if (sessionId != null) {
+      _cache.remove(sessionId);
+    } else {
+      _cache.clear();
+    }
+  }
+
   const LearnerContextService();
 
   /// Builds a [LearnerContext] for the given [sessionId].
@@ -53,7 +65,17 @@ class LearnerContextService {
     int maxErrors = 5,
     int maxEvidence = 10,
     int maxContextTokens = defaultMaxContextTokens,
+    Duration cacheTtl = const Duration(seconds: 30),
+    bool bypassCache = false,
   }) async {
+    final now = DateTime.now();
+    if (!bypassCache) {
+      final cached = _cache[sessionId];
+      if (cached != null && cached.expiresAt.isAfter(now)) {
+        return cached.context;
+      }
+    }
+
     // Run independent queries in parallel
     final results = await Future.wait([
       _loadConfirmedVocabulary(db, maxVocab * 2), // fetch extra, prune by budget
@@ -127,7 +149,7 @@ class LearnerContextService {
 
     final budgetUsed = (maxContextTokens - budgetRemaining).clamp(0, maxContextTokens);
 
-    return LearnerContext(
+    final assembledContext = LearnerContext(
       profile: LearnerProfile(
         hskLevel: hskLevel,
         learnerName: learnerName,
@@ -141,6 +163,13 @@ class LearnerContextService {
       contextBudgetUsed: budgetUsed,
       warningFlags: warningFlags,
     );
+
+    _cache[sessionId] = (
+      context: assembledContext,
+      expiresAt: now.add(cacheTtl),
+    );
+
+    return assembledContext;
   }
 
   // ---------------------------------------------------------------------------

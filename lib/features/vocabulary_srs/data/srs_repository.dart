@@ -22,6 +22,9 @@ class SrsRepository {
   final Set<String> _inFlightContentIds = {};
   final Map<String, DateTime> _lastReviewTimes = {};
 
+  // In-memory TTL cache for due counts to minimize disk reads
+  final Map<String, ({int count, DateTime expiresAt})> _dueCountCache = {};
+
   /// Minimum cooldown window between two reviews for the same item (milliseconds)
   final int debounceCooldownMs;
 
@@ -154,8 +157,9 @@ class SrsRepository {
         );
       });
 
-      // Update cooldown timestamp
+      // Update cooldown timestamp & invalidate due count cache
       _lastReviewTimes[lockKey] = nowUtc;
+      _dueCountCache.clear();
 
       return reviewResult;
     } finally {
@@ -193,5 +197,49 @@ class SrsRepository {
       orderBy: 'created_at DESC',
       limit: limit,
     );
+  }
+
+  /// Retrieves the number of cards due for review, with in-memory TTL caching
+  /// to eliminate redundant SQLite queries on repeated UI widget evaluations.
+  Future<int> getDueCardsCount({
+    String contentType = 'vocabulary',
+    DateTime? asOf,
+    Duration ttl = const Duration(seconds: 60),
+  }) async {
+    final now = DateTime.now();
+    final cacheKey = contentType;
+
+    // Use cache only when asOf is not explicitly customized
+    if (asOf == null) {
+      final cached = _dueCountCache[cacheKey];
+      if (cached != null && cached.expiresAt.isAfter(now)) {
+        return cached.count;
+      }
+    }
+
+    final asOfUtc = (asOf ?? now).toUtc().toIso8601String();
+    final result = await _db.rawQuery(
+      'SELECT COUNT(id) as count FROM ${DatabaseConstants.tableSrsItems} '
+      'WHERE content_type = ? AND due_at <= ? AND deleted_at IS NULL',
+      [contentType, asOfUtc],
+    );
+
+    final count = (result.first['count'] as num?)?.toInt() ?? 0;
+
+    if (asOf == null) {
+      _dueCountCache[cacheKey] = (
+        count: count,
+        expiresAt: now.add(ttl),
+      );
+    }
+
+    return count;
+  }
+
+  /// Clears in-memory debounce, in-flight, and due count caches.
+  void clearCache() {
+    _inFlightContentIds.clear();
+    _lastReviewTimes.clear();
+    _dueCountCache.clear();
   }
 }
