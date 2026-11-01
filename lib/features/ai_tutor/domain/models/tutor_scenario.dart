@@ -24,6 +24,49 @@ class TutorScenario {
     required this.contextPrompt,
   });
 
+  String get objectiveVi => descriptionVi;
+
+  List<String> get suggestedUserPrompts {
+    switch (code) {
+      case 'free_chat':
+        return const [
+          '你好！今天天气怎么样？',
+          '我想学一下如何介绍自己。',
+          '你可以考考我HSK 1的生词吗？',
+        ];
+      case 'ordering_food':
+        return const [
+          '服务员，请给我菜单。',
+          '这个菜有点辣吗？',
+          '请问一共多少钱？',
+        ];
+      case 'asking_directions':
+        return const [
+          '请问，地铁站在哪里？',
+          '去火车站怎么走？',
+          '离这里远不远？',
+        ];
+      case 'shopping':
+        return const [
+          '这个多少钱一件？',
+          '可以便宜一点吗？',
+          '有没有大一号的？',
+        ];
+      case 'hobbies':
+        return const [
+          '你周末喜欢做什么？',
+          '我很喜欢听中文歌。',
+          '你平时喜欢运动吗？',
+        ];
+      default:
+        return const [
+          '你好！',
+          '今天很高兴跟你聊天。',
+          '请问这个用中文怎么说？',
+        ];
+    }
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'code': code,

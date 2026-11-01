@@ -836,3 +836,69 @@ Hệ thống bài tập thực hành được trừu tượng hóa để dùng c
 - **Phiên bản Database:** Nâng cấp tự động lên **v7** (`hi_chinese.db`), tương thích ngược 100% với các phiên bản trước.
 
 
+
+## 22. Kiến Trúc Giao Diện AI Tutor (Text Chat Streaming & Voice Conversation Service)
+
+### 22.1. Tổng Quan Kiến Trúc & Chia Sẻ Tài Nguyên Giữa Hai Trải Nghiệm
+Để tối ưu hóa trải nghiệm học khẩu ngữ và đàm thoại tiếng Trung, hệ thống AI Tutor được thiết kế phân tách rõ rệt thành hai màn hình chuyên biệt nhưng hoàn toàn hợp nhất ở tầng Domain và Data:
+- **AiTutorTextChatScreen:** Tối ưu hóa cho hội thoại dạng văn bản có suy ngẫm sâu, hỗ trợ streaming, hiển thị phiên âm Pinyin/chữ Hán (RubyText), phân tích sửa lỗi sư phạm 3 bước, và gợi ý câu hỏi tiếp theo.
+- **AiTutorVoiceChatScreen:** Tối ưu hóa cho đàm thoại khẩu ngữ theo thời gian thực (Hands-free / Push-to-Talk), trực quan hóa waveform âm thanh, hỗ trợ ngắt lời (interruption), và tự động xử lý VAD (Voice Activity Detection).
+- **Hợp nhất Tầng Lõi:** Cả hai chế độ đều dùng chung:
+  - currentChatSessionIdProvider: Đồng bộ ID phiên hội thoại giữa Text và Voice; cho phép học viên bắt đầu bằng giọng nói và xem lại lịch sử tin nhắn bằng văn bản hoặc ngược lại.
+  - AiTutorRepository & ChatDao: Lưu trữ bền vững tin nhắn, phiên học, bản ghi sửa lỗi sư phạm và bằng chứng học tập vào SQLite cục bộ (hi_chinese.db).
+  - TutorPersona (Tiểu Vũ, Lão Sư Trương, Linh Linh) & TutorScenario (Free Chat, Gọi món ăn, Hỏi đường, Mua sắm, Sở thích): Chia sẻ thống nhất mục tiêu sư phạm, chỉ dẫn hệ thống (system prompt), và cấp độ HSK mục tiêu.
+
+### 22.2. Giao Diện Text Chat: Streaming, Sửa Lỗi Sư Phạm & An Toàn Dữ Liệu
+- **Streaming Response có Kiểm Soát:**
+  - Áp dụng CancelToken từ Dio / Gemini client để cho phép học viên chủ động *"Dừng tạo"* bất kỳ lúc nào khi phản hồi đang streaming.
+  - Bộ đệm streaming (_streamingContentBuffer) chỉ hiển thị trên giao diện người dùng. **Tuyệt đối không lưu trữ tin nhắn rỗng hoặc tin nhắn bị hủy dở dang vào SQLite**; chỉ khi streaming kết thúc thành công với nội dung hợp lệ thì AiTutorRepository.recordAssistantResponse mới được kích hoạt.
+- **Thử Lại Có Kiểm Soát (Controlled Turn Retry):**
+  - Cung cấp nút *"Thử lại"* cho lượt hội thoại cuối cùng. Khi bấm thử lại, hệ thống xóa an toàn câu trả lời cũ của trợ lý qua ChatDao.deleteLastAssistantTurn(sessionId) và kích hoạt tạo mới lại câu trả lời với context nguyên vẹn.
+- **Hiển Thị Ngôn Ngữ & Sửa Lỗi Sư Phạm 3 Bước:**
+  - Trợ lý AI phân tích và đưa ra phản hồi sửa lỗi ngôn ngữ chuẩn mực:
+    1. *Khích lệ (Encouragement)*: Tạo tâm lý tự tin, ghi nhận nỗ lực biểu đạt.
+    2. *Chỉ ra lỗi & Phản hồi nhẹ nhàng (Gentle Feedback)*: Giải thích rõ ràng nguyên nhân sai ngữ pháp/từ vựng bằng tiếng Việt.
+    3. *Mẫu câu chuẩn (Model Correction)*: Đưa ra cách diễn đạt tự nhiên chuẩn người bản xứ kèm Pinyin và bản dịch.
+  - Hỗ trợ công tắc ẩn/hiện bản dịch tiếng Việt cho từng tin nhắn để khuyến khích học viên tự luyện đọc chữ Hán trước khi xem gợi ý.
+- **Gợi Ý Câu Hỏi Tự Do (Contextual Prompt Chips):**
+  - Dựa trên kịch bản (TutorScenario), hiển thị các quick chips gợi ý câu hỏi (ví dụ: *"这道菜辣不辣？"*, *"请问洗手间在哪里？"*). Học viên có thể chạm vào chip để gửi ngay hoặc tự do gõ tin nhắn bất kỳ mà không bị gò bó.
+- **Quản Lý Phiên Hội Thoại Toàn Diện (Session Management):**
+  - Drawer danh sách phiên cho phép: hiển thị ngày tạo, số lượng tin nhắn, tạo phiên mới, đổi tên phiên và xóa phiên hội thoại (kèm hộp thoại xác nhận cảnh báo an toàn).
+
+### 22.3. Voice Conversation Service: Quản Lý Vòng Đời Âm Thanh & 10 Trạng Thái
+Hệ thống giọng nói được quản lý bởi DefaultVoiceConversationService với máy trạng thái nghiêm ngặt gồm 10 trạng thái vận hành (VoiceConversationStatus):
+1. idle: Chờ tương tác từ học viên, micro và audio player ở trạng thái nghỉ.
+2. equestingPermission: Kiểm tra và yêu cầu quyền RECORD_AUDIO từ hệ điều hành.
+3. connecting: Khởi tạo luồng âm thanh hoặc kết nối phiên đàm thoại.
+4. listening: Micro đang mở, thu âm âm thanh thực từ học viên qua AudioRecorderService.
+5. processing: Đang xử lý nhận dạng giọng nói (ASR) hoặc đợi phản hồi từ AI Tutor Engine.
+6. speaking: Trợ lý AI đang phát âm câu trả lời thực qua AudioPlayerService.
+7. interrupted: Học viên chủ động ngắt lời AI hoặc phiên bị ngắt do sự kiện hệ thống.
+8. econnecting: Đang tự động kết nối lại khi có gián đoạn mạng hoặc socket.
+9. error: Xảy ra lỗi âm thanh / quyền / mạng (kèm thông điệp lỗi thân thiện bằng tiếng Việt).
+10. ended: Phiên hội thoại kết thúc an toàn, toàn bộ stream và tài nguyên được giải phóng.
+
+- **Thu Âm & Phát Âm Thanh Thực Tế (Không Dùng Mẫu Giả Lập):**
+  - Sử dụng AudioRecorderService để thu luồng micro thực tế (hỗ trợ đo cường độ âm thanh mplitude theo thời gian thực từ -60dBFS đến 0dBFS) và AudioPlayerService để phát âm thanh phản hồi.
+  - WaveformVisualizer phản xạ biên độ âm thanh trực tiếp từ luồng stream, mang lại cảm giác sống động, nhạy bén.
+- **Khả Năng Ngắt Lời AI (Interrupt Handling):**
+  - Trong lúc AI đang nói (speaking), học viên có thể chạm nút *"Ngắt lời"* hoặc nói to (VAD trigger), VoiceConversationService.interrupt() lập tức gọi _audioPlayer.stop(), chuyển trạng thái sang interrupted và ngay sau đó sẵn sàng thu âm lượt nói mới của học viên.
+- **Kiểm Tra Thiết Bị Trước Khi Đàm Thoại (Pre-flight Mic & Voice Test):**
+  - Nút *Kiểm tra Mic*: Mở hộp thoại đo tín hiệu micro thực tế trong 5 giây, hiển thị thanh decibel trực quan để người dùng an tâm thiết bị hoạt động tốt.
+  - Nút *Nghe thử giọng mẫu*: Phát đoạn audio mẫu tương ứng với từng persona được chọn (Tiểu Vũ, Lão Sư Trương, Linh Linh) trước khi bước vào phòng hội thoại.
+- **Bảo Vệ Quyền Riêng Tư Khi App Chuyển Background (AppLifecycle Policy):**
+  - Kết nối trực tiếp với AppLifecycleManager. Khi ứng dụng nhận trạng thái paused, inactive, hoặc detached, dịch vụ lập tức dừng thu âm micro, dừng phát âm thanh và chuyển trạng thái về interrupted, bảo đảm không bao giờ chạy ngầm micro trái phép.
+
+### 22.4. Phân Định Rõ Ràng Giữa Transcript Tạm Thời (Interim) và Nội Dung Xác Nhận (Final)
+- Trong luồng đàm thoại, dữ liệu phiên âm được mô hình hóa qua VoiceTranscriptSegment:
+  - isInterim = true: Lời nói tạm thời đang nhận dạng từ ASR streaming; hiển thị chữ nghiêng màu xám nhạt kèm biểu tượng nhấp nháy, giúp người học an tâm hệ thống đang nghe được mình nói.
+  - isInterim = false: Lời nói đã được ASR chốt hoàn chỉnh (end of utterance/turn); chuyển thành văn bản chính thức và được đẩy vào Context Builder của AI Tutor để xử lý phản hồi.
+
+### 22.5. Đánh Giá Kỹ Thuật Firebase AI Logic Live API Preview & Fallback Turn-based
+- **Hiện Trạng Kỹ Thuật (Transparency & Diagnostic Info):**
+  - Giao diện cung cấp nút *"Thông tin Live API Preview"* mở hộp thoại phân tích kỹ thuật:
+    - isAvailable = false: Thông báo minh bạch tính năng *Bidirectional Streaming WebSocket / Gemini Live API* trên mobile client hiện tại đang ở trạng thái **Preview / Giới Hạn**.
+    - Nêu rõ các rào cản kỹ thuật thực tế: Endpoint WebSocket hai chiều yêu cầu token ngắn hạn (ephemeral tokens) và độ trễ mạng thấp; thư viện native mobile SDK chưa mở rộng GA toàn diện.
+- **Giải Pháp Vững Chắc - Fallback Turn-based Audio:**
+  - Hệ thống tự động chuyển đổi mượt mà sang chế độ **Turn-based Audio**: Thu âm theo lượt hoàn chỉnh -> Gửi xử lý qua Context Builder -> Nhận phản hồi văn bản -> Phát âm TTS chuẩn bản xứ.
+  - Kiến trúc mở: Khi Firebase AI Logic hoặc Google Gemini mở cổng Live WebSocket GA chính thức, chỉ cần kích hoạt triển khai LiveStreamVoiceService cắm vào interface VoiceConversationService mà không cần sửa đổi bất kỳ dòng mã UI nào.

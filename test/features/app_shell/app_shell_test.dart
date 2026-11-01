@@ -87,8 +87,8 @@ void main() {
       await tester.pump(const Duration(milliseconds: 200));
 
       // Verifies AiTutorTabScreen content is displayed
-      expect(find.textContaining('Context: Mục tiêu phản xạ giao tiếp'), findsOneWidget);
-      expect(find.text('Sửa câu của tôi ✍️'), findsOneWidget);
+      expect(find.text('Nhắn tin'), findsOneWidget);
+      expect(find.text('Hội thoại'), findsOneWidget);
     });
 
     testWidgets('Tapping Review tab switches to ReviewScreen with SM-2 flashcard', (tester) async {

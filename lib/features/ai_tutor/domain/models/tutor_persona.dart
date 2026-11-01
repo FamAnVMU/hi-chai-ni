@@ -28,6 +28,10 @@ class TutorPersona {
     required this.systemPromptInstruction,
   });
 
+  String get avatarLabel => avatarEmoji;
+  String get roleDescriptionVi => toneDescription;
+  String get voicePreviewSampleUri => 'assets/audio/personas/${id.name}_preview.mp3';
+
   Map<String, dynamic> toMap() {
     return {
       'id': id.name,

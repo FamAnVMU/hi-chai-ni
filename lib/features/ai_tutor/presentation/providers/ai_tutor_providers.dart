@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/audio/audio_player_service.dart';
+import '../../../../core/audio/audio_recorder_service.dart';
 import '../../../../core/database/app_database.dart';
 import '../../../../core/database/dao/chat_dao.dart';
 import '../../../../core/network/ai/ai_service.dart';
@@ -6,6 +8,25 @@ import '../../data/repositories/ai_tutor_repository.dart';
 import '../../domain/models/tutor_chat_turn.dart';
 import '../../domain/models/tutor_persona.dart';
 import '../../domain/models/tutor_scenario.dart';
+import '../../domain/voice/voice_conversation_models.dart';
+import '../../domain/voice/voice_conversation_service.dart';
+
+/// Available chat interaction modes.
+enum AiTutorMode {
+  text,
+  voice,
+}
+
+/// Provider managing whether Text Chat or Voice Conversation is active.
+class AiTutorModeNotifier extends Notifier<AiTutorMode> {
+  @override
+  AiTutorMode build() => AiTutorMode.text;
+
+  void setMode(AiTutorMode mode) => state = mode;
+}
+
+final aiTutorModeProvider =
+    NotifierProvider<AiTutorModeNotifier, AiTutorMode>(AiTutorModeNotifier.new);
 
 /// Provider for the [AiTutorRepository] singleton.
 final aiTutorRepositoryProvider = Provider<AiTutorRepository>((ref) {
@@ -16,6 +37,54 @@ final aiTutorRepositoryProvider = Provider<AiTutorRepository>((ref) {
     database: database,
     aiService: aiService,
   );
+});
+
+/// Dedicated AudioRecorderService instance for AI Tutor.
+final aiTutorAudioRecorderProvider = Provider<AudioRecorderService>((ref) {
+  final recorder = DefaultAudioRecorderService();
+  ref.onDispose(() => recorder.dispose());
+  return recorder;
+});
+
+/// Dedicated AudioPlayerService instance for AI Tutor.
+final aiTutorAudioPlayerProvider = Provider<AudioPlayerService>((ref) {
+  final player = DefaultAudioPlayerService();
+  ref.onDispose(() => player.dispose());
+  return player;
+});
+
+/// Provider for [VoiceConversationService] singleton for the AI Tutor.
+final voiceConversationServiceProvider = Provider<VoiceConversationService>((ref) {
+  final recorder = ref.watch(aiTutorAudioRecorderProvider);
+  final player = ref.watch(aiTutorAudioPlayerProvider);
+  final repository = ref.watch(aiTutorRepositoryProvider);
+
+  final service = DefaultVoiceConversationService(
+    recorder: recorder,
+    player: player,
+    repository: repository,
+  );
+
+  ref.onDispose(() => service.dispose());
+  return service;
+});
+
+/// Reactive stream provider for the voice conversation status.
+final voiceStatusProvider = StreamProvider<VoiceConversationStatus>((ref) {
+  final service = ref.watch(voiceConversationServiceProvider);
+  return service.statusStream;
+});
+
+/// Reactive stream provider for real-time voice amplitude (0.0 to 1.0).
+final voiceAmplitudeProvider = StreamProvider<double>((ref) {
+  final service = ref.watch(voiceConversationServiceProvider);
+  return service.amplitudeStream;
+});
+
+/// Reactive stream provider for real-time voice transcript segments.
+final voiceTranscriptsProvider = StreamProvider<List<VoiceTranscriptSegment>>((ref) {
+  final service = ref.watch(voiceConversationServiceProvider);
+  return service.transcriptStream;
 });
 
 /// Notifier managing the currently selected AI Tutor persona.

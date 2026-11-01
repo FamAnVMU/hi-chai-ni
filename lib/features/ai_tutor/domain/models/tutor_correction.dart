@@ -42,6 +42,10 @@ class TutorEvaluation {
     this.errorCategory = TutorErrorCategory.none,
   });
 
+  String get encouragementVi => explanationVi.isNotEmpty ? explanationVi : 'Bạn đã diễn đạt rất tốt!';
+  String get gentleFeedbackVi => explanationVi;
+  String get modelCorrectionZh => correctedText ?? '';
+
   Map<String, dynamic> toMap() {
     return {
       'is_correct': isCorrect ? 1 : 0,

@@ -26,6 +26,14 @@ abstract class AiTutorRepository {
     TutorPersonaId personaId = TutorPersonaId.qiaoqiao,
   });
 
+  Future<List<Map<String, dynamic>>> getActiveSessions({int limit = 30});
+
+  Future<void> updateSessionTitle(String sessionId, String newTitle);
+
+  Future<void> deleteSession(String sessionId);
+
+  Future<void> removeLastTurn(String sessionId);
+
   Future<List<TutorChatTurn>> getSessionTurns(String sessionId);
 
   Future<TutorResponse> sendMessage({
@@ -114,6 +122,34 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
     });
 
     return sessionId;
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getActiveSessions({int limit = 30}) async {
+    final db = await _getDb();
+    final chatDao = ChatDao(db);
+    return chatDao.getActiveSessions(limit: limit);
+  }
+
+  @override
+  Future<void> updateSessionTitle(String sessionId, String newTitle) async {
+    final db = await _getDb();
+    final chatDao = ChatDao(db);
+    await chatDao.updateSessionTitle(sessionId, newTitle);
+  }
+
+  @override
+  Future<void> deleteSession(String sessionId) async {
+    final db = await _getDb();
+    final chatDao = ChatDao(db);
+    await chatDao.deleteSession(sessionId);
+  }
+
+  @override
+  Future<void> removeLastTurn(String sessionId) async {
+    final db = await _getDb();
+    final chatDao = ChatDao(db);
+    await chatDao.deleteLastAssistantTurn(sessionId);
   }
 
   @override

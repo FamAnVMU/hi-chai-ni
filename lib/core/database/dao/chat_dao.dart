@@ -52,6 +52,61 @@ class ChatDao {
     );
   }
 
+  Future<void> updateSessionTitle(String sessionId, String newTitle, {Transaction? txn}) async {
+    final executor = txn ?? _db;
+    final nowUtc = DateTime.now().toUtc().toIso8601String();
+    await executor.update(
+      DatabaseConstants.tableChatSessions,
+      {
+        'title': newTitle.trim(),
+        'updated_at': nowUtc,
+      },
+      where: 'id = ? AND deleted_at IS NULL',
+      whereArgs: [sessionId],
+    );
+  }
+
+  Future<void> deleteSession(String sessionId, {Transaction? txn}) async {
+    final executor = txn ?? _db;
+    final nowUtc = DateTime.now().toUtc().toIso8601String();
+    await executor.update(
+      DatabaseConstants.tableChatSessions,
+      {
+        'deleted_at': nowUtc,
+        'updated_at': nowUtc,
+      },
+      where: 'id = ?',
+      whereArgs: [sessionId],
+    );
+  }
+
+  Future<void> deleteMessage(String messageId, {Transaction? txn}) async {
+    final executor = txn ?? _db;
+    await executor.delete(
+      DatabaseConstants.tableChatMessages,
+      where: 'id = ?',
+      whereArgs: [messageId],
+    );
+  }
+
+  Future<void> deleteLastAssistantTurn(String sessionId, {Transaction? txn}) async {
+    final executor = txn ?? _db;
+    final messages = await executor.query(
+      DatabaseConstants.tableChatMessages,
+      where: 'session_id = ?',
+      whereArgs: [sessionId],
+      orderBy: 'created_at DESC',
+      limit: 1,
+    );
+    if (messages.isNotEmpty && messages.first['role'] == 'assistant') {
+      await executor.delete(
+        DatabaseConstants.tableChatMessages,
+        where: 'id = ?',
+        whereArgs: [messages.first['id']],
+      );
+    }
+  }
+
   Future<void> touchSession(String sessionId, {Transaction? txn}) async {
     final executor = txn ?? _db;
     final nowUtc = DateTime.now().toUtc().toIso8601String();
