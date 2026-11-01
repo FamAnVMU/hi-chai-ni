@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hi_chinese/core/constants/app_constants.dart';
 import 'package:hi_chinese/core/utils/app_lifecycle_manager.dart';
@@ -6,8 +7,12 @@ import 'package:hi_chinese/main.dart';
 
 void main() {
   testWidgets('HiChineseApp renders successfully with diagnostic components', (WidgetTester tester) async {
-    // Build app widget
-    await tester.pumpWidget(const HiChineseApp());
+    // Build app widget wrapped with ProviderScope for Riverpod ThemeModeNotifier
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: HiChineseApp(),
+      ),
+    );
 
     // Verify app title and welcome message
     expect(find.text(AppConstants.appName), findsOneWidget);

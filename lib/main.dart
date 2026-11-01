@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/constants/app_constants.dart';
+import 'core/theme/theme.dart';
 import 'core/utils/app_lifecycle_manager.dart';
 import 'core/utils/permission_helper.dart';
+import 'features/design_system/presentation/screens/design_system_demo_screen.dart';
 import 'features/settings/settings.dart';
 
 void main() {
@@ -37,26 +39,19 @@ void main() {
   );
 }
 
-class HiChineseApp extends StatelessWidget {
+class HiChineseApp extends ConsumerWidget {
   const HiChineseApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
+
     return MaterialApp(
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.dark,
-      darkTheme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF121811), // Dark Forest Background
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFFA3D635), // Lime Green
-          onPrimary: Color(0xFF121811),
-          surface: Color(0xFF1A2418),
-          onSurface: Colors.white,
-        ),
-      ),
+      themeMode: themeMode,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
       home: const HiChineseSkeletonScreen(),
     );
   }
@@ -155,7 +150,16 @@ class _HiChineseSkeletonScreenState extends State<HiChineseSkeletonScreen> {
         backgroundColor: const Color(0xFF1A2418),
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings, color: Color(0xFFA3D635)),
+            icon: const Icon(Icons.palette_outlined),
+            tooltip: 'Design System Showcase',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const DesignSystemDemoScreen()),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings),
             tooltip: 'Cài Đặt AI & Kết Nối',
             onPressed: () {
               Navigator.of(context).push(
@@ -200,6 +204,51 @@ class _HiChineseSkeletonScreenState extends State<HiChineseSkeletonScreen> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
+
+              // Quick Access to Design System Showcase
+              HiCard(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const DesignSystemDemoScreen()),
+                  );
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: AppRadius.borderMd,
+                      ),
+                      child: Icon(
+                        Icons.palette_rounded,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.lg),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Design System Showcase (Material 3)',
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Xem mẫu bảng màu, font Việt-Trung, nút bấm, input, modal',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
 
               // Safe Area & System UI Diagnostic Card
               Container(
