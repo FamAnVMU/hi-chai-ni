@@ -902,3 +902,65 @@ Hệ thống giọng nói được quản lý bởi DefaultVoiceConversationServ
 - **Giải Pháp Vững Chắc - Fallback Turn-based Audio:**
   - Hệ thống tự động chuyển đổi mượt mà sang chế độ **Turn-based Audio**: Thu âm theo lượt hoàn chỉnh -> Gửi xử lý qua Context Builder -> Nhận phản hồi văn bản -> Phát âm TTS chuẩn bản xứ.
   - Kiến trúc mở: Khi Firebase AI Logic hoặc Google Gemini mở cổng Live WebSocket GA chính thức, chỉ cần kích hoạt triển khai LiveStreamVoiceService cắm vào interface VoiceConversationService mà không cần sửa đổi bất kỳ dòng mã UI nào.
+
+## 23. Kiến Trúc Profile & Settings và Quản Lý Dữ Liệu An Toàn
+
+### 23.1. Mô Hình Hồ Sơ Độc Lập (Local Standalone Learner Profile & Goal History)
+Nhằm bảo vệ tối đa quyền riêng tư và hỗ trợ học tập hoàn toàn ngoại tuyến, hệ thống hồ sơ của HI Chinese áp dụng mô hình Local Standalone độc lập:
+- **UserProfile Entity:**
+  - Định danh cục bộ (id: 'default_learner'), tên hiển thị tùy chọn (không bắt buộc), trình độ hiện tại (currentHskLevel: 1 - 6), mục tiêu đích (	argetHskLevel: 1 - 6), mục đích học (purpose: dailyCommunication, hskExam, businessWork, travelCulture), lộ trình thời gian (	imeframe), thời gian học mỗi ngày (dailyMinutes: 15, 30, 45, 60 phút), ngày bắt đầu học (startDate), danh sách sở thích học tập (interests), và phong cách biểu tượng đại diện (vatarStyle: panda, dragon, bamboo, lantern, tea, scholar).
+  - **Không bắt buộc tạo tài khoản máy chủ hay đăng nhập đám mây.** Toàn bộ thông tin được lưu trữ bền vững tại bảng SQLite user_profiles cục bộ trên thiết bị.
+- **Theo Dõi Thay Đổi Mục Tiêu Có Ý Nghĩa (GoalHistoryRecord):**
+  - Khi học viên điều chỉnh mục tiêu (HSK mục tiêu, số phút/ngày, hoặc mục đích chính), hệ thống không chỉ ghi đè lên hồ sơ mà **bắt buộc học viên nhập lý do thay đổi**.
+  - Một bản ghi kiểm toán lịch sử (GoalHistoryRecord) được ghi vào bảng goal_history (ghi nhận ngày giờ UTC, mục tiêu cũ $\rightarrow$ mới, số phút cũ $\rightarrow$ mới, mục đích cũ $\rightarrow$ mới, và lý do giải thích).
+  - Giao diện GoalHistorySheet cung cấp chế độ xem dòng thời gian (timeline) các lần điều chỉnh mục tiêu, giúp học viên theo dõi tiến trình và sự trưởng thành trong động lực học tập.
+
+### 23.2. Cấu Hình Ứng Dụng & Trải Nghiệm Đọc Tiếng Trung
+- **Theme Mode & Dynamic Typography:**
+  - Hỗ trợ 3 chế độ màu sắc: Hệ thống (ThemeMode.system), Sáng (ThemeMode.light), và Tối (ThemeMode.dark - chế độ Dark Forest chủ đạo của HI Chinese).
+  - Tùy biến cỡ chữ hiển thị với 4 mức tỷ lệ ( .85x - 1.30x), tự động áp dụng thông qua MediaQuery.textScaler: TextScaler.linear(fontScale) trong MaterialApp builder. Cung cấp hộp thoại xem trước (preview) chữ Hán và phiên âm theo thời gian thực.
+- **Tùy Chọn Đọc Tiếng Trung (Reading Preferences):**
+  - Công tắc bật/tắt hiển thị Pinyin mặc định trong từ điển và bài đọc hiểu.
+  - Tùy chọn chú âm trên đầu chữ Hán dạng RubyText (showRubyAnnotation).
+  - Tùy chọn tô màu thanh điệu (Pinyin tone coloring).
+  - Đa ngôn ngữ giao diện (uiLanguage: vi, en, zh).
+
+### 23.3. Cài Đặt Âm Thanh, Giọng Đọc & Quản Lý Quyền Micro
+- **Cấu Hình Giọng Đọc & Phản Hồi:**
+  - Tốc độ phát âm (speechRate): 3 mức Chậm (0.8x), Tiêu chuẩn (1.0x), và Nhanh (1.2x).
+  - Tự động phát âm thanh (utoPlayAudio): Tự động phát audio phát âm khi lật thẻ flashcard SRS hoặc tra cứu từ điển.
+  - Rung phản hồi cảm ứng (hapticFeedback) khi hoàn thành bài tập hoặc thao tác thành công.
+- **Quản Lý Quyền Truy Cập Micro An Toàn:**
+  - Không bao giờ yêu cầu quyền micro bừa bãi khi khởi động ứng dụng; chỉ kích hoạt theo nhu cầu thực tế của học viên thông qua PermissionHelper.requestMicrophoneWithRationale.
+  - Màn hình Cài đặt hiển thị trực quan trạng thái quyền hiện tại (Granted / Denied) và cung cấp nút kiểm tra, hiển thị hộp thoại giải thích mục đích trước khi gọi API quyền hệ điều hành.
+
+### 23.4. Quản Lý Dữ Liệu & Bộ Nhớ (Data & Storage Management)
+- **Đo Lường Dung Lượng Thực Tế (StorageBreakdown):**
+  - Tính toán và bóc tách minh bạch dung lượng tệp tin trên đĩa: tệp cơ sở dữ liệu chính (hi_chinese.db), tệp nhật ký WAL (hi_chinese.db-wal), tệp bộ nhớ chia sẻ SHM (hi_chinese.db-shm), và thư mục bộ nhớ đệm âm thanh / thu âm tạm.
+- **Sao Lưu Cơ Sở Dữ Liệu Nguyên Tử (.hibak):**
+  - Thực hiện kiểm tra toàn vẹn (PRAGMA integrity_check) trước khi sao lưu.
+  - Chạy PRAGMA wal_checkpoint(TRUNCATE) để xả toàn bộ trang giao dịch pending từ WAL vào tệp DB chính.
+  - Sử dụng cơ chế VACUUM INTO sao lưu nguyên tử hoặc sao chép an toàn vào thư mục ackups/.
+- **Khôi Phục Bản Sao Lưu Có Bảo Hiểm (Safety Snapshot):**
+  - Trước khi ghi đè cơ sở dữ liệu hiện tại bằng tệp sao lưu, hệ thống **tự động tạo một bản sao lưu an toàn tức thời** (pre_restore_safety_snapshot_<timestamp>.hibak). Nếu quá trình khôi phục gặp lỗi, dữ liệu cũ vẫn được bảo toàn nguyên vẹn.
+- **Xuất & Nhập Dữ Liệu Di Động (Portable JSON):**
+  - Cho phép xuất toàn bộ hồ sơ, lịch sử mục tiêu, từ đã lưu, lịch sử tra cứu, tiến độ đọc và cài đặt ra định dạng JSON tiêu chuẩn, hỗ trợ sao chép vào Clipboard để lưu trữ hoặc chuyển đổi giữa các thiết bị.
+
+### 23.5. Bảo Vệ Dữ Liệu Phá Hủy & Phân Tách Local/Cloud (Data Protection)
+- **Vùng Nguy Hiểm Tách Biệt (Danger Zone):**
+  - Nút *"Đặt lại dữ liệu & tiến trình học tập"* được đặt ở khu vực riêng biệt có viền cảnh báo màu đỏ, hoàn toàn tách biệt khỏi các nút thao tác thông thường.
+- **Quy Trình Xác Nhận 2 Bước Nghiêm Ngặt:**
+  1. Hộp thoại cảnh báo hiển thị danh mục cụ thể các bảng dữ liệu cá nhân sẽ bị xóa (tiến trình, SRS, bài tập, chat AI Tutor).
+  2. Hệ thống **tự động kích hoạt bản sao lưu an toàn** (pre_destruction_safety_snapshot_<timestamp>.hibak) trước khi tiến hành xóa.
+  3. Bắt buộc người dùng nhập đúng từ khóa xác nhận: "XOA" hoặc "RESET". Nút thực thi bị vô hiệu hóa (disabled) cho đến khi người dùng nhập chính xác mã này.
+- **Phân Định Tuyệt Đối Local vs Cloud:**
+  - Logic dịch vụ và giao diện cam kết minh bạch: Thao tác đặt lại chỉ làm sạch dữ liệu SQLite và bộ nhớ cache cục bộ trên thiết bị hiện tại, **hoàn toàn không ngầm xóa hoặc tác động đến bất kỳ tài khoản/dữ liệu đám mây (Firebase / Google Drive)** nếu có liên kết bên ngoài.
+- **Bảo Vệ Nội Dung Giáo Trình Mặc Định:**
+  - Dữ liệu giáo trình, từ điển chuẩn, ngữ pháp, bài đọc và bài tập thực hành được nạp từ tài sản ứng dụng (seed_history) được giữ nguyên 100%, đồng thời một hồ sơ người học mặc định sạch được khởi tạo lại ngay lập tức.
+
+### 23.6. Cơ Sở Dữ Liệu SQLite & Migration v8
+- **Nâng Cấp Schema lên Version 8:**
+  - Thêm bảng user_profiles: Lưu trữ thông tin hồ sơ người học cá nhân.
+  - Thêm bảng goal_history: Lưu trữ lịch sử điều chỉnh mục tiêu và lý do sư phạm.
+  - Thêm bảng pp_settings: Lưu trữ cặp khóa-giá trị cho toàn bộ thiết lập ứng dụng.
+- **Phiên Bản Database:** Nâng cấp tự động lên **v8** (hi_chinese.db), duy trì khả năng tương thích ngược hoàn hảo và bảo vệ nguyên vẹn dữ liệu từ các phiên bản v1 - v7.

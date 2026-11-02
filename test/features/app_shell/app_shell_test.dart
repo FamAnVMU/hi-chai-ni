@@ -7,7 +7,10 @@ import 'package:hi_chinese/features/app_shell/presentation/providers/app_shell_p
 import 'package:hi_chinese/features/app_shell/presentation/screens/app_shell.dart';
 import 'package:hi_chinese/features/home/home.dart';
 import 'package:hi_chinese/features/app_shell/presentation/widgets/hi_bottom_nav_bar.dart';
+import 'package:hi_chinese/features/profile/profile.dart';
+import 'package:hi_chinese/features/settings/settings.dart';
 import 'package:hi_chinese/features/vocabulary_srs/vocabulary_srs.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +35,15 @@ void main() {
         ),
         srsDueCountProvider.overrideWith(
           () => _MockSrsDueCountNotifier(),
+        ),
+        userProfileProvider.overrideWith(
+          () => _MockUserProfileNotifier(),
+        ),
+        goalHistoryProvider.overrideWith(
+          (ref) => Future.value([]),
+        ),
+        microphoneStatusProvider.overrideWith(
+          (ref) => Future.value(PermissionStatus.granted),
         ),
       ],
       child: Consumer(
@@ -111,8 +123,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 200));
 
       expect(find.text('Cá Nhân & Cài Đặt'), findsOneWidget);
-      expect(find.text('Giao Diện & Chế Độ Màu'), findsOneWidget);
-      expect(find.text('Cài đặt AI Tutor & Kiểm tra kết nối'), findsOneWidget);
+      expect(find.text('Giao Diện & Tùy Chọn Đọc'), findsOneWidget);
     });
   });
 
@@ -320,4 +331,9 @@ class _MockSrsStudySessionNotifier extends SrsStudySessionNotifier {
 class _MockSrsDueCountNotifier extends SrsDueCountNotifier {
   @override
   Future<int> build() async => 5;
+}
+
+class _MockUserProfileNotifier extends UserProfileNotifier {
+  @override
+  Future<UserProfile> build() async => UserProfile.defaultProfile();
 }
