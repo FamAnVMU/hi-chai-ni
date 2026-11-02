@@ -1,0 +1,46 @@
+name: Publish GitHub Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create GitHub Release with Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          name: HI Chinese ${{ github.ref_name }} – Nền Tảng Tự Học HSK Hoàn Chỉnh
+          draft: false
+          prerelease: false
+          body: |
+            ## 🌟 HI Chinese ${{ github.ref_name }} – Nền Tảng Tự Học HSK Hoàn Chỉnh (Offline-First)
+
+            Bản phát hành chính thức của **HI Chinese** dành riêng cho hệ điều hành Android.
+            
+            ### 🚀 Tính Năng Cốt Lõi
+            - **Offline-First 100%:** Giáo trình chuẩn HSK 1, 150 từ vựng cốt lõi, 45 điểm ngữ pháp, 15 bài hội thoại, 150 bài tập xác định và đề thi tốt nghiệp cấp độ hoạt động không cần mạng.
+            - **Quy Trình Học 6 Chặng Chuẩn Sư Phạm:** Khởi động $\rightarrow$ Từ vựng mới $\rightarrow$ Điểm ngữ pháp $\rightarrow$ Hội thoại $\rightarrow$ Luyện tập thích ứng $\rightarrow$ Kiểm tra hoàn thành bài.
+            - **Mở Khóa Có Điều Kiện & SRS:** Yêu cầu $\ge 80\%$ để mở bài tiếp theo, tự động phát hiện kiến thức yếu để đề xuất ôn tập.
+            - **Trắc Nghiệm Thích Ứng CAT & Phân Lớp:** Tự động ghi nhận đạt chuẩn các bài trước khi vượt qua khảo sát đầu vào.
+            - **AI Trợ Giảng Bổ Trợ An Toàn:** Cung cấp giải thích ngữ cảnh khi có mạng với rào chắn nghiêm ngặt bảo vệ tính bất biến của giáo trình.
+
+            ### 📦 Danh Sách Tệp APK Cài Đặt
+            - **`hi-chinese-v1.0.0-arm64.apk`**: Khuyên dùng cho hầu hết smartphone Android hiện đại (64-bit arm64-v8a).
+            - **`hi-chinese-v1.0.0-universal.apk`**: Bản universal tương thích với mọi cấu hình điện thoại / máy tính bảng Android.
+            - **`hi-chinese-v1.0.0-arm32.apk`**: Dành cho thiết bị Android 32-bit (armeabi-v7a).
+            - **`app-release.apk`**: Tệp APK Release tổng hợp.
+          files: |
+            release-apk/hi-chinese-v1.0.0-arm64.apk
+            release-apk/hi-chinese-v1.0.0-universal.apk
+            release-apk/hi-chinese-v1.0.0-arm32.apk
+            release-apk/app-release.apk

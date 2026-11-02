@@ -1053,3 +1053,53 @@ Nhằm bảo vệ tối đa quyền riêng tư và hỗ trợ học tập hoàn 
 - **Toàn Bộ Test Suite:** **367/367 tests PASSED (100%)** bao gồm 6 bài benchmark định lượng mới.
 - **Phân Tích Tĩnh (Static Analysis):** `dart analyze lib test` đạt **0 errors, 0 warnings**.
 - **Tính Bất Biến Về Dữ Liệu & Chức Năng:** Toàn bộ nội dung giáo trình, HSK seed fixture, âm thanh, tính năng từ điển, phòng luyện phát âm, AI Tutor, lộ trình học và trắc nghiệm được bảo toàn nguyên vẹn 100%, không bị lược bỏ hay cắt giảm để lấy số liệu dung lượng ảo.
+
+
+---
+
+## 26. Kiến Trúc Nền Tảng Tự Học Tiếng Trung HSK Hoàn Chỉnh (HSK Self-Study Paradigm Pivot)
+
+### 26.1. Bối Cảnh & Tôn Chỉ Sản Phẩm Cốt Lõi
+- **Chuyển dịch chiến lược:** HI Chinese chính thức chuyển hướng từ một ứng dụng "AI Chat kèm một số công cụ học" sang một **nền tảng tự học tiếng Trung có hệ thống**, dẫn dắt người học từ sơ cấp tiến dần qua từng cấp độ HSK bằng giáo trình, học liệu, ngân hàng bài tập và hệ thống đánh giá được xây dựng sẵn.
+- **Tôn chỉ Offline-First:** Toàn bộ quá trình học tập cốt lõi (tra cứu từ vựng, ngữ pháp, tập viết chữ Hán, bài đọc, bài nghe, làm bài tập, chấm điểm và thi tốt nghiệp cấp độ) **hoạt động ngoại tuyến 100%**, không phụ thuộc vào kết nối Internet hay Gemini API.
+- **Vị trí của AI:** AI chỉ đóng vai trò **trợ giảng bổ trợ (Auxiliary Assistant)** để giải thích sâu hơn, gợi ý ví dụ theo yêu cầu hoặc phân tích nguyên nhân lỗi sai khi người học có kết nối mạng. AI **tuyệt đối không** có quyền thay đổi giáo trình, không tự tạo đáp án chuẩn ghi đè bài tập và không tự cấp quyền mở khóa bài học.
+- **Tách biệt dữ liệu và giao diện:** Tuyệt đối không hardcode nội dung bài học vào giao diện Flutter; toàn bộ được quản lý qua CMS Catalog SQLite Schema v9.
+
+### 26.2. 8 Trụ Cột Kiến Trúc Triển Khai
+1. **Content Management System (CMS) & Schema v9:**
+   - 8 bảng SQLite độc lập: `content_packs`, `curriculums`, `curriculum_units`, `curriculum_lessons`, `lesson_segments`, `content_items`, `curriculum_mastery`, `level_exit_exams`.
+   - Lưu trữ có cấu trúc đầy đủ: `content_id`, `curriculum_id`, `hsk_level`, `unit_id`, `lesson_id`, `knowledge_type`, `content_json`, `learning_objectives`, `source_reference`, `version`.
+2. **Gói Học Liệu Ngoại Tuyến Độc Lập (Content Packs):**
+   - HSK 1 được đóng gói tích hợp sẵn trong ứng dụng (`assets/data/content_packs/hsk1/hsk1_pack_v1.json`). HSK 2 trở lên hỗ trợ tải về theo nhu cầu (on-demand download) và lưu cục bộ.
+   - Nạp dữ liệu qua `ContentPackLoader` chạy ngầm trong background `Isolate.run`, xác thực tính toàn vẹn bằng SHA-256 checksum và thực thi giao dịch cơ sở dữ liệu `transaction` có tính năng idempotent (chống trùng lặp khi nạp lại).
+3. **Bộ Học Liệu Chuẩn Quốc Tế HSK 1 Hoàn Chỉnh:**
+   - 15 bài học tuần tự phân chia thành 3 Units theo chuẩn HSK 2.0.
+   - 150 từ vựng cốt lõi duy nhất (có chữ Hán, Pinyin chuẩn thanh điệu, nghĩa tiếng Việt chuẩn xác và câu ví dụ ngữ cảnh).
+   - 45 cấu trúc ngữ pháp có phân tích chi tiết.
+   - 15 bài hội thoại song ngữ tình huống thực tế.
+   - 150 bài tập xác định có đáp án chuẩn và lời giải thích chi tiết.
+   - 1 đề thi tốt nghiệp HSK 1 hoàn chỉnh gồm 40 câu (20 câu Nghe hiểu + 20 câu Đọc hiểu), chuẩn thang điểm 200 (điểm đạt $\ge 120$).
+4. **Prerequisite & Mastery Engine:**
+   - Đánh giá khóa/mở khóa bài học tự động: Bài học tiếp theo chỉ mở khi bài học tiên quyết đạt điểm kiểm tra $\ge 80\%$.
+   - Theo dõi 5 trạng thái năng lực: `not_started`, `in_progress`, `completed`, `needs_review`, `mastered`.
+   - Thuật toán hồi quy và phát hiện kiến thức yếu để đề xuất ôn tập Spaced Repetition (SRS).
+   - Cơ chế Phân Lớp (Placement Test Auto-Credit): Người học vượt qua bài khảo sát đầu vào đạt trình độ tương ứng được tự động ghi nhận hoàn thành các bài học trước đó với lý do `credited_by_placement_test`, mở khóa ngay bài học phù hợp.
+5. **Luồng Học 6 Chặng Thích Ứng (Adaptive 6-Step Lesson Flow):**
+   - Cấu trúc bài học tiêu chuẩn: `Khởi động (Warmup)` $\rightarrow$ `Từ vựng mới (Vocabulary)` $\rightarrow$ `Điểm ngữ pháp (Grammar)` $\rightarrow$ `Hội thoại ngữ cảnh (Dialogue)` $\rightarrow$ `Luyện tập thích ứng (Practice)` $\rightarrow$ `Kiểm tra hoàn thành bài (Mastery Check)`.
+   - Bộ lấy mẫu bài tập `AdaptiveExerciseSampler`: Phân bổ 40% câu hỏi ưu tiên kỹ năng trọng tâm của học viên và 60% cân bằng các kỹ năng còn lại. Chấm điểm tất định 100% không dùng AI.
+6. **Luồng Onboarding 3 Bước Sư Phạm:**
+   - Bước 1: Nhập Gemini API Key (tùy chọn, có nút "Bỏ qua để học ngoại tuyến").
+   - Bước 2: Khảo sát năng lực đầu vào bằng trắc nghiệm thích ứng CAT (bắt buộc trước khi bắt đầu học).
+   - Bước 3: Thiết lập mục tiêu cá nhân hóa (cam kết thời lượng 15/30/60 phút mỗi ngày và lựa chọn kỹ năng trọng điểm cần nâng cao).
+7. **Giao Diện Giáo Trình, Trình Học Bài & Phòng Thi Tốt Nghiệp:**
+   - `CurriculumSyllabusScreen`: Bản đồ giáo trình phân cấp theo Units, hiển thị tiến độ, trạng thái khóa/mở khóa và huy hiệu bài học.
+   - `LessonStudyScreen`: Trình học 6 chặng liên hoàn với thanh tiến trình trực quan, hỗ trợ điều hướng trước/sau mượt mà.
+   - `LevelExitExamScreen`: Phòng thi mô phỏng đề thi HSK chuẩn quốc tế có đồng hồ đếm ngược 35 phút, phân chia rõ rệt 2 phần Nghe và Đọc, chấm điểm thang 200 và cấp chứng nhận hoàn thành cấp độ khi đạt $\ge 120/200$.
+8. **Rào Chắn AI Bổ Trợ (Auxiliary Guardrails):**
+   - Bổ sung 4 quy tắc rào chắn nghiêm ngặt trong `TutorSystemPromptBuilder` chống can thiệp giáo trình và cấm tự tạo đáp án chuẩn ghi đè bài tập.
+   - Widget `AiTutorHelperSheet`: Hiển thị dưới dạng modal phụ trợ khi người học cần trợ giúp tại chặng Ngữ pháp hoặc Bài tập. Tự động hiển thị fallback banner hướng dẫn ngoại tuyến khi không có kết nối mạng.
+
+### 26.3. Đảm Bảo Chất Lượng & Kiểm Thử Hồi Quy (Verification)
+- **Kiểm Thử Tự Động Toàn Diện:** Toàn bộ test suite **399/399 tests PASSED (100%)**, bao gồm cả master regression suite `hsk_self_study_platform_master_test.dart` kiểm chứng toàn bộ chu trình ngoại tuyến.
+- **Phân Tích Tĩnh (Static Analysis):** `dart analyze lib test` đạt chuẩn **0 errors, 0 warnings**.
+- **Đóng Gói Release:** Biên dịch thành công các gói APK Release tối ưu hóa kích thước và hiệu năng (Universal APK và Split-per-ABI APKs).
