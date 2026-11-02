@@ -6,6 +6,18 @@ HI Chinese hoạt động theo mô hình **Offline-First**, lưu trữ dữ li�
 
 ---
 
+## 📦 Tải Ứng Dụng (Download Release APK v1.0.0)
+
+Người học có thể tải trực tiếp file APK cài đặt cho điện thoại Android:
+
+| Phiên Bản APK | Kích Thước | Thiết Bị Phù Hợp | Tải Về Trực Tiếp |
+| :--- | :---: | :--- | :--- |
+| **`hi-chinese-v1.0.0-arm64.apk`** | **19.7 MB** | **Khuyên dùng** cho hầu hết smartphone Android hiện đại (64-bit) | [⬇️ Tải APK ARM64](release-apk/hi-chinese-v1.0.0-arm64.apk) |
+| **`hi-chinese-v1.0.0-universal.apk`** | **56.2 MB** | Bản tổng hợp chạy trên mọi cấu hình điện thoại / máy tính bảng Android | [⬇️ Tải APK Universal](release-apk/hi-chinese-v1.0.0-universal.apk) |
+| **`hi-chinese-v1.0.0-arm32.apk`** | **17.3 MB** | Dành cho các thiết bị Android thế hệ cũ (32-bit armeabi-v7a) | [⬇️ Tải APK ARM32](release-apk/hi-chinese-v1.0.0-arm32.apk) |
+
+---
+
 ## 🌟 Đặc Điểm Nổi Bật
 
 - **Độc lập 100% Mobile:** Toàn bộ dữ liệu từ vựng, ngữ pháp, bài đọc, flashcard SRS và tiến độ học tập được lưu trữ và xử lý trực tiếp trên điện thoại. Không phụ thuộc máy tính cá nhân, server Node.js hay Cloudflare Tunnel.
