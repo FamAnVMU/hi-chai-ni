@@ -1,0 +1,78 @@
+import 'package:sqflite/sqflite.dart';
+import '../../../core/database/dao/curriculum_dao.dart';
+import '../../../core/database/dao/mastery_dao.dart';
+
+class PlacementUnlockHandler {
+  final DatabaseExecutor _db;
+  late final CurriculumDao _curriculumDao;
+  late final MasteryDao _masteryDao;
+
+  PlacementUnlockHandler(this._db) {
+    _curriculumDao = CurriculumDao(_db);
+    _masteryDao = MasteryDao(_db);
+  }
+
+  /// Credits all lessons prior to [targetLessonOrder] in [hskLevel],
+  /// and unlocks [targetLessonOrder] for immediate study.
+  Future<int> creditLessonsUpToLevel({
+    required int hskLevel,
+    required int targetLessonOrder,
+  }) async {
+    final curr = await _curriculumDao.getCurriculumByLevel(hskLevel);
+    if (curr == null) return 0;
+
+    final currId = curr['id'] as String;
+    final allLessons = await _curriculumDao.getAllLessonsForCurriculum(currId);
+    final nowIso = DateTime.now().toUtc().toIso8601String();
+    int creditedCount = 0;
+
+    for (final lesson in allLessons) {
+      final lessonId = lesson['id'] as String;
+      final orderIndex = (lesson['order_index'] as num).toInt();
+      final unitId = lesson['unit_id'] as String;
+
+      if (orderIndex < targetLessonOrder) {
+        // Auto-credit previous lesson
+        await _curriculumDao.updateLessonStatus(
+          lessonId,
+          status: 'completed',
+          isLocked: 0,
+          completedAt: nowIso,
+          creditedReason: 'credited_by_placement_test',
+        );
+
+        await _masteryDao.upsertMastery({
+          'id': 'mastery_$lessonId',
+          'item_id': lessonId,
+          'item_type': 'lesson',
+          'mastery_state': 'completed',
+          'score': 1.0,
+          'attempts_count': 1,
+          'last_attempt_at': nowIso,
+          'due_review_at': DateTime.now().toUtc().add(const Duration(days: 7)).toIso8601String(),
+          'created_at': nowIso,
+          'updated_at': nowIso,
+        });
+
+        creditedCount++;
+      } else if (orderIndex == targetLessonOrder) {
+        // Unlock target lesson for immediate learning
+        await _curriculumDao.updateLessonStatus(
+          lessonId,
+          status: 'not_started',
+          isLocked: 0,
+        );
+
+        // Unlock unit if locked
+        await _db.update(
+          'curriculum_units',
+          {'is_locked': 0},
+          where: 'id = ?',
+          whereArgs: [unitId],
+        );
+      }
+    }
+
+    return creditedCount;
+  }
+}
