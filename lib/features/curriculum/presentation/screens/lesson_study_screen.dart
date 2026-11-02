@@ -10,6 +10,7 @@ import '../widgets/lesson_grammar_view.dart';
 import '../widgets/lesson_dialogue_view.dart';
 import '../widgets/lesson_practice_view.dart';
 import '../widgets/lesson_mastery_view.dart';
+import '../widgets/ai_tutor_helper_sheet.dart';
 
 class LessonStudyScreen extends ConsumerStatefulWidget {
   final CurriculumLesson lesson;
@@ -44,7 +45,7 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
     }
   }
 
-  void _showAiExplanationDialog(BuildContext context, String title) {
+  void _showAiExplanationDialog(BuildContext context, String title, {String? contextDescription}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -52,46 +53,10 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (ctx) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.smart_toy_rounded, color: AppColors.limeGreenDark),
-                    const SizedBox(width: AppSpacing.sm),
-                    Text(
-                      'Trợ Giảng AI Bổ Trợ',
-                      style: Theme.of(ctx).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.of(ctx).pop(),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  'Giải thích cho: $title',
-                  style: Theme.of(ctx).textTheme.bodySmall?.copyWith(color: AppColors.limeGreenDark, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  '💡 Mẹo ghi nhớ: Trong cấu trúc câu tiếng Trung, trạng ngữ chỉ thời gian và nơi chốn luôn đứng trước động từ chính.',
-                  style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(height: 1.4),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                HiButton(
-                  text: 'Đã hiểu',
-                  onPressed: () => Navigator.of(ctx).pop(),
-                ),
-              ],
-            ),
-          ),
+        return AiTutorHelperSheet(
+          topicTitle: title,
+          topicContext: contextDescription ?? 'Nội dung thuộc bài học ${widget.lesson.titleVi}',
+          isOnline: true,
         );
       },
     );
