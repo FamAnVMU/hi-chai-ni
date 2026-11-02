@@ -214,6 +214,7 @@ class SrsReviewResult {
   });
 
   bool get isSuccessful => quality >= 3;
+  DateTime get reviewedAt => reviewTime;
 
   @override
   String toString() =>

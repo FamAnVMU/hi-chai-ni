@@ -46,10 +46,11 @@ class LessonFlowNotifier extends Notifier<LessonFlowState> {
       userAnswers: state.userAnswers,
     );
 
-    // Record attempt in MasteryEngine
+    // Record attempt in MasteryEngine & Learning Data Pipeline
     await masteryEngine.recordLessonAttempt(
       lessonId: state.lessonId,
       scorePercent: result.scorePercent,
+      questionResults: questions,
     );
 
     state = state.copyWith(

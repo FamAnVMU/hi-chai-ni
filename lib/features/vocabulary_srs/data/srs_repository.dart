@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 import '../../../core/database/database_constants.dart';
+import '../../learning_pipeline/data/learning_pipeline_coordinator.dart';
+import '../../learning_pipeline/domain/models/learning_evidence.dart';
 import '../domain/sm2_engine.dart';
 import '../domain/srs_models.dart';
 
@@ -17,6 +19,7 @@ class DuplicateReviewException implements Exception {
 class SrsRepository {
   final Database _db;
   final Sm2Engine _engine;
+  final LearningPipelineCoordinator _pipelineCoordinator;
 
   // In-memory concurrency guards for double-tap and duplicate request prevention
   final Set<String> _inFlightContentIds = {};
@@ -31,8 +34,10 @@ class SrsRepository {
   SrsRepository(
     this._db, {
     Sm2Engine? engine,
+    LearningPipelineCoordinator? pipelineCoordinator,
     this.debounceCooldownMs = 800,
-  }) : _engine = engine ?? const Sm2Engine();
+  })  : _engine = engine ?? const Sm2Engine(),
+        _pipelineCoordinator = pipelineCoordinator ?? LearningPipelineCoordinator(_db);
 
   Sm2Engine get engine => _engine;
 
@@ -130,6 +135,8 @@ class SrsRepository {
         // Append to immutable learner_evidence (never overwriting prior evidence)
         final evidenceId = 'EVI_${DateTime.now().microsecondsSinceEpoch}_$contentId';
         final metadata = {
+          'activity_type': ActivityType.retention.value,
+          'is_success': reviewResult.isSuccessful,
           'rating': rating.label,
           'quality': rating.quality,
           'prev_interval': reviewResult.previousIntervalDays,
@@ -154,6 +161,14 @@ class SrsRepository {
             'created_at': nowUtc.toIso8601String(),
           },
           conflictAlgorithm: ConflictAlgorithm.abort, // Guarantees append-only integrity
+        );
+
+        // Synchronize with unified Learning Pipeline to update curriculum_mastery
+        await _pipelineCoordinator.recordSrsReview(
+          reviewResult: reviewResult,
+          contentId: contentId,
+          contentType: contentType,
+          txn: txn,
         );
       });
 

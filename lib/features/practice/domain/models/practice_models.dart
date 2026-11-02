@@ -420,6 +420,9 @@ class ExerciseAttempt {
     required this.createdAt,
   });
 
+  bool get isCorrect => result.isCorrect;
+  double get score => result.score;
+
   factory ExerciseAttempt.fromMap(Map<String, dynamic> map) {
     ExerciseAnswer parsedAnswer = ExerciseAnswer(exerciseId: map['exercise_id'] as String? ?? '');
     if (map['answer_json'] is String) {

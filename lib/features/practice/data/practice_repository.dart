@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 import '../../../../core/database/database_constants.dart';
+import '../../learning_pipeline/data/learning_pipeline_coordinator.dart';
 import '../domain/catalog/practice_seed_catalog.dart';
 import '../domain/models/practice_models.dart';
 
@@ -35,8 +36,12 @@ abstract class PracticeRepository {
 
 class DefaultPracticeRepository implements PracticeRepository {
   final DatabaseExecutor _db;
+  final LearningPipelineCoordinator _pipelineCoordinator;
 
-  DefaultPracticeRepository(this._db);
+  DefaultPracticeRepository(
+    this._db, {
+    LearningPipelineCoordinator? pipelineCoordinator,
+  }) : _pipelineCoordinator = pipelineCoordinator ?? LearningPipelineCoordinator(_db);
 
   /// Automatically ensures curated seed catalog is populated in SQLite
   Future<void> _ensureCatalogSeeded() async {
@@ -210,6 +215,15 @@ class DefaultPracticeRepository implements PracticeRepository {
     required String sessionId,
     required ExerciseAttempt attempt,
   }) async {
+    final exercise = await getExerciseById(attempt.exerciseId);
+    if (exercise != null) {
+      return await _pipelineCoordinator.recordExerciseAttempt(
+        sessionId: sessionId,
+        attempt: attempt,
+        exercise: exercise,
+      );
+    }
+
     // 1. Debounce and idempotency guard: check if attempt for (sessionId, exerciseId) already exists
     final existing = await _db.query(
       DatabaseConstants.tablePracticeAttempts,
