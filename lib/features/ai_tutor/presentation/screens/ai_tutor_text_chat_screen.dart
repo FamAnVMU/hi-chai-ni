@@ -407,7 +407,6 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     final sessionId = ref.watch(currentChatSessionIdProvider);
     final persona = ref.watch(activePersonaProvider);
@@ -484,15 +483,18 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
             // Top Context Bar
             Container(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xs),
-              color: isDark ? AppColors.darkForestSurface : theme.colorScheme.surfaceContainerHighest.withAlpha(70),
+              decoration: const BoxDecoration(
+                color: AppColors.primaryBlueLight,
+                border: Border(bottom: BorderSide(color: AppColors.border)),
+              ),
               child: Row(
                 children: [
-                  const Icon(Icons.lightbulb_outline_rounded, size: 14, color: AppColors.limeGreen),
+                  const Icon(Icons.lightbulb_outline_rounded, size: 14, color: AppColors.primaryBlueDark),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       'Mục tiêu: ${scenario.objectiveVi}',
-                      style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
+                      style: theme.textTheme.bodySmall?.copyWith(fontSize: 11, color: AppColors.primaryBlueDark, fontWeight: FontWeight.w500),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -573,15 +575,12 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
           margin: const EdgeInsets.only(bottom: AppSpacing.md, left: AppSpacing.huge),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
           decoration: BoxDecoration(
-            color: isDark ? AppColors.darkForestCard : theme.colorScheme.primaryContainer,
+            color: AppColors.primaryBlueDark,
             borderRadius: BorderRadius.only(
               topLeft: AppRadius.rMd,
               topRight: AppRadius.rMd,
               bottomLeft: AppRadius.rMd,
               bottomRight: Radius.zero,
-            ),
-            border: Border.all(
-              color: isDark ? AppColors.darkForestBorder : theme.colorScheme.outlineVariant,
             ),
           ),
           child: Column(
@@ -589,7 +588,10 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
             children: [
               Text(
                 turn.content,
-                style: theme.textTheme.bodyMedium,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               const SizedBox(height: 4),
               Row(
@@ -597,10 +599,10 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
                 children: [
                   InkWell(
                     onTap: () => _copyToClipboard(turn.content),
-                    child: Icon(
+                    child: const Icon(
                       Icons.copy_rounded,
                       size: 14,
-                      color: theme.colorScheme.onSurfaceVariant.withAlpha(160),
+                      color: Colors.white70,
                     ),
                   ),
                 ],
@@ -622,7 +624,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
         margin: const EdgeInsets.only(bottom: AppSpacing.md, right: AppSpacing.xxl),
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.darkForestSurface : Colors.white,
+          color: AppColors.cardBackground,
           borderRadius: BorderRadius.only(
             topLeft: AppRadius.rMd,
             topRight: AppRadius.rMd,
@@ -630,7 +632,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
             bottomLeft: Radius.zero,
           ),
           border: Border.all(
-            color: isDark ? AppColors.darkForestBorder : theme.colorScheme.outlineVariant,
+            color: AppColors.border,
           ),
         ),
         child: Column(
@@ -779,7 +781,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
               style: theme.textTheme.bodySmall?.copyWith(
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
-                color: AppColors.limeGreen,
+                color: AppColors.primaryBlueDark,
               ),
             ),
         ],
@@ -789,7 +791,6 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
 
   Widget _buildStreamingBubble() {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Align(
       alignment: Alignment.centerLeft,
@@ -797,7 +798,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
         margin: const EdgeInsets.only(bottom: AppSpacing.md, right: AppSpacing.xxl),
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.darkForestSurface : Colors.white,
+          color: AppColors.cardBackground,
           borderRadius: BorderRadius.only(
             topLeft: AppRadius.rMd,
             topRight: AppRadius.rMd,
@@ -805,7 +806,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
             bottomLeft: Radius.zero,
           ),
           border: Border.all(
-            color: AppColors.limeGreen.withAlpha(120),
+            color: AppColors.primaryBlueDark,
             width: 1.2,
           ),
         ),
@@ -818,13 +819,13 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
                 const SizedBox(
                   width: 12,
                   height: 12,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primaryBlueDark),
                 ),
                 const SizedBox(width: 8),
                 Text(
                   'AI Tutor đang trả lời...',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.limeGreen,
+                    color: AppColors.primaryBlueDark,
                     fontWeight: FontWeight.bold,
                     fontSize: 11,
                   ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/network/ai/ai.dart';
+import '../../../../core/theme/theme.dart';
 import '../../domain/models/firebase_config_status.dart';
 import '../providers/ai_settings_providers.dart';
 
@@ -32,14 +33,9 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
     final modelRegistry = ref.watch(aiModelRegistryProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121811), // Dark forest background
+      backgroundColor: AppColors.mainBackground,
       appBar: AppBar(
-        title: const Text(
-          'Cài Đặt AI & Kết Nối',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: const Color(0xFF1A2418),
-        centerTitle: true,
+        title: const Text('Cài Đặt AI & Kết Nối'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
@@ -85,10 +81,10 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
     return Text(
       title,
       style: const TextStyle(
-        fontSize: 16.0,
-        fontWeight: FontWeight.w700,
-        color: Color(0xFFA3D635), // Lime green accent
-        letterSpacing: 0.5,
+        fontSize: 15.0,
+        fontWeight: FontWeight.bold,
+        color: AppColors.primaryBlueDark,
+        letterSpacing: 0.3,
       ),
     );
   }
@@ -98,10 +94,11 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
   // ---------------------------------------------------------------------------
   Widget _buildProviderSelector(AiSettingsState state, AiSettingsNotifier notifier) {
     return Card(
-      color: const Color(0xFF1A2418),
+      color: AppColors.cardBackground,
+      elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
-        side: const BorderSide(color: Color(0xFF2E3D2B)),
+        side: const BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -114,7 +111,7 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
               current: state.providerType,
               onSelect: () => notifier.setProviderType(AiProviderType.geminiRest),
             ),
-            const Divider(color: Color(0xFF2E3D2B), height: 1.0),
+            const Divider(color: AppColors.divider, height: 1.0),
             _buildProviderTile(
               title: 'Firebase AI Logic',
               subtitle: 'Đám mây • Vertex AI kèm Firebase App Check',
@@ -122,7 +119,7 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
               current: state.providerType,
               onSelect: () => notifier.setProviderType(AiProviderType.firebaseAiLogic),
             ),
-            const Divider(color: Color(0xFF2E3D2B), height: 1.0),
+            const Divider(color: AppColors.divider, height: 1.0),
             _buildProviderTile(
               title: 'Custom Backend Proxy',
               subtitle: 'Doanh nghiệp • Máy chủ chuyển tiếp an toàn',
@@ -157,7 +154,7 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? const Color(0xFFA3D635) : Colors.grey,
+                  color: isSelected ? AppColors.primaryBlueDark : AppColors.mutedText,
                   width: 2.0,
                 ),
               ),
@@ -168,13 +165,13 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
                         height: 10.0,
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Color(0xFFA3D635),
+                          color: AppColors.primaryBlueDark,
                         ),
                       ),
                     )
                   : null,
             ),
-            const SizedBox(width: 8.0),
+            const SizedBox(width: 10.0),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,12 +180,12 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
                     title,
                     style: TextStyle(
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                      color: isSelected ? Colors.white : Colors.white70,
+                      color: isSelected ? AppColors.primaryText : AppColors.secondaryText,
                     ),
                   ),
                   Text(
                     subtitle,
-                    style: const TextStyle(fontSize: 12.0, color: Colors.grey),
+                    style: const TextStyle(fontSize: 12.0, color: AppColors.secondaryText),
                   ),
                 ],
               ),
@@ -204,10 +201,11 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
   // ---------------------------------------------------------------------------
   Widget _buildByokCredentialCard(AiSettingsState state, AiSettingsNotifier notifier) {
     return Card(
-      color: const Color(0xFF1A2418),
+      color: AppColors.cardBackground,
+      elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
-        side: const BorderSide(color: Color(0xFF2E3D2B)),
+        side: const BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -219,13 +217,13 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
               Container(
                 padding: const EdgeInsets.all(12.0),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E381C),
+                  color: AppColors.successContainerLight,
                   borderRadius: BorderRadius.circular(8.0),
-                  border: Border.all(color: const Color(0xFF4CAF50).withAlpha(120)),
+                  border: Border.all(color: AppColors.success.withAlpha(120)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.shield_outlined, color: Color(0xFFA3D635), size: 22.0),
+                    const Icon(Icons.shield_outlined, color: AppColors.success, size: 22.0),
                     const SizedBox(width: 10.0),
                     Expanded(
                       child: Column(
@@ -233,21 +231,22 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
                         children: [
                           const Text(
                             'Khóa API đã lưu an toàn',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryText),
                           ),
                           Text(
                             'Giá trị: ${state.maskedApiKey ?? "********"}',
                             style: const TextStyle(
                               fontSize: 13.0,
                               fontFamily: 'monospace',
-                              color: Color(0xFFA3D635),
+                              color: AppColors.success,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                      icon: const Icon(Icons.delete_outline, color: AppColors.error),
                       tooltip: 'Xóa khóa API',
                       onPressed: () => _confirmDeleteKey(context, notifier),
                     ),
@@ -259,18 +258,18 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
               Container(
                 padding: const EdgeInsets.all(12.0),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF3B2E15),
+                  color: AppColors.warningContainerLight,
                   borderRadius: BorderRadius.circular(8.0),
-                  border: Border.all(color: Colors.amber.withAlpha(100)),
+                  border: Border.all(color: AppColors.warning.withAlpha(100)),
                 ),
                 child: const Row(
                   children: [
-                    Icon(Icons.warning_amber_rounded, color: Colors.amber, size: 22.0),
+                    Icon(Icons.warning_amber_rounded, color: AppColors.warning, size: 22.0),
                     SizedBox(width: 10.0),
                     Expanded(
                       child: Text(
                         'Chưa cấu hình API Key. Hãy nhập key bên dưới để kích hoạt AI Tutor.',
-                        style: TextStyle(fontSize: 13.0, color: Colors.white),
+                        style: TextStyle(fontSize: 13.0, color: AppColors.primaryText),
                       ),
                     ),
                   ],
@@ -283,29 +282,29 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
             TextField(
               controller: _apiKeyController,
               obscureText: _obscureKey,
-              style: const TextStyle(fontFamily: 'monospace', color: Colors.white),
+              style: const TextStyle(fontFamily: 'monospace', color: AppColors.primaryText),
               decoration: InputDecoration(
                 labelText: state.hasApiKey ? 'Thay đổi Gemini API Key' : 'Nhập Gemini API Key',
                 hintText: 'AIzaSy...',
-                hintStyle: const TextStyle(color: Colors.grey),
+                hintStyle: const TextStyle(color: AppColors.mutedText),
                 filled: true,
-                fillColor: const Color(0xFF141C13),
+                fillColor: AppColors.inputBackground,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
-                  borderSide: const BorderSide(color: Color(0xFF2E3D2B)),
+                  borderSide: const BorderSide(color: AppColors.border),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
-                  borderSide: const BorderSide(color: Color(0xFF2E3D2B)),
+                  borderSide: const BorderSide(color: AppColors.border),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
-                  borderSide: const BorderSide(color: Color(0xFFA3D635)),
+                  borderSide: const BorderSide(color: AppColors.primaryBlueDark),
                 ),
                 suffixIcon: IconButton(
                   icon: Icon(
                     _obscureKey ? Icons.visibility_off : Icons.visibility,
-                    color: Colors.grey,
+                    color: AppColors.mutedText,
                   ),
                   onPressed: () => setState(() => _obscureKey = !_obscureKey),
                 ),
@@ -331,7 +330,7 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Đã mã hóa và lưu khóa API an toàn!'),
-                          backgroundColor: Color(0xFF1E381C),
+                          backgroundColor: AppColors.success,
                         ),
                       );
                     },
@@ -339,15 +338,15 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
                   ? const SizedBox(
                       width: 16.0,
                       height: 16.0,
-                      child: CircularProgressIndicator(strokeWidth: 2.0, color: Colors.black),
+                      child: CircularProgressIndicator(strokeWidth: 2.0, color: Colors.white),
                     )
-                  : const Icon(Icons.save_outlined, color: Colors.black),
+                  : const Icon(Icons.save_outlined, color: Colors.white),
               label: Text(
                 state.hasApiKey ? 'Cập Nhật Khóa' : 'Lưu Khóa API',
-                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFA3D635),
+                backgroundColor: AppColors.primaryBlueDark,
                 padding: const EdgeInsets.symmetric(vertical: 12.0),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
               ),
@@ -358,7 +357,7 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
             const Text(
               '🔒 Bảo mật: Khóa được mã hóa phần cứng bằng AES-256 GCM qua Android KeyStore. '
               'Khóa KHÔNG bao giờ được ghi vào log, crash report hay chia sẻ ra ngoài.',
-              style: TextStyle(fontSize: 11.5, color: Colors.grey),
+              style: TextStyle(fontSize: 11.5, color: AppColors.secondaryText),
             ),
           ],
         ),
@@ -371,10 +370,11 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
   // ---------------------------------------------------------------------------
   Widget _buildFirebaseStatusCard(FirebaseConfigStatus status) {
     return Card(
-      color: const Color(0xFF1A2418),
+      color: AppColors.cardBackground,
+      elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
-        side: const BorderSide(color: Color(0xFF2E3D2B)),
+        side: const BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -387,7 +387,7 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
                 SizedBox(width: 8.0),
                 Text(
                   'Firebase AI Logic & App Check',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.0),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.0, color: AppColors.primaryText),
                 ),
               ],
             ),
@@ -411,7 +411,7 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
             const Text(
               '💡 Chế độ Firebase AI Logic yêu cầu file google-services.json hợp lệ từ Google Cloud '
               'kèm chứng thực thiết bị Play Integrity để chống lạm dụng API.',
-              style: TextStyle(fontSize: 12.0, color: Colors.grey),
+              style: TextStyle(fontSize: 12.0, color: AppColors.secondaryText),
             ),
           ],
         ),
@@ -426,15 +426,15 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
   }) {
     return Row(
       children: [
-        Text(label, style: const TextStyle(fontSize: 13.0, color: Colors.white70)),
+        Text(label, style: const TextStyle(fontSize: 13.0, color: AppColors.secondaryText)),
         const SizedBox(width: 8.0),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
           decoration: BoxDecoration(
-            color: isOk ? const Color(0xFF1E381C) : const Color(0xFF3B1A1A),
+            color: isOk ? AppColors.successContainerLight : AppColors.errorContainerLight,
             borderRadius: BorderRadius.circular(4.0),
             border: Border.all(
-              color: isOk ? const Color(0xFF4CAF50) : const Color(0xFFE53935),
+              color: isOk ? AppColors.success : AppColors.error,
             ),
           ),
           child: Text(
@@ -442,7 +442,7 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
             style: TextStyle(
               fontSize: 11.5,
               fontWeight: FontWeight.w600,
-              color: isOk ? const Color(0xFFA3D635) : Colors.redAccent,
+              color: isOk ? AppColors.success : AppColors.error,
             ),
           ),
         ),
@@ -459,10 +459,11 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
     }
 
     return Card(
-      color: const Color(0xFF1A2418),
+      color: AppColors.cardBackground,
+      elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
-        side: const BorderSide(color: Color(0xFF2E3D2B)),
+        side: const BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -471,13 +472,13 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
           children: [
             TextField(
               controller: _proxyUrlController,
-              style: const TextStyle(fontFamily: 'monospace', color: Colors.white),
+              style: const TextStyle(fontFamily: 'monospace', color: AppColors.primaryText),
               decoration: InputDecoration(
                 labelText: 'URL Máy Chủ Proxy',
                 hintText: 'https://proxy.example.com/v1beta',
-                hintStyle: const TextStyle(color: Colors.grey),
+                hintStyle: const TextStyle(color: AppColors.mutedText),
                 filled: true,
-                fillColor: const Color(0xFF141C13),
+                fillColor: AppColors.inputBackground,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
               ),
             ),
@@ -491,8 +492,8 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFA3D635),
-                foregroundColor: Colors.black,
+                backgroundColor: AppColors.primaryBlueDark,
+                foregroundColor: Colors.white,
               ),
               child: const Text('Lưu Địa Chỉ Proxy', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
@@ -513,10 +514,11 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
     final activeSpec = modelRegistry.getModelSpec(state.selectedModelId);
 
     return Card(
-      color: const Color(0xFF1A2418),
+      color: AppColors.cardBackground,
+      elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
-        side: const BorderSide(color: Color(0xFF2E3D2B)),
+        side: const BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -526,27 +528,27 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
             // Dropdown Selector
             const Text(
               'Mô hình mặc định:',
-              style: TextStyle(fontSize: 13.0, color: Colors.white70),
+              style: TextStyle(fontSize: 13.0, color: AppColors.secondaryText),
             ),
             const SizedBox(height: 6.0),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               decoration: BoxDecoration(
-                color: const Color(0xFF141C13),
+                color: AppColors.inputBackground,
                 borderRadius: BorderRadius.circular(8.0),
-                border: Border.all(color: const Color(0xFF2E3D2B)),
+                border: Border.all(color: AppColors.border),
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
                   value: state.selectedModelId,
                   isExpanded: true,
-                  dropdownColor: const Color(0xFF1A2418),
+                  dropdownColor: AppColors.cardBackground,
                   items: modelRegistry.availableModelSpecs.map((spec) {
                     return DropdownMenuItem<String>(
                       value: spec.modelId,
                       child: Text(
                         spec.displayName,
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                        style: const TextStyle(color: AppColors.primaryText, fontWeight: FontWeight.w600),
                       ),
                     );
                   }).toList(),
@@ -562,15 +564,16 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
             if (activeSpec != null) ...[
               Text(
                 activeSpec.description,
-                style: const TextStyle(fontSize: 12.5, color: Colors.white70),
+                style: const TextStyle(fontSize: 12.5, color: AppColors.primaryText),
               ),
               const SizedBox(height: 8.0),
               Text(
                 'Khuyên dùng cho: ${activeSpec.recommendedFor}',
                 style: const TextStyle(
                   fontSize: 12.0,
-                  color: Color(0xFFA3D635),
+                  color: AppColors.primaryBlueDark,
                   fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 14.0),
@@ -578,7 +581,7 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
               // Explicit Capability Matrix Badges
               const Text(
                 'Khả năng được xác nhận (Capability Matrix):',
-                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: Colors.white),
+                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: AppColors.primaryText),
               ),
               const SizedBox(height: 8.0),
               Wrap(
@@ -604,10 +607,10 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       decoration: BoxDecoration(
-        color: supported ? const Color(0xFF1E381C) : const Color(0xFF222621),
+        color: supported ? AppColors.primaryBlueLight : AppColors.inputBackground,
         borderRadius: BorderRadius.circular(6.0),
         border: Border.all(
-          color: supported ? const Color(0xFF4CAF50).withAlpha(150) : const Color(0xFF384037),
+          color: supported ? AppColors.secondaryBlue : AppColors.border,
         ),
       ),
       child: Row(
@@ -616,7 +619,7 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
           Icon(
             supported ? Icons.check_circle_outline : Icons.remove_circle_outline,
             size: 13.0,
-            color: supported ? const Color(0xFFA3D635) : Colors.grey,
+            color: supported ? AppColors.primaryBlueDark : AppColors.mutedText,
           ),
           const SizedBox(width: 4.0),
           Text(
@@ -624,7 +627,7 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
             style: TextStyle(
               fontSize: 11.0,
               fontWeight: FontWeight.w500,
-              color: supported ? Colors.white : Colors.grey,
+              color: supported ? AppColors.primaryBlueDark : AppColors.mutedText,
             ),
           ),
         ],
@@ -639,10 +642,11 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
     final result = state.connectionTestResult;
 
     return Card(
-      color: const Color(0xFF1A2418),
+      color: AppColors.cardBackground,
+      elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
-        side: const BorderSide(color: Color(0xFF2E3D2B)),
+        side: const BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -655,17 +659,17 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
                   ? const SizedBox(
                       width: 18.0,
                       height: 18.0,
-                      child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.black),
+                      child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
                     )
-                  : const Icon(Icons.network_check, color: Colors.black),
+                  : const Icon(Icons.network_check, color: Colors.white),
               label: Text(
                 state.isTestingConnection
                     ? 'Đang gửi gói tin kiểm tra thực tế...'
                     : 'Kiểm Tra Kết Nối Thực Tế',
-                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFA3D635),
+                backgroundColor: AppColors.primaryBlueDark,
                 padding: const EdgeInsets.symmetric(vertical: 14.0),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
               ),
@@ -675,7 +679,7 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
               'Gửi 1 request nhỏ thật tới API endpoint để kiểm tra kết nối, tính toán độ trễ (latency) '
               'và xác minh khóa.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 11.5, color: Colors.grey),
+              style: TextStyle(fontSize: 11.5, color: AppColors.secondaryText),
             ),
 
             // Diagnostic Result Presentation
@@ -684,10 +688,10 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
               Container(
                 padding: const EdgeInsets.all(14.0),
                 decoration: BoxDecoration(
-                  color: result.isSuccess ? const Color(0xFF1B381A) : const Color(0xFF3B1A1A),
+                  color: result.isSuccess ? AppColors.successContainerLight : AppColors.errorContainerLight,
                   borderRadius: BorderRadius.circular(10.0),
                   border: Border.all(
-                    color: result.isSuccess ? const Color(0xFF388E3C) : const Color(0xFFD32F2F),
+                    color: result.isSuccess ? AppColors.success : AppColors.error,
                   ),
                 ),
                 child: Column(
@@ -698,7 +702,7 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
                       children: [
                         Icon(
                           result.isSuccess ? Icons.check_circle : Icons.error_outline,
-                          color: result.isSuccess ? const Color(0xFFA3D635) : Colors.redAccent,
+                          color: result.isSuccess ? AppColors.success : AppColors.error,
                           size: 22.0,
                         ),
                         const SizedBox(width: 8.0),
@@ -708,15 +712,16 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
                             style: TextStyle(
                               fontSize: 15.0,
                               fontWeight: FontWeight.bold,
-                              color: result.isSuccess ? Colors.white : Colors.redAccent,
+                              color: result.isSuccess ? AppColors.success : AppColors.error,
                             ),
                           ),
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3.0),
                           decoration: BoxDecoration(
-                            color: Colors.black38,
+                            color: AppColors.cardBackground,
                             borderRadius: BorderRadius.circular(12.0),
+                            border: Border.all(color: AppColors.border),
                           ),
                           child: Text(
                             '⚡ ${result.latencyMs} ms',
@@ -725,8 +730,8 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
                               fontFamily: 'monospace',
                               fontWeight: FontWeight.bold,
                               color: result.latencyMs < 500
-                                  ? const Color(0xFFA3D635)
-                                  : Colors.orangeAccent,
+                                  ? AppColors.success
+                                  : AppColors.warning,
                             ),
                           ),
                         ),
@@ -737,7 +742,7 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
                     // Test Metadata
                     Text(
                       'Nhà cung cấp: ${result.providerName}  |  Mô hình: ${result.modelTested}',
-                      style: const TextStyle(fontSize: 12.0, color: Colors.white70),
+                      style: const TextStyle(fontSize: 12.0, color: AppColors.secondaryText),
                     ),
                     const SizedBox(height: 6.0),
 
@@ -747,7 +752,7 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
                         'Chi tiết: ${result.errorMessage}',
                         style: const TextStyle(
                           fontSize: 12.0,
-                          color: Colors.white,
+                          color: AppColors.error,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -759,8 +764,9 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
                       Container(
                         padding: const EdgeInsets.all(10.0),
                         decoration: BoxDecoration(
-                          color: Colors.black26,
+                          color: AppColors.cardBackground,
                           borderRadius: BorderRadius.circular(6.0),
+                          border: Border.all(color: AppColors.border),
                         ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -771,7 +777,7 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
                                 result.troubleshootingHint!,
                                 style: const TextStyle(
                                   fontSize: 12.5,
-                                  color: Colors.white,
+                                  color: AppColors.primaryText,
                                   height: 1.3,
                                 ),
                               ),
@@ -794,19 +800,19 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1A2418),
-        title: const Text('Xác nhận xóa khóa API?', style: TextStyle(color: Colors.white)),
+        backgroundColor: AppColors.cardBackground,
+        title: const Text('Xác nhận xóa khóa API?', style: TextStyle(color: AppColors.primaryText, fontWeight: FontWeight.bold)),
         content: const Text(
           'Khóa sẽ bị xóa hoàn toàn khỏi Android KeyStore. Bạn sẽ cần nhập lại khóa để tiếp tục sử dụng AI.',
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(color: AppColors.secondaryText),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
+            child: const Text('Hủy', style: TextStyle(color: AppColors.secondaryText)),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
             onPressed: () {
               notifier.clearApiKey();
               Navigator.of(ctx).pop();

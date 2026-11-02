@@ -99,17 +99,17 @@ class RoadmapRecommendationCard extends StatelessWidget {
 
     switch (rec.priority) {
       case RecommendationPriority.urgent:
-        priorityColor = AppColors.errorLight;
+        priorityColor = AppColors.error;
         priorityLabel = 'Cần củng cố';
         priorityIcon = Icons.warning_amber_rounded;
         break;
       case RecommendationPriority.recommended:
-        priorityColor = AppColors.limeGreen;
+        priorityColor = AppColors.primaryBlueDark;
         priorityLabel = 'Đề xuất tiếp theo';
         priorityIcon = Icons.trending_up_rounded;
         break;
       case RecommendationPriority.enrichment:
-        priorityColor = Colors.teal;
+        priorityColor = AppColors.information;
         priorityLabel = 'Mở rộng nâng cao';
         priorityIcon = Icons.stars_rounded;
         break;

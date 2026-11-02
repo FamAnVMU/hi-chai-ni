@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/models/home_dashboard_data.dart';
 
-/// Card showing the learner's active HSK roadmap progress and next lesson snippet.
+/// Clean Modern Card showing the learner's active HSK roadmap progress and next lesson snippet.
 class HomeRoadmapCard extends StatelessWidget {
   final RoadmapProgress roadmap;
   final VoidCallback onContinueLesson;
@@ -16,6 +16,7 @@ class HomeRoadmapCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return HiCard(
       child: Column(
@@ -23,9 +24,9 @@ class HomeRoadmapCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.school_rounded,
-                color: AppColors.limeGreen,
+                color: isDark ? AppColors.accentBlue : AppColors.primaryBlueDark,
                 size: AppDimensions.iconMd,
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -34,6 +35,7 @@ class HomeRoadmapCard extends StatelessWidget {
                   roadmap.levelTitle,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
+                    color: AppColors.primaryText,
                   ),
                 ),
               ),
@@ -48,7 +50,8 @@ class HomeRoadmapCard extends StatelessWidget {
           Text(
             roadmap.nextLessonTitle,
             style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
+              color: AppColors.primaryText,
             ),
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -63,7 +66,7 @@ class HomeRoadmapCard extends StatelessWidget {
                 child: Text(
                   'Tiến độ cấp độ: ${roadmap.progressPercentageString}',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                    color: AppColors.secondaryText,
                   ),
                 ),
               ),
@@ -71,7 +74,7 @@ class HomeRoadmapCard extends StatelessWidget {
                 Text(
                   '${roadmap.masteredVocabCount} từ thành thạo',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: AppColors.limeGreen,
+                    color: isDark ? AppColors.accentBlue : AppColors.primaryBlueDark,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

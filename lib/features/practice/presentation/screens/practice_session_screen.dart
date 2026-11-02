@@ -255,7 +255,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
         return AlertDialog(
           title: const Row(
             children: [
-              Icon(Icons.emoji_events_rounded, color: AppColors.limeGreen, size: 28),
+              Icon(Icons.emoji_events_rounded, color: AppColors.primaryBlueDark, size: 28),
               SizedBox(width: AppSpacing.xs),
               Expanded(
                 child: Text('Hoàn Thành Luyện Tập!'),
@@ -316,11 +316,12 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
       appBar: AppBar(
         title: Text(_session!.title),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(6),
+          preferredSize: const Size.fromHeight(4),
           child: LinearProgressIndicator(
             value: progress,
-            backgroundColor: theme.colorScheme.surfaceContainerHighest,
-            valueColor: const AlwaysStoppedAnimation(AppColors.limeGreen),
+            backgroundColor: AppColors.primaryBlueLight,
+            valueColor: const AlwaysStoppedAnimation(AppColors.primaryBlueDark),
+            minHeight: 4,
           ),
         ),
       ),
@@ -342,7 +343,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
                       Text(
                         '${(progress * 100).toInt()}%',
                         style: theme.textTheme.labelMedium?.copyWith(
-                          color: AppColors.limeGreen,
+                          color: AppColors.primaryBlueDark,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -363,9 +364,9 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
             // Bottom Action Bar
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surface,
-                border: Border(top: BorderSide(color: theme.colorScheme.outlineVariant.withAlpha(50))),
+              decoration: const BoxDecoration(
+                color: AppColors.cardBackground,
+                border: Border(top: BorderSide(color: AppColors.border)),
               ),
               child: Row(
                 children: [

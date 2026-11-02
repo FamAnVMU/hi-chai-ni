@@ -12,7 +12,7 @@ enum HiChipStatus {
   info,
 }
 
-/// Standardized chip component for tags, filters, and status badges.
+/// Standardized chip component for tags, filters, and status badges in Clean Modern White & Light Blue.
 class HiChip extends StatelessWidget {
   final String label;
   final Widget? icon;
@@ -44,97 +44,96 @@ class HiChip extends StatelessWidget {
 
     switch (status) {
       case HiChipStatus.success:
-        bgColor = isDark
-            ? AppColors.successContainerDark
-            : AppColors.successContainerLight;
+        bgColor = isDark ? AppColors.successContainerDark : AppColors.successContainerLight;
         textColor = isDark ? AppColors.successDark : AppColors.success;
-        borderSide = BorderSide(color: textColor.withAlpha(80));
+        borderSide = BorderSide(color: textColor.withAlpha(90), width: 1);
         break;
       case HiChipStatus.warning:
-        bgColor = isDark
-            ? AppColors.warningContainerDark
-            : AppColors.warningContainerLight;
+        bgColor = isDark ? AppColors.warningContainerDark : AppColors.warningContainerLight;
         textColor = isDark ? AppColors.warningDark : AppColors.warning;
-        borderSide = BorderSide(color: textColor.withAlpha(80));
+        borderSide = BorderSide(color: textColor.withAlpha(90), width: 1);
         break;
       case HiChipStatus.error:
-        bgColor = isDark
-            ? AppColors.errorContainerDark
-            : theme.colorScheme.errorContainer;
-        textColor = isDark ? AppColors.errorDark : theme.colorScheme.error;
-        borderSide = BorderSide(color: textColor.withAlpha(80));
+        bgColor = isDark ? AppColors.errorContainerDark : AppColors.errorContainerLight;
+        textColor = isDark ? AppColors.errorDark : AppColors.error;
+        borderSide = BorderSide(color: textColor.withAlpha(90), width: 1);
         break;
       case HiChipStatus.info:
-        bgColor = isDark
-            ? theme.colorScheme.tertiaryContainer
-            : theme.colorScheme.tertiaryContainer;
-        textColor = isDark
-            ? theme.colorScheme.onTertiaryContainer
-            : theme.colorScheme.tertiary;
-        borderSide = BorderSide(color: textColor.withAlpha(80));
+        bgColor = isDark ? AppColors.infoContainerDark : AppColors.infoContainerLight;
+        textColor = isDark ? AppColors.infoDark : AppColors.information;
+        borderSide = BorderSide(color: textColor.withAlpha(90), width: 1);
         break;
       case HiChipStatus.neutral:
         if (isSelected) {
-          bgColor = theme.colorScheme.primaryContainer;
-          textColor = theme.colorScheme.onPrimaryContainer;
-          borderSide = BorderSide(color: theme.colorScheme.primary);
-        } else {
-          bgColor = isDark ? AppColors.darkForestSurface : Colors.white;
-          textColor = theme.colorScheme.onSurface;
+          bgColor = isDark ? AppColors.primaryBlueDark.withAlpha(90) : AppColors.primaryBlueLight;
+          textColor = isDark ? AppColors.accentBlue : AppColors.primaryBlueDark;
           borderSide = BorderSide(
-            color: isDark ? AppColors.darkForestBorder : theme.colorScheme.outlineVariant,
+            color: isDark ? AppColors.accentBlue : AppColors.primaryBlue,
+            width: 1.2,
+          );
+        } else {
+          bgColor = isDark ? AppColors.darkForestSurface : AppColors.cardBackground;
+          textColor = isDark ? AppColors.mutedText : AppColors.secondaryText;
+          borderSide = BorderSide(
+            color: isDark ? AppColors.darkForestBorder : AppColors.border,
+            width: 1,
           );
         }
         break;
     }
 
-    final chipWidget = Material(
-      color: bgColor,
-      shape: RoundedRectangleBorder(
+    final chipWidget = AnimatedContainer(
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
+      decoration: BoxDecoration(
+        color: bgColor,
         borderRadius: AppRadius.borderSm,
-        side: borderSide,
+        border: borderSide != BorderSide.none ? Border.fromBorderSide(borderSide) : null,
       ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: AppRadius.borderSm,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.sm + 2,
-            vertical: AppSpacing.xs + 2,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (icon != null) ...[
-                IconTheme(
-                  data: IconThemeData(
-                    color: textColor,
-                    size: AppDimensions.iconXs,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: AppRadius.borderSm,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm + 2,
+              vertical: AppSpacing.xs + 2,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (icon != null) ...[
+                  IconTheme(
+                    data: IconThemeData(
+                      color: textColor,
+                      size: AppDimensions.iconXs,
+                    ),
+                    child: icon!,
                   ),
-                  child: icon!,
+                  const SizedBox(width: AppSpacing.xs),
+                ],
+                Text(
+                  label,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: textColor,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  ),
                 ),
-                const SizedBox(width: AppSpacing.xs),
+                if (onDeleted != null) ...[
+                  const SizedBox(width: AppSpacing.xs),
+                  GestureDetector(
+                    onTap: onDeleted,
+                    child: deleteIcon ??
+                        Icon(
+                          Icons.close,
+                          size: AppDimensions.iconXs,
+                          color: textColor,
+                        ),
+                  ),
+                ],
               ],
-              Text(
-                label,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: textColor,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                ),
-              ),
-              if (onDeleted != null) ...[
-                const SizedBox(width: AppSpacing.xs),
-                GestureDetector(
-                  onTap: onDeleted,
-                  child: deleteIcon ??
-                      Icon(
-                        Icons.close,
-                        size: AppDimensions.iconXs,
-                        color: textColor,
-                      ),
-                ),
-              ],
-            ],
+            ),
           ),
         ),
       ),

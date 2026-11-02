@@ -29,14 +29,14 @@ class LessonWarmupView extends StatelessWidget {
           Center(
             child: Container(
               padding: const EdgeInsets.all(AppSpacing.lg),
-              decoration: BoxDecoration(
-                color: AppColors.limeGreen.withAlpha(30),
+              decoration: const BoxDecoration(
+                color: AppColors.primaryBlueLight,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.lightbulb_outline_rounded,
-                size: 56,
-                color: AppColors.limeGreenDark,
+                size: 52,
+                color: AppColors.primaryBlueDark,
               ),
             ),
           ),
@@ -45,7 +45,7 @@ class LessonWarmupView extends StatelessWidget {
             'Khởi Động Bài Học',
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
-              color: AppColors.limeGreenDark,
+              color: AppColors.primaryText,
             ),
             textAlign: TextAlign.center,
           ),
@@ -53,23 +53,26 @@ class LessonWarmupView extends StatelessWidget {
           Text(
             '${lesson.titleZh} • ${lesson.pinyin}',
             style: theme.textTheme.titleMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+              color: AppColors.secondaryText,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.xl),
           HiCard(
+            backgroundColor: AppColors.cardBackground,
+            borderColor: AppColors.border,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.flag_rounded, color: AppColors.limeGreen),
+                    const Icon(Icons.flag_rounded, color: AppColors.primaryBlueDark, size: 20),
                     const SizedBox(width: AppSpacing.sm),
                     Text(
                       'Mục tiêu học tập',
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: AppColors.primaryText,
                       ),
                     ),
                   ],
@@ -77,24 +80,29 @@ class LessonWarmupView extends StatelessWidget {
                 const SizedBox(height: AppSpacing.sm),
                 Text(
                   introText,
-                  style: theme.textTheme.bodyMedium?.copyWith(height: 1.5),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    height: 1.5,
+                    color: AppColors.secondaryText,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withAlpha(50),
-                    borderRadius: BorderRadius.circular(12),
+                    color: AppColors.inputBackground,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.border),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.timer_outlined, size: 20, color: AppColors.limeGreenDark),
+                      const Icon(Icons.timer_outlined, size: 20, color: AppColors.primaryBlueDark),
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: Text(
                           'Thời gian học dự kiến: ${lesson.estimatedMinutes} phút',
                           style: theme.textTheme.bodySmall?.copyWith(
                             fontWeight: FontWeight.w600,
+                            color: AppColors.primaryText,
                           ),
                         ),
                       ),
@@ -107,7 +115,7 @@ class LessonWarmupView extends StatelessWidget {
           const SizedBox(height: AppSpacing.xxl),
           HiButton(
             text: 'Bắt đầu học từ vựng',
-            icon: const Icon(Icons.arrow_forward_rounded, color: Colors.white),
+            icon: const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 20),
             isFullWidth: true,
             size: HiButtonSize.lg,
             onPressed: onStart,

@@ -32,7 +32,7 @@ class AppShell extends ConsumerWidget {
               const Icon(
                 Icons.translate_rounded,
                 size: 64,
-                color: AppColors.limeGreen,
+                color: AppColors.primaryBlueDark,
               ),
               const SizedBox(height: AppSpacing.lg),
               HiLoadingIndicator(

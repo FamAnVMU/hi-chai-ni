@@ -128,8 +128,9 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
         title: const Text('Từ Điển Thông Minh'),
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: AppColors.limeGreen,
-          labelColor: isDark ? AppColors.limeGreen : theme.colorScheme.primary,
+          indicatorColor: AppColors.primaryBlueDark,
+          labelColor: AppColors.primaryBlueDark,
+          unselectedLabelColor: AppColors.secondaryText,
           tabs: const [
             Tab(text: 'Tra cứu', icon: Icon(Icons.search_rounded)),
             Tab(text: 'Đã lưu', icon: Icon(Icons.bookmark_rounded)),
@@ -163,7 +164,7 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
             controller: _searchController,
             decoration: InputDecoration(
               hintText: 'Nhập chữ Hán, Pinyin (ni3 hao3 / nihao), nghĩa tiếng Việt...',
-              prefixIcon: const Icon(Icons.search_rounded),
+              prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primaryBlueDark),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.clear_rounded),
@@ -174,9 +175,19 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
                     )
                   : null,
               filled: true,
+              fillColor: AppColors.inputBackground,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppRadius.lg),
-                borderSide: BorderSide.none,
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: AppColors.border),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: AppColors.border),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: AppColors.primaryBlueDark, width: 1.5),
               ),
             ),
             onChanged: _onSearchChanged,
@@ -228,28 +239,29 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
                                     entry.simplified,
                                     style: theme.textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
-                                      color: isDark ? AppColors.limeGreen : theme.colorScheme.primary,
+                                      color: AppColors.primaryText,
                                     ),
                                   ),
                                   const SizedBox(width: AppSpacing.sm),
                                   Text(
                                     entry.pinyin,
                                     style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: theme.colorScheme.onSurfaceVariant,
+                                      color: AppColors.primaryBlueDark,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                   const Spacer(),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                     decoration: BoxDecoration(
-                                      color: AppColors.limeGreen.withAlpha(isDark ? 60 : 35),
+                                      color: AppColors.primaryBlueLight,
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
                                       'HSK ${entry.hskLevel}',
                                       style: theme.textTheme.labelSmall?.copyWith(
                                         fontWeight: FontWeight.bold,
-                                        color: isDark ? AppColors.limeGreen : const Color(0xFF2E5B0E),
+                                        color: AppColors.primaryBlueDark,
                                       ),
                                     ),
                                   ),
@@ -374,14 +386,15 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
                     word.simplified,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: isDark ? AppColors.limeGreen : theme.colorScheme.primary,
+                      color: AppColors.primaryText,
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   Text(
                     word.pinyin,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+                      color: AppColors.primaryBlueDark,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],

@@ -53,7 +53,7 @@ class _CatQuestionCardState extends State<CatQuestionCard> {
             Text(
               item.writingSubType!.labelVi,
               style: theme.textTheme.labelSmall?.copyWith(
-                color: AppColors.limeGreen,
+                color: AppColors.primaryBlueDark,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -139,13 +139,13 @@ class _CatQuestionCardState extends State<CatQuestionCard> {
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? theme.colorScheme.primary.withAlpha(30)
-                          : theme.colorScheme.surface,
+                          ? AppColors.primaryBlueLight
+                          : AppColors.cardBackground,
                       borderRadius: AppRadius.borderMd,
                       border: Border.all(
                         color: isSelected
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.outlineVariant,
+                            ? AppColors.primaryBlueDark
+                            : AppColors.border,
                         width: isSelected ? 2 : 1,
                       ),
                     ),
@@ -154,12 +154,12 @@ class _CatQuestionCardState extends State<CatQuestionCard> {
                         CircleAvatar(
                           radius: 12,
                           backgroundColor: isSelected
-                              ? theme.colorScheme.primary
-                              : theme.colorScheme.surfaceContainerHighest,
+                              ? AppColors.primaryBlueDark
+                              : AppColors.inputBackground,
                           child: Text(
                             String.fromCharCode(65 + index), // A, B, C, D
                             style: theme.textTheme.labelSmall?.copyWith(
-                              color: isSelected ? Colors.black : null,
+                              color: isSelected ? Colors.white : AppColors.secondaryText,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

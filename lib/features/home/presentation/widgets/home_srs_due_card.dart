@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/theme.dart';
 
-/// Card alerting the learner about spaced repetition (SRS) cards due for review today.
+/// Clean Modern Card alerting the learner about spaced repetition (SRS) cards due for review today.
 class HomeSrsDueCard extends StatelessWidget {
   final int dueCount;
   final VoidCallback onStartReview;
@@ -15,20 +15,21 @@ class HomeSrsDueCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final hasDue = dueCount > 0;
 
     return HiCard(
       borderColor: hasDue
-          ? theme.colorScheme.primary.withAlpha(120)
-          : theme.colorScheme.outlineVariant,
+          ? (isDark ? AppColors.accentBlue.withAlpha(120) : AppColors.primaryBlue.withAlpha(120))
+          : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.psychology_rounded,
-                color: AppColors.limeGreen,
+                color: isDark ? AppColors.accentBlue : AppColors.primaryBlueDark,
                 size: AppDimensions.iconMd,
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -37,6 +38,7 @@ class HomeSrsDueCard extends StatelessWidget {
                   'Ôn tập ngắt quãng (SM-2)',
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
+                    color: AppColors.primaryText,
                   ),
                 ),
               ),
@@ -52,7 +54,9 @@ class HomeSrsDueCard extends StatelessWidget {
             hasDue
                 ? 'Hôm nay có $dueCount thẻ từ vựng cần củng cố trí nhớ dài hạn theo thuật toán SM-2.'
                 : 'Tuyệt vời! Bạn đã hoàn thành tất cả các thẻ từ vựng cần ôn tập của ngày hôm nay.',
-            style: theme.textTheme.bodyMedium,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppColors.secondaryText,
+            ),
           ),
           const SizedBox(height: AppSpacing.md),
           HiButton(

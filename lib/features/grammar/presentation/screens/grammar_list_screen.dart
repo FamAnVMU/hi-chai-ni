@@ -144,15 +144,15 @@ class GrammarListScreen extends ConsumerWidget {
 
     switch (status) {
       case GrammarProgressStatus.mastered:
-        statusColor = AppColors.limeGreen;
+        statusColor = AppColors.success;
         statusIcon = Icons.check_circle_rounded;
         break;
       case GrammarProgressStatus.learning:
-        statusColor = Colors.orange;
+        statusColor = AppColors.warning;
         statusIcon = Icons.timelapse_rounded;
         break;
       case GrammarProgressStatus.unlearned:
-        statusColor = theme.colorScheme.outline;
+        statusColor = AppColors.mutedText;
         statusIcon = Icons.radio_button_unchecked_rounded;
         break;
     }
@@ -171,9 +171,9 @@ class GrammarListScreen extends ConsumerWidget {
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.md),
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
+            color: AppColors.cardBackground,
             borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(color: theme.colorScheme.outlineVariant.withAlpha(70)),
+            border: Border.all(color: AppColors.border),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,13 +183,13 @@ class GrammarListScreen extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: AppColors.limeGreen.withAlpha(30),
+                      color: AppColors.primaryBlueLight,
                       borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
                     child: Text(
                       'HSK ${item.hskLevel}',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: AppColors.limeGreen,
+                        color: AppColors.primaryBlueDark,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -200,6 +200,7 @@ class GrammarListScreen extends ConsumerWidget {
                       item.title,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: AppColors.primaryText,
                       ),
                     ),
                   ),
@@ -211,7 +212,7 @@ class GrammarListScreen extends ConsumerWidget {
                 item.structure,
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.limeGreen,
+                  color: AppColors.primaryBlueDark,
                   fontFamily: 'monospace',
                 ),
               ),
@@ -221,7 +222,7 @@ class GrammarListScreen extends ConsumerWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+                  color: AppColors.secondaryText,
                 ),
               ),
             ],

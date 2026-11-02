@@ -107,19 +107,19 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen>
                       _buildStatCard(
                         title: 'Cần ôn hôm nay',
                         value: dueCountStr,
-                        color: AppColors.limeGreen,
+                        color: AppColors.primaryBlueDark,
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       _buildStatCard(
                         title: 'Đã ôn phiên này',
                         value: reviewedCount.toString(),
-                        color: Colors.blueAccent,
+                        color: AppColors.primaryBlue,
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       _buildStatCard(
                         title: 'Tỷ lệ nhớ',
                         value: '$accuracyPercent%',
-                        color: Colors.greenAccent,
+                        color: AppColors.success,
                       ),
                     ],
                   ),

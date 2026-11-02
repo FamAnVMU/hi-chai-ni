@@ -30,7 +30,8 @@ class FlashcardEmptyState extends StatelessWidget {
             horizontal: AppSpacing.xl,
             vertical: AppSpacing.xxl,
           ),
-          borderColor: AppColors.limeGreen,
+          backgroundColor: AppColors.cardBackground,
+          borderColor: AppColors.border,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -39,14 +40,14 @@ class FlashcardEmptyState extends StatelessWidget {
                 width: 72,
                 height: 72,
                 decoration: BoxDecoration(
-                  color: AppColors.limeGreen.withAlpha(40),
+                  color: AppColors.primaryBlueLight,
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.limeGreen, width: 2),
+                  border: Border.all(color: AppColors.secondaryBlue, width: 2),
                 ),
                 child: const Icon(
                   Icons.emoji_events_rounded,
-                  color: AppColors.limeGreen,
-                  size: 40,
+                  color: AppColors.primaryBlueDark,
+                  size: 38,
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
@@ -55,6 +56,7 @@ class FlashcardEmptyState extends StatelessWidget {
                 'Xuất Sắc! Hoàn Thành Ôn Tập',
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: AppColors.primaryText,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -63,7 +65,7 @@ class FlashcardEmptyState extends StatelessWidget {
               Text(
                 'Không còn thẻ nào đến hạn hôm nay. Thuật toán SM-2 đã tự động xếp lịch ôn tập tối ưu cho các ngày tiếp theo.',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+                  color: AppColors.secondaryText,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -78,14 +80,16 @@ class FlashcardEmptyState extends StatelessWidget {
                       context: context,
                       label: 'Đã ôn tập',
                       value: '$completedReviewsCount thẻ',
-                      color: AppColors.limeGreen,
+                      color: AppColors.primaryBlueDark,
+                      bgColor: AppColors.primaryBlueLight,
                     ),
                     const SizedBox(width: AppSpacing.md),
                     _buildStatPill(
                       context: context,
                       label: 'Tỷ lệ nhớ',
                       value: '$accuracyPercent%',
-                      color: Colors.lightBlueAccent,
+                      color: AppColors.success,
+                      bgColor: AppColors.successContainerLight,
                     ),
                   ],
                 ),
@@ -95,7 +99,7 @@ class FlashcardEmptyState extends StatelessWidget {
               // Actions
               HiButton(
                 text: 'Học thêm 15 từ mới',
-                icon: const Icon(Icons.add_circle_outline_rounded),
+                icon: const Icon(Icons.add_circle_outline_rounded, size: 18),
                 variant: HiButtonVariant.primary,
                 size: HiButtonSize.lg,
                 isFullWidth: true,
@@ -105,7 +109,7 @@ class FlashcardEmptyState extends StatelessWidget {
                 const SizedBox(height: AppSpacing.sm),
                 HiButton(
                   text: 'Quay về Trang Chủ',
-                  icon: const Icon(Icons.home_rounded),
+                  icon: const Icon(Icons.home_rounded, size: 18),
                   variant: HiButtonVariant.secondary,
                   size: HiButtonSize.md,
                   isFullWidth: true,
@@ -124,21 +128,22 @@ class FlashcardEmptyState extends StatelessWidget {
     required String label,
     required String value,
     required Color color,
+    required Color bgColor,
   }) {
     final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
       decoration: BoxDecoration(
-        color: color.withAlpha(25),
+        color: bgColor,
         borderRadius: AppRadius.borderMd,
-        border: Border.all(color: color.withAlpha(100)),
+        border: Border.all(color: color.withAlpha(80)),
       ),
       child: Column(
         children: [
           Text(
             label,
             style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+              color: AppColors.secondaryText,
             ),
           ),
           const SizedBox(height: 2),

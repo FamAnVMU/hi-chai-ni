@@ -47,20 +47,21 @@ class _AiTutorTabScreenState extends ConsumerState<AiTutorTabScreen>
                   final isSelected = p.id == activePersona.id;
                   return ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: isSelected ? AppColors.limeGreen : Colors.grey.shade300,
+                      backgroundColor: isSelected ? AppColors.primaryBlueLight : AppColors.inputBackground,
+                      foregroundColor: isSelected ? AppColors.primaryBlueDark : AppColors.secondaryText,
                       child: Text(p.avatarLabel),
                     ),
                     title: Text(
                       '${p.nameZh} (${p.nameVi})',
-                      style: TextStyle(fontWeight: isSelected ? FontWeight.bold : FontWeight.normal),
+                      style: TextStyle(fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, color: AppColors.primaryText),
                     ),
                     subtitle: Text(
                       p.roleDescriptionVi,
-                      style: const TextStyle(fontSize: 11),
+                      style: const TextStyle(fontSize: 11, color: AppColors.secondaryText),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    trailing: isSelected ? const Icon(Icons.check_circle_rounded, color: AppColors.limeGreen) : null,
+                    trailing: isSelected ? const Icon(Icons.check_circle_rounded, color: AppColors.primaryBlueDark) : null,
                     onTap: () {
                       ref.read(activePersonaProvider.notifier).selectPersona(p);
                       Navigator.of(ctx).pop();
@@ -104,18 +105,19 @@ class _AiTutorTabScreenState extends ConsumerState<AiTutorTabScreen>
                       final isSelected = sc.code == activeScenario.code;
                       return ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: isSelected ? AppColors.limeGreen.withAlpha(50) : Colors.grey.shade200,
+                          backgroundColor: isSelected ? AppColors.primaryBlueLight : AppColors.inputBackground,
+                          foregroundColor: isSelected ? AppColors.primaryBlueDark : AppColors.secondaryText,
                           child: Text('${index + 1}'),
                         ),
                         title: Text(
                           sc.titleVi,
-                          style: TextStyle(fontWeight: isSelected ? FontWeight.bold : FontWeight.normal),
+                          style: TextStyle(fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, color: AppColors.primaryText),
                         ),
                         subtitle: Text(
                           sc.objectiveVi,
-                          style: const TextStyle(fontSize: 11),
+                          style: const TextStyle(fontSize: 11, color: AppColors.secondaryText),
                         ),
-                        trailing: isSelected ? const Icon(Icons.check_circle_rounded, color: AppColors.limeGreen) : null,
+                        trailing: isSelected ? const Icon(Icons.check_circle_rounded, color: AppColors.primaryBlueDark) : null,
                         onTap: () {
                           ref.read(activeScenarioProvider.notifier).selectScenario(sc);
                           Navigator.of(ctx).pop();

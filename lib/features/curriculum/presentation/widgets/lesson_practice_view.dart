@@ -37,7 +37,7 @@ class _LessonPracticeViewState extends State<LessonPracticeView> {
       return Center(
         child: Text(
           'Đang nạp các bài tập luyện tập...',
-          style: theme.textTheme.bodyMedium,
+          style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.secondaryText),
         ),
       );
     }
@@ -67,14 +67,14 @@ class _LessonPracticeViewState extends State<LessonPracticeView> {
                 'Luyện tập thích ứng',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.limeGreenDark,
+                  color: AppColors.primaryText,
                 ),
               ),
               Text(
                 'Câu ${_currentIndex + 1}/${exercises.length}',
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onSurfaceVariant,
+                  color: AppColors.secondaryText,
                 ),
               ),
             ],
@@ -82,21 +82,24 @@ class _LessonPracticeViewState extends State<LessonPracticeView> {
           const SizedBox(height: AppSpacing.sm),
           LinearProgressIndicator(
             value: (_currentIndex + 1) / exercises.length,
-            backgroundColor: theme.colorScheme.surfaceContainerHighest,
-            color: AppColors.limeGreen,
+            backgroundColor: AppColors.primaryBlueLight,
+            color: AppColors.primaryBlueDark,
+            minHeight: 4,
             borderRadius: BorderRadius.circular(4),
           ),
           const SizedBox(height: AppSpacing.lg),
 
           // Question Card
           HiCard(
+            backgroundColor: AppColors.cardBackground,
+            borderColor: AppColors.border,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.limeGreenDark.withAlpha(20),
+                    color: AppColors.primaryBlueLight,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -104,7 +107,7 @@ class _LessonPracticeViewState extends State<LessonPracticeView> {
                     style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.limeGreenDark,
+                      color: AppColors.primaryBlueDark,
                     ),
                   ),
                 ),
@@ -114,6 +117,7 @@ class _LessonPracticeViewState extends State<LessonPracticeView> {
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     height: 1.4,
+                    color: AppColors.primaryText,
                   ),
                 ),
               ],
@@ -124,20 +128,20 @@ class _LessonPracticeViewState extends State<LessonPracticeView> {
           // Options List
           ...options.map((opt) {
             final isChosen = selected == opt;
-            Color? borderColor;
-            Color? bgColor;
+            Color borderColor = AppColors.border;
+            Color bgColor = AppColors.cardBackground;
 
             if (isSubmitted) {
               if (opt == correctAnswer) {
-                borderColor = AppColors.limeGreen;
-                bgColor = AppColors.limeGreen.withAlpha(30);
+                borderColor = AppColors.success;
+                bgColor = AppColors.successContainerLight;
               } else if (isChosen && !isCorrect) {
-                borderColor = AppColors.errorLight;
-                bgColor = AppColors.errorLight.withAlpha(30);
+                borderColor = AppColors.error;
+                bgColor = AppColors.errorContainerLight;
               }
             } else if (isChosen) {
-              borderColor = AppColors.limeGreenDark;
-              bgColor = AppColors.limeGreenDark.withAlpha(20);
+              borderColor = AppColors.primaryBlueDark;
+              bgColor = AppColors.primaryBlueLight;
             }
 
             return Padding(
@@ -155,10 +159,10 @@ class _LessonPracticeViewState extends State<LessonPracticeView> {
                 child: Container(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
-                    color: bgColor ?? theme.colorScheme.surface,
+                    color: bgColor,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: borderColor ?? theme.colorScheme.outlineVariant,
+                      color: borderColor,
                       width: isChosen ? 2 : 1,
                     ),
                   ),
@@ -170,10 +174,10 @@ class _LessonPracticeViewState extends State<LessonPracticeView> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: isChosen ? (borderColor ?? AppColors.limeGreenDark) : Colors.grey,
+                            color: isChosen ? borderColor : AppColors.mutedText,
                             width: 2,
                           ),
-                          color: isChosen ? (borderColor ?? AppColors.limeGreenDark) : Colors.transparent,
+                          color: isChosen ? borderColor : Colors.transparent,
                         ),
                         child: isChosen
                             ? const Icon(Icons.check, size: 16, color: Colors.white)
@@ -185,6 +189,7 @@ class _LessonPracticeViewState extends State<LessonPracticeView> {
                           opt,
                           style: theme.textTheme.bodyLarge?.copyWith(
                             fontWeight: isChosen ? FontWeight.bold : FontWeight.normal,
+                            color: AppColors.primaryText,
                           ),
                         ),
                       ),
@@ -214,10 +219,10 @@ class _LessonPracticeViewState extends State<LessonPracticeView> {
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: isCorrect ? AppColors.limeGreen.withAlpha(25) : AppColors.errorLight.withAlpha(20),
+                color: isCorrect ? AppColors.successContainerLight : AppColors.errorContainerLight,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isCorrect ? AppColors.limeGreen : AppColors.errorLight,
+                  color: isCorrect ? AppColors.success : AppColors.error,
                 ),
               ),
               child: Column(
@@ -227,14 +232,16 @@ class _LessonPracticeViewState extends State<LessonPracticeView> {
                     children: [
                       Icon(
                         isCorrect ? Icons.check_circle_rounded : Icons.cancel_rounded,
-                        color: isCorrect ? AppColors.limeGreenDark : AppColors.errorLight,
+                        color: isCorrect ? AppColors.success : AppColors.error,
                       ),
                       const SizedBox(width: AppSpacing.sm),
-                      Text(
-                        isCorrect ? 'Chính xác!' : 'Chưa chính xác! (Đáp án: $correctAnswer)',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: isCorrect ? AppColors.limeGreenDark : AppColors.errorLight,
+                      Expanded(
+                        child: Text(
+                          isCorrect ? 'Chính xác!' : 'Chưa chính xác! (Đáp án: $correctAnswer)',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: isCorrect ? AppColors.success : AppColors.error,
+                          ),
                         ),
                       ),
                     ],
@@ -243,7 +250,10 @@ class _LessonPracticeViewState extends State<LessonPracticeView> {
                     const SizedBox(height: 6),
                     Text(
                       'Giải thích: $explanation',
-                      style: theme.textTheme.bodySmall?.copyWith(height: 1.4),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        height: 1.4,
+                        color: AppColors.primaryText,
+                      ),
                     ),
                   ],
                   if (!isCorrect && widget.onAskAi != null) ...[
@@ -252,10 +262,10 @@ class _LessonPracticeViewState extends State<LessonPracticeView> {
                       alignment: Alignment.centerRight,
                       child: TextButton.icon(
                         onPressed: widget.onAskAi,
-                        icon: const Icon(Icons.psychology_outlined, size: 16, color: AppColors.limeGreenDark),
+                        icon: const Icon(Icons.psychology_outlined, size: 16, color: AppColors.primaryBlueDark),
                         label: const Text(
                           'Hỏi AI vì sao sai',
-                          style: TextStyle(color: AppColors.limeGreenDark, fontSize: 13),
+                          style: TextStyle(color: AppColors.primaryBlueDark, fontSize: 13),
                         ),
                       ),
                     ),

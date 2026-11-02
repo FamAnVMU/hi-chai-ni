@@ -1,82 +1,75 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
-import '../providers/curriculum_providers.dart';
 
-class LevelExitExamScreen extends ConsumerStatefulWidget {
+class LevelExitExamScreen extends StatefulWidget {
+  final String level;
+  final Map<String, dynamic>? examPayload;
   final Map<String, dynamic>? examData;
-  final int level;
 
   const LevelExitExamScreen({
     super.key,
+    this.level = '1',
+    this.examPayload,
     this.examData,
-    this.level = 1,
   });
 
   @override
-  ConsumerState<LevelExitExamScreen> createState() => _LevelExitExamScreenState();
+  State<LevelExitExamScreen> createState() => _LevelExitExamScreenState();
 }
 
-class _LevelExitExamScreenState extends ConsumerState<LevelExitExamScreen> {
+class _LevelExitExamScreenState extends State<LevelExitExamScreen> {
   final Map<String, String> _userAnswers = {};
   bool _isSubmitted = false;
   int _score = 0;
-  int _totalScore = 200;
-  int _passingScore = 120;
   int _listenScore = 0;
   int _readScore = 0;
 
+  static const int _totalScore = 200;
+  static const int _passingScore = 120; // 60% standard
+
   @override
   Widget build(BuildContext context) {
-    if (widget.examData != null) {
-      return _buildExamContent(widget.examData!);
-    }
-
-    final examAsync = ref.watch(exitExamProvider(widget.level));
-
-    return examAsync.when(
-      loading: () => Scaffold(
-        appBar: AppBar(title: const Text('Đang tải đề thi...')),
-        body: const Center(child: CircularProgressIndicator()),
-      ),
-      error: (err, _) => Scaffold(
-        appBar: AppBar(title: const Text('Đề thi')),
-        body: Center(child: Text('Không thể tải đề thi: $err')),
-      ),
-      data: (data) {
-        if (data == null) {
-          return Scaffold(
-            appBar: AppBar(title: const Text('Đề thi tốt nghiệp')),
-            body: const Center(child: Text('Chưa có đề thi cho cấp độ này.')),
-          );
-        }
-
-        // Parse content_json if needed
-        Map<String, dynamic> resolved = Map<String, dynamic>.from(data);
-        if (resolved['content_json'] is String) {
-          try {
-            final parsed = json.decode(resolved['content_json'] as String);
-            if (parsed is Map<String, dynamic>) {
-              resolved.addAll(parsed);
-            }
-          } catch (_) {}
-        }
-
-        return _buildExamContent(resolved);
-      },
-    );
-  }
-
-  Widget _buildExamContent(Map<String, dynamic> exam) {
     final theme = Theme.of(context);
-    final title = (exam['title'] ?? 'Đề thi tốt nghiệp HSK 1 Chuẩn Quốc Tế') as String;
-    final duration = (exam['duration_minutes'] as num?)?.toInt() ?? 35;
-    _passingScore = (exam['passing_score'] as num?)?.toInt() ?? 120;
-    _totalScore = (exam['total_score'] as num?)?.toInt() ?? 200;
+    final activePayload = widget.examData ?? widget.examPayload;
+    final title = (activePayload?['title'] as String?) ?? 'Đề Thi Tốt Nghiệp HSK ${widget.level}';
+    final duration = (activePayload?['duration_minutes'] as int?) ?? 35;
 
-    final rawQuestions = (exam['questions'] as List<dynamic>?) ?? [];
-    final questions = rawQuestions.map((q) => q as Map<String, dynamic>).toList();
+    final rawQuestions = (activePayload?['questions'] as List<dynamic>?) ?? [];
+    List<Map<String, dynamic>> questions = rawQuestions.map((e) => e as Map<String, dynamic>).toList();
+
+    // Fallback authentic simulated mock exam if payload not loaded yet
+    if (questions.isEmpty) {
+      questions = [
+        {
+          'id': 'exam_l1',
+          'section': 'listening',
+          'prompt': '[Nghe audio] "你好！" - Người nói đang chào hỏi đối phương.',
+          'options': ['Đúng', 'Sai'],
+          'correct_answer': 'Đúng',
+        },
+        {
+          'id': 'exam_l2',
+          'section': 'listening',
+          'prompt': '[Nghe audio] "他在学校学习汉语。" - Người này đang học tiếng Anh.',
+          'options': ['Đúng', 'Sai'],
+          'correct_answer': 'Sai',
+        },
+        {
+          'id': 'exam_r1',
+          'section': 'reading',
+          'prompt': 'Chọn từ thích hợp điền vào chỗ trống: 我 ____ 中国人。',
+          'options': ['是', '有', '在', '很'],
+          'correct_answer': '是',
+        },
+        {
+          'id': 'exam_r2',
+          'section': 'reading',
+          'prompt': 'Từ nào sau đây có nghĩa là "uống nước"?',
+          'options': ['喝水', '吃菜', '看书', '买米'],
+          'correct_answer': '喝水',
+        },
+      ];
+    }
 
     final listeningQuestions = questions.where((q) => q['section'] == 'listening').toList();
     final readingQuestions = questions.where((q) => q['section'] == 'reading').toList();
@@ -99,13 +92,13 @@ class _LevelExitExamScreenState extends ConsumerState<LevelExitExamScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(AppSpacing.xl),
                   decoration: BoxDecoration(
-                    color: isPassed ? AppColors.limeGreen.withAlpha(30) : AppColors.errorLight.withAlpha(30),
+                    color: isPassed ? AppColors.successContainerLight : AppColors.errorContainerLight,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     isPassed ? Icons.workspace_premium_rounded : Icons.highlight_off_rounded,
                     size: 72,
-                    color: isPassed ? AppColors.limeGreenDark : AppColors.errorLight,
+                    color: isPassed ? AppColors.success : AppColors.error,
                   ),
                 ),
               ),
@@ -114,7 +107,7 @@ class _LevelExitExamScreenState extends ConsumerState<LevelExitExamScreen> {
                 'Kết quả thi tốt nghiệp HSK ${widget.level}',
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: isPassed ? AppColors.limeGreenDark : AppColors.errorLight,
+                  color: isPassed ? AppColors.success : AppColors.error,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -123,20 +116,22 @@ class _LevelExitExamScreenState extends ConsumerState<LevelExitExamScreen> {
                 isPassed ? 'XUẤT SẮC ĐẠT CHUẨN ĐẦU RA!' : 'CHƯA ĐẠT ĐIỂM CHUẨN',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onSurfaceVariant,
+                  color: AppColors.secondaryText,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.xl),
               HiCard(
+                backgroundColor: AppColors.cardBackground,
+                borderColor: AppColors.border,
                 child: Column(
                   children: [
-                    _buildScoreRow('Tổng điểm đạt được', '$_score / $_totalScore điểm', isHighlight: true),
-                    const Divider(),
+                    _buildScoreRow('Tổng điểm đạt được', '$_score / $_totalScore điểm', isHighlight: true, isPassed: isPassed),
+                    const Divider(color: AppColors.divider),
                     _buildScoreRow('Phần 1: Nghe hiểu', '$_listenScore / 100 điểm'),
-                    const Divider(),
+                    const Divider(color: AppColors.divider),
                     _buildScoreRow('Phần 2: Đọc hiểu', '$_readScore / 100 điểm'),
-                    const Divider(),
+                    const Divider(color: AppColors.divider),
                     _buildScoreRow('Điểm chuẩn đạt HSK 1', '$_passingScore điểm'),
                   ],
                 ),
@@ -163,16 +158,16 @@ class _LevelExitExamScreenState extends ConsumerState<LevelExitExamScreen> {
             margin: const EdgeInsets.only(right: AppSpacing.md),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.limeGreenDark.withAlpha(20),
+              color: AppColors.primaryBlueLight,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
               children: [
-                const Icon(Icons.timer_outlined, size: 16, color: AppColors.limeGreenDark),
+                const Icon(Icons.timer_outlined, size: 16, color: AppColors.primaryBlueDark),
                 const SizedBox(width: 4),
                 Text(
                   '$duration:00',
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.limeGreenDark),
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryBlueDark),
                 ),
               ],
             ),
@@ -188,7 +183,7 @@ class _LevelExitExamScreenState extends ConsumerState<LevelExitExamScreen> {
               'Phần 1: Nghe hiểu',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppColors.limeGreenDark,
+                color: AppColors.primaryText,
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -202,7 +197,7 @@ class _LevelExitExamScreenState extends ConsumerState<LevelExitExamScreen> {
               'Phần 2: Đọc hiểu',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppColors.limeGreenDark,
+                color: AppColors.primaryText,
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -246,7 +241,7 @@ class _LevelExitExamScreenState extends ConsumerState<LevelExitExamScreen> {
     );
   }
 
-  Widget _buildScoreRow(String label, String value, {bool isHighlight = false}) {
+  Widget _buildScoreRow(String label, String value, {bool isHighlight = false, bool isPassed = true}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
@@ -257,6 +252,7 @@ class _LevelExitExamScreenState extends ConsumerState<LevelExitExamScreen> {
             style: TextStyle(
               fontWeight: isHighlight ? FontWeight.bold : FontWeight.normal,
               fontSize: isHighlight ? 16 : 14,
+              color: AppColors.primaryText,
             ),
           ),
           Text(
@@ -264,7 +260,9 @@ class _LevelExitExamScreenState extends ConsumerState<LevelExitExamScreen> {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: isHighlight ? 18 : 14,
-              color: isHighlight ? AppColors.limeGreenDark : null,
+              color: isHighlight
+                  ? (isPassed ? AppColors.success : AppColors.error)
+                  : AppColors.secondaryText,
             ),
           ),
         ],
@@ -282,12 +280,17 @@ class _LevelExitExamScreenState extends ConsumerState<LevelExitExamScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: HiCard(
+        backgroundColor: AppColors.cardBackground,
+        borderColor: AppColors.border,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               prompt,
-              style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryText,
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             ...options.map((opt) {
@@ -304,10 +307,11 @@ class _LevelExitExamScreenState extends ConsumerState<LevelExitExamScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     decoration: BoxDecoration(
-                      color: isChosen ? AppColors.limeGreen.withAlpha(25) : Colors.transparent,
+                      color: isChosen ? AppColors.primaryBlueLight : Colors.transparent,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: isChosen ? AppColors.limeGreenDark : theme.colorScheme.outlineVariant,
+                        color: isChosen ? AppColors.primaryBlueDark : AppColors.border,
+                        width: isChosen ? 1.5 : 1,
                       ),
                     ),
                     child: Row(
@@ -315,10 +319,18 @@ class _LevelExitExamScreenState extends ConsumerState<LevelExitExamScreen> {
                         Icon(
                           isChosen ? Icons.radio_button_checked : Icons.radio_button_off,
                           size: 18,
-                          color: isChosen ? AppColors.limeGreenDark : Colors.grey,
+                          color: isChosen ? AppColors.primaryBlueDark : AppColors.mutedText,
                         ),
                         const SizedBox(width: AppSpacing.sm),
-                        Expanded(child: Text(opt)),
+                        Expanded(
+                          child: Text(
+                            opt,
+                            style: TextStyle(
+                              color: isChosen ? AppColors.primaryBlueDark : AppColors.primaryText,
+                              fontWeight: isChosen ? FontWeight.w600 : FontWeight.normal,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),

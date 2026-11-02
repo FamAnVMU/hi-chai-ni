@@ -139,11 +139,12 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
           ),
         ],
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(6),
+          preferredSize: const Size.fromHeight(4),
           child: LinearProgressIndicator(
             value: (currentIndex + 1) / 6,
-            backgroundColor: theme.colorScheme.surfaceContainerHighest,
-            color: AppColors.limeGreen,
+            backgroundColor: AppColors.primaryBlueLight,
+            color: AppColors.primaryBlueDark,
+            minHeight: 4,
           ),
         ),
       ),
@@ -151,9 +152,9 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
       bottomNavigationBar: SafeArea(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            border: Border(top: BorderSide(color: theme.colorScheme.outlineVariant)),
+          decoration: const BoxDecoration(
+            color: AppColors.cardBackground,
+            border: Border(top: BorderSide(color: AppColors.border)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -177,7 +178,7 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
                     width: isActive ? 16 : 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: isActive ? AppColors.limeGreenDark : theme.colorScheme.outlineVariant,
+                      color: isActive ? AppColors.primaryBlueDark : AppColors.border,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   );

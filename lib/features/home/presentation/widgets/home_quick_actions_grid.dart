@@ -26,6 +26,7 @@ class HomeQuickActionsGrid extends StatelessWidget {
           'Truy Cập Nhanh',
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.bold,
+            color: AppColors.primaryText,
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -35,7 +36,7 @@ class HomeQuickActionsGrid extends StatelessWidget {
               child: _buildActionTile(
                 context: context,
                 icon: Icons.school_rounded,
-                iconColor: AppColors.limeGreen,
+                iconColor: AppColors.primaryBlueDark,
                 title: 'Bài học HSK',
                 subtitle: 'Theo lộ trình',
                 onTap: onNavigateLearning,
@@ -46,7 +47,7 @@ class HomeQuickActionsGrid extends StatelessWidget {
               child: _buildActionTile(
                 context: context,
                 icon: Icons.psychology_rounded,
-                iconColor: Colors.orange,
+                iconColor: AppColors.warning,
                 title: 'Ôn tập thẻ',
                 subtitle: 'Thuật toán SM-2',
                 onTap: onNavigateReview,
@@ -61,7 +62,7 @@ class HomeQuickActionsGrid extends StatelessWidget {
               child: _buildActionTile(
                 context: context,
                 icon: Icons.menu_book_rounded,
-                iconColor: Colors.blueAccent,
+                iconColor: AppColors.information,
                 title: 'Từ điển tra cứu',
                 subtitle: 'Tra offline tức thì',
                 onTap: () => Navigator.of(context).push(
@@ -74,7 +75,7 @@ class HomeQuickActionsGrid extends StatelessWidget {
               child: _buildActionTile(
                 context: context,
                 icon: Icons.auto_awesome_rounded,
-                iconColor: AppColors.limeGreen,
+                iconColor: AppColors.primaryBlue,
                 title: 'AI Voice Tutor',
                 subtitle: 'Luyện hội thoại',
                 onTap: onNavigateAiTutor,
@@ -102,15 +103,15 @@ class HomeQuickActionsGrid extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: AppRadius.borderMd,
+        splashColor: iconColor.withAlpha(20),
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.md),
           decoration: BoxDecoration(
-            color: isDark ? AppColors.darkForestCard : theme.colorScheme.surface,
+            color: isDark ? AppColors.darkForestCard : AppColors.cardBackground,
             borderRadius: AppRadius.borderMd,
             border: Border.all(
-              color: isDark
-                  ? theme.colorScheme.outlineVariant.withAlpha(40)
-                  : theme.colorScheme.outlineVariant.withAlpha(80),
+              color: isDark ? AppColors.darkForestBorder : AppColors.border,
+              width: 1.0,
             ),
           ),
           child: Row(
@@ -132,6 +133,7 @@ class HomeQuickActionsGrid extends StatelessWidget {
                       title,
                       style: theme.textTheme.labelMedium?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: AppColors.primaryText,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -140,7 +142,7 @@ class HomeQuickActionsGrid extends StatelessWidget {
                     Text(
                       subtitle,
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+                        color: AppColors.secondaryText,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

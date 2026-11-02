@@ -36,7 +36,7 @@ class _LessonMasteryViewState extends State<LessonMasteryView> {
       return Center(
         child: Text(
           'Đang nạp bài kiểm tra hoàn thành...',
-          style: theme.textTheme.bodyMedium,
+          style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.secondaryText),
         ),
       );
     }
@@ -54,13 +54,13 @@ class _LessonMasteryViewState extends State<LessonMasteryView> {
               child: Container(
                 padding: const EdgeInsets.all(AppSpacing.xl),
                 decoration: BoxDecoration(
-                  color: isPassed ? AppColors.limeGreen.withAlpha(30) : AppColors.errorLight.withAlpha(30),
+                  color: isPassed ? AppColors.successContainerLight : AppColors.errorContainerLight,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   isPassed ? Icons.emoji_events_rounded : Icons.replay_rounded,
                   size: 64,
-                  color: isPassed ? AppColors.limeGreenDark : AppColors.errorLight,
+                  color: isPassed ? AppColors.success : AppColors.error,
                 ),
               ),
             ),
@@ -69,7 +69,7 @@ class _LessonMasteryViewState extends State<LessonMasteryView> {
               isPassed ? 'Chúc Mừng Bạn Đã Vượt Qua!' : 'Cần Ôn Tập Thêm',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: isPassed ? AppColors.limeGreenDark : AppColors.errorLight,
+                color: isPassed ? AppColors.success : AppColors.error,
               ),
               textAlign: TextAlign.center,
             ),
@@ -78,24 +78,33 @@ class _LessonMasteryViewState extends State<LessonMasteryView> {
               'Điểm số: ${(_scorePercent * 100).toInt()}% ($_correctCount/${exercises.length} câu đúng)',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
+                color: AppColors.primaryText,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.lg),
             HiCard(
+              backgroundColor: AppColors.cardBackground,
+              borderColor: AppColors.border,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     isPassed ? 'Đạt chuẩn đầu ra' : 'Chưa đạt chuẩn đầu ra (Yêu cầu ≥ 80%)',
-                    style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryText,
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
                     isPassed
                         ? 'Toàn bộ từ vựng và ngữ pháp của bài học đã được tự động đưa vào hệ thống lặp lại ngắt quãng (SRS) để ôn tập định kỳ.'
                         : 'Bạn nên xem lại phần từ vựng và điểm ngữ pháp của bài học trước khi thử làm lại bài kiểm tra.',
-                    style: theme.textTheme.bodyMedium?.copyWith(height: 1.4),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      height: 1.4,
+                      color: AppColors.secondaryText,
+                    ),
                   ),
                 ],
               ),
@@ -133,13 +142,13 @@ class _LessonMasteryViewState extends State<LessonMasteryView> {
         children: [
           Row(
             children: [
-              const Icon(Icons.verified_user_outlined, color: AppColors.limeGreenDark),
+              const Icon(Icons.verified_user_outlined, color: AppColors.primaryBlueDark),
               const SizedBox(width: AppSpacing.sm),
               Text(
                 'Đánh giá hoàn thành',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.limeGreenDark,
+                  color: AppColors.primaryText,
                 ),
               ),
             ],
@@ -148,7 +157,7 @@ class _LessonMasteryViewState extends State<LessonMasteryView> {
           Text(
             'Trả lời đúng tối thiểu 80% để mở khóa bài học tiếp theo.',
             style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+              color: AppColors.secondaryText,
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
@@ -165,6 +174,8 @@ class _LessonMasteryViewState extends State<LessonMasteryView> {
             return Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.lg),
               child: HiCard(
+                backgroundColor: AppColors.cardBackground,
+                borderColor: AppColors.border,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -172,6 +183,7 @@ class _LessonMasteryViewState extends State<LessonMasteryView> {
                       'Câu ${idx + 1}: $prompt',
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: AppColors.primaryText,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -189,10 +201,10 @@ class _LessonMasteryViewState extends State<LessonMasteryView> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                             decoration: BoxDecoration(
-                              color: isChosen ? AppColors.limeGreen.withAlpha(25) : Colors.transparent,
+                              color: isChosen ? AppColors.primaryBlueLight : Colors.transparent,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: isChosen ? AppColors.limeGreenDark : theme.colorScheme.outlineVariant,
+                                color: isChosen ? AppColors.primaryBlueDark : AppColors.border,
                                 width: isChosen ? 1.5 : 1,
                               ),
                             ),
@@ -201,10 +213,18 @@ class _LessonMasteryViewState extends State<LessonMasteryView> {
                                 Icon(
                                   isChosen ? Icons.radio_button_checked : Icons.radio_button_off,
                                   size: 18,
-                                  color: isChosen ? AppColors.limeGreenDark : Colors.grey,
+                                  color: isChosen ? AppColors.primaryBlueDark : AppColors.mutedText,
                                 ),
                                 const SizedBox(width: AppSpacing.sm),
-                                Expanded(child: Text(opt)),
+                                Expanded(
+                                  child: Text(
+                                    opt,
+                                    style: TextStyle(
+                                      color: isChosen ? AppColors.primaryBlueDark : AppColors.primaryText,
+                                      fontWeight: isChosen ? FontWeight.w600 : FontWeight.normal,
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           ),

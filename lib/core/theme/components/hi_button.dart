@@ -17,12 +17,13 @@ enum HiButtonSize {
   lg,
 }
 
-/// Standardized, accessible Button component for HI Chinese.
+/// Standardized, accessible Button component for HI Chinese: Clean Modern White & Light Blue.
 ///
 /// Features:
 /// - Guarantees minimum 48x48 dp touch target per WCAG 2.2 AA.
-/// - Built-in loading indicator state.
-/// - Supports primary (lime in dark / forest in light), secondary, ghost, danger.
+/// - Built-in smooth loading indicator state.
+/// - Clean subtle feedback on touch (150ms animation).
+/// - Supports primary, secondary (white outline), ghost, danger.
 class HiButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
@@ -48,7 +49,6 @@ class HiButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
     final isEnabled = onPressed != null && !isLoading;
 
@@ -81,32 +81,30 @@ class HiButton extends StatelessWidget {
         break;
     }
 
-    // Color resolution by variant
+    // Color resolution by variant in Clean Modern theme
     Color backgroundColor;
     Color foregroundColor;
     BorderSide borderSide = BorderSide.none;
 
     switch (variant) {
       case HiButtonVariant.primary:
-        backgroundColor = colorScheme.primary;
-        foregroundColor = colorScheme.onPrimary;
+        backgroundColor = isDark ? AppColors.accentBlue : AppColors.primaryBlueDark;
+        foregroundColor = isDark ? AppColors.darkForestBg : Colors.white;
         break;
       case HiButtonVariant.secondary:
-        backgroundColor = isDark
-            ? AppColors.darkForestSurface
-            : colorScheme.surfaceContainerHighest;
-        foregroundColor = colorScheme.onSurface;
+        backgroundColor = isDark ? AppColors.darkForestSurface : AppColors.cardBackground;
+        foregroundColor = isDark ? Colors.white : AppColors.primaryText;
         borderSide = BorderSide(
-          color: isDark ? AppColors.darkForestBorder : colorScheme.outlineVariant,
+          color: isDark ? AppColors.darkForestBorder : AppColors.border,
           width: 1,
         );
         break;
       case HiButtonVariant.ghost:
         backgroundColor = Colors.transparent;
-        foregroundColor = colorScheme.primary;
+        foregroundColor = isDark ? AppColors.accentBlue : AppColors.primaryBlueDark;
         break;
       case HiButtonVariant.danger:
-        backgroundColor = isDark ? const Color(0xFF93000A) : colorScheme.error;
+        backgroundColor = AppColors.error;
         foregroundColor = Colors.white;
         break;
     }
@@ -114,11 +112,11 @@ class HiButton extends StatelessWidget {
     if (!isEnabled) {
       backgroundColor = isDark
           ? AppColors.darkForestCard.withAlpha(128)
-          : colorScheme.surfaceContainerHighest.withAlpha(150);
+          : AppColors.secondaryBackground;
       foregroundColor = isDark
           ? Colors.white38
-          : colorScheme.onSurface.withAlpha(90);
-      borderSide = BorderSide.none;
+          : AppColors.disabledText;
+      borderSide = isDark ? BorderSide.none : const BorderSide(color: AppColors.divider, width: 1);
     }
 
     Widget content;
@@ -169,23 +167,30 @@ class HiButton extends StatelessWidget {
     }
 
     // Enforce minimum 48x48dp touch target standard
-    Widget buttonWidget = Material(
-      color: backgroundColor,
-      borderRadius: AppRadius.borderMd,
-      child: InkWell(
-        onTap: isEnabled ? onPressed : null,
+    Widget buttonWidget = AnimatedContainer(
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
+      decoration: BoxDecoration(
+        color: backgroundColor,
         borderRadius: AppRadius.borderMd,
-        child: Container(
-          height: buttonHeight,
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          decoration: BoxDecoration(
-            borderRadius: AppRadius.borderMd,
-            border: borderSide != BorderSide.none
-                ? Border.fromBorderSide(borderSide)
-                : null,
+        border: borderSide != BorderSide.none
+            ? Border.fromBorderSide(borderSide)
+            : null,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: AppRadius.borderMd,
+        child: InkWell(
+          onTap: isEnabled ? onPressed : null,
+          borderRadius: AppRadius.borderMd,
+          splashColor: foregroundColor.withAlpha(20),
+          highlightColor: foregroundColor.withAlpha(10),
+          child: Container(
+            height: buttonHeight,
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+            alignment: Alignment.center,
+            child: content,
           ),
-          alignment: Alignment.center,
-          child: content,
         ),
       ),
     );

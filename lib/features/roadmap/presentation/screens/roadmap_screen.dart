@@ -138,7 +138,8 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
     final theme = Theme.of(context);
 
     return HiCard(
-      backgroundColor: theme.colorScheme.primaryContainer.withAlpha(50),
+      backgroundColor: AppColors.primaryBlueLight,
+      borderColor: AppColors.secondaryBlue,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -146,7 +147,7 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
             children: [
               const Icon(
                 Icons.emoji_events_rounded,
-                color: AppColors.limeGreen,
+                color: AppColors.primaryBlueDark,
                 size: AppDimensions.iconMd,
               ),
               const SizedBox(width: AppSpacing.xs),
@@ -155,6 +156,7 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
                   'Mục Tiêu Của Bạn: HSK ${goal.targetHskLevel}',
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
+                    color: AppColors.primaryBlueDark,
                   ),
                 ),
               ),
@@ -233,7 +235,7 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
                 '$completedCount / $totalCount bài (${(completionRate * 100).toInt()}%)',
                 style: theme.textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.limeGreen,
+                  color: AppColors.primaryBlueDark,
                 ),
               ),
             ],
@@ -243,9 +245,9 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
             borderRadius: BorderRadius.circular(AppRadius.full),
             child: LinearProgressIndicator(
               value: completionRate,
-              minHeight: 8,
-              backgroundColor: theme.colorScheme.surfaceContainerHighest,
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.limeGreen),
+              minHeight: 6,
+              backgroundColor: AppColors.primaryBlueLight,
+              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primaryBlueDark),
             ),
           ),
         ],

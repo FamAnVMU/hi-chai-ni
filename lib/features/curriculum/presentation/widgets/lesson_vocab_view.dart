@@ -25,7 +25,7 @@ class LessonVocabView extends StatelessWidget {
       return Center(
         child: Text(
           'Đang nạp dữ liệu từ vựng...',
-          style: theme.textTheme.bodyMedium,
+          style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.secondaryText),
         ),
       );
     }
@@ -33,7 +33,7 @@ class LessonVocabView extends StatelessWidget {
     return ListView.separated(
       padding: AppSpacing.screenPadding,
       itemCount: words.length,
-      separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.md),
+      separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.sm),
       itemBuilder: (context, index) {
         final w = words[index];
         final hanzi = (w['hanzi'] ?? w['simplified'] ?? '') as String;
@@ -42,28 +42,30 @@ class LessonVocabView extends StatelessWidget {
         final type = (w['type'] ?? w['part_of_speech'] ?? '') as String;
 
         return HiCard(
+          backgroundColor: AppColors.cardBackground,
+          borderColor: AppColors.border,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Character avatar
               Container(
-                width: 64,
-                height: 64,
+                width: 60,
+                height: 60,
                 decoration: BoxDecoration(
-                  color: AppColors.limeGreen.withAlpha(25),
+                  color: AppColors.primaryBlueLight,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: AppColors.limeGreen.withAlpha(100),
-                    width: 1.5,
+                    color: AppColors.secondaryBlue,
+                    width: 1,
                   ),
                 ),
                 child: Center(
                   child: Text(
                     hanzi,
                     style: const TextStyle(
-                      fontSize: 32,
+                      fontSize: 30,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.limeGreenDark,
+                      color: AppColors.primaryBlueDark,
                     ),
                   ),
                 ),
@@ -80,7 +82,7 @@ class LessonVocabView extends StatelessWidget {
                           pinyin,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: AppColors.limeGreenDark,
+                            color: AppColors.primaryBlueDark,
                           ),
                         ),
                         if (type.isNotEmpty) ...[
@@ -88,13 +90,14 @@ class LessonVocabView extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.surfaceContainerHighest,
+                              color: AppColors.inputBackground,
                               borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: AppColors.border),
                             ),
                             child: Text(
                               type,
                               style: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
+                                color: AppColors.secondaryText,
                               ),
                             ),
                           ),
@@ -106,6 +109,7 @@ class LessonVocabView extends StatelessWidget {
                       meaning,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w500,
+                        color: AppColors.primaryText,
                       ),
                     ),
                   ],
@@ -113,7 +117,7 @@ class LessonVocabView extends StatelessWidget {
               ),
               // Action buttons: Audio & Writing
               IconButton(
-                icon: const Icon(Icons.volume_up_rounded, color: AppColors.limeGreenDark),
+                icon: const Icon(Icons.volume_up_rounded, color: AppColors.primaryBlueDark),
                 tooltip: 'Nghe phát âm chuẩn',
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -125,7 +129,7 @@ class LessonVocabView extends StatelessWidget {
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.edit_note_rounded, color: AppColors.limeGreen),
+                icon: const Icon(Icons.edit_note_rounded, color: AppColors.primaryBlue),
                 tooltip: 'Luyện viết nét bút thuận',
                 onPressed: () {
                   Navigator.of(context).push(

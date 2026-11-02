@@ -103,6 +103,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with AutomaticKee
                 final dateStr = '${profile.startDate.day}/${profile.startDate.month}/${profile.startDate.year}';
                 return HiCard(
                   padding: const EdgeInsets.all(AppSpacing.md),
+                  backgroundColor: AppColors.cardBackground,
+                  borderColor: AppColors.border,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -110,7 +112,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with AutomaticKee
                         children: [
                           CircleAvatar(
                             radius: 30,
-                            backgroundColor: theme.colorScheme.primaryContainer,
+                            backgroundColor: AppColors.primaryBlueLight,
                             child: Text(
                               _getAvatarEmoji(profile.avatarStyle),
                               style: const TextStyle(fontSize: 28),
@@ -128,13 +130,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with AutomaticKee
                                         profile.displayName,
                                         style: theme.textTheme.titleMedium?.copyWith(
                                           fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryText,
                                         ),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                     HiChip(
                                       label: 'HSK ${profile.currentHskLevel}',
-                                      status: HiChipStatus.neutral,
+                                      status: HiChipStatus.info,
                                     ),
                                   ],
                                 ),
@@ -142,7 +145,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with AutomaticKee
                                 Text(
                                   'Mục tiêu: HSK ${profile.targetHskLevel} • ${profile.dailyMinutes} phút/ngày',
                                   style: theme.textTheme.bodySmall?.copyWith(
-                                    color: theme.colorScheme.primary,
+                                    color: AppColors.primaryBlueDark,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -150,7 +153,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with AutomaticKee
                                 Text(
                                   '${profile.purpose.displayName} • Học từ $dateStr',
                                   style: theme.textTheme.bodySmall?.copyWith(
-                                    color: theme.colorScheme.onSurfaceVariant,
+                                    color: AppColors.secondaryText,
                                   ),
                                 ),
                               ],
@@ -418,7 +421,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with AutomaticKee
                   // Quản lý quyền Micro
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.mic_rounded, color: AppColors.limeGreen),
+                    leading: const Icon(Icons.mic_rounded, color: AppColors.primaryBlueDark),
                     title: const Text('Quyền truy cập Micro'),
                     subtitle: micStatusAsync.when(
                       loading: () => const Text('Đang kiểm tra...'),
@@ -426,7 +429,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with AutomaticKee
                       data: (status) => Text(
                         status.isGranted ? 'Trạng thái: Đã cấp quyền (Sẵn sàng)' : 'Trạng thái: Chưa cấp quyền',
                         style: TextStyle(
-                          color: status.isGranted ? AppColors.limeGreen : Colors.orangeAccent,
+                          color: status.isGranted ? AppColors.success : AppColors.warning,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -445,17 +448,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with AutomaticKee
             Text(
               'Hệ Thống, AI & Dữ Liệu',
               style: theme.textTheme.labelMedium?.copyWith(
-                color: theme.colorScheme.primary,
+                color: AppColors.primaryBlueDark,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: AppSpacing.xs),
             HiCard(
               padding: EdgeInsets.zero,
+              backgroundColor: AppColors.cardBackground,
+              borderColor: AppColors.border,
               child: Column(
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.psychology_outlined, color: AppColors.limeGreen),
+                    leading: const Icon(Icons.psychology_outlined, color: AppColors.primaryBlueDark),
                     title: const Text('Cài đặt AI Tutor & Chẩn đoán kết nối'),
                     subtitle: const Text('BYOK API Key, model routing, ping latency'),
                     trailing: const Icon(Icons.chevron_right_rounded),
@@ -465,17 +470,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with AutomaticKee
                       );
                     },
                   ),
-                  const Divider(height: 1),
+                  const Divider(height: 1, color: AppColors.divider),
                   ListTile(
-                    leading: const Icon(Icons.storage_rounded, color: AppColors.limeGreen),
+                    leading: const Icon(Icons.storage_rounded, color: AppColors.primaryBlueDark),
                     title: const Text('Quản lý Dữ liệu & Sao lưu'),
                     subtitle: const Text('Backup, restore, export JSON, dung lượng DB'),
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => DataManagementSheet.show(context),
                   ),
-                  const Divider(height: 1),
+                  const Divider(height: 1, color: AppColors.divider),
                   ListTile(
-                    leading: const Icon(Icons.palette_outlined, color: AppColors.limeGreen),
+                    leading: const Icon(Icons.palette_outlined, color: AppColors.primaryBlueDark),
                     title: const Text('Design System Showcase'),
                     subtitle: const Text('Bảng màu, typography Việt-Trung, RubyText'),
                     trailing: const Icon(Icons.chevron_right_rounded),
@@ -485,9 +490,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with AutomaticKee
                       );
                     },
                   ),
-                  const Divider(height: 1),
+                  const Divider(height: 1, color: AppColors.divider),
                   ListTile(
-                    leading: const Icon(Icons.policy_outlined, color: AppColors.limeGreen),
+                    leading: const Icon(Icons.policy_outlined, color: AppColors.primaryBlueDark),
                     title: const Text('Thông tin & Chính sách bảo vệ dữ liệu'),
                     subtitle: Text('Standalone Offline-first • Schema v${DatabaseConstants.currentDatabaseVersion}'),
                     trailing: const Icon(Icons.chevron_right_rounded),

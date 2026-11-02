@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import '../tokens/app_colors.dart';
 import '../tokens/app_dimensions.dart';
 import '../tokens/app_radius.dart';
 import '../tokens/app_spacing.dart';
 
-/// Themed loading indicators for HI Chinese.
+/// Themed loading indicators for HI Chinese: Clean Modern White & Light Blue.
 class HiLoadingIndicator extends StatelessWidget {
   final double size;
   final double strokeWidth;
@@ -21,7 +22,7 @@ class HiLoadingIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final indicatorColor = color ?? theme.colorScheme.primary;
+    final indicatorColor = color ?? (theme.brightness == Brightness.dark ? AppColors.accentBlue : AppColors.primaryBlueDark);
 
     final spinner = SizedBox(
       height: size,
@@ -45,7 +46,7 @@ class HiLoadingIndicator extends StatelessWidget {
         Text(
           message!,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
+            color: AppColors.secondaryText,
           ),
           textAlign: TextAlign.center,
         ),
@@ -54,7 +55,7 @@ class HiLoadingIndicator extends StatelessWidget {
   }
 }
 
-/// Linear progress bar indicator with rounded corners.
+/// Linear progress bar indicator with rounded corners in Clean Modern palette.
 class HiLinearProgress extends StatelessWidget {
   final double? value;
   final Color? color;
@@ -72,6 +73,10 @@ class HiLinearProgress extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final barColor = color ?? (isDark ? AppColors.accentBlue : AppColors.primaryBlueDark);
+    final defaultBgColor = backgroundColor ?? (isDark ? AppColors.darkForestCard : AppColors.primaryBlueLight);
 
     return ClipRRect(
       borderRadius: AppRadius.borderFull,
@@ -79,11 +84,8 @@ class HiLinearProgress extends StatelessWidget {
         height: height,
         child: LinearProgressIndicator(
           value: value,
-          valueColor: AlwaysStoppedAnimation<Color>(
-            color ?? theme.colorScheme.primary,
-          ),
-          backgroundColor: backgroundColor ??
-              theme.colorScheme.surfaceContainerHighest.withAlpha(128),
+          valueColor: AlwaysStoppedAnimation<Color>(barColor),
+          backgroundColor: defaultBgColor,
         ),
       ),
     );

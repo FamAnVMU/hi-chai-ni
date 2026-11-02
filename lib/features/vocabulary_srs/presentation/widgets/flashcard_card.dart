@@ -38,7 +38,7 @@ class _FlashcardCardState extends State<FlashcardCard>
     super.initState();
     _flipController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 250),
       value: widget.isFlipped ? 1.0 : 0.0,
     );
     _flipAnimation = CurvedAnimation(
@@ -125,9 +125,10 @@ class _FlashcardCardState extends State<FlashcardCard>
         behavior: HitTestBehavior.opaque,
         child: HiCard(
           padding: const EdgeInsets.all(AppSpacing.xl),
-          borderColor: AppColors.limeGreen.withAlpha(120),
+          backgroundColor: AppColors.cardBackground,
+          borderColor: AppColors.border,
           child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 340),
+            constraints: const BoxConstraints(minHeight: 320),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -139,13 +140,13 @@ class _FlashcardCardState extends State<FlashcardCard>
                       children: [
                         HiChip(
                           label: 'HSK ${card.hskLevel}',
-                          status: HiChipStatus.success,
+                          status: HiChipStatus.info,
                         ),
                         if (card.strokeCount != null) ...[
                           const SizedBox(width: AppSpacing.xs),
                           HiChip(
                             label: '${card.strokeCount} nét',
-                            status: HiChipStatus.info,
+                            status: HiChipStatus.neutral,
                           ),
                         ],
                       ],
@@ -155,7 +156,7 @@ class _FlashcardCardState extends State<FlashcardCard>
                         widget.showPinyinOnFront
                             ? Icons.visibility_off_outlined
                             : Icons.visibility_outlined,
-                        color: AppColors.limeGreen,
+                        color: AppColors.primaryBlueDark,
                         size: AppDimensions.iconSm,
                       ),
                       tooltip: widget.showPinyinOnFront
@@ -175,7 +176,7 @@ class _FlashcardCardState extends State<FlashcardCard>
                       Text(
                         card.pinyin,
                         style: theme.textTheme.headlineSmall?.copyWith(
-                          color: AppColors.limeGreen,
+                          color: AppColors.primaryBlueDark,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 1.2,
                         ),
@@ -187,6 +188,7 @@ class _FlashcardCardState extends State<FlashcardCard>
                       style: theme.textTheme.displayMedium?.copyWith(
                         fontSize: 56,
                         fontWeight: FontWeight.bold,
+                        color: AppColors.primaryText,
                         fontFamilyFallback: const ['Noto Sans SC', 'Heiti SC'],
                       ),
                     ),
@@ -196,7 +198,7 @@ class _FlashcardCardState extends State<FlashcardCard>
                       Text(
                         'Phồn thể: ${card.traditional}',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+                          color: AppColors.mutedText,
                         ),
                       ),
                     ],
@@ -209,16 +211,16 @@ class _FlashcardCardState extends State<FlashcardCard>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.touch_app_rounded,
                       size: AppDimensions.iconSm,
-                      color: theme.colorScheme.onSurfaceVariant,
+                      color: AppColors.mutedText,
                     ),
                     const SizedBox(width: AppSpacing.xs),
                     Text(
                       'Chạm vào thẻ để lật xem đáp án',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+                        color: AppColors.mutedText,
                       ),
                     ),
                   ],
@@ -240,9 +242,10 @@ class _FlashcardCardState extends State<FlashcardCard>
           'Mặt sau thẻ từ vựng: ${card.simplified}, phiên âm ${card.pinyin}, nghĩa ${card.meaningVi}',
       child: HiCard(
         padding: const EdgeInsets.all(AppSpacing.xl),
-        borderColor: AppColors.limeGreen,
+        backgroundColor: AppColors.cardBackground,
+        borderColor: AppColors.secondaryBlue,
         child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 340),
+          constraints: const BoxConstraints(minHeight: 320),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -255,14 +258,14 @@ class _FlashcardCardState extends State<FlashcardCard>
                     children: [
                       HiChip(
                         label: 'HSK ${card.hskLevel}',
-                        status: HiChipStatus.success,
+                        status: HiChipStatus.info,
                       ),
                       if (card.partOfSpeech != null &&
                           card.partOfSpeech!.isNotEmpty) ...[
                         const SizedBox(width: AppSpacing.xs),
                         HiChip(
                           label: card.partOfSpeech!,
-                          status: HiChipStatus.info,
+                          status: HiChipStatus.neutral,
                         ),
                       ],
                     ],
@@ -273,6 +276,7 @@ class _FlashcardCardState extends State<FlashcardCard>
                         icon: const Icon(
                           Icons.volume_up_rounded,
                           size: AppDimensions.iconSm,
+                          color: AppColors.primaryBlueDark,
                         ),
                         tooltip: 'Phát âm',
                         onPressed: () => _handleAudioPlayback(context),
@@ -282,6 +286,7 @@ class _FlashcardCardState extends State<FlashcardCard>
                         icon: const Icon(
                           Icons.menu_book_rounded,
                           size: AppDimensions.iconSm,
+                          color: AppColors.primaryBlueDark,
                         ),
                         tooltip: 'Mở chi tiết từ điển',
                         onPressed: () {
@@ -309,10 +314,11 @@ class _FlashcardCardState extends State<FlashcardCard>
                     ],
                     hanziStyle: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: AppColors.primaryText,
                       fontFamilyFallback: const ['Noto Sans SC', 'Heiti SC'],
                     ),
                     pinyinStyle: theme.textTheme.titleSmall?.copyWith(
-                      color: AppColors.limeGreen,
+                      color: AppColors.primaryBlueDark,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -322,7 +328,7 @@ class _FlashcardCardState extends State<FlashcardCard>
                     textAlign: TextAlign.center,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.onSurface,
+                      color: AppColors.primaryText,
                     ),
                   ),
                 ],
@@ -335,28 +341,29 @@ class _FlashcardCardState extends State<FlashcardCard>
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withAlpha(90),
+                    color: AppColors.inputBackground,
                     borderRadius: AppRadius.borderMd,
                     border: Border.all(
-                      color: theme.colorScheme.outlineVariant.withAlpha(60),
+                      color: AppColors.border,
                     ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
+                      const Row(
                         children: [
                           Icon(
                             Icons.format_quote_rounded,
                             size: AppDimensions.iconSm,
-                            color: AppColors.limeGreen,
+                            color: AppColors.primaryBlueDark,
                           ),
-                          const SizedBox(width: AppSpacing.xs),
+                          SizedBox(width: AppSpacing.xs),
                           Text(
                             'Ví dụ câu:',
-                            style: theme.textTheme.labelMedium?.copyWith(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: AppColors.limeGreen,
+                              fontSize: 12,
+                              color: AppColors.primaryBlueDark,
                             ),
                           ),
                         ],
@@ -367,6 +374,7 @@ class _FlashcardCardState extends State<FlashcardCard>
                         showPinyin: true,
                         hanziStyle: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
+                          color: AppColors.primaryText,
                           fontFamilyFallback: const ['Noto Sans SC', 'Heiti SC'],
                         ),
                       ),
@@ -376,7 +384,7 @@ class _FlashcardCardState extends State<FlashcardCard>
                         Text(
                           card.exampleVi!,
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
+                            color: AppColors.secondaryText,
                             fontStyle: FontStyle.italic,
                           ),
                         ),
@@ -392,8 +400,11 @@ class _FlashcardCardState extends State<FlashcardCard>
               Center(
                 child: TextButton.icon(
                   onPressed: widget.onFlip,
-                  icon: const Icon(Icons.flip_rounded, size: AppDimensions.iconSm),
-                  label: const Text('Lật lại mặt trước'),
+                  icon: const Icon(Icons.flip_rounded, size: AppDimensions.iconSm, color: AppColors.primaryBlueDark),
+                  label: const Text(
+                    'Lật lại mặt trước',
+                    style: TextStyle(color: AppColors.primaryBlueDark),
+                  ),
                 ),
               ),
             ],

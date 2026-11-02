@@ -33,6 +33,7 @@ class FlashcardProgressHeader extends StatelessWidget {
               'Thẻ $currentStep / $totalCards',
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
+                color: AppColors.primaryText,
               ),
             ),
             Row(
@@ -48,13 +49,13 @@ class FlashcardProgressHeader extends StatelessWidget {
                       const Icon(
                         Icons.check_circle_rounded,
                         size: 14,
-                        color: AppColors.limeGreen,
+                        color: AppColors.success,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         'Đã lưu SQLite',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: AppColors.limeGreen,
+                          color: AppColors.success,
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                         ),
@@ -72,9 +73,9 @@ class FlashcardProgressHeader extends StatelessWidget {
           borderRadius: AppRadius.borderFull,
           child: LinearProgressIndicator(
             value: progress,
-            minHeight: 6,
-            backgroundColor: theme.colorScheme.surfaceContainerHighest,
-            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.limeGreen),
+            minHeight: 4,
+            backgroundColor: AppColors.primaryBlueLight,
+            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primaryBlueDark),
           ),
         ),
       ],

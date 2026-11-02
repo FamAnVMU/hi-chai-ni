@@ -77,24 +77,24 @@ class TrueFalseOrErrorWidget extends StatelessWidget {
   }) {
     final theme = Theme.of(context);
 
-    Color border = theme.colorScheme.outlineVariant;
-    Color bg = theme.colorScheme.surface;
-    Color textColor = theme.colorScheme.onSurface;
+    Color border = AppColors.border;
+    Color bg = AppColors.cardBackground;
+    Color textColor = AppColors.primaryText;
 
     if (isSubmitted) {
       if (isTarget) {
-        border = AppColors.limeGreen;
-        bg = AppColors.limeGreen.withAlpha(25);
-        textColor = AppColors.limeGreen;
+        border = AppColors.success;
+        bg = AppColors.successContainerLight;
+        textColor = AppColors.success;
       } else if (isSelected && !result!.isCorrect) {
-        border = AppColors.errorLight;
-        bg = AppColors.errorLight.withAlpha(25);
-        textColor = AppColors.errorLight;
+        border = AppColors.error;
+        bg = AppColors.errorContainerLight;
+        textColor = AppColors.error;
       }
     } else if (isSelected) {
-      border = AppColors.limeGreen;
-      bg = AppColors.limeGreen.withAlpha(20);
-      textColor = AppColors.limeGreen;
+      border = AppColors.primaryBlueDark;
+      bg = AppColors.primaryBlueLight;
+      textColor = AppColors.primaryBlueDark;
     }
 
     return InkWell(
@@ -149,20 +149,20 @@ class TrueFalseOrErrorWidget extends StatelessWidget {
             final isSelected = selectedErrorToken == token;
             final isTargetError = definition.errorToken == token;
 
-            Color chipBg = theme.colorScheme.surface;
-            Color chipBorder = theme.colorScheme.outlineVariant;
+            Color chipBg = AppColors.cardBackground;
+            Color chipBorder = AppColors.border;
 
             if (isSubmitted) {
               if (isTargetError) {
-                chipBg = AppColors.limeGreen.withAlpha(30);
-                chipBorder = AppColors.limeGreen;
+                chipBg = AppColors.successContainerLight;
+                chipBorder = AppColors.success;
               } else if (isSelected && !result!.isCorrect) {
-                chipBg = AppColors.errorLight.withAlpha(30);
-                chipBorder = AppColors.errorLight;
+                chipBg = AppColors.errorContainerLight;
+                chipBorder = AppColors.error;
               }
             } else if (isSelected) {
-              chipBg = Colors.orange.withAlpha(30);
-              chipBorder = Colors.orange;
+              chipBg = AppColors.primaryBlueLight;
+              chipBorder = AppColors.primaryBlueDark;
             }
 
             return ActionChip(

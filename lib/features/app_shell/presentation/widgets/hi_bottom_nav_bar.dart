@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/app_tab.dart';
 
-/// Custom Bottom Navigation Bar for HI Chinese featuring a prominent
-/// center AI Tutor action button and full Android gesture navigation support.
+/// Clean Modern Bottom Navigation Bar for HI Chinese: White & Light Blue minimal UI.
 class HiBottomNavBar extends StatelessWidget {
   final AppTab currentTab;
   final ValueChanged<AppTab> onTabSelected;
@@ -20,8 +19,8 @@ class HiBottomNavBar extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final bottomPadding = MediaQuery.paddingOf(context).bottom;
 
-    final barBgColor = isDark ? AppColors.darkForestSurface : Colors.white;
-    final borderColor = isDark ? AppColors.darkForestBorder : theme.colorScheme.outlineVariant;
+    final barBgColor = isDark ? AppColors.darkForestSurface : AppColors.cardBackground;
+    final borderColor = isDark ? AppColors.darkForestBorder : AppColors.border;
 
     return Container(
       decoration: BoxDecoration(
@@ -29,13 +28,12 @@ class HiBottomNavBar extends StatelessWidget {
         border: Border(
           top: BorderSide(color: borderColor, width: 1.0),
         ),
-        boxShadow: AppElevation.shadowLow(theme.brightness),
       ),
       child: SafeArea(
         top: false,
         bottom: true,
         child: Container(
-          height: 64.0 + (bottomPadding > 0 ? 0 : 4.0),
+          height: 60.0 + (bottomPadding > 0 ? 0 : 4.0),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -57,7 +55,7 @@ class HiBottomNavBar extends StatelessWidget {
                 isDark: isDark,
               ),
 
-              // 2: AI TUTOR (NÚT TRUNG TÂM NỔI BẬT)
+              // 2: AI TUTOR (NÚT TRUNG TÂM GỌN GÀNG, HIỆN ĐẠI)
               _buildCenterAiTutorButton(
                 context,
                 isSelected: currentTab == AppTab.aiTutor,
@@ -94,8 +92,8 @@ class HiBottomNavBar extends StatelessWidget {
     required bool isDark,
   }) {
     final theme = Theme.of(context);
-    final activeColor = isDark ? AppColors.limeGreen : theme.colorScheme.primary;
-    final inactiveColor = isDark ? Colors.white60 : theme.colorScheme.onSurfaceVariant;
+    final activeColor = isDark ? AppColors.accentBlue : AppColors.primaryBlueDark;
+    final inactiveColor = isDark ? AppColors.mutedText : AppColors.secondaryText;
 
     final color = isSelected ? activeColor : inactiveColor;
 
@@ -110,6 +108,8 @@ class HiBottomNavBar extends StatelessWidget {
             key: ValueKey('tab_${tab.name}'),
             onTap: () => onTabSelected(tab),
             borderRadius: AppRadius.borderMd,
+            splashColor: (isDark ? AppColors.accentBlue : AppColors.primaryBlue).withAlpha(15),
+            highlightColor: Colors.transparent,
             child: ConstrainedBox(
               constraints: const BoxConstraints(
                 minHeight: AppDimensions.minTouchTarget,
@@ -123,13 +123,13 @@ class HiBottomNavBar extends StatelessWidget {
                     size: AppDimensions.iconMd,
                     color: color,
                   ),
-                  const SizedBox(height: AppSpacing.xxs),
+                  const SizedBox(height: 3.0),
                   Text(
                     tab.label,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: color,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                      fontSize: 10.5,
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      fontSize: 11.0,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -143,7 +143,7 @@ class HiBottomNavBar extends StatelessWidget {
     );
   }
 
-  /// Prominent Center AI Tutor Button
+  /// Center AI Tutor Button: Clean, modern pill design
   Widget _buildCenterAiTutorButton(
     BuildContext context, {
     required bool isSelected,
@@ -151,18 +151,17 @@ class HiBottomNavBar extends StatelessWidget {
   }) {
     final theme = Theme.of(context);
 
-    // Selected state colors
     final containerColor = isSelected
-        ? AppColors.limeGreen
-        : (isDark ? AppColors.darkForestCard : theme.colorScheme.primaryContainer);
+        ? (isDark ? AppColors.accentBlue : AppColors.primaryBlueDark)
+        : (isDark ? AppColors.darkForestCard : AppColors.primaryBlueLight);
 
     final iconColor = isSelected
-        ? AppColors.darkForestBg // High-contrast dark forest on lime green
-        : (isDark ? AppColors.limeGreen : theme.colorScheme.onPrimaryContainer);
+        ? Colors.white
+        : (isDark ? AppColors.accentBlue : AppColors.primaryBlueDark);
 
     final textColor = isSelected
-        ? (isDark ? AppColors.limeGreen : theme.colorScheme.primary)
-        : (isDark ? Colors.white70 : theme.colorScheme.onSurfaceVariant);
+        ? (isDark ? AppColors.accentBlue : AppColors.primaryBlueDark)
+        : (isDark ? AppColors.mutedText : AppColors.secondaryText);
 
     return Semantics(
       label: AppTab.aiTutor.semanticLabel,
@@ -175,7 +174,7 @@ class HiBottomNavBar extends StatelessWidget {
           onTap: () => onTabSelected(AppTab.aiTutor),
           borderRadius: AppRadius.borderFull,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.xxs),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: 2.0),
             constraints: const BoxConstraints(
               minWidth: 58.0,
               minHeight: AppDimensions.minTouchTarget,
@@ -184,31 +183,24 @@ class HiBottomNavBar extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  height: 36.0,
-                  width: 52.0,
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  curve: Curves.easeOut,
+                  height: 34.0,
+                  width: 50.0,
                   decoration: BoxDecoration(
                     color: containerColor,
                     borderRadius: AppRadius.borderFull,
                     border: Border.all(
                       color: isSelected
-                          ? AppColors.limeGreen
-                          : (isDark ? AppColors.darkForestBorder : theme.colorScheme.outlineVariant),
-                      width: 1.5,
+                          ? (isDark ? AppColors.accentBlue : AppColors.primaryBlueDark)
+                          : (isDark ? AppColors.darkForestBorder : AppColors.border),
+                      width: 1.0,
                     ),
-                    boxShadow: isSelected
-                        ? [
-                            BoxShadow(
-                              color: AppColors.limeGreen.withAlpha(80),
-                              blurRadius: 8,
-                              spreadRadius: 1,
-                            ),
-                          ]
-                        : null,
                   ),
                   child: Icon(
                     Icons.auto_awesome_rounded,
-                    size: AppDimensions.iconSm + 2,
+                    size: AppDimensions.iconSm + 1,
                     color: iconColor,
                   ),
                 ),
@@ -217,7 +209,7 @@ class HiBottomNavBar extends StatelessWidget {
                   AppTab.aiTutor.label,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: textColor,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                     fontSize: 10.5,
                   ),
                   maxLines: 1,

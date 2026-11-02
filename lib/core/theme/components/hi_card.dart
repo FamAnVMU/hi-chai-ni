@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import '../tokens/app_colors.dart';
 import '../tokens/app_dimensions.dart';
 import '../tokens/app_radius.dart';
 import '../tokens/app_spacing.dart';
 
-/// Semantic Card component for HI Chinese.
+/// Clean Modern Card component for HI Chinese: White background with crisp border.
 ///
-/// Automatically adopts surface styling:
-/// - Light: white with subtle light outline
-/// - Dark: #1A2418 (darkForestSurface) with #2E3D2B border
+/// Features:
+/// - Light: Clean pure white (#FFFFFF) with subtle outline (#E3EBF4).
+/// - Dark: Deep navy slate (#1E293B) with subtle border (#334155).
+/// - Elevation level 0 to keep UI minimal and un-cluttered.
 class HiCard extends StatelessWidget {
   final Widget child;
   final VoidCallback? onTap;
@@ -29,30 +31,42 @@ class HiCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final cardTheme = theme.cardTheme;
+    final isDark = theme.brightness == Brightness.dark;
     final r = borderRadius ?? AppRadius.borderLg;
+
+    final defaultBorderColor = isDark ? AppColors.darkForestBorder : AppColors.border;
+    final defaultBgColor = isDark ? AppColors.darkForestSurface : AppColors.cardBackground;
 
     final shape = RoundedRectangleBorder(
       borderRadius: r,
       side: BorderSide(
-        color: borderColor ?? theme.colorScheme.outlineVariant,
+        color: borderColor ?? defaultBorderColor,
         width: AppDimensions.cardBorderWidth,
       ),
     );
 
-    return Card(
-      elevation: cardTheme.elevation ?? 0,
-      color: backgroundColor ?? cardTheme.color,
+    final cardWidget = Material(
+      color: backgroundColor ?? defaultBgColor,
       shape: shape,
       clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: r,
-        child: Padding(
-          padding: padding,
-          child: child,
-        ),
-      ),
+      elevation: 0,
+      child: onTap != null
+          ? InkWell(
+              onTap: onTap,
+              borderRadius: r,
+              splashColor: (isDark ? AppColors.accentBlue : AppColors.primaryBlue).withAlpha(15),
+              highlightColor: (isDark ? AppColors.accentBlue : AppColors.primaryBlue).withAlpha(8),
+              child: Padding(
+                padding: padding,
+                child: child,
+              ),
+            )
+          : Padding(
+              padding: padding,
+              child: child,
+            ),
     );
+
+    return cardWidget;
   }
 }

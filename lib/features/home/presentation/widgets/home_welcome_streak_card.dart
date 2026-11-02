@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/models/home_dashboard_data.dart';
 
-/// Card displaying the greeting, daily goal progress, and real active study streak.
+/// Clean Modern Card displaying learner greeting, daily goal progress, and active study streak.
 class HomeWelcomeStreakCard extends StatelessWidget {
   final HomeDashboardData data;
 
@@ -36,9 +36,6 @@ class HomeWelcomeStreakCard extends StatelessWidget {
     }
 
     return HiCard(
-      backgroundColor: isDark
-          ? AppColors.darkForestCard
-          : theme.colorScheme.primaryContainer.withAlpha(120),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -49,15 +46,15 @@ class HomeWelcomeStreakCard extends StatelessWidget {
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
                   color: hasStreak
-                      ? Colors.orange.withAlpha(isDark ? 50 : 30)
-                      : theme.colorScheme.primary.withAlpha(isDark ? 50 : 30),
+                      ? (isDark ? const Color(0xFF422808) : AppColors.warningContainerLight)
+                      : (isDark ? AppColors.infoContainerDark : AppColors.primaryBlueLight),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   hasStreak
                       ? Icons.local_fire_department_rounded
                       : Icons.wb_sunny_rounded,
-                  color: hasStreak ? Colors.orange : AppColors.limeGreen,
+                  color: hasStreak ? AppColors.warning : (isDark ? AppColors.accentBlue : AppColors.primaryBlueDark),
                   size: AppDimensions.iconLg,
                 ),
               ),
@@ -69,7 +66,7 @@ class HomeWelcomeStreakCard extends StatelessWidget {
                     Text(
                       '${data.greeting}, ${data.learnerName}',
                       style: theme.textTheme.labelMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+                        color: AppColors.secondaryText,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -77,6 +74,7 @@ class HomeWelcomeStreakCard extends StatelessWidget {
                       streakTitle,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: AppColors.primaryText,
                       ),
                     ),
                   ],
@@ -88,7 +86,7 @@ class HomeWelcomeStreakCard extends StatelessWidget {
           Text(
             streakSubtitle,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+              color: AppColors.secondaryText,
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -101,6 +99,7 @@ class HomeWelcomeStreakCard extends StatelessWidget {
                   'Mục tiêu hôm nay: ${streak.todayItemsCompleted}/${data.dailyGoalWords} từ • ${(streak.todayDurationSeconds / 60).round()}/${data.dailyGoalMinutes} phút',
                   style: theme.textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.w600,
+                    color: AppColors.primaryText,
                   ),
                 ),
               ),

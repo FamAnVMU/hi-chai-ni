@@ -34,11 +34,29 @@ void main() {
 
   group('Design System Tokens & Contrast Tests', () {
     test('Palette constants conform to plan', () {
-      expect(AppColors.limeGreen, const Color(0xFFA3D635));
-      expect(AppColors.offWhite, const Color(0xFFF6FAF2));
-      expect(AppColors.darkForestBg, const Color(0xFF121811));
-      expect(AppColors.darkForestSurface, const Color(0xFF1A2418));
-      expect(AppColors.darkForestCard, const Color(0xFF243022));
+      expect(AppColors.primaryBlue, const Color(0xFF5B9BE6));
+      expect(AppColors.primaryBlueDark, const Color(0xFF3979C7));
+      expect(AppColors.primaryBlueLight, const Color(0xFFEAF3FF));
+      expect(AppColors.secondaryBlue, const Color(0xFFB9D7F5));
+      expect(AppColors.accentBlue, const Color(0xFF8CC4F2));
+
+      expect(AppColors.mainBackground, const Color(0xFFF7FAFE));
+      expect(AppColors.secondaryBackground, const Color(0xFFF0F6FC));
+      expect(AppColors.cardBackground, const Color(0xFFFFFFFF));
+      expect(AppColors.inputBackground, const Color(0xFFF5F8FC));
+
+      expect(AppColors.primaryText, const Color(0xFF1E293B));
+      expect(AppColors.secondaryText, const Color(0xFF64748B));
+      expect(AppColors.mutedText, const Color(0xFF94A3B8));
+      expect(AppColors.disabledText, const Color(0xFFB6C2D0));
+
+      expect(AppColors.border, const Color(0xFFE3EBF4));
+      expect(AppColors.divider, const Color(0xFFEDF2F7));
+
+      expect(AppColors.success, const Color(0xFF22A06B));
+      expect(AppColors.warning, const Color(0xFFE6A23C));
+      expect(AppColors.error, const Color(0xFFE05D66));
+      expect(AppColors.information, const Color(0xFF478DD4));
     });
 
     test('Spacing tokens adhere to standard 4/8pt grid', () {
@@ -109,17 +127,17 @@ void main() {
   });
 
   group('ThemeModeNotifier Tests', () {
-    test('Default mode is dark and toggles correctly', () {
+    test('Default mode is light and toggles correctly', () {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
-      expect(container.read(themeModeProvider), ThemeMode.dark);
-
-      container.read(themeModeProvider.notifier).toggleTheme();
       expect(container.read(themeModeProvider), ThemeMode.light);
 
       container.read(themeModeProvider.notifier).toggleTheme();
       expect(container.read(themeModeProvider), ThemeMode.dark);
+
+      container.read(themeModeProvider.notifier).toggleTheme();
+      expect(container.read(themeModeProvider), ThemeMode.light);
 
       container.read(themeModeProvider.notifier).setThemeMode(ThemeMode.system);
       expect(container.read(themeModeProvider), ThemeMode.system);
@@ -134,7 +152,7 @@ void main() {
       expect(light.useMaterial3, isTrue);
       expect(dark.useMaterial3, isTrue);
       expect(dark.scaffoldBackgroundColor, AppColors.darkForestBg);
-      expect(light.scaffoldBackgroundColor, AppColors.offWhite);
+      expect(light.scaffoldBackgroundColor, AppColors.mainBackground);
     });
   });
 

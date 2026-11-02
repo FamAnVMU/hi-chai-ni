@@ -55,20 +55,20 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
           children: [
             // Official HSK 1 Curriculum Banner Card
             HiCard(
-              backgroundColor: AppColors.limeGreen.withAlpha(25),
-              borderColor: AppColors.limeGreen.withAlpha(120),
+              backgroundColor: AppColors.primaryBlueLight,
+              borderColor: AppColors.secondaryBlue,
               child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
-                      color: AppColors.limeGreenDark,
+                      color: AppColors.primaryBlueDark,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
                       Icons.menu_book_rounded,
                       color: Colors.white,
-                      size: 32,
+                      size: 28,
                     ),
                   ),
                   const SizedBox(width: AppSpacing.md),
@@ -80,13 +80,15 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
                           'Giáo Trình HSK 1 Chuẩn',
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: AppColors.limeGreenDark,
+                            color: AppColors.primaryBlueDark,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           '15 bài học liên hoàn • 150 từ vựng • 45 ngữ pháp',
-                          style: theme.textTheme.bodySmall,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.secondaryText,
+                          ),
                         ),
                       ],
                     ),
@@ -131,144 +133,54 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            // Placement Test Banner Card
-            HiCard(
-              backgroundColor: theme.colorScheme.primaryContainer.withAlpha(80),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.auto_awesome_rounded,
-                    color: AppColors.limeGreen,
-                    size: AppDimensions.iconLg,
+            // Placement Test Card
+            _buildFeatureBanner(
+              context: context,
+              icon: Icons.auto_awesome_rounded,
+              title: 'Khảo sát năng lực đầu vào',
+              subtitle: 'Kiểm tra thích ứng 6 kỹ năng để chọn lớp HSK',
+              buttonText: 'Làm bài',
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const PlacementTestIntroScreen(),
                   ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Khảo sát năng lực đầu vào',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Kiểm tra thích ứng 6 kỹ năng để chọn lớp HSK',
-                          style: theme.textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  HiButton(
-                    text: 'Làm bài',
-                    size: HiButtonSize.sm,
-                    variant: HiButtonVariant.primary,
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const PlacementTestIntroScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
+                );
+              },
             ),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.sm),
 
-            // Adaptive Roadmap Banner Card
-            HiCard(
-              backgroundColor: AppColors.limeGreen.withAlpha(20),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.map_rounded,
-                    color: AppColors.limeGreen,
-                    size: AppDimensions.iconLg,
+            // Adaptive Roadmap Card
+            _buildFeatureBanner(
+              context: context,
+              icon: Icons.map_rounded,
+              title: 'Lộ trình thích ứng cá nhân',
+              subtitle: 'Đề xuất thông minh theo điểm thực tế & tiên quyết',
+              buttonText: 'Xem lộ trình',
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const RoadmapScreen(),
                   ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Lộ trình thích ứng cá nhân',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Đề xuất thông minh theo điểm thực tế & tiên quyết',
-                          style: theme.textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  HiButton(
-                    text: 'Xem lộ trình',
-                    size: HiButtonSize.sm,
-                    variant: HiButtonVariant.primary,
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const RoadmapScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
+                );
+              },
             ),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.sm),
 
-            // Hanzi Writing Practice Banner Card
-            HiCard(
-              backgroundColor: theme.colorScheme.surfaceContainerHighest.withAlpha(90),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.brush_rounded,
-                    color: AppColors.limeGreen,
-                    size: AppDimensions.iconLg,
+            // Hanzi Writing Practice Card
+            _buildFeatureBanner(
+              context: context,
+              icon: Icons.brush_rounded,
+              title: 'Luyện viết chữ Hán',
+              subtitle: 'Tập vẽ nét bút thuận trên ô Mizige (米字格)',
+              buttonText: 'Luyện viết',
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const HanziWritingScreen(),
                   ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Luyện viết chữ Hán',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Tập vẽ nét bút thuận trên ô Mizige (米字格)',
-                          style: theme.textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  HiButton(
-                    text: 'Luyện viết',
-                    size: HiButtonSize.sm,
-                    variant: HiButtonVariant.secondary,
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const HanziWritingScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
+                );
+              },
             ),
             const SizedBox(height: AppSpacing.sm),
 
@@ -276,84 +188,36 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
             Row(
               children: [
                 Expanded(
-                  child: HiCard(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(
-                          Icons.record_voice_over_rounded,
-                          color: AppColors.limeGreen,
-                          size: 28,
+                  child: _buildCompactActionCard(
+                    context: context,
+                    icon: Icons.record_voice_over_rounded,
+                    title: 'Luyện phát âm',
+                    subtitle: 'Âm vị & Thanh điệu',
+                    buttonText: 'Luyện âm',
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const PronunciationLabScreen(),
                         ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          'Luyện phát âm',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'Âm vị & Thanh điệu',
-                          style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        HiButton(
-                          text: 'Luyện âm',
-                          size: HiButtonSize.sm,
-                          variant: HiButtonVariant.secondary,
-                          isFullWidth: true,
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const PronunciationLabScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                 ),
-                const SizedBox(width: AppSpacing.md),
+                const SizedBox(width: AppSpacing.sm),
                 Expanded(
-                  child: HiCard(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(
-                          Icons.speed_rounded,
-                          color: Colors.blueAccent,
-                          size: 28,
+                  child: _buildCompactActionCard(
+                    context: context,
+                    icon: Icons.speed_rounded,
+                    title: 'Shadowing',
+                    subtitle: 'Nói đuổi & Nhịp độ',
+                    buttonText: 'Luyện nói',
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ShadowingScreen(),
                         ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          'Shadowing',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'Nói đuổi & Nhịp độ',
-                          style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        HiButton(
-                          text: 'Luyện nói',
-                          size: HiButtonSize.sm,
-                          variant: HiButtonVariant.secondary,
-                          isFullWidth: true,
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const ShadowingScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -364,236 +228,99 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
             Row(
               children: [
                 Expanded(
-                  child: HiCard(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(
-                          Icons.menu_book_rounded,
-                          color: AppColors.limeGreen,
-                          size: 28,
+                  child: _buildCompactActionCard(
+                    context: context,
+                    icon: Icons.menu_book_rounded,
+                    title: 'Luyện đọc hiểu',
+                    subtitle: 'Tương tác & Tra từ',
+                    buttonText: 'Đọc hiểu',
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ReadingPassageListScreen(),
                         ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          'Luyện đọc hiểu',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'Tương tác & Tra từ',
-                          style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        HiButton(
-                          text: 'Đọc hiểu',
-                          size: HiButtonSize.sm,
-                          variant: HiButtonVariant.secondary,
-                          isFullWidth: true,
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const ReadingPassageListScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                 ),
-                const SizedBox(width: AppSpacing.md),
+                const SizedBox(width: AppSpacing.sm),
                 Expanded(
-                  child: HiCard(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(
-                          Icons.search_rounded,
-                          color: Colors.amber,
-                          size: 28,
+                  child: _buildCompactActionCard(
+                    context: context,
+                    icon: Icons.search_rounded,
+                    title: 'Từ điển',
+                    subtitle: 'Tra cứu offline',
+                    buttonText: 'Tra từ',
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const DictionaryScreen(),
                         ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          'Từ điển',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'Tra cứu offline',
-                          style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        HiButton(
-                          text: 'Tra từ',
-                          size: HiButtonSize.sm,
-                          variant: HiButtonVariant.secondary,
-                          isFullWidth: true,
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const DictionaryScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.sm),
 
             // Grammar Module Banner Card
-            HiCard(
-              backgroundColor: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.auto_stories_rounded,
-                    color: AppColors.limeGreen,
-                    size: AppDimensions.iconLg,
+            _buildFeatureBanner(
+              context: context,
+              icon: Icons.auto_stories_rounded,
+              title: 'Ngữ pháp tiếng Hán',
+              subtitle: 'Cấu trúc câu, ví dụ đối chiếu L1 & bài tập áp dụng',
+              buttonText: 'Học ngữ pháp',
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const GrammarListScreen(),
                   ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Ngữ pháp tiếng Hán',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Cấu trúc câu, ví dụ đối chiếu L1 & bài tập áp dụng',
-                          style: theme.textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  HiButton(
-                    text: 'Học ngữ pháp',
-                    size: HiButtonSize.sm,
-                    variant: HiButtonVariant.primary,
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const GrammarListScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
+                );
+              },
             ),
             const SizedBox(height: AppSpacing.sm),
 
             // Practice Engine Banner Card
-            HiCard(
-              backgroundColor: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.quiz_rounded,
-                    color: Colors.deepPurpleAccent,
-                    size: AppDimensions.iconLg,
+            _buildFeatureBanner(
+              context: context,
+              icon: Icons.quiz_rounded,
+              title: 'Luyện tập tương tác (Practice Engine)',
+              subtitle: '7 dạng bài tập chuẩn mực: trắc nghiệm, ghép cặp, điền từ...',
+              buttonText: 'Luyện tập',
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const PracticeSessionScreen(),
                   ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Luyện tập tương tác (Practice Engine)',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '7 dạng bài tập chuẩn mực: trắc nghiệm, ghép cặp, điền từ...',
-                          style: theme.textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  HiButton(
-                    text: 'Luyện tập',
-                    size: HiButtonSize.sm,
-                    variant: HiButtonVariant.primary,
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const PracticeSessionScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
+                );
+              },
             ),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.sm),
 
             // Listening Comprehension Banner Card
-            HiCard(
-              backgroundColor: AppColors.limeGreen.withAlpha(20),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.headphones_rounded,
-                    color: AppColors.limeGreen,
-                    size: AppDimensions.iconLg,
+            _buildFeatureBanner(
+              context: context,
+              icon: Icons.headphones_rounded,
+              title: 'Luyện nghe hiểu hội thoại',
+              subtitle: 'Hội thoại chuẩn người bản xứ, tùy chỉnh tốc độ và câu hỏi hiểu',
+              buttonText: 'Nghe ngay',
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const ListeningScreen(),
                   ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Luyện nghe hiểu hội thoại',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Hội thoại chuẩn người bản xứ, tùy chỉnh tốc độ và câu hỏi hiểu',
-                          style: theme.textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  HiButton(
-                    text: 'Nghe ngay',
-                    size: HiButtonSize.sm,
-                    variant: HiButtonVariant.primary,
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const ListeningScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
+                );
+              },
             ),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.xl),
 
             // Unit 1
             Text(
               'Chương 1: Khởi Đầu & Phát Âm Cơ Bản',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
+                color: AppColors.primaryText,
               ),
             ),
             const SizedBox(height: AppSpacing.md),
@@ -633,6 +360,7 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
               'Chương 2: Đời Sống Hàng Ngày',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
+                color: AppColors.primaryText,
               ),
             ),
             const SizedBox(height: AppSpacing.md),
@@ -652,6 +380,124 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
     );
   }
 
+  Widget _buildFeatureBanner({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required String buttonText,
+    required VoidCallback onPressed,
+  }) {
+    final theme = Theme.of(context);
+
+    return HiCard(
+      backgroundColor: AppColors.cardBackground,
+      borderColor: AppColors.border,
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            decoration: BoxDecoration(
+              color: AppColors.primaryBlueLight,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              icon,
+              color: AppColors.primaryBlueDark,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryText,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.secondaryText,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppSpacing.xs),
+          HiButton(
+            text: buttonText,
+            size: HiButtonSize.sm,
+            variant: HiButtonVariant.secondary,
+            onPressed: onPressed,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompactActionCard({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required String buttonText,
+    required VoidCallback onPressed,
+  }) {
+    final theme = Theme.of(context);
+
+    return HiCard(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      backgroundColor: AppColors.cardBackground,
+      borderColor: AppColors.border,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: AppColors.primaryBlueLight,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              color: AppColors.primaryBlueDark,
+              size: 22,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            title,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: AppColors.primaryText,
+            ),
+          ),
+          Text(
+            subtitle,
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontSize: 11,
+              color: AppColors.secondaryText,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          HiButton(
+            text: buttonText,
+            size: HiButtonSize.sm,
+            variant: HiButtonVariant.secondary,
+            isFullWidth: true,
+            onPressed: onPressed,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildLessonCard({
     required int unitNumber,
     required String title,
@@ -664,6 +510,8 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
     final theme = Theme.of(context);
 
     return HiCard(
+      backgroundColor: AppColors.cardBackground,
+      borderColor: AppColors.border,
       onTap: () {
         HiSnackBar.showInfo(context, 'Mở bài học $unitNumber: $title');
       },
@@ -676,7 +524,7 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
               Text(
                 'Bài $unitNumber',
                 style: theme.textTheme.labelMedium?.copyWith(
-                  color: theme.colorScheme.primary,
+                  color: AppColors.primaryBlueDark,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -691,6 +539,7 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
             title,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.bold,
+              color: AppColors.primaryText,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -706,12 +555,15 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
             children: [
               Text(
                 '$vocabCount từ vựng',
-                style: theme.textTheme.bodySmall,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppColors.mutedText,
+                ),
               ),
               Text(
                 '${(progress * 100).toInt()}%',
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: AppColors.primaryBlueDark,
                 ),
               ),
             ],

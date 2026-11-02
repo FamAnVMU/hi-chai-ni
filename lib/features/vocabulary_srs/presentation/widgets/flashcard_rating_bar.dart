@@ -29,7 +29,7 @@ class FlashcardRatingBar extends StatelessWidget {
               context: context,
               rating: SrsRating.again,
               label: 'Quên',
-              color: const Color(0xFFEF4444), // Crimson / Red
+              color: AppColors.error,
               isNarrow: isNarrow,
             ),
             const SizedBox(width: AppSpacing.xs),
@@ -37,7 +37,7 @@ class FlashcardRatingBar extends StatelessWidget {
               context: context,
               rating: SrsRating.hard,
               label: 'Khó',
-              color: const Color(0xFFF59E0B), // Amber
+              color: AppColors.warning,
               isNarrow: isNarrow,
             ),
             const SizedBox(width: AppSpacing.xs),
@@ -45,7 +45,7 @@ class FlashcardRatingBar extends StatelessWidget {
               context: context,
               rating: SrsRating.good,
               label: 'Nhớ',
-              color: AppColors.limeGreen, // Lime Green
+              color: AppColors.primaryBlueDark,
               isNarrow: isNarrow,
             ),
             const SizedBox(width: AppSpacing.xs),
@@ -53,7 +53,7 @@ class FlashcardRatingBar extends StatelessWidget {
               context: context,
               rating: SrsRating.easy,
               label: 'Dễ',
-              color: const Color(0xFF10B981), // Emerald
+              color: AppColors.success,
               isNarrow: isNarrow,
             ),
           ],
@@ -79,7 +79,7 @@ class FlashcardRatingBar extends StatelessWidget {
         button: true,
         enabled: !isProcessing,
         child: Material(
-          color: color.withAlpha(25),
+          color: color.withAlpha(20),
           shape: RoundedRectangleBorder(
             borderRadius: AppRadius.borderMd,
             side: BorderSide(
@@ -103,8 +103,8 @@ class FlashcardRatingBar extends StatelessWidget {
                     style: theme.textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: isProcessing
-                          ? theme.colorScheme.onSurface.withAlpha(120)
-                          : theme.colorScheme.onSurface,
+                          ? AppColors.disabledText
+                          : AppColors.primaryText,
                     ),
                   ),
                   const SizedBox(height: 2),
