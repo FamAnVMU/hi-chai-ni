@@ -11,6 +11,7 @@ import '../../../roadmap/roadmap.dart';
 import '../../../grammar/grammar.dart';
 import '../../../practice/practice.dart';
 import '../../../listening/listening.dart';
+import '../../../content_packs/presentation/screens/content_pack_manager_screen.dart';
 
 /// Tab 1: Learning Screen featuring structured lessons and HSK roadmap.
 class LearningScreen extends StatefulWidget {
@@ -34,6 +35,19 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
     return Scaffold(
       appBar: AppBar(
         title: const Text('Lộ Trình Học Tập'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.download_for_offline_outlined),
+            tooltip: 'Kho học liệu HSK',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const ContentPackManagerScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: ListView(
