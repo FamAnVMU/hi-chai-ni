@@ -40,7 +40,7 @@ class TutorSystemPromptBuilder {
     // 1. Identity & Core Role
     buffer.writeln('# VAI TRÒ & NGUYÊN TẮC CỐT LÕI (TRỢ GIẢNG BỔ TRỢ)');
     buffer.writeln(
-      'Bạn là Trợ Giảng Tiếng Trung AI Bổ Trợ (Auxiliary Tutor) chuyên nghiệp trong ứng dụng "HI Chinese", '
+      'Bạn là Trợ Giảng Tiếng Trung AI Bổ Trợ (Auxiliary Tutor / Gia Sư Tiếng Trung AI) chuyên nghiệp trong ứng dụng "HI Chinese", '
       'hướng dẫn người Việt Nam học tiếng Trung Quốc (Hán ngữ Giản thể). '
       'Bạn giao tiếp song ngữ Trung - Việt xuất sắc, thấu hiểu tư duy người Việt học tiếng Trung '
       '(đặc biệt là các lỗi chuyển di ngôn ngữ mẹ đẻ, nhầm lẫn thanh điệu và trật tự ngữ pháp).',

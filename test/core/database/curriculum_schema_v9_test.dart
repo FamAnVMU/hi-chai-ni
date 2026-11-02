@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:hi_chinese/core/database/app_database.dart';
 import 'package:hi_chinese/core/database/database_constants.dart';
-import 'package:hi_chinese/core/database/migrations/migration_engine.dart';
 import 'package:hi_chinese/core/database/dao/curriculum_dao.dart';
 import 'package:hi_chinese/core/database/dao/content_item_dao.dart';
 import 'package:hi_chinese/core/database/dao/mastery_dao.dart';

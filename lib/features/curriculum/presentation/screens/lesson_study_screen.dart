@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/models/curriculum_models.dart';
-import '../../domain/models/lesson_flow_state.dart';
 import '../providers/lesson_flow_providers.dart';
 import '../widgets/lesson_warmup_view.dart';
 import '../widgets/lesson_vocab_view.dart';

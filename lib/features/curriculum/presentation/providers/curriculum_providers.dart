@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/database/app_database.dart';
 import '../../data/curriculum_repository.dart';
 import '../../domain/engine/prerequisite_engine.dart';
-import '../../domain/engine/mastery_engine.dart';
 import '../../domain/models/curriculum_models.dart';
 import '../../domain/models/content_item_models.dart';
 

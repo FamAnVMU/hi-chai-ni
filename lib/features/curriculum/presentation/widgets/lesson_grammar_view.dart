@@ -36,7 +36,7 @@ class LessonGrammarView extends StatelessWidget {
     return ListView.separated(
       padding: AppSpacing.screenPadding,
       itemCount: points.length,
-      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
+      separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.md),
       itemBuilder: (context, index) {
                     final p = points[index];
                     final title = (p['title'] ?? '') as String;

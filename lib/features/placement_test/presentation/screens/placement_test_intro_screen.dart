@@ -8,7 +8,12 @@ import 'placement_test_result_screen.dart';
 /// Screen introducing the Computerized Adaptive Placement Test (CAT),
 /// showing past results if available, and allowing resume of in-progress test.
 class PlacementTestIntroScreen extends ConsumerWidget {
-  const PlacementTestIntroScreen({super.key});
+  final void Function([int? hskLevel])? onTestComplete;
+
+  const PlacementTestIntroScreen({
+    super.key,
+    this.onTestComplete,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

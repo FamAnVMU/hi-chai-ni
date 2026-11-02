@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/database/app_database.dart';
-import '../../../../core/database/dao/curriculum_dao.dart';
-import '../../../../core/database/dao/user_saved_words_dao.dart';
 import '../../../../core/database/database_constants.dart';
 import '../../../placement_test/presentation/screens/placement_test_intro_screen.dart';
 import 'onboarding_api_key_screen.dart';
@@ -22,10 +20,8 @@ class OnboardingFlowScreen extends ConsumerStatefulWidget {
 
 class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
   int _currentStepIndex = 0;
-  String? _savedApiKey;
 
   void _onApiKeySaved(String apiKey) async {
-    _savedApiKey = apiKey;
     final db = AppDatabase.instance.database;
     final nowIso = DateTime.now().toUtc().toIso8601String();
     await db.insert(
@@ -43,7 +39,7 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
     setState(() => _currentStepIndex = 1);
   }
 
-  void _onPlacementTestFinished() {
+  void _onPlacementTestFinished([int? hskLevel]) {
     setState(() => _currentStepIndex = 2);
   }
 

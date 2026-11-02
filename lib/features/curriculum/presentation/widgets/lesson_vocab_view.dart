@@ -33,7 +33,7 @@ class LessonVocabView extends StatelessWidget {
     return ListView.separated(
       padding: AppSpacing.screenPadding,
       itemCount: words.length,
-      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
+      separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.md),
       itemBuilder: (context, index) {
         final w = words[index];
         final hanzi = (w['hanzi'] ?? w['simplified'] ?? '') as String;

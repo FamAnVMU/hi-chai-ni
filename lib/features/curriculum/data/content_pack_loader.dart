@@ -190,7 +190,7 @@ class ContentPackLoader {
       }
 
       if (_db is Database) {
-        await (_db as Database).transaction((txn) async {
+        await _db.transaction((txn) async {
           await runInserts(txn);
         });
       } else {

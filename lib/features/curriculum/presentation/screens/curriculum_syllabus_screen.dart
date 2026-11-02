@@ -20,8 +20,6 @@ class CurriculumSyllabusScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-
     // If units provided via constructor (e.g. in tests)
     if (units != null) {
       return _buildSyllabusContent(context, ref, units!);

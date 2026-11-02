@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:hi_chinese/core/database/app_database.dart';
-import 'package:hi_chinese/features/curriculum/domain/models/content_pack_models.dart';
-import 'package:hi_chinese/features/curriculum/domain/models/curriculum_models.dart';
 import 'package:hi_chinese/features/curriculum/data/content_pack_loader.dart';
 import 'package:hi_chinese/features/curriculum/data/curriculum_repository.dart';
 

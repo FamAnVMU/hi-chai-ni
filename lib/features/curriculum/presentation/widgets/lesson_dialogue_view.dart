@@ -34,7 +34,7 @@ class LessonDialogueView extends StatelessWidget {
     return ListView.separated(
       padding: AppSpacing.screenPadding,
       itemCount: lines.length,
-      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
+      separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.md),
       itemBuilder: (context, index) {
                     final item = lines[index];
                     final speaker = (item['speaker'] ?? 'A') as String;
