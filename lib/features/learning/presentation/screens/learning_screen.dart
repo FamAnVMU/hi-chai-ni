@@ -1,3 +1,4 @@
+import '../../../curriculum/presentation/screens/curriculum_syllabus_screen.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../hanzi_writing/hanzi_writing.dart';
@@ -38,6 +39,62 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
         child: ListView(
           padding: AppSpacing.screenPadding,
           children: [
+            // Official HSK 1 Curriculum Banner Card
+            HiCard(
+              backgroundColor: AppColors.limeGreen.withAlpha(25),
+              borderColor: AppColors.limeGreen.withAlpha(120),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: AppColors.limeGreenDark,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.menu_book_rounded,
+                      color: Colors.white,
+                      size: 32,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Giáo Trình HSK 1 Chuẩn',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.limeGreenDark,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '15 bài học liên hoàn • 150 từ vựng • 45 ngữ pháp',
+                          style: theme.textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  HiButton(
+                    text: 'Học ngay',
+                    size: HiButtonSize.sm,
+                    variant: HiButtonVariant.primary,
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const CurriculumSyllabusScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+
             // Level Selector Chips
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,

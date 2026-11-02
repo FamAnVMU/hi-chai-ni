@@ -39,6 +39,7 @@ class CurriculumUnit {
   final String? descriptionVi;
   final String? iconName;
   final bool isLocked;
+  final List<CurriculumLesson> lessons;
 
   const CurriculumUnit({
     required this.id,
@@ -49,9 +50,10 @@ class CurriculumUnit {
     this.descriptionVi,
     this.iconName,
     this.isLocked = true,
+    this.lessons = const [],
   });
 
-  factory CurriculumUnit.fromMap(Map<String, dynamic> map) {
+  factory CurriculumUnit.fromMap(Map<String, dynamic> map, {List<CurriculumLesson> lessons = const []}) {
     return CurriculumUnit(
       id: map['id'] as String,
       curriculumId: map['curriculum_id'] as String,
@@ -61,6 +63,7 @@ class CurriculumUnit {
       descriptionVi: map['description_vi'] as String?,
       iconName: map['icon_name'] as String?,
       isLocked: map['is_locked'] == 1 || map['is_locked'] == true,
+      lessons: lessons,
     );
   }
 }
@@ -168,6 +171,7 @@ class LessonSegment {
   final String segmentType; // 'warmup', 'vocabulary', 'grammar', 'dialogue', 'practice', 'mastery_check'
   final String title;
   final String? contentRefId;
+  final Map<String, dynamic>? contentPayload;
 
   const LessonSegment({
     required this.id,
@@ -176,9 +180,10 @@ class LessonSegment {
     required this.segmentType,
     required this.title,
     this.contentRefId,
+    this.contentPayload,
   });
 
-  factory LessonSegment.fromMap(Map<String, dynamic> map) {
+  factory LessonSegment.fromMap(Map<String, dynamic> map, {Map<String, dynamic>? contentPayload}) {
     return LessonSegment(
       id: map['id'] as String,
       lessonId: map['lesson_id'] as String,
@@ -186,6 +191,7 @@ class LessonSegment {
       segmentType: map['segment_type'] as String,
       title: map['title'] as String,
       contentRefId: map['content_ref_id'] as String?,
+      contentPayload: contentPayload,
     );
   }
 }

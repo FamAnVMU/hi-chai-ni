@@ -1,3 +1,4 @@
+import '../../../curriculum/presentation/screens/curriculum_syllabus_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
@@ -129,9 +130,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   HomeRoadmapCard(
                     roadmap: data.roadmap,
                     onContinueLesson: () {
-                      ref
-                          .read(selectedTabProvider.notifier)
-                          .selectTab(AppTab.learning);
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const CurriculumSyllabusScreen(),
+                        ),
+                      );
                     },
                   ),
                   const SizedBox(height: AppSpacing.lg),
