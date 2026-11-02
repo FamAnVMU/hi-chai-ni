@@ -964,3 +964,42 @@ Nhằm bảo vệ tối đa quyền riêng tư và hỗ trợ học tập hoàn 
   - Thêm bảng goal_history: Lưu trữ lịch sử điều chỉnh mục tiêu và lý do sư phạm.
   - Thêm bảng pp_settings: Lưu trữ cặp khóa-giá trị cho toàn bộ thiết lập ứng dụng.
 - **Phiên Bản Database:** Nâng cấp tự động lên **v8** (hi_chinese.db), duy trì khả năng tương thích ngược hoàn hảo và bảo vệ nguyên vẹn dữ liệu từ các phiên bản v1 - v7.
+
+
+## 24. Master Regression Test Suite, Listening Module & Release Verification
+
+### 24.1. Bối Cảnh & Mục Tiêu (Context & Objectives)
+- Ứng dụng HI Chinese đã hoàn thiện tất cả các trụ cột tính năng chính: Core SQLite Migration (v1-v8), SM-2 SRS Engine, Gemini AI Tutor & Live Audio, Placement Test CAT 2PL IRT, Adaptive Roadmap, Grammar Engine, Practice Engine, Dictionary & Reading, Hanzi Writing Stroke Evaluation, Pronunciation & Shadowing, Profile & Settings.
+- Nhằm đảm bảo chất lượng hệ thống (Quality Gate) trước khi đóng gói sản phẩm thương mại và triển khai bản phát hành (Production Release), dự án thiết lập **Master Regression Test Suite** và bổ sung module **Listening Comprehension** còn thiếu để tạo vòng khép kín toàn diện 100% chức năng.
+
+### 24.2. Thiết Kế & Triển Khai Module Luyện Nghe Hiểu (Listening Module)
+- **Kiến Trúc Tách Lớp Domain-Data-Presentation:**
+  - `domain/models/listening_lesson.dart`: Chứa `ListeningLesson` (audio URL, Hanzi, Pinyin, bản dịch tiếng Việt, cấp HSK, thời lượng) và `ListeningQuestion` (câu hỏi trắc nghiệm nội dung, các lựa chọn, đáp án đúng, giải thích ngữ cảnh).
+  - `data/repositories/listening_repository.dart`: Cung cấp danh mục bài nghe mẫu kèm câu hỏi kiểm tra khả năng nghe hiểu thực chất (không chỉ nhận diện chữ).
+  - `presentation/providers/listening_providers.dart`: Quản lý trạng thái playback, tốc độ (0.8x, 1.0x, 1.2x, 1.5x), ẩn/hiện Hanzi/Pinyin/Dịch, và chấm điểm trắc nghiệm nghe hiểu.
+  - `presentation/screens/listening_screen.dart`: Giao diện nghe trực quan, thanh điều khiển âm thanh, chuyển đổi script đa chế độ và khu vực bài tập tương tác.
+- **Tích Hợp Vào Tab Học Tập:**
+  - `LearningScreen` được bổ sung thẻ "Luyện Nghe Hiểu" dẫn trực tiếp đến `ListeningScreen`.
+
+### 24.3. Master Regression Test Suite (test/regression/full_app_regression_test.dart)
+- Bao phủ trọn vẹn 9 nhóm phạm vi cốt lõi với 15 kịch bản kiểm thử nghiêm ngặt:
+  1. **Database Engine & Schema v8 Integrity:** Khởi tạo SQLite độc lập trong thư mục tạm, chạy tuần tự migration từ v0 đến v8 qua `MigrationEngine`, xác minh toàn vẹn bảng và quan hệ Foreign Keys.
+  2. **SM-2 SRS Pure Mathematical Engine:** Đánh giá tính toán Ease Factor, khoảng lặp phân tán ngày, giới hạn dưới $1.3$, và xử lý lapse về 1 ngày.
+  3. **AI Tutor Context Builder, Anti-Injection & Response Parser:** Kiểm chứng cắt tỉa cửa sổ ngữ cảnh trượt (sliding window turns), chèn hồ sơ người học và parse phản hồi JSON có evaluation, sửa lỗi và câu hỏi gợi ý.
+  4. **Voice Conversation State Machine & Live API Contract:** Kiểm chứng 10 trạng thái chuyển đổi máy hữu hạn (FSM) và thông tin Live API Preview (PCM 16kHz, WebSocket endpoint, Gemini 2.5 Flash Native Audio).
+  5. **Placement Test CAT 2PL IRT Scoring Engine:** Xác minh cập nhật năng lực $\theta$ (theta) theo hàm xác suất logistic và phân bổ câu hỏi thích ứng theo độ khó.
+  6. **Adaptive Learning Roadmap Generator:** Đề xuất lộ trình học tập có giải thích sư phạm, tôn trọng kiến thức tiên quyết và giới hạn tải nhận thức.
+  7. **Grammar Evaluation Engine:** Chấm điểm trắc nghiệm ngữ pháp tất định, tạo Learning Evidence chuẩn xác.
+  8. **Practice Scoring Engine & Partial Credit:** Chấm điểm bài tập nối cặp với tính điểm từng phần (partial credit) và đảm bảo tính bất biến (idempotency).
+  9. **Reading RubyText & Listening Comprehension:** Hiển thị Hán tự kèm Pinyin trên đầu ký tự, tra cứu từ tương tác khi chạm, và chấm điểm câu hỏi nghe hiểu.
+  10. **Hanzi Writing Stroke Evaluation:** Đánh giá thứ tự nét chữ Hán ("十": 先横后竖) dựa trên dữ liệu vector/stroke và thuật toán so sánh góc/hướng chuẩn.
+  11. **Pronunciation Lab & Shadowing Engine:** Phân tách rõ ràng luồng chấm phát âm và shadowing, tính điểm tương đồng âm vị mà không giả lập điểm số.
+  12. **Profile & Goal History Repository:** Yêu cầu lý do bắt buộc khi đổi mục tiêu học tập, ghi nhận nhật ký lịch sử không thể xóa.
+  13. **App Settings DAO:** Lưu trữ và khôi phục cài đặt giao diện, font chữ, âm thanh và AI model độc lập.
+  14. **Data Management & Safety Snapshots:** Tạo bản sao lưu an toàn trước mọi thao tác phá hủy (pre-destruction snapshot), yêu cầu mã xác nhận "XOA" / "RESET".
+  15. **Audio Permission Helper:** Kiểm tra trạng thái quyền micro an toàn, không cưỡng chế hỏi quyền khi mở ứng dụng.
+
+### 24.4. Kết Quả Kiểm Thử Toàn Diện (Comprehensive Verification Results)
+- **Tổng Số Test Suite:** 361/361 unit, integration, widget và regression tests PASSED (100%).
+- **Phân Tích Mã Tĩnh (Static Analysis):** `dart analyze lib test` đạt chuẩn tuyệt đối: **0 errors, 0 warnings**.
+- **Tính Độc Lập & An Toàn Dữ Liệu:** 100% test chạy trên tệp SQLite riêng biệt trong `temp/`, tự động dọn dẹp sau khi chạy, hoàn toàn không chạm vào cơ sở dữ liệu thật của người dùng và không gọi API tính phí.

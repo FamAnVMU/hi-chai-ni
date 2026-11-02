@@ -9,6 +9,7 @@ import '../../../dictionary/dictionary.dart';
 import '../../../roadmap/roadmap.dart';
 import '../../../grammar/grammar.dart';
 import '../../../practice/practice.dart';
+import '../../../listening/listening.dart';
 
 /// Tab 1: Learning Screen featuring structured lessons and HSK roadmap.
 class LearningScreen extends StatefulWidget {
@@ -461,6 +462,53 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) => const PracticeSessionScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+
+            // Listening Comprehension Banner Card
+            HiCard(
+              backgroundColor: AppColors.limeGreen.withAlpha(20),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.headphones_rounded,
+                    color: AppColors.limeGreen,
+                    size: AppDimensions.iconLg,
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Luyện nghe hiểu hội thoại',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Hội thoại chuẩn người bản xứ, tùy chỉnh tốc độ và câu hỏi hiểu',
+                          style: theme.textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  HiButton(
+                    text: 'Nghe ngay',
+                    size: HiButtonSize.sm,
+                    variant: HiButtonVariant.primary,
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ListeningScreen(),
                         ),
                       );
                     },
