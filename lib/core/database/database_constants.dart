@@ -2,7 +2,7 @@ class DatabaseConstants {
   DatabaseConstants._();
 
   static const String databaseName = 'hi_chinese.db';
-  static const int currentDatabaseVersion = 8;
+  static const int currentDatabaseVersion = 9;
 
   // Table names
   static const String tableVocabularies = 'vocabularies';
@@ -31,4 +31,14 @@ class DatabaseConstants {
   static const String tableUserProfiles = 'user_profiles';
   static const String tableGoalHistory = 'goal_history';
   static const String tableAppSettings = 'app_settings';
+
+  // Schema v9 Curriculum & Content Catalog Tables
+  static const String tableContentPacks = 'content_packs';
+  static const String tableCurriculums = 'curriculums';
+  static const String tableCurriculumUnits = 'curriculum_units';
+  static const String tableCurriculumLessons = 'curriculum_lessons';
+  static const String tableLessonSegments = 'lesson_segments';
+  static const String tableContentItems = 'content_items';
+  static const String tableCurriculumMastery = 'curriculum_mastery';
+  static const String tableLevelExitExams = 'level_exit_exams';
 }
