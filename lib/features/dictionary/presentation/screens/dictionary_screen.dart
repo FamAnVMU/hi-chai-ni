@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../core/database/app_database.dart';
 import '../../../../core/theme/theme.dart';
@@ -47,11 +48,21 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
     _loadHistory();
   }
 
+  Timer? _debounceTimer;
+
   @override
   void dispose() {
+    _debounceTimer?.cancel();
     _tabController.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 250), () {
+      _performSearch(query);
+    });
   }
 
   Future<void> _performSearch(String query) async {
@@ -168,8 +179,11 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
                 borderSide: BorderSide.none,
               ),
             ),
-            onChanged: (val) => _performSearch(val),
-            onSubmitted: (val) => _performSearch(val),
+            onChanged: _onSearchChanged,
+            onSubmitted: (val) {
+              _debounceTimer?.cancel();
+              _performSearch(val);
+            },
           ),
         ),
 

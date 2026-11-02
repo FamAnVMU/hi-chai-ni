@@ -52,6 +52,28 @@ class VocabularyDao {
     );
   }
 
+  /// Batch fetches senses for multiple vocabulary IDs in a single query.
+  /// Eliminates the N+1 query problem during multi-result search operations.
+  Future<Map<String, List<Map<String, dynamic>>>> getSensesByVocabularyIds(
+    List<String> vocabIds,
+  ) async {
+    if (vocabIds.isEmpty) return const {};
+
+    final placeholders = List.filled(vocabIds.length, '?').join(',');
+    final rows = await _db.query(
+      DatabaseConstants.tableVocabularySenses,
+      where: 'vocabulary_id IN ($placeholders) AND deleted_at IS NULL',
+      whereArgs: vocabIds,
+    );
+
+    final map = <String, List<Map<String, dynamic>>>{};
+    for (final row in rows) {
+      final vid = row['vocabulary_id'] as String;
+      map.putIfAbsent(vid, () => []).add(row);
+    }
+    return map;
+  }
+
   Future<List<Map<String, dynamic>>> getVocabulariesByHsk(int hskLevel, {int limit = 50, int offset = 0}) async {
     return await _db.query(
       DatabaseConstants.tableVocabularies,

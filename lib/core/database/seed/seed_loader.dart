@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:isolate';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -65,22 +66,29 @@ class SeedLoader {
   }) async {
     final sw = stopwatch ?? (Stopwatch()..start());
 
-    // 1. Parse JSON
-    Map<String, dynamic> parsedJson;
-    try {
-      parsedJson = json.decode(rawJson) as Map<String, dynamic>;
-    } catch (e) {
-      final errorMsg = 'Failed to parse seed JSON string: $e';
+    // 1. Offload CPU-intensive JSON decoding, model mapping, and SHA-256 hashing to a background isolate
+    // to guarantee 0ms UI thread blocking during app startup or asset updates.
+    final (parsedBundle, computedHash, parseError) = await Isolate.run(() {
+      try {
+        final decoded = json.decode(rawJson) as Map<String, dynamic>;
+        final bundle = SeedBundle.fromJson(decoded);
+        final bytes = utf8.encode(rawJson);
+        final hash = sha256.convert(bytes).toString();
+        return (bundle, hash, null);
+      } catch (e) {
+        return (null, '', e.toString());
+      }
+    });
+
+    if (parseError != null || parsedBundle == null) {
+      final errorMsg = 'Failed to parse seed JSON string: $parseError';
       debugPrint('[SeedLoader] $errorMsg');
       return SeedResult.failed(error: errorMsg, duration: sw.elapsed);
     }
 
-    final bundle = SeedBundle.fromJson(parsedJson);
-    final checksum = computeChecksum(rawJson);
-
     return seedBundle(
-      bundle,
-      checksum: checksum,
+      parsedBundle,
+      checksum: computedHash,
       onProgress: onProgress,
       batchSize: batchSize,
       stopwatch: sw,

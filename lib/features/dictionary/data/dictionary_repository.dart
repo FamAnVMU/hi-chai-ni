@@ -52,12 +52,16 @@ class DefaultDictionaryRepository implements DictionaryRepository {
       searchType: searchType,
     );
 
+    final vocabIds = rawResults.map((r) => r['id'] as String).toList();
+    final sensesMap = await _vocabDao.getSensesByVocabularyIds(vocabIds);
+    final savedMap = await _savedWordsDao.getSavedWordsByIds(vocabIds);
+
     final entries = <DictionaryEntry>[];
     for (final row in rawResults) {
       final id = row['id'] as String;
-      final rawSenses = await _vocabDao.getSensesByVocabularyId(id);
+      final rawSenses = sensesMap[id] ?? const [];
       final senses = rawSenses.map((s) => DictionarySense.fromMap(s)).toList();
-      final savedData = await _savedWordsDao.getSavedWord(id);
+      final savedData = savedMap[id];
 
       entries.add(DictionaryEntry.fromMap(
         row,

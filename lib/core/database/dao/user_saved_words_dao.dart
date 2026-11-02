@@ -78,6 +78,27 @@ class UserSavedWordsDao {
     return result.isNotEmpty ? result.first : null;
   }
 
+  /// Batch fetches saved status for multiple vocabulary IDs in a single query.
+  /// Eliminates sequential queries during search result mapping.
+  Future<Map<String, Map<String, dynamic>>> getSavedWordsByIds(
+    List<String> vocabIds,
+  ) async {
+    if (vocabIds.isEmpty) return const {};
+
+    final placeholders = List.filled(vocabIds.length, '?').join(',');
+    final rows = await _db.query(
+      DatabaseConstants.tableUserSavedWords,
+      where: 'vocabulary_id IN ($placeholders)',
+      whereArgs: vocabIds,
+    );
+
+    final map = <String, Map<String, dynamic>>{};
+    for (final row in rows) {
+      map[row['vocabulary_id'] as String] = row;
+    }
+    return map;
+  }
+
   Future<List<Map<String, dynamic>>> getSavedWords({bool? onlyFavorites = true}) async {
     String? whereClause;
     List<dynamic>? whereArgs;

@@ -22,7 +22,9 @@ class HanziCanvasController extends ChangeNotifier {
   int get strokeCount => _strokes.length;
 
   void setCanvasSize(Size size) {
-    _canvasSize = size;
+    if (_canvasSize != size) {
+      _canvasSize = size;
+    }
   }
 
   void setStrokeWidth(double width) {

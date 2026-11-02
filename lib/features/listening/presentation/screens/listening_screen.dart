@@ -3,11 +3,31 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
 import '../providers/listening_providers.dart';
 
-class ListeningScreen extends ConsumerWidget {
+class ListeningScreen extends ConsumerStatefulWidget {
   const ListeningScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ListeningScreen> createState() => _ListeningScreenState();
+}
+
+class _ListeningScreenState extends ConsumerState<ListeningScreen> {
+  late final ListeningPlaybackNotifier _notifier;
+
+  @override
+  void initState() {
+    super.initState();
+    _notifier = ref.read(listeningPlaybackProvider.notifier);
+  }
+
+  @override
+  void dispose() {
+    // Safety: Halt audio playback when leaving screen
+    _notifier.setPlaying(false);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final activeLesson = ref.watch(activeListeningLessonProvider);
     final playbackState = ref.watch(listeningPlaybackProvider);

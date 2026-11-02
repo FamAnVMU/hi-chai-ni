@@ -33,6 +33,10 @@ void main() {
   // Initialize Android lifecycle observer to manage background audio release
   AppLifecycleManager.instance.initialize();
 
+  // Configure bounded image cache to prevent memory pressure on Android devices
+  PaintingBinding.instance.imageCache.maximumSizeBytes = 50 * 1024 * 1024; // 50MB ceiling
+  PaintingBinding.instance.imageCache.maximumSize = 100; // max 100 images in memory
+
   runApp(
     const ProviderScope(
       child: HiChineseApp(),

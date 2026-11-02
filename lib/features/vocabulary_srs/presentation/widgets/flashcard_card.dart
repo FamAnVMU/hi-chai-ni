@@ -86,26 +86,28 @@ class _FlashcardCardState extends State<FlashcardCard>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _flipAnimation,
-      builder: (context, _) {
-        final angle = _flipAnimation.value * math.pi;
-        final isBackVisible = angle >= (math.pi / 2);
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _flipAnimation,
+        builder: (context, _) {
+          final angle = _flipAnimation.value * math.pi;
+          final isBackVisible = angle >= (math.pi / 2);
 
-        return Transform(
-          alignment: Alignment.center,
-          transform: Matrix4.identity()
-            ..setEntry(3, 2, 0.001) // 3D Perspective
-            ..rotateY(angle),
-          child: isBackVisible
-              ? Transform(
-                  alignment: Alignment.center,
-                  transform: Matrix4.identity()..rotateY(math.pi),
-                  child: _buildBackFace(context),
-                )
-              : _buildFrontFace(context),
-        );
-      },
+          return Transform(
+            alignment: Alignment.center,
+            transform: Matrix4.identity()
+              ..setEntry(3, 2, 0.001) // 3D Perspective
+              ..rotateY(angle),
+            child: isBackVisible
+                ? Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.identity()..rotateY(math.pi),
+                    child: _buildBackFace(context),
+                  )
+                : _buildFrontFace(context),
+          );
+        },
+      ),
     );
   }
 
