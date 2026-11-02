@@ -4,6 +4,7 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:sqflite/sqflite.dart';
+import 'content_pack_manager.dart';
 import '../../curriculum/data/content_pack_loader.dart';
 import '../../curriculum/domain/models/content_pack_models.dart';
 
@@ -158,5 +159,11 @@ class ContentPackRemoteService {
         message: 'Lỗi trong quá trình tải và cài đặt: $e',
       );
     }
+  }
+
+  /// Uninstalls an installed content pack cleanly while preserving user learning progress.
+  Future<bool> uninstallPack(String packId, {bool force = false}) async {
+    final manager = ContentPackManager(db);
+    return manager.uninstallPack(packId, force: force);
   }
 }

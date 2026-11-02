@@ -2,7 +2,7 @@ class DatabaseConstants {
   DatabaseConstants._();
 
   static const String databaseName = 'hi_chinese.db';
-  static const int currentDatabaseVersion = 9;
+  static const int currentDatabaseVersion = 10;
 
   // Table names
   static const String tableVocabularies = 'vocabularies';
@@ -41,4 +41,9 @@ class DatabaseConstants {
   static const String tableContentItems = 'content_items';
   static const String tableCurriculumMastery = 'curriculum_mastery';
   static const String tableLevelExitExams = 'level_exit_exams';
+
+  // Schema v10 Knowledge Normalization & Content Packs
+  static const String tableKnowledgeRegistry = 'knowledge_registry';
+  static const String tableLessonKnowledgeItems = 'lesson_knowledge_items';
+  static const String tableContentIdMappings = 'content_id_mappings';
 }

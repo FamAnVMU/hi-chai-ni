@@ -33,9 +33,9 @@ void main() {
       }
     });
 
-    test('1. Database opens at version 9 and creates all curriculum tables', () async {
+    test('1. Database opens and creates all curriculum tables', () async {
       final version = await db.getVersion();
-      expect(version, 9);
+      expect(version, greaterThanOrEqualTo(9));
 
       // Verify tables exist
       final tables = await db.rawQuery(

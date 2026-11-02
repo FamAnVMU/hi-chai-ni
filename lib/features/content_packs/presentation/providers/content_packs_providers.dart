@@ -138,6 +138,28 @@ class ContentPacksNotifier extends AsyncNotifier<List<ContentPackItemState>> {
     }
   }
 
+  Future<bool> uninstallPack(String packId) async {
+    try {
+      final success = await _service.uninstallPack(packId);
+      if (success) {
+        await refresh();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      final currentList = state.value;
+      if (currentList != null) {
+        final targetIdx = currentList.indexWhere((p) => p.info.packId == packId);
+        if (targetIdx != -1) {
+          final updatedList = List<ContentPackItemState>.from(currentList);
+          updatedList[targetIdx] = updatedList[targetIdx].copyWith(error: e.toString());
+          state = AsyncData(updatedList);
+        }
+      }
+      return false;
+    }
+  }
+
   Future<void> refresh() async {
     state = const AsyncLoading();
     state = AsyncData(await _fetchStates());
