@@ -12,6 +12,7 @@ export 'migrations/migration_v7.dart';
 export 'migrations/migration_v8.dart';
 export 'migrations/migration_v9.dart';
 export 'migrations/migration_v10.dart';
+export 'migrations/migration_v11.dart';
 export 'migrations/migration_engine.dart';
 export 'dao/vocabulary_dao.dart';
 export 'dao/srs_dao.dart';

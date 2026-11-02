@@ -173,4 +173,14 @@ class CatAssessmentResult {
     if (theta < 2.2) return 4;
     return 5;
   }
+
+  /// Evaluates whether learner demonstrated sufficient Pinyin proficiency to bypass Pinyin Foundation.
+  bool get shouldBypassPinyinFoundation {
+    final speaking = skillScores[CatSkill.speaking];
+    final writing = skillScores[CatSkill.writing];
+    if (overallTheta >= -0.5) return true;
+    if (speaking != null && speaking.isAssessed && (speaking.accuracyRate ?? 0) >= 0.8) return true;
+    if (writing != null && writing.isAssessed && (writing.accuracyRate ?? 0) >= 0.8) return true;
+    return false;
+  }
 }

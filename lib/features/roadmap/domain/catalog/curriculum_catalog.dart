@@ -5,6 +5,54 @@ class CurriculumCatalog {
   CurriculumCatalog._();
 
   static const List<CurriculumLevel> levels = [
+    // Pinyin Foundation (Level 0)
+    CurriculumLevel(
+      level: 0,
+      title: 'Pinyin Foundation: Ngữ Âm Nền Tảng',
+      description: 'Dành riêng cho người mới bắt đầu từ số 0. Làm chủ 21 thanh mẫu, 36 vận mẫu, 4 thanh điệu và các quy tắc biến điệu then chốt.',
+      units: [
+        CurriculumUnit(
+          id: 'UNIT_PINYIN_01',
+          level: 0,
+          unitNumber: 1,
+          title: 'Khởi động & Cấu tạo âm tiết',
+          description: 'Bản chất Pinyin và phân biệt với chữ Quốc ngữ tiếng Việt.',
+          lessons: [
+            CurriculumLesson(
+              id: 'LES_PINYIN_01_ANATOMY',
+              unitId: 'UNIT_PINYIN_01',
+              level: 0,
+              title: 'Cấu tạo âm tiết: Thanh mẫu + Vận mẫu + Thanh điệu',
+              description: 'Nhận diện các thành tố của âm tiết tiếng Trung.',
+              primarySkill: SkillDimension.speaking,
+              estimatedMinutes: 10,
+              prerequisiteLessonIds: [],
+              prerequisiteSkills: [],
+            ),
+          ],
+        ),
+        CurriculumUnit(
+          id: 'UNIT_PINYIN_02',
+          level: 0,
+          unitNumber: 2,
+          title: 'Thanh mẫu & Vận mẫu cốt lõi',
+          description: 'Kỹ thuật đặt môi, lưỡi, bật hơi và ghép vần.',
+          lessons: [
+            CurriculumLesson(
+              id: 'LES_PINYIN_02_INITIALS',
+              unitId: 'UNIT_PINYIN_02',
+              level: 0,
+              title: 'Thanh mẫu: b, p, m, f, d, t, n, l, g, k, h',
+              description: 'Làm chủ phụ âm đầu và kỹ thuật bật hơi p, t, k.',
+              primarySkill: SkillDimension.speaking,
+              estimatedMinutes: 15,
+              prerequisiteLessonIds: ['LES_PINYIN_01_ANATOMY'],
+              prerequisiteSkills: ['pinyin_anatomy'],
+            ),
+          ],
+        ),
+      ],
+    ),
     // HSK 1 Level
     CurriculumLevel(
       level: 1,

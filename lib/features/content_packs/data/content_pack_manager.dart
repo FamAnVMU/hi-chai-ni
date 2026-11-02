@@ -16,7 +16,7 @@ class ContentPackManagerException implements Exception {
 
 class ContentPackManager {
   final DatabaseExecutor _db;
-  static const String currentAppVersion = '1.0.6';
+  static const String currentAppVersion = '1.0.7';
   static const int currentSupportedSchemaVersion = 2;
 
   const ContentPackManager(this._db);

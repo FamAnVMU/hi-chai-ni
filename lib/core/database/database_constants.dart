@@ -2,7 +2,7 @@ class DatabaseConstants {
   DatabaseConstants._();
 
   static const String databaseName = 'hi_chinese.db';
-  static const int currentDatabaseVersion = 10;
+  static const int currentDatabaseVersion = 11;
 
   // Table names
   static const String tableVocabularies = 'vocabularies';
@@ -46,4 +46,8 @@ class DatabaseConstants {
   static const String tableKnowledgeRegistry = 'knowledge_registry';
   static const String tableLessonKnowledgeItems = 'lesson_knowledge_items';
   static const String tableContentIdMappings = 'content_id_mappings';
+
+  // Schema v11 Offline Audio Asset Management & Pinyin Foundation
+  static const String tableAudioAssets = 'audio_assets';
+  static const String tablePinyinProgress = 'pinyin_progress';
 }
