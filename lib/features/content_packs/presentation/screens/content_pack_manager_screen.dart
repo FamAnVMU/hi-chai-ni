@@ -36,13 +36,13 @@ class ContentPackManagerScreen extends ConsumerWidget {
             children: [
               // Thông tin giới thiệu kiến trúc Offline-First
               HiCard(
-                backgroundColor: AppColors.limeGreenDark.withAlpha(20),
-                borderColor: AppColors.limeGreenDark.withAlpha(80),
+                backgroundColor: AppColors.primaryBlueDark.withAlpha(20),
+                borderColor: AppColors.primaryBlueDark.withAlpha(80),
                 child: Row(
                   children: [
                     const Icon(
                       Icons.cloud_download_rounded,
-                      color: AppColors.limeGreenDark,
+                      color: AppColors.primaryBlueDark,
                       size: 36,
                     ),
                     const SizedBox(width: AppSpacing.md),
@@ -54,7 +54,7 @@ class ContentPackManagerScreen extends ConsumerWidget {
                             'Tự học Offline hoàn toàn',
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: AppColors.limeGreenDark,
+                              color: AppColors.primaryBlueDark,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -99,10 +99,10 @@ class ContentPackManagerScreen extends ConsumerWidget {
                               ),
                               decoration: BoxDecoration(
                                 color: isInstalled
-                                    ? AppColors.limeGreenDark
+                                    ? AppColors.primaryBlueDark
                                     : (info.isBundled
-                                        ? Colors.orange[800]
-                                        : Colors.blue[700]),
+                                        ? AppColors.information
+                                        : AppColors.primaryBlueDark),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
@@ -156,14 +156,14 @@ class ContentPackManagerScreen extends ConsumerWidget {
                                 children: [
                                   const Icon(
                                     Icons.check_circle_rounded,
-                                    color: AppColors.limeGreenDark,
+                                    color: AppColors.primaryBlueDark,
                                     size: 18,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
                                     'Đã sẵn sàng',
                                     style: theme.textTheme.bodySmall?.copyWith(
-                                      color: AppColors.limeGreenDark,
+                                      color: AppColors.primaryBlueDark,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -196,7 +196,7 @@ class ContentPackManagerScreen extends ConsumerWidget {
                                               : (item.error ?? 'Cài đặt thất bại, vui lòng thử lại.'),
                                         ),
                                         backgroundColor: success
-                                            ? AppColors.limeGreenDark
+                                            ? AppColors.primaryBlueDark
                                             : Colors.red[700],
                                       ),
                                     );

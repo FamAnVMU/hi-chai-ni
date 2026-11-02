@@ -102,13 +102,13 @@ class _OnboardingPersonalizationScreenState extends State<OnboardingPersonalizat
                   padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                   child: Material(
                     color: isSelected
-                        ? theme.colorScheme.primaryContainer.withAlpha(80)
-                        : theme.colorScheme.surfaceContainerHighest.withAlpha(60),
+                        ? AppColors.primaryBlueLight
+                        : AppColors.cardBackground,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: BorderSide(
-                        color: isSelected ? AppColors.limeGreen : Colors.transparent,
-                        width: 2,
+                        color: isSelected ? AppColors.primaryBlueDark : AppColors.border,
+                        width: isSelected ? 1.5 : 1,
                       ),
                     ),
                     child: InkWell(
@@ -120,14 +120,22 @@ class _OnboardingPersonalizationScreenState extends State<OnboardingPersonalizat
                         padding: const EdgeInsets.all(AppSpacing.md),
                         child: Row(
                           children: [
-                            Radio<String>(
-                              value: skill['id']!,
-                              groupValue: _selectedSkill,
-                              onChanged: (val) {
-                                if (val != null) setState(() => _selectedSkill = val);
-                              },
+                            Container(
+                              width: 22,
+                              height: 22,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: isSelected ? AppColors.primaryBlueDark : Colors.transparent,
+                                border: Border.all(
+                                  color: isSelected ? AppColors.primaryBlueDark : AppColors.mutedText,
+                                  width: 2,
+                                ),
+                              ),
+                              child: isSelected
+                                  ? const Icon(Icons.check, size: 14, color: Colors.white)
+                                  : null,
                             ),
-                            const SizedBox(width: AppSpacing.sm),
+                            const SizedBox(width: AppSpacing.md),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,12 +144,13 @@ class _OnboardingPersonalizationScreenState extends State<OnboardingPersonalizat
                                     skill['label']!,
                                     style: theme.textTheme.titleSmall?.copyWith(
                                       fontWeight: FontWeight.bold,
+                                      color: isSelected ? AppColors.primaryBlueDark : AppColors.primaryText,
                                     ),
                                   ),
                                   Text(
                                     skill['desc']!,
                                     style: theme.textTheme.bodySmall?.copyWith(
-                                      color: theme.colorScheme.onSurfaceVariant,
+                                      color: AppColors.secondaryText,
                                     ),
                                   ),
                                 ],

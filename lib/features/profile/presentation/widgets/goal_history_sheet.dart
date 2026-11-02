@@ -53,7 +53,7 @@ class GoalHistorySheet extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           Row(
             children: [
-              const Icon(Icons.history_rounded, color: AppColors.limeGreen),
+              const Icon(Icons.history_rounded, color: AppColors.primaryBlueDark),
               const SizedBox(width: AppSpacing.sm),
               Text(
                 'Lịch Sử Thay Đổi Mục Tiêu',
@@ -126,7 +126,7 @@ class GoalHistorySheet extends StatelessWidget {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(Icons.format_quote_rounded, size: 14, color: AppColors.limeGreen),
+                                  const Icon(Icons.format_quote_rounded, size: 14, color: AppColors.primaryBlueDark),
                                   const SizedBox(width: 4),
                                   Expanded(
                                     child: Text(

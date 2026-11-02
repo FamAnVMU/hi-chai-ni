@@ -174,7 +174,7 @@ class _HanziWritingScreenState extends ConsumerState<HanziWritingScreen> {
                       character,
                       style: theme.textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: AppColors.limeGreen,
+                        color: AppColors.primaryBlueDark,
                         fontFamilyFallback: const ['Noto Sans SC', 'Heiti SC'],
                       ),
                     ),

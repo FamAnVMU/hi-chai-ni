@@ -20,7 +20,7 @@ class AboutAndPrivacyDialog extends StatelessWidget {
     return AlertDialog(
       title: Row(
         children: const [
-          Icon(Icons.info_outline_rounded, color: AppColors.limeGreen),
+          Icon(Icons.info_outline_rounded, color: AppColors.primaryBlueDark),
           SizedBox(width: AppSpacing.sm),
           Text('Thông Tin & Chính Sách'),
         ],
@@ -33,7 +33,7 @@ class AboutAndPrivacyDialog extends StatelessWidget {
             Center(
               child: Column(
                 children: [
-                  const Icon(Icons.translate_rounded, size: 48, color: AppColors.limeGreen),
+                  const Icon(Icons.translate_rounded, size: 48, color: AppColors.primaryBlueDark),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
                     AppConstants.appName,

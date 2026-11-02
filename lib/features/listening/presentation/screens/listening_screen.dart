@@ -98,11 +98,11 @@ class _ListeningScreenState extends ConsumerState<ListeningScreen> {
                       const SizedBox(width: AppSpacing.sm),
                       CircleAvatar(
                         radius: 28,
-                        backgroundColor: AppColors.limeGreen,
+                        backgroundColor: AppColors.primaryBlueDark,
                         child: IconButton(
                           icon: Icon(
                             playbackState.isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                            color: AppColors.darkForestBg,
+                            color: Colors.white,
                             size: 32,
                           ),
                           onPressed: notifier.togglePlay,
@@ -170,7 +170,7 @@ class _ListeningScreenState extends ConsumerState<ListeningScreen> {
                     const Divider(height: AppSpacing.md),
                     Text('Phiên âm (Pinyin):', style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 4),
-                    Text(activeLesson.transcriptPinyin, style: const TextStyle(fontSize: 13, height: 1.4, color: AppColors.limeGreen)),
+                    Text(activeLesson.transcriptPinyin, style: const TextStyle(fontSize: 13, height: 1.4, color: AppColors.primaryBlueDark)),
                     const Divider(height: AppSpacing.md),
                     Text('Bản dịch tiếng Việt:', style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 4),
@@ -210,31 +210,73 @@ class _ListeningScreenState extends ConsumerState<ListeningScreen> {
                       final optText = q.options[optIdx];
                       final isSelected = selectedOpt == optIdx;
 
-                      Color? optColor;
+                      Color cardBg = AppColors.cardBackground;
+                      Color cardBorder = AppColors.border;
+                      Color textColor = AppColors.primaryText;
+
                       if (isSubmitted) {
                         if (optIdx == q.correctOptionIndex) {
-                          optColor = Colors.green.withAlpha(40);
+                          cardBg = AppColors.successContainerLight;
+                          cardBorder = AppColors.success;
+                          textColor = AppColors.success;
                         } else if (isSelected) {
-                          optColor = Colors.red.withAlpha(40);
+                          cardBg = AppColors.errorContainerLight;
+                          cardBorder = AppColors.error;
+                          textColor = AppColors.error;
                         }
+                      } else if (isSelected) {
+                        cardBg = AppColors.primaryBlueLight;
+                        cardBorder = AppColors.primaryBlueDark;
+                        textColor = AppColors.primaryBlueDark;
                       }
 
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 6),
-                        decoration: BoxDecoration(
-                          color: optColor,
-                          borderRadius: BorderRadius.circular(AppRadius.sm),
-                        ),
-                        child: RadioListTile<int>(
-                          dense: true,
-                          title: Text(optText),
-                          value: optIdx,
-                          groupValue: selectedOpt,
-                          onChanged: isSubmitted
-                              ? null
-                              : (val) {
-                                  if (val != null) notifier.selectAnswer(q.id, val);
-                                },
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Material(
+                          color: cardBg,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.sm),
+                            side: BorderSide(
+                              color: cardBorder,
+                              width: isSelected || (isSubmitted && optIdx == q.correctOptionIndex) ? 1.5 : 1.0,
+                            ),
+                          ),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(AppRadius.sm),
+                            onTap: isSubmitted ? null : () => notifier.selectAnswer(q.id, optIdx),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 22,
+                                    height: 22,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: isSelected ? cardBorder : Colors.transparent,
+                                      border: Border.all(
+                                        color: isSelected ? cardBorder : AppColors.mutedText,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: isSelected
+                                        ? const Icon(Icons.check, size: 14, color: Colors.white)
+                                        : null,
+                                  ),
+                                  const SizedBox(width: AppSpacing.md),
+                                  Expanded(
+                                    child: Text(
+                                      optText,
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                        color: textColor,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                       );
                     }),
@@ -249,11 +291,11 @@ class _ListeningScreenState extends ConsumerState<ListeningScreen> {
                     else ...[
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(AppSpacing.sm),
+                        padding: const EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
-                          color: isCorrect ? Colors.green.withAlpha(20) : Colors.red.withAlpha(20),
+                          color: isCorrect ? AppColors.successContainerLight : AppColors.errorContainerLight,
                           borderRadius: BorderRadius.circular(AppRadius.sm),
-                          border: Border.all(color: isCorrect ? Colors.green : Colors.redAccent, width: 1),
+                          border: Border.all(color: isCorrect ? AppColors.success : AppColors.error, width: 1),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -261,14 +303,16 @@ class _ListeningScreenState extends ConsumerState<ListeningScreen> {
                             Text(
                               isCorrect ? '✓ Chính xác!' : '✗ Chưa chính xác',
                               style: TextStyle(
-                                color: isCorrect ? Colors.green : Colors.redAccent,
+                                color: isCorrect ? AppColors.success : AppColors.error,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(height: 2),
+                            const SizedBox(height: 4),
                             Text(
                               q.explanationVi,
-                              style: theme.textTheme.bodySmall,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: AppColors.secondaryText,
+                              ),
                             ),
                           ],
                         ),

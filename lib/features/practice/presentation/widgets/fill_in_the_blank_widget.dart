@@ -95,7 +95,7 @@ class _FillInTheBlankWidgetState extends State<FillInTheBlankWidget> {
                         _controller.text = val;
                         widget.onAnswerChanged(val);
                       },
-                selectedColor: AppColors.limeGreen.withAlpha(40),
+                selectedColor: AppColors.primaryBlueDark.withAlpha(40),
                 backgroundColor: theme.colorScheme.surface,
               );
             }).toList(),

@@ -151,7 +151,7 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
           children: [
             Row(
               children: [
-                const Icon(Icons.auto_awesome_rounded, color: AppColors.limeGreen),
+                const Icon(Icons.auto_awesome_rounded, color: AppColors.primaryBlueDark),
                 const SizedBox(width: 8),
                 Text(
                   'Hỏi AI về Bài Đọc',
@@ -216,7 +216,7 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
         builder: (ctx) => AlertDialog(
           title: const Row(
             children: [
-              Icon(Icons.auto_awesome_rounded, color: AppColors.limeGreen),
+              Icon(Icons.auto_awesome_rounded, color: AppColors.primaryBlueDark),
               SizedBox(width: 8),
               Text('Phản Hồi Từ AI Tutor'),
             ],
@@ -238,7 +238,6 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     final showPinyin = _displayMode == ReadingDisplayMode.full ||
         _displayMode == ReadingDisplayMode.hanziAndPinyin;
@@ -304,14 +303,15 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: AppColors.limeGreen.withAlpha(isDark ? 60 : 35),
+                              color: AppColors.primaryBlueLight,
                               borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: AppColors.border, width: 0.8),
                             ),
                             child: Text(
                               'HSK ${widget.passage.hskLevel}',
                               style: theme.textTheme.labelSmall?.copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: isDark ? AppColors.limeGreen : const Color(0xFF2E5B0E),
+                                color: AppColors.primaryBlueDark,
                               ),
                             ),
                           ),

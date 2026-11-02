@@ -212,7 +212,7 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                           ],
                           hanziStyle: theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: isDark ? AppColors.limeGreen : theme.colorScheme.primary,
+                            color: isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary,
                           ),
                           pinyinStyle: theme.textTheme.titleMedium?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
@@ -224,14 +224,14 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: AppColors.limeGreen.withAlpha(isDark ? 60 : 35),
+                                color: AppColors.primaryBlueDark.withAlpha(isDark ? 60 : 35),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
                                 'HSK ${_entry.hskLevel}',
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: isDark ? AppColors.limeGreen : const Color(0xFF2E5B0E),
+                                  color: isDark ? AppColors.primaryBlueDark : AppColors.primaryBlueDark,
                                 ),
                               ),
                             ),
@@ -263,7 +263,7 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                                 ? Icons.volume_up_rounded
                                 : Icons.volume_off_rounded,
                             color: _entry.audioUri != null
-                                ? AppColors.limeGreen
+                                ? AppColors.primaryBlueDark
                                 : theme.colorScheme.onSurfaceVariant.withAlpha(100),
                           ),
                     onPressed: _handlePlayAudio,
@@ -404,7 +404,7 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                                   borderRadius: BorderRadius.circular(AppRadius.sm),
                                   border: Border(
                                     left: BorderSide(
-                                      color: isDark ? AppColors.limeGreen : theme.colorScheme.primary,
+                                      color: isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary,
                                       width: 3,
                                     ),
                                   ),
@@ -447,7 +447,7 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                   if (_aiExplanation != null) ...[
                     HiCard(
                       backgroundColor: isDark
-                          ? AppColors.darkForestSurface
+                          ? AppColors.cardBackground
                           : theme.colorScheme.primaryContainer.withAlpha(60),
                       padding: const EdgeInsets.all(AppSpacing.md),
                       child: Column(
@@ -455,13 +455,13 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                         children: [
                           Row(
                             children: [
-                              const Icon(Icons.auto_awesome_rounded, size: 16, color: AppColors.limeGreen),
+                              const Icon(Icons.auto_awesome_rounded, size: 16, color: AppColors.primaryBlueDark),
                               const SizedBox(width: 6),
                               Text(
                                 'AI Tutor Phân Tích Bổ Sung',
                                 style: theme.textTheme.labelMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: isDark ? AppColors.limeGreen : theme.colorScheme.primary,
+                                  color: isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary,
                                 ),
                               ),
                             ],

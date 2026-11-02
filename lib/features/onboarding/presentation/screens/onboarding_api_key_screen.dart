@@ -41,7 +41,7 @@ class _OnboardingApiKeyScreenState extends State<OnboardingApiKeyScreen> {
               const Icon(
                 Icons.auto_awesome_rounded,
                 size: 64,
-                color: AppColors.limeGreen,
+                color: AppColors.primaryBlueDark,
               ),
               const SizedBox(height: AppSpacing.md),
               Text(

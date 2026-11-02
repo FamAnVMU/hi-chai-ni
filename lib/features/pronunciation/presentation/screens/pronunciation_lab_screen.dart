@@ -290,7 +290,7 @@ class _PronunciationLabScreenState extends ConsumerState<PronunciationLabScreen>
                       target.text,
                       style: theme.textTheme.displayMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: AppColors.limeGreen,
+                        color: AppColors.primaryBlueDark,
                         fontFamilyFallback: const ['Noto Sans SC', 'Heiti SC'],
                       ),
                     ),
@@ -331,7 +331,7 @@ class _PronunciationLabScreenState extends ConsumerState<PronunciationLabScreen>
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.tips_and_updates_outlined, size: 16, color: AppColors.limeGreen),
+                            const Icon(Icons.tips_and_updates_outlined, size: 16, color: AppColors.primaryBlueDark),
                             const SizedBox(width: AppSpacing.xs),
                             Expanded(
                               child: Text(
@@ -379,13 +379,13 @@ class _PronunciationLabScreenState extends ConsumerState<PronunciationLabScreen>
                       height: 80,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: _isRecording ? Colors.redAccent : AppColors.limeGreen,
+                        color: _isRecording ? Colors.redAccent : AppColors.primaryBlueDark,
                         boxShadow: AppElevation.shadowMid(theme.brightness),
                       ),
                       child: Icon(
                         _isRecording ? Icons.stop_rounded : Icons.mic_rounded,
                         size: 40,
-                        color: _isRecording ? Colors.white : const Color(0xFF121811),
+                        color: _isRecording ? Colors.white : AppColors.primaryText,
                       ),
                     ),
                   ),

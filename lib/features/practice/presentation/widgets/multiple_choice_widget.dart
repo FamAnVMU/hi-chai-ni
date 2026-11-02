@@ -32,18 +32,18 @@ class MultipleChoiceWidget extends StatelessWidget {
 
         if (isSubmitted) {
           if (idx == definition.correctOptionIndex) {
-            borderColor = AppColors.limeGreen;
-            bgColor = AppColors.limeGreen.withAlpha(20);
-            textColor = AppColors.limeGreen;
+            borderColor = AppColors.primaryBlueDark;
+            bgColor = AppColors.primaryBlueDark.withAlpha(20);
+            textColor = AppColors.primaryBlueDark;
           } else if (isSelected && !result!.isCorrect) {
             borderColor = AppColors.errorLight;
             bgColor = AppColors.errorLight.withAlpha(20);
             textColor = AppColors.errorLight;
           }
         } else if (isSelected) {
-          borderColor = AppColors.limeGreen;
-          bgColor = AppColors.limeGreen.withAlpha(15);
-          textColor = AppColors.limeGreen;
+          borderColor = AppColors.primaryBlueDark;
+          bgColor = AppColors.primaryBlueDark.withAlpha(15);
+          textColor = AppColors.primaryBlueDark;
         }
 
         return Padding(
@@ -73,7 +73,7 @@ class MultipleChoiceWidget extends StatelessWidget {
                       color: isSelected
                           ? (isSubmitted && !result!.isCorrect
                               ? AppColors.errorLight
-                              : AppColors.limeGreen)
+                              : AppColors.primaryBlueDark)
                           : theme.colorScheme.surfaceContainerHighest,
                     ),
                     child: Text(
@@ -95,7 +95,7 @@ class MultipleChoiceWidget extends StatelessWidget {
                     ),
                   ),
                   if (isSubmitted && idx == definition.correctOptionIndex)
-                    const Icon(Icons.check_circle_rounded, color: AppColors.limeGreen, size: 20)
+                    const Icon(Icons.check_circle_rounded, color: AppColors.primaryBlueDark, size: 20)
                   else if (isSubmitted && isSelected && !result!.isCorrect)
                     const Icon(Icons.cancel_rounded, color: AppColors.errorLight, size: 20),
                 ],

@@ -37,7 +37,7 @@ class HanziCanvas extends StatelessWidget {
           width: size,
           height: size,
           decoration: BoxDecoration(
-            color: isDark ? AppColors.darkForestSurface : AppColors.offWhite,
+            color: isDark ? AppColors.cardBackground : AppColors.cardBackground,
             borderRadius: AppRadius.borderMd,
             boxShadow: AppElevation.shadowMid(theme.brightness),
           ),
@@ -79,9 +79,9 @@ class HanziCanvas extends StatelessWidget {
                               mode: controller.mode,
                               highlightedStrokeOrder: highlightedStrokeOrder,
                               watermarkColor: isDark
-                                  ? AppColors.limeGreen.withAlpha(45)
-                                  : AppColors.limeGreen.withAlpha(70),
-                              highlightStrokeColor: AppColors.limeGreen,
+                                  ? AppColors.primaryBlueDark.withAlpha(45)
+                                  : AppColors.primaryBlueDark.withAlpha(70),
+                              highlightStrokeColor: AppColors.primaryBlueDark,
                             ),
                           );
                         },

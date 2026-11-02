@@ -312,7 +312,7 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
                         '$percent%',
                         style: theme.textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: rate >= 0.7 ? AppColors.limeGreen : Colors.orange,
+                          color: rate >= 0.7 ? AppColors.primaryBlueDark : Colors.orange,
                         ),
                       ),
                     ],
@@ -325,7 +325,7 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
                       minHeight: 4,
                       backgroundColor: theme.colorScheme.surfaceContainerHighest,
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        rate >= 0.7 ? AppColors.limeGreen : Colors.orange,
+                        rate >= 0.7 ? AppColors.primaryBlueDark : Colors.orange,
                       ),
                     ),
                   ),
@@ -355,13 +355,13 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.limeGreen.withAlpha(30),
+                  color: AppColors.primaryBlueDark.withAlpha(30),
                   borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: Text(
                   'Unit ${unit.unitNumber}',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: AppColors.limeGreen,
+                    color: AppColors.primaryBlueDark,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -408,7 +408,7 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
     switch (status) {
       case LessonStatus.completed:
         statusIcon = Icons.check_circle_rounded;
-        statusColor = AppColors.limeGreen;
+        statusColor = AppColors.primaryBlueDark;
         break;
       case LessonStatus.inProgress:
         statusIcon = Icons.timelapse_rounded;
@@ -416,7 +416,7 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
         break;
       case LessonStatus.available:
         statusIcon = Icons.lock_open_rounded;
-        statusColor = AppColors.limeGreen;
+        statusColor = AppColors.primaryBlueDark;
         break;
       case LessonStatus.skipped:
         statusIcon = Icons.skip_next_rounded;
@@ -445,7 +445,7 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
             borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(
               color: status == LessonStatus.inProgress
-                  ? AppColors.limeGreen.withAlpha(120)
+                  ? AppColors.primaryBlueDark.withAlpha(120)
                   : theme.colorScheme.outlineVariant.withAlpha(60),
             ),
           ),
@@ -481,7 +481,7 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
                   '${(progress!.completionScore! * 100).toInt()}%',
                   style: theme.textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.limeGreen,
+                    color: AppColors.primaryBlueDark,
                   ),
                 ),
               const SizedBox(width: 4),

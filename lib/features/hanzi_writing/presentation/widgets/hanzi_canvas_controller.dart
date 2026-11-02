@@ -7,7 +7,7 @@ class HanziCanvasController extends ChangeNotifier {
   final List<DrawnStroke> _strokes = [];
   DrawnStroke? _activeStroke;
   double _strokeWidth = 7.0;
-  Color _strokeColor = const Color(0xFF121811);
+  Color _strokeColor = const Color(0xFF1E293B);
   WritingMode _mode = WritingMode.tracing;
   Size _canvasSize = const Size(320.0, 320.0);
 

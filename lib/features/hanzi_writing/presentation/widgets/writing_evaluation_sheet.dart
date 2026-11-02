@@ -75,18 +75,18 @@ class WritingEvaluationSheet extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
                         decoration: BoxDecoration(
                           color: isSuccess
-                              ? AppColors.limeGreen.withAlpha(40)
+                              ? AppColors.primaryBlueDark.withAlpha(40)
                               : theme.colorScheme.error.withAlpha(40),
                           borderRadius: AppRadius.borderMd,
                           border: Border.all(
-                            color: isSuccess ? AppColors.limeGreen : theme.colorScheme.error,
+                            color: isSuccess ? AppColors.primaryBlueDark : theme.colorScheme.error,
                           ),
                         ),
                         child: Text(
                           '$score%',
                           style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: isSuccess ? AppColors.limeGreen : theme.colorScheme.error,
+                            color: isSuccess ? AppColors.primaryBlueDark : theme.colorScheme.error,
                           ),
                         ),
                       ),
@@ -156,7 +156,7 @@ class WritingEvaluationSheet extends StatelessWidget {
                       Icon(
                         isNegative ? Icons.warning_amber_rounded : Icons.check_circle_outline_rounded,
                         size: 16,
-                        color: isNegative ? Colors.orangeAccent : AppColors.limeGreen,
+                        color: isNegative ? Colors.orangeAccent : AppColors.primaryBlueDark,
                       ),
                       const SizedBox(width: AppSpacing.xs),
                       Expanded(

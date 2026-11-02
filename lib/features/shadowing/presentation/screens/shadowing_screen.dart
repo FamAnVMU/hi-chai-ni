@@ -245,7 +245,7 @@ class _ShadowingScreenState extends ConsumerState<ShadowingScreen> {
           IconButton(
             icon: Icon(_isLooping ? Icons.repeat_one_on_rounded : Icons.repeat_rounded),
             tooltip: _isLooping ? 'Tắt lặp lại câu' : 'Bật lặp lại câu',
-            color: _isLooping ? AppColors.limeGreen : null,
+            color: _isLooping ? AppColors.primaryBlueDark : null,
             onPressed: () {
               setState(() {
                 _isLooping = !_isLooping;
@@ -351,7 +351,7 @@ class _ShadowingScreenState extends ConsumerState<ShadowingScreen> {
                       ],
                       hanziStyle: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: AppColors.limeGreen,
+                        color: AppColors.primaryBlueDark,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -398,13 +398,13 @@ class _ShadowingScreenState extends ConsumerState<ShadowingScreen> {
                       height: 80,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: _isRecording ? Colors.redAccent : AppColors.limeGreen,
+                        color: _isRecording ? Colors.redAccent : AppColors.primaryBlueDark,
                         boxShadow: AppElevation.shadowMid(theme.brightness),
                       ),
                       child: Icon(
                         _isRecording ? Icons.stop_rounded : Icons.mic_rounded,
                         size: 40,
-                        color: _isRecording ? Colors.white : const Color(0xFF121811),
+                        color: _isRecording ? Colors.white : AppColors.primaryText,
                       ),
                     ),
                   ),

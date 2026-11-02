@@ -580,11 +580,11 @@ class _DesignSystemDemoScreenState extends ConsumerState<DesignSystemDemoScreen>
 
   Widget _buildColorGrid(bool isDark) {
     final colors = [
-      {'name': 'Lime Green', 'color': AppColors.limeGreen, 'hex': '#A3D635'},
-      {'name': 'Dark Forest Bg', 'color': AppColors.darkForestBg, 'hex': '#121811'},
-      {'name': 'Dark Surface', 'color': AppColors.darkForestSurface, 'hex': '#1A2418'},
-      {'name': 'Dark Card', 'color': AppColors.darkForestCard, 'hex': '#243022'},
-      {'name': 'Off-white Light', 'color': AppColors.offWhite, 'hex': '#F6FAF2'},
+      {'name': 'Primary Blue', 'color': AppColors.primaryBlueDark, 'hex': '#5B9BE6'},
+      {'name': 'Main Background', 'color': AppColors.mainBackground, 'hex': '#F7FAFE'},
+      {'name': 'Card Background', 'color': AppColors.cardBackground, 'hex': '#FFFFFF'},
+      {'name': 'Primary Blue Light', 'color': AppColors.cardBackground, 'hex': '#EAF3FF'},
+      {'name': 'Off-white Light', 'color': AppColors.mainBackground, 'hex': '#F6FAF2'},
       {'name': 'Success', 'color': isDark ? AppColors.successDark : AppColors.success, 'hex': isDark ? '#81C784' : '#2E7D32'},
       {'name': 'Warning', 'color': isDark ? AppColors.warningDark : AppColors.warning, 'hex': isDark ? '#FFB74D' : '#B26A00'},
       {'name': 'Error', 'color': isDark ? AppColors.errorDark : AppColors.errorLight, 'hex': isDark ? '#FFB4AB' : '#BA1A1A'},

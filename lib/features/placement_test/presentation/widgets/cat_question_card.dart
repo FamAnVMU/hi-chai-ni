@@ -218,7 +218,7 @@ class _CatQuestionCardState extends State<CatQuestionCard> {
                 children: [
                   Icon(
                     _isSpeakingSimulated ? Icons.mic_rounded : Icons.mic_none_rounded,
-                    color: _isSpeakingSimulated ? Colors.redAccent : AppColors.limeGreen,
+                    color: _isSpeakingSimulated ? Colors.redAccent : AppColors.primaryBlueDark,
                     size: AppDimensions.iconXl,
                   ),
                   const SizedBox(height: AppSpacing.sm),

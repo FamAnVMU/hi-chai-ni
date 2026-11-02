@@ -35,7 +35,7 @@ class PlacementTestResultScreen extends ConsumerWidget {
               // 1. Overall Reference HSK Level Card
               HiCard(
                 backgroundColor: isDark
-                    ? AppColors.darkForestCard
+                    ? AppColors.cardBackground
                     : theme.colorScheme.primaryContainer.withAlpha(120),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,7 +50,7 @@ class PlacementTestResultScreen extends ConsumerWidget {
                           ),
                           child: const Icon(
                             Icons.school_rounded,
-                            color: AppColors.limeGreen,
+                            color: AppColors.primaryBlueDark,
                             size: AppDimensions.iconLg,
                           ),
                         ),
@@ -131,7 +131,7 @@ class PlacementTestResultScreen extends ConsumerWidget {
 
               // 4. Recommended Starting Level & Learning Action
               HiCard(
-                borderColor: AppColors.limeGreen,
+                borderColor: AppColors.primaryBlueDark,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -139,7 +139,7 @@ class PlacementTestResultScreen extends ConsumerWidget {
                       children: [
                         const Icon(
                           Icons.flag_rounded,
-                          color: AppColors.limeGreen,
+                          color: AppColors.primaryBlueDark,
                           size: AppDimensions.iconMd,
                         ),
                         const SizedBox(width: AppSpacing.sm),

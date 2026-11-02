@@ -91,7 +91,7 @@ class ReadingModeSelector extends StatelessWidget {
             ? (isDark ? Colors.black : Colors.white)
             : theme.colorScheme.onSurface,
       ),
-      selectedColor: isDark ? AppColors.limeGreen : theme.colorScheme.primary,
+      selectedColor: isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary,
       backgroundColor: theme.colorScheme.surfaceContainerHighest.withAlpha(60),
       onSelected: (_) => onModeChanged(mode),
     );

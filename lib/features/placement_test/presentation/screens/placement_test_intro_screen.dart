@@ -44,12 +44,12 @@ class PlacementTestIntroScreen extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.all(AppSpacing.md),
                           decoration: BoxDecoration(
-                            color: AppColors.limeGreen.withAlpha(30),
+                            color: AppColors.primaryBlueDark.withAlpha(30),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
                             Icons.auto_awesome_rounded,
-                            color: AppColors.limeGreen,
+                            color: AppColors.primaryBlueDark,
                             size: AppDimensions.iconLg,
                           ),
                         ),
@@ -139,7 +139,7 @@ class PlacementTestIntroScreen extends ConsumerWidget {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.history_rounded, color: AppColors.limeGreen),
+                          const Icon(Icons.history_rounded, color: AppColors.primaryBlueDark),
                           const SizedBox(width: AppSpacing.sm),
                           Text(
                             'Bạn có bài kiểm tra đang dang dở!',
@@ -195,7 +195,7 @@ class PlacementTestIntroScreen extends ConsumerWidget {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.verified_outlined, color: AppColors.limeGreen),
+                          const Icon(Icons.verified_outlined, color: AppColors.primaryBlueDark),
                           const SizedBox(width: AppSpacing.sm),
                           Text(
                             'Kết Quả Bài Kiểm Tra Gần Nhất',
@@ -270,7 +270,7 @@ class PlacementTestIntroScreen extends ConsumerWidget {
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: Row(
         children: [
-          Icon(icon, size: AppDimensions.iconSm, color: AppColors.limeGreen),
+          Icon(icon, size: AppDimensions.iconSm, color: AppColors.primaryBlueDark),
           const SizedBox(width: AppSpacing.sm),
           Text(
             title,

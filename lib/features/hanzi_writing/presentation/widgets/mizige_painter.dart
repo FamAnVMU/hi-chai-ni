@@ -7,8 +7,8 @@ class MizigePainter extends CustomPainter {
   final double borderWidth;
 
   const MizigePainter({
-    this.borderColor = const Color(0xFF8DA385),
-    this.guidelineColor = const Color(0xFFC5D9BE),
+    this.borderColor = const Color(0xFFCBD5E1),
+    this.guidelineColor = const Color(0xFFE2E8F0),
     this.borderWidth = 2.0,
   });
 

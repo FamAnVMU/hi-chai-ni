@@ -144,14 +144,14 @@ class _ReadingPassageListScreenState extends State<ReadingPassageListScreen> {
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                         decoration: BoxDecoration(
-                                          color: AppColors.limeGreen.withAlpha(isDark ? 60 : 35),
+                                          color: AppColors.primaryBlueDark.withAlpha(isDark ? 60 : 35),
                                           borderRadius: BorderRadius.circular(4),
                                         ),
                                         child: Text(
                                           'HSK ${passage.hskLevel}',
                                           style: theme.textTheme.labelSmall?.copyWith(
                                             fontWeight: FontWeight.bold,
-                                            color: isDark ? AppColors.limeGreen : const Color(0xFF2E5B0E),
+                                            color: isDark ? AppColors.primaryBlueDark : AppColors.primaryBlueDark,
                                           ),
                                         ),
                                       ),
@@ -239,7 +239,7 @@ class _ReadingPassageListScreenState extends State<ReadingPassageListScreen> {
                                       Text(
                                         'Bắt đầu đọc',
                                         style: theme.textTheme.labelMedium?.copyWith(
-                                          color: isDark ? AppColors.limeGreen : theme.colorScheme.primary,
+                                          color: isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -247,7 +247,7 @@ class _ReadingPassageListScreenState extends State<ReadingPassageListScreen> {
                                       Icon(
                                         Icons.arrow_forward_ios_rounded,
                                         size: 12,
-                                        color: isDark ? AppColors.limeGreen : theme.colorScheme.primary,
+                                        color: isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary,
                                       ),
                                     ],
                                   ),

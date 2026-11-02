@@ -153,7 +153,7 @@ class HomeRecentActivitiesCard extends StatelessWidget {
       case ActivityType.srsReview:
         return Colors.orange;
       case ActivityType.aiTutor:
-        return AppColors.limeGreen;
+        return AppColors.primaryBlueDark;
       case ActivityType.lesson:
         return Colors.blueAccent;
       case ActivityType.hanziWriting:

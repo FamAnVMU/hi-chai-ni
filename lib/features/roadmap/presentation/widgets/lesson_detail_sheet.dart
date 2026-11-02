@@ -62,7 +62,7 @@ class LessonDetailSheet extends StatelessWidget {
         statusIcon = Icons.lock_outline_rounded;
         break;
       case LessonStatus.available:
-        statusColor = AppColors.limeGreen;
+        statusColor = AppColors.primaryBlueDark;
         statusText = 'Có thể học ngay';
         statusIcon = Icons.lock_open_rounded;
         break;
@@ -72,7 +72,7 @@ class LessonDetailSheet extends StatelessWidget {
         statusIcon = Icons.timelapse_rounded;
         break;
       case LessonStatus.completed:
-        statusColor = AppColors.limeGreen;
+        statusColor = AppColors.primaryBlueDark;
         statusText = 'Đã hoàn thành';
         statusIcon = Icons.check_circle_rounded;
         break;
@@ -191,7 +191,7 @@ class LessonDetailSheet extends StatelessWidget {
                       Icon(
                         isDone ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
                         size: 16,
-                        color: isDone ? AppColors.limeGreen : theme.colorScheme.outline,
+                        color: isDone ? AppColors.primaryBlueDark : theme.colorScheme.outline,
                       ),
                       const SizedBox(width: AppSpacing.xs),
                       Expanded(
@@ -249,7 +249,7 @@ class LessonDetailSheet extends StatelessWidget {
                     const Icon(
                       Icons.history_edu_rounded,
                       size: 16,
-                      color: AppColors.limeGreen,
+                      color: AppColors.primaryBlueDark,
                     ),
                     const SizedBox(width: AppSpacing.xs),
                     Text(
@@ -262,7 +262,7 @@ class LessonDetailSheet extends StatelessWidget {
                         'Điểm đạt: ${(progress!.completionScore! * 100).toInt()}%',
                         style: theme.textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: AppColors.limeGreen,
+                          color: AppColors.primaryBlueDark,
                         ),
                       ),
                     ],

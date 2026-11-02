@@ -42,7 +42,7 @@ class RemoteContentPackInfo {
 
 /// Service managing remote content pack downloading, verifying, and SQLite installing.
 class ContentPackRemoteService {
-  final DatabaseExecutor _db;
+  final DatabaseExecutor db;
   final http.Client _httpClient;
 
   /// Default GitHub repository base for official content packs
@@ -50,10 +50,9 @@ class ContentPackRemoteService {
   static const String cdnBaseUrl = 'https://raw.githubusercontent.com/$defaultRepo/main/content_packs_cdn';
 
   ContentPackRemoteService({
-    required DatabaseExecutor db,
+    required this.db,
     http.Client? httpClient,
-  })  : _db = db,
-        _httpClient = httpClient ?? http.Client();
+  }) : _httpClient = httpClient ?? http.Client();
 
   /// Curated catalog of available HSK packs (HSK 1 & 2 are bundled, HSK 3-6 downloadable).
   static List<RemoteContentPackInfo> getAvailablePacks() {
@@ -107,7 +106,7 @@ class ContentPackRemoteService {
 
   /// Checks if a pack is already installed in SQLite.
   Future<bool> isPackInstalled(String packId) async {
-    final result = await _db.query(
+    final result = await db.query(
       'content_packs',
       where: 'id = ?',
       whereArgs: [packId],
@@ -148,7 +147,7 @@ class ContentPackRemoteService {
       }
 
       onProgress?.call(0.8);
-      final loader = ContentPackLoader(_db);
+      final loader = ContentPackLoader(db);
       final result = await loader.loadPackFromJson(rawJson);
       onProgress?.call(1.0);
       return result;

@@ -103,7 +103,7 @@ class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
                     final sizeStr = (size / 1024).toStringAsFixed(1);
                     return ListTile(
                       contentPadding: EdgeInsets.zero,
-                      leading: const Icon(Icons.inventory_2_outlined, color: AppColors.limeGreen),
+                      leading: const Icon(Icons.inventory_2_outlined, color: AppColors.primaryBlueDark),
                       title: Text(name, style: theme.textTheme.bodyMedium?.copyWith(fontSize: 13)),
                       subtitle: Text('$sizeStr KB • ${file.lastModifiedSync().toLocal()}'),
                       trailing: TextButton(
@@ -173,7 +173,7 @@ class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
                 codeController.text.trim().toUpperCase() == 'RESET';
 
             return AlertDialog(
-              backgroundColor: const Color(0xFF241515),
+              backgroundColor: AppColors.errorContainerLight,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppRadius.lg),
                 side: const BorderSide(color: Colors.redAccent, width: 1.5),
@@ -204,7 +204,7 @@ class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
                       decoration: InputDecoration(
                         hintText: 'Nhập XOA hoặc RESET',
                         hintStyle: TextStyle(color: Colors.white.withAlpha(100)),
-                        fillColor: const Color(0xFF351A1A),
+                        fillColor: AppColors.cardBackground,
                         filled: true,
                         border: const OutlineInputBorder(borderSide: BorderSide(color: Colors.redAccent)),
                       ),
@@ -289,7 +289,7 @@ class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
             const SizedBox(height: AppSpacing.md),
             Row(
               children: [
-                const Icon(Icons.storage_rounded, color: AppColors.limeGreen),
+                const Icon(Icons.storage_rounded, color: AppColors.primaryBlueDark),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
                   'Quản Lý Dữ Liệu & Bộ Nhớ',
@@ -333,7 +333,7 @@ class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
               child: Column(
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.backup_rounded, color: AppColors.limeGreen),
+                    leading: const Icon(Icons.backup_rounded, color: AppColors.primaryBlueDark),
                     title: const Text('Sao lưu cơ sở dữ liệu ngay'),
                     subtitle: const Text('Tạo file .hibak bảo vệ dữ liệu với WAL checkpoint'),
                     trailing: _isProcessing
@@ -343,7 +343,7 @@ class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
                   ),
                   const Divider(height: 1),
                   ListTile(
-                    leading: const Icon(Icons.restore_page_rounded, color: AppColors.limeGreen),
+                    leading: const Icon(Icons.restore_page_rounded, color: AppColors.primaryBlueDark),
                     title: const Text('Xem danh sách sao lưu & Khôi phục'),
                     subtitle: Text('${backupsAsync.value?.length ?? 0} bản sao lưu sẵn có'),
                     trailing: const Icon(Icons.chevron_right_rounded),
@@ -354,7 +354,7 @@ class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
                   ),
                   const Divider(height: 1),
                   ListTile(
-                    leading: const Icon(Icons.download_for_offline_rounded, color: AppColors.limeGreen),
+                    leading: const Icon(Icons.download_for_offline_rounded, color: AppColors.primaryBlueDark),
                     title: const Text('Xuất dữ liệu cá nhân ra JSON'),
                     subtitle: const Text('Sao chép JSON tiến trình & hồ sơ vào Clipboard'),
                     trailing: const Icon(Icons.chevron_right_rounded),
@@ -362,7 +362,7 @@ class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
                   ),
                   const Divider(height: 1),
                   ListTile(
-                    leading: const Icon(Icons.verified_outlined, color: AppColors.limeGreen),
+                    leading: const Icon(Icons.verified_outlined, color: AppColors.primaryBlueDark),
                     title: const Text('Kiểm tra toàn vẹn SQLite (PRAGMA integrity_check)'),
                     subtitle: const Text('Xác nhận không có phân mảnh hay hỏng hóc file'),
                     trailing: const Icon(Icons.chevron_right_rounded),
@@ -424,7 +424,7 @@ class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
       children: [
         Expanded(child: Text(label, style: style)),
         const SizedBox(width: AppSpacing.sm),
-        Text(value, style: style.copyWith(color: AppColors.limeGreen)),
+        Text(value, style: style.copyWith(color: AppColors.primaryBlueDark)),
       ],
     );
   }

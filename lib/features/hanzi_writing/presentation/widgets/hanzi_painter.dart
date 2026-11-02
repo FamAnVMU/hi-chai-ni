@@ -20,8 +20,8 @@ class HanziPainter extends CustomPainter {
     this.strokeData,
     this.mode = WritingMode.tracing,
     this.highlightedStrokeOrder,
-    this.watermarkColor = const Color(0x33A3D635),
-    this.highlightStrokeColor = const Color(0xFFA3D635),
+    this.watermarkColor = const Color(0x335B9BE6),
+    this.highlightStrokeColor = const Color(0xFF5B9BE6),
   });
 
   @override

@@ -43,7 +43,7 @@ class CatKnowledgeGapsCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
               child: Row(
                 children: [
-                  const Icon(Icons.check_circle_outline_rounded, color: AppColors.limeGreen),
+                  const Icon(Icons.check_circle_outline_rounded, color: AppColors.primaryBlueDark),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(

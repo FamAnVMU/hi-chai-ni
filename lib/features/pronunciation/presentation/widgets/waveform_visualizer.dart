@@ -26,10 +26,10 @@ class WaveformVisualizer extends StatelessWidget {
       height: 90,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkForestSurface : theme.colorScheme.surfaceContainerHighest.withAlpha(90),
+        color: isDark ? AppColors.cardBackground : theme.colorScheme.surfaceContainerHighest.withAlpha(90),
         borderRadius: AppRadius.borderMd,
         border: Border.all(
-          color: isRecording ? AppColors.limeGreen.withAlpha(120) : theme.colorScheme.outlineVariant,
+          color: isRecording ? AppColors.primaryBlueDark.withAlpha(120) : theme.colorScheme.outlineVariant,
         ),
       ),
       child: Column(
@@ -55,7 +55,7 @@ class WaveformVisualizer extends StatelessWidget {
                   height: barHeight,
                   decoration: BoxDecoration(
                     color: isRecording
-                        ? (isCenter ? AppColors.limeGreen : AppColors.limeGreen.withAlpha(160))
+                        ? (isCenter ? AppColors.primaryBlueDark : AppColors.primaryBlueDark.withAlpha(160))
                         : theme.colorScheme.outlineVariant,
                     borderRadius: AppRadius.borderFull,
                   ),

@@ -98,7 +98,7 @@ class _GoalSettingsSheetState extends State<GoalSettingsSheet> {
               children: [
                 const Icon(
                   Icons.flag_rounded,
-                  color: AppColors.limeGreen,
+                  color: AppColors.primaryBlueDark,
                   size: AppDimensions.iconMd,
                 ),
                 const SizedBox(width: AppSpacing.xs),

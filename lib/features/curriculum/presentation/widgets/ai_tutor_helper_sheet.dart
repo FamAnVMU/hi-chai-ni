@@ -74,12 +74,12 @@ class _AiTutorHelperSheetState extends ConsumerState<AiTutorHelperSheet> {
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.xs),
                     decoration: BoxDecoration(
-                      color: AppColors.limeGreen.withValues(alpha: 0.2),
+                      color: AppColors.primaryBlueDark.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       Icons.smart_toy_rounded,
-                      color: AppColors.limeGreenDark,
+                      color: AppColors.primaryBlueDark,
                       size: 24,
                     ),
                   ),
@@ -114,7 +114,7 @@ class _AiTutorHelperSheetState extends ConsumerState<AiTutorHelperSheet> {
                       'Chủ đề: ${widget.topicTitle}',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: AppColors.limeGreenDark,
+                        color: AppColors.primaryBlueDark,
                       ),
                     ),
                     if (widget.topicContext != null) ...[
@@ -180,7 +180,7 @@ class _AiTutorHelperSheetState extends ConsumerState<AiTutorHelperSheet> {
                       avatar: const Icon(Icons.lightbulb_outline, size: 16),
                       label: const Text('Giải thích dễ hiểu hơn'),
                       backgroundColor: _selectedQuery == 'Giải thích dễ hiểu hơn'
-                          ? AppColors.limeGreen.withValues(alpha: 0.25)
+                          ? AppColors.primaryBlueDark.withValues(alpha: 0.25)
                           : null,
                       onPressed: () => _onSelectChip('Giải thích dễ hiểu hơn'),
                     ),
@@ -188,7 +188,7 @@ class _AiTutorHelperSheetState extends ConsumerState<AiTutorHelperSheet> {
                       avatar: const Icon(Icons.format_list_bulleted, size: 16),
                       label: const Text('Cho thêm 2 ví dụ'),
                       backgroundColor: _selectedQuery == 'Cho thêm 2 ví dụ'
-                          ? AppColors.limeGreen.withValues(alpha: 0.25)
+                          ? AppColors.primaryBlueDark.withValues(alpha: 0.25)
                           : null,
                       onPressed: () => _onSelectChip('Cho thêm 2 ví dụ'),
                     ),
@@ -196,7 +196,7 @@ class _AiTutorHelperSheetState extends ConsumerState<AiTutorHelperSheet> {
                       avatar: const Icon(Icons.question_answer_outlined, size: 16),
                       label: const Text('Hỏi AI trợ giảng'),
                       backgroundColor: _selectedQuery == 'Hỏi AI trợ giảng'
-                          ? AppColors.limeGreen.withValues(alpha: 0.25)
+                          ? AppColors.primaryBlueDark.withValues(alpha: 0.25)
                           : null,
                       onPressed: () => _onSelectChip('Hỏi AI trợ giảng'),
                     ),
@@ -220,7 +220,7 @@ class _AiTutorHelperSheetState extends ConsumerState<AiTutorHelperSheet> {
                           'Phản hồi từ Trợ Giảng:',
                           style: theme.textTheme.bodySmall?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: AppColors.limeGreenDark,
+                            color: AppColors.primaryBlueDark,
                           ),
                         ),
                         const SizedBox(height: AppSpacing.xs),

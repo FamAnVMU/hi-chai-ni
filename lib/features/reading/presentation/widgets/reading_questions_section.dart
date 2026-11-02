@@ -61,7 +61,6 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     if (widget.questions.isEmpty) {
       return const SizedBox.shrink();
@@ -84,17 +83,19 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: _score! >= 70
-                      ? AppColors.limeGreen.withAlpha(isDark ? 60 : 35)
-                      : Colors.red.withAlpha(isDark ? 60 : 35),
+                      ? AppColors.successContainerLight
+                      : AppColors.errorContainerLight,
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: _score! >= 70 ? AppColors.success : AppColors.error,
+                    width: 1,
+                  ),
                 ),
                 child: Text(
                   'Điểm: ${_score!.toStringAsFixed(0)}%',
                   style: theme.textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: _score! >= 70
-                        ? (isDark ? AppColors.limeGreen : const Color(0xFF2E5B0E))
-                        : Colors.red,
+                    color: _score! >= 70 ? AppColors.success : AppColors.error,
                   ),
                 ),
               ),
@@ -143,40 +144,79 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                     final optText = opt.value;
                     final isSelected = selectedOption == optIndex;
 
-                    Color? tileColor;
+                    Color cardBg = AppColors.cardBackground;
+                    Color cardBorder = AppColors.border;
+                    Color textColor = AppColors.primaryText;
+
                     if (_hasSubmitted) {
                       if (optIndex == q.answerIndex) {
-                        tileColor = Colors.green.withAlpha(40);
-                      } else if (isSelected && optIndex != q.answerIndex) {
-                        tileColor = Colors.red.withAlpha(40);
+                        cardBg = AppColors.successContainerLight;
+                        cardBorder = AppColors.success;
+                        textColor = AppColors.success;
+                      } else if (isSelected) {
+                        cardBg = AppColors.errorContainerLight;
+                        cardBorder = AppColors.error;
+                        textColor = AppColors.error;
                       }
+                    } else if (isSelected) {
+                      cardBg = AppColors.primaryBlueLight;
+                      cardBorder = AppColors.primaryBlueDark;
+                      textColor = AppColors.primaryBlueDark;
                     }
 
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 4),
-                      decoration: BoxDecoration(
-                        color: tileColor ?? Colors.transparent,
-                        borderRadius: BorderRadius.circular(AppRadius.sm),
-                      ),
-                      child: RadioListTile<int>(
-                        value: optIndex,
-                        groupValue: selectedOption,
-                        dense: true,
-                        title: Text(
-                          optText,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: Material(
+                        color: cardBg,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
+                          side: BorderSide(
+                            color: cardBorder,
+                            width: isSelected || (_hasSubmitted && optIndex == q.answerIndex) ? 1.5 : 1.0,
                           ),
                         ),
-                        onChanged: _hasSubmitted
-                            ? null
-                            : (val) {
-                                if (val != null) {
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
+                          onTap: _hasSubmitted
+                              ? null
+                              : () {
                                   setState(() {
-                                    _userAnswers[q.id] = val;
+                                    _userAnswers[q.id] = optIndex;
                                   });
-                                }
-                              },
+                                },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: isSelected ? cardBorder : Colors.transparent,
+                                    border: Border.all(
+                                      color: isSelected ? cardBorder : AppColors.mutedText,
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: isSelected
+                                      ? const Icon(Icons.check, size: 12, color: Colors.white)
+                                      : null,
+                                ),
+                                const SizedBox(width: AppSpacing.sm),
+                                Expanded(
+                                  child: Text(
+                                    optText,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                      color: textColor,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     );
                   }),
@@ -187,13 +227,13 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                     Container(
                       padding: const EdgeInsets.all(AppSpacing.sm),
                       decoration: BoxDecoration(
-                        color: isDark
-                            ? AppColors.darkForestSurface
-                            : theme.colorScheme.surfaceContainerHighest.withAlpha(60),
+                        color: isCorrect
+                            ? AppColors.successContainerLight.withAlpha(120)
+                            : AppColors.warningContainerLight,
                         borderRadius: BorderRadius.circular(AppRadius.sm),
                         border: Border(
                           left: BorderSide(
-                            color: isCorrect ? AppColors.limeGreen : Colors.orange,
+                            color: isCorrect ? AppColors.success : AppColors.warning,
                             width: 3,
                           ),
                         ),
@@ -206,13 +246,14 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                               Icon(
                                 isCorrect ? Icons.check_circle_rounded : Icons.info_outline_rounded,
                                 size: 16,
-                                color: isCorrect ? AppColors.limeGreen : Colors.orange,
+                                color: isCorrect ? AppColors.success : AppColors.warning,
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 isCorrect ? 'Đáp án chính xác' : 'Giải thích đáp án',
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   fontWeight: FontWeight.bold,
+                                  color: isCorrect ? AppColors.success : AppColors.warning,
                                 ),
                               ),
                             ],

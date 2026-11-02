@@ -25,7 +25,7 @@ class RoadmapRecommendationCard extends StatelessWidget {
           children: [
             const Icon(
               Icons.check_circle_outline_rounded,
-              color: AppColors.limeGreen,
+              color: AppColors.primaryBlueDark,
               size: AppDimensions.iconLg,
             ),
             const SizedBox(width: AppSpacing.md),
@@ -61,7 +61,7 @@ class RoadmapRecommendationCard extends StatelessWidget {
           children: [
             const Icon(
               Icons.auto_awesome_rounded,
-              color: AppColors.limeGreen,
+              color: AppColors.primaryBlueDark,
               size: AppDimensions.iconMd,
             ),
             const SizedBox(width: AppSpacing.xs),

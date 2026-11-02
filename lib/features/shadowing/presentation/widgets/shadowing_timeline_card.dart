@@ -40,7 +40,7 @@ class ShadowingTimelineCard extends StatelessWidget {
                 children: [
                   Icon(
                     isOptimal ? Icons.speed_rounded : Icons.av_timer_rounded,
-                    color: isOptimal ? AppColors.limeGreen : Colors.orangeAccent,
+                    color: isOptimal ? AppColors.primaryBlueDark : Colors.orangeAccent,
                     size: 20,
                   ),
                   const SizedBox(width: AppSpacing.xs),
@@ -64,7 +64,7 @@ class ShadowingTimelineCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: isDark ? AppColors.darkForestSurface : AppColors.offWhite,
+              color: isDark ? AppColors.cardBackground : AppColors.cardBackground,
               borderRadius: AppRadius.borderMd,
               border: Border.all(color: theme.colorScheme.outlineVariant),
             ),
@@ -125,7 +125,7 @@ class ShadowingTimelineCard extends StatelessWidget {
                           minHeight: 10,
                           backgroundColor: theme.colorScheme.outlineVariant,
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            isOptimal ? AppColors.limeGreen : Colors.orangeAccent,
+                            isOptimal ? AppColors.primaryBlueDark : Colors.orangeAccent,
                           ),
                         ),
                       ),
@@ -149,10 +149,10 @@ class ShadowingTimelineCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: (isOptimal ? AppColors.limeGreen : Colors.orangeAccent).withAlpha(20),
+              color: (isOptimal ? AppColors.primaryBlueDark : Colors.orangeAccent).withAlpha(20),
               borderRadius: AppRadius.borderMd,
               border: Border.all(
-                color: (isOptimal ? AppColors.limeGreen : Colors.orangeAccent).withAlpha(80),
+                color: (isOptimal ? AppColors.primaryBlueDark : Colors.orangeAccent).withAlpha(80),
               ),
             ),
             child: Row(
@@ -160,7 +160,7 @@ class ShadowingTimelineCard extends StatelessWidget {
                 Icon(
                   isOptimal ? Icons.thumb_up_alt_rounded : Icons.tune_rounded,
                   size: 20,
-                  color: isOptimal ? AppColors.limeGreen : Colors.orangeAccent,
+                  color: isOptimal ? AppColors.primaryBlueDark : Colors.orangeAccent,
                 ),
                 const SizedBox(width: AppSpacing.xs),
                 Expanded(
@@ -185,7 +185,7 @@ class ShadowingTimelineCard extends StatelessWidget {
                   theme,
                   label: 'Trùng khớp Timeline',
                   value: '${result.timelineMatchPercent.toInt()}%',
-                  color: AppColors.limeGreen,
+                  color: AppColors.primaryBlueDark,
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),

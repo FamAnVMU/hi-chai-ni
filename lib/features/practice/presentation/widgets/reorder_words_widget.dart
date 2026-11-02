@@ -83,7 +83,7 @@ class _ReorderWordsWidgetState extends State<ReorderWordsWidget> {
             borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(
               color: isSubmitted
-                  ? (widget.result!.isCorrect ? AppColors.limeGreen : AppColors.errorLight)
+                  ? (widget.result!.isCorrect ? AppColors.primaryBlueDark : AppColors.errorLight)
                   : theme.colorScheme.outlineVariant,
               width: 1.5,
             ),
@@ -105,7 +105,7 @@ class _ReorderWordsWidgetState extends State<ReorderWordsWidget> {
                     final token = widget.orderedTokens[idx];
                     return ActionChip(
                       label: Text(token, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      backgroundColor: AppColors.limeGreen.withAlpha(30),
+                      backgroundColor: AppColors.primaryBlueDark.withAlpha(30),
                       onPressed: isSubmitted ? null : () => _removeTokenAt(idx),
                     );
                   }),

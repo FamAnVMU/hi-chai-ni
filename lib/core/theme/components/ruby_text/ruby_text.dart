@@ -126,7 +126,7 @@ class RubyText extends StatelessWidget {
 
     final defaultPinyinStyle = (pinyinStyle ?? AppTypography.pinyin()).copyWith(
       color: pinyinStyle?.color ??
-          (isDark ? AppColors.limeGreen : theme.colorScheme.primary),
+          (isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary),
     );
 
     return Wrap(
@@ -210,11 +210,11 @@ class RubyText extends StatelessWidget {
     if (isInteractive || isActive) {
       final highlightColor = activeColor ??
           (isDark
-              ? AppColors.limeGreen.withAlpha(50)
+              ? AppColors.primaryBlueDark.withAlpha(50)
               : theme.colorScheme.primaryContainer.withAlpha(180));
 
       final activeBorderColor = isActive
-          ? (isDark ? AppColors.limeGreen : theme.colorScheme.primary)
+          ? (isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary)
           : Colors.transparent;
 
       Widget interactiveContent = coreWidget;
@@ -232,7 +232,7 @@ class RubyText extends StatelessWidget {
               child: CircularProgressIndicator(
                 strokeWidth: 1.8,
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  isDark ? AppColors.limeGreen : theme.colorScheme.primary,
+                  isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary,
                 ),
               ),
             ),

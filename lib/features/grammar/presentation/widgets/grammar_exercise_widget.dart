@@ -81,13 +81,13 @@ class _GrammarExerciseWidgetState extends State<GrammarExerciseWidget> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.limeGreen.withAlpha(25),
+                  color: AppColors.primaryBlueDark.withAlpha(25),
                   borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: Text(
                   'Bài ${widget.exerciseIndex + 1}',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: AppColors.limeGreen,
+                    color: AppColors.primaryBlueDark,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -132,11 +132,11 @@ class _GrammarExerciseWidgetState extends State<GrammarExerciseWidget> {
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? AppColors.limeGreen.withAlpha(30)
+                          ? AppColors.primaryBlueDark.withAlpha(30)
                           : theme.colorScheme.surfaceContainerHighest.withAlpha(50),
                       borderRadius: BorderRadius.circular(AppRadius.sm),
                       border: Border.all(
-                        color: isSelected ? AppColors.limeGreen : theme.colorScheme.outlineVariant,
+                        color: isSelected ? AppColors.primaryBlueDark : theme.colorScheme.outlineVariant,
                       ),
                     ),
                     child: Row(
@@ -144,7 +144,7 @@ class _GrammarExerciseWidgetState extends State<GrammarExerciseWidget> {
                         Icon(
                           isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
                           size: 18,
-                          color: isSelected ? AppColors.limeGreen : theme.colorScheme.outline,
+                          color: isSelected ? AppColors.primaryBlueDark : theme.colorScheme.outline,
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
@@ -234,14 +234,14 @@ class _GrammarExerciseWidgetState extends State<GrammarExerciseWidget> {
               padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
                 color: _result!.isCorrect
-                    ? AppColors.limeGreen.withAlpha(25)
+                    ? AppColors.primaryBlueDark.withAlpha(25)
                     : (_result!.needsHumanReview
                         ? Colors.orange.withAlpha(25)
                         : AppColors.errorLight.withAlpha(25)),
                 borderRadius: BorderRadius.circular(AppRadius.sm),
                 border: Border.all(
                   color: _result!.isCorrect
-                      ? AppColors.limeGreen
+                      ? AppColors.primaryBlueDark
                       : (_result!.needsHumanReview ? Colors.orange : AppColors.errorLight),
                 ),
               ),
@@ -265,7 +265,7 @@ class _GrammarExerciseWidgetState extends State<GrammarExerciseWidget> {
                                     : Icons.cancel_rounded),
                             size: 18,
                             color: _result!.isCorrect
-                                ? AppColors.limeGreen
+                                ? AppColors.primaryBlueDark
                                 : (_result!.needsHumanReview ? Colors.orange : AppColors.errorLight),
                           ),
                           const SizedBox(width: AppSpacing.xs),
@@ -278,7 +278,7 @@ class _GrammarExerciseWidgetState extends State<GrammarExerciseWidget> {
                             style: theme.textTheme.labelMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: _result!.isCorrect
-                                  ? AppColors.limeGreen
+                                  ? AppColors.primaryBlueDark
                                   : (_result!.needsHumanReview ? Colors.orange : AppColors.errorLight),
                             ),
                           ),
@@ -288,7 +288,7 @@ class _GrammarExerciseWidgetState extends State<GrammarExerciseWidget> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: AppColors.limeGreen.withAlpha(30),
+                            color: AppColors.primaryBlueDark.withAlpha(30),
                             borderRadius: BorderRadius.circular(AppRadius.full),
                           ),
                           child: Text(

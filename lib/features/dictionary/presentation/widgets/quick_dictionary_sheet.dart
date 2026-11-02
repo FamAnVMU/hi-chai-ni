@@ -146,7 +146,7 @@ class _QuickDictionarySheetState extends State<QuickDictionarySheet> {
                     children: [
                       const Icon(
                         Icons.menu_book_rounded,
-                        color: AppColors.limeGreen,
+                        color: AppColors.primaryBlueDark,
                         size: AppDimensions.iconMd,
                       ),
                       const SizedBox(width: AppSpacing.xs),
@@ -250,7 +250,7 @@ class _QuickDictionarySheetState extends State<QuickDictionarySheet> {
                                     item.simplified,
                                     style: theme.textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
-                                      color: isDark ? AppColors.limeGreen : theme.colorScheme.primary,
+                                      color: isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary,
                                     ),
                                   ),
                                   const SizedBox(width: AppSpacing.sm),
@@ -264,14 +264,14 @@ class _QuickDictionarySheetState extends State<QuickDictionarySheet> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                     decoration: BoxDecoration(
-                                      color: AppColors.limeGreen.withAlpha(isDark ? 60 : 35),
+                                      color: AppColors.primaryBlueDark.withAlpha(isDark ? 60 : 35),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
                                       'HSK ${item.hskLevel}',
                                       style: theme.textTheme.labelSmall?.copyWith(
                                         fontWeight: FontWeight.bold,
-                                        color: isDark ? AppColors.limeGreen : const Color(0xFF2E5B0E),
+                                        color: isDark ? AppColors.primaryBlueDark : AppColors.primaryBlueDark,
                                       ),
                                     ),
                                   ),

@@ -144,7 +144,7 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
           return AlertDialog(
             title: const Row(
               children: [
-                Icon(Icons.mic_none_rounded, color: AppColors.limeGreen),
+                Icon(Icons.mic_none_rounded, color: AppColors.primaryBlueDark),
                 SizedBox(width: 8),
                 Text('Kiểm tra Microphone'),
               ],
@@ -167,7 +167,7 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
                         LinearProgressIndicator(
                           value: amp.clamp(0.0, 1.0),
                           backgroundColor: Colors.grey.shade300,
-                          color: AppColors.limeGreen,
+                          color: AppColors.primaryBlueDark,
                           minHeight: 12,
                           borderRadius: BorderRadius.circular(6),
                         ),
@@ -308,7 +308,7 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
           children: [
             CircleAvatar(
               radius: 14,
-              backgroundColor: AppColors.limeGreen.withAlpha(40),
+              backgroundColor: AppColors.primaryBlueDark.withAlpha(40),
               child: Text(
                 persona.avatarLabel,
                 style: const TextStyle(fontSize: 14),
@@ -350,7 +350,7 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
             // Status & Live API Preview Banner
             Container(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 6.0),
-              color: isDark ? AppColors.darkForestSurface : theme.colorScheme.surfaceContainerHighest.withAlpha(70),
+              color: isDark ? AppColors.cardBackground : theme.colorScheme.surfaceContainerHighest.withAlpha(70),
               child: Row(
                 children: [
                   _buildStatusChip(_currentStatus),
@@ -504,7 +504,7 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
         icon = Icons.sync;
         break;
       case VoiceConversationStatus.listening:
-        color = AppColors.limeGreen;
+        color = AppColors.primaryBlueDark;
         label = 'Đang lắng nghe...';
         icon = Icons.hearing;
         break;
@@ -583,8 +583,8 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
         decoration: BoxDecoration(
           color: isUser
-              ? (isDark ? AppColors.darkForestCard : theme.colorScheme.primaryContainer)
-              : (isDark ? AppColors.darkForestSurface : Colors.white),
+              ? (isDark ? AppColors.cardBackground : theme.colorScheme.primaryContainer)
+              : (isDark ? AppColors.cardBackground : Colors.white),
           borderRadius: AppRadius.borderMd,
           border: Border.all(
             color: isInterim
@@ -628,7 +628,7 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
                 seg.pinyin!,
                 style: TextStyle(
                   fontSize: 11,
-                  color: isDark ? AppColors.limeGreen : theme.colorScheme.primary,
+                  color: isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary,
                 ),
               ),
             ],
@@ -677,8 +677,8 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
             IconButton.filled(
               icon: const Icon(Icons.call_rounded, size: 28),
               style: IconButton.styleFrom(
-                backgroundColor: AppColors.limeGreen,
-                foregroundColor: Colors.black,
+                backgroundColor: AppColors.primaryBlueDark,
+                foregroundColor: Colors.white,
                 padding: const EdgeInsets.all(16),
               ),
               tooltip: 'Bắt đầu đàm thoại',

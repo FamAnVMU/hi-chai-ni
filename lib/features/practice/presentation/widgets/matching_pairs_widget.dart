@@ -101,11 +101,11 @@ class _MatchingPairsWidgetState extends State<MatchingPairsWidget> {
 
                   if (isSubmitted) {
                     final isCorrect = widget.definition.matchingPairs[left] == pairedRight;
-                    border = isCorrect ? AppColors.limeGreen : AppColors.errorLight;
-                    bg = isCorrect ? AppColors.limeGreen.withAlpha(20) : AppColors.errorLight.withAlpha(20);
+                    border = isCorrect ? AppColors.success : AppColors.error;
+                    bg = isCorrect ? AppColors.successContainerLight : AppColors.errorContainerLight;
                   } else if (isSelected) {
-                    border = AppColors.limeGreen;
-                    bg = AppColors.limeGreen.withAlpha(25);
+                    border = AppColors.primaryBlueDark;
+                    bg = AppColors.primaryBlueDark.withAlpha(25);
                   } else if (isPaired) {
                     border = theme.colorScheme.primary.withAlpha(150);
                     bg = theme.colorScheme.primary.withAlpha(15);
@@ -155,8 +155,8 @@ class _MatchingPairsWidgetState extends State<MatchingPairsWidget> {
                       orElse: () => const MapEntry('', ''),
                     ).key;
                     final isCorrect = widget.definition.matchingPairs[pairedLeft] == right;
-                    border = isCorrect ? AppColors.limeGreen : AppColors.errorLight;
-                    bg = isCorrect ? AppColors.limeGreen.withAlpha(20) : AppColors.errorLight.withAlpha(20);
+                    border = isCorrect ? AppColors.success : AppColors.error;
+                    bg = isCorrect ? AppColors.successContainerLight : AppColors.errorContainerLight;
                   } else if (isPaired) {
                     border = theme.colorScheme.primary.withAlpha(150);
                     bg = theme.colorScheme.primary.withAlpha(15);

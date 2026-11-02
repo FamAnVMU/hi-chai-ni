@@ -37,7 +37,7 @@ class PronunciationResultCard extends StatelessWidget {
                 children: [
                   Icon(
                     isRecognized ? Icons.check_circle_rounded : Icons.info_outline_rounded,
-                    color: isRecognized ? AppColors.limeGreen : Colors.orangeAccent,
+                    color: isRecognized ? AppColors.primaryBlueDark : Colors.orangeAccent,
                     size: 20,
                   ),
                   const SizedBox(width: AppSpacing.xs),
@@ -61,7 +61,7 @@ class PronunciationResultCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: isDark ? AppColors.darkForestSurface : AppColors.offWhite,
+              color: isDark ? AppColors.cardBackground : AppColors.cardBackground,
               borderRadius: AppRadius.borderMd,
               border: Border.all(color: theme.colorScheme.outlineVariant),
             ),
@@ -90,7 +90,7 @@ class PronunciationResultCard extends StatelessWidget {
                         'Điểm ASR: ${(result.overallScore! * 100).toInt()}%',
                         style: theme.textTheme.labelMedium?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: AppColors.limeGreen,
+                          color: AppColors.primaryBlueDark,
                         ),
                       ),
                   ],
@@ -110,7 +110,7 @@ class PronunciationResultCard extends StatelessWidget {
                     label: 'Độ chuẩn thanh điệu',
                     value: '${((result.toneAccuracy ?? 0) * 100).toInt()}%',
                     icon: Icons.graphic_eq_rounded,
-                    color: AppColors.limeGreen,
+                    color: AppColors.primaryBlueDark,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
@@ -163,7 +163,7 @@ class PronunciationResultCard extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.arrow_right_rounded, size: 18, color: AppColors.limeGreen),
+                  const Icon(Icons.arrow_right_rounded, size: 18, color: AppColors.primaryBlueDark),
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(fb, style: theme.textTheme.bodySmall),

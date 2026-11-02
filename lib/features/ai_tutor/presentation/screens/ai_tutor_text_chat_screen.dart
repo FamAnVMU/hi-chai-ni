@@ -284,12 +284,12 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
                       return ListTile(
                         selected: isSelected,
                         selectedTileColor: isDark
-                            ? AppColors.darkForestCard
+                            ? AppColors.cardBackground
                             : theme.colorScheme.primaryContainer.withAlpha(80),
                         shape: RoundedRectangleBorder(borderRadius: AppRadius.borderSm),
                         leading: Icon(
                           isSelected ? Icons.chat_rounded : Icons.chat_bubble_outline_rounded,
-                          color: isSelected ? AppColors.limeGreen : theme.colorScheme.onSurfaceVariant,
+                          color: isSelected ? AppColors.primaryBlueDark : theme.colorScheme.onSurfaceVariant,
                         ),
                         title: Text(
                           title,
@@ -425,7 +425,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
               children: [
                 CircleAvatar(
                   radius: 14,
-                  backgroundColor: AppColors.limeGreen.withAlpha(40),
+                  backgroundColor: AppColors.primaryBlueDark.withAlpha(40),
                   child: Text(
                     persona.avatarLabel,
                     style: const TextStyle(fontSize: 14),
@@ -657,7 +657,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
               Text(
                 turn.pinyin!,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: isDark ? AppColors.limeGreen : theme.colorScheme.primary,
+                  color: isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary,
                   fontFamily: 'NotoSans',
                   fontSize: 12,
                 ),
@@ -678,7 +678,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? AppColors.darkForestCard
+                        ? AppColors.cardBackground
                         : theme.colorScheme.surfaceContainerHighest.withAlpha(90),
                     borderRadius: AppRadius.borderSm,
                   ),
@@ -702,7 +702,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
                     icon: Icon(
                       isTranslationExpanded ? Icons.translate_rounded : Icons.translate_outlined,
                       size: 16,
-                      color: isTranslationExpanded ? AppColors.limeGreen : theme.colorScheme.onSurfaceVariant,
+                      color: isTranslationExpanded ? AppColors.primaryBlueDark : theme.colorScheme.onSurfaceVariant,
                     ),
                     tooltip: isTranslationExpanded ? 'Ẩn bản dịch' : 'Xem bản dịch tiếng Việt',
                     onPressed: () {
@@ -744,7 +744,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkForestCard : const Color(0xFFFFF9E6),
+        color: isDark ? AppColors.cardBackground : const Color(0xFFFFF9E6),
         border: Border.all(color: Colors.amber.shade400, width: 0.8),
         borderRadius: AppRadius.borderSm,
       ),

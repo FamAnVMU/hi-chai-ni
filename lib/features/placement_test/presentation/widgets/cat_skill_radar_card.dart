@@ -26,7 +26,7 @@ class CatSkillRadarCard extends StatelessWidget {
             children: [
               const Icon(
                 Icons.analytics_outlined,
-                color: AppColors.limeGreen,
+                color: AppColors.primaryBlueDark,
                 size: AppDimensions.iconMd,
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -82,7 +82,7 @@ class CatSkillRadarCard extends StatelessWidget {
                   '${((estimate?.accuracyRate ?? 0.0) * 100).toInt()}%',
                   style: theme.textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.limeGreen,
+                    color: AppColors.primaryBlueDark,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.xs),

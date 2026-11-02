@@ -43,7 +43,7 @@ class DrawnStroke {
 
   const DrawnStroke({
     required this.points,
-    this.color = const Color(0xFF1A2418),
+    this.color = const Color(0xFF1E293B),
     this.baseStrokeWidth = 7.0,
   });
 
