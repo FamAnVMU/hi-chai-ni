@@ -60,3 +60,7 @@ key.properties
 *.sqlite
 *.sqlite3
 /backups/
+
+# Release APKs
+*.apk
+/release-apk/
