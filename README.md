@@ -6,15 +6,14 @@ HI Chinese hoạt động theo mô hình **Offline-First**, lưu trữ toàn b�
 
 ---
 
-## 📦 Tải Ứng Dụng (Download Release APK v1.0.0)
+## 📦 Tải Ứng Dụng (Download Release APK v1.0.1 - 64-bit ARM64)
 
-Người học có thể tải trực tiếp file APK cài đặt cho điện thoại Android:
+Ứng dụng được tối ưu hóa chuyên biệt cho cấu trúc **64-bit Android (arm64-v8a)** hiện đại:
 
-| Phiên Bản APK | Kích Thước | Thiết Bị Phù Hợp | Tải Về Trực Tiếp |
+| Phiên Bản APK | Kích Thước | Cấu Trúc | Tải Về Trực Tiếp |
 | :--- | :---: | :--- | :--- |
-| **`hi-chinese-v1.0.0-arm64.apk`** | **19.9 MB** | **Khuyên dùng** cho hầu hết smartphone Android hiện đại (64-bit arm64-v8a) | [⬇️ Tải APK ARM64](release-apk/hi-chinese-v1.0.0-arm64.apk) |
-| **`hi-chinese-v1.0.0-universal.apk`** | **56.4 MB** | Bản tổng hợp chạy trên mọi cấu hình điện thoại / máy tính bảng Android | [⬇️ Tải APK Universal](release-apk/hi-chinese-v1.0.0-universal.apk) |
-| **`hi-chinese-v1.0.0-arm32.apk`** | **17.5 MB** | Dành cho các thiết bị Android thế hệ cũ (32-bit armeabi-v7a) | [⬇️ Tải APK ARM32](release-apk/hi-chinese-v1.0.0-arm32.apk) |
+| **`hi-chinese-v1.0.1-arm64.apk`** | **20.2 MB** | **64-bit ARM64 (arm64-v8a)** dành cho mọi smartphone Android hiện nay | [⬇️ Tải APK ARM64](release-apk/hi-chinese-v1.0.1-arm64.apk) |
+| **`app-release.apk`** | **20.2 MB** | Tệp cài đặt Release tiêu chuẩn (64-bit) | [⬇️ Tải APK Release](release-apk/app-release.apk) |
 
 ---
 

@@ -34,13 +34,9 @@ jobs:
             - **Trắc Nghiệm Thích Ứng CAT & Phân Lớp:** Tự động ghi nhận đạt chuẩn các bài trước khi vượt qua khảo sát đầu vào.
             - **AI Trợ Giảng Bổ Trợ An Toàn:** Cung cấp giải thích ngữ cảnh khi có mạng với rào chắn nghiêm ngặt bảo vệ tính bất biến của giáo trình.
 
-            ### 📦 Danh Sách Tệp APK Cài Đặt
-            - **`hi-chinese-v1.0.0-arm64.apk`**: Khuyên dùng cho hầu hết smartphone Android hiện đại (64-bit arm64-v8a).
-            - **`hi-chinese-v1.0.0-universal.apk`**: Bản universal tương thích với mọi cấu hình điện thoại / máy tính bảng Android.
-            - **`hi-chinese-v1.0.0-arm32.apk`**: Dành cho thiết bị Android 32-bit (armeabi-v7a).
-            - **`app-release.apk`**: Tệp APK Release tổng hợp.
+            ### 📦 Danh Sách Tệp APK Cài Đặt (64-bit ARM64)
+            - **`hi-chinese-v1.0.1-arm64.apk`**: Bản dựng 64-bit tối ưu kích thước và hiệu năng (arm64-v8a).
+            - **`app-release.apk`**: Tệp APK Release 64-bit tiêu chuẩn.
           files: |
-            release-apk/hi-chinese-v1.0.0-arm64.apk
-            release-apk/hi-chinese-v1.0.0-universal.apk
-            release-apk/hi-chinese-v1.0.0-arm32.apk
+            release-apk/hi-chinese-v1.0.1-arm64.apk
             release-apk/app-release.apk
