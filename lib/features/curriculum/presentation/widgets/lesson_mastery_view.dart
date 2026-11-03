@@ -6,6 +6,7 @@ import 'lesson_content_empty_state.dart';
 class LessonMasteryView extends StatefulWidget {
   final CurriculumLesson lesson;
   final LessonSegment? segment;
+  final void Function(String questionId, String answer)? onAnswerRecorded;
   final Function(List<Map<String, dynamic>> questions)? onSubmit;
   final VoidCallback? onFinishLesson;
 
@@ -13,6 +14,7 @@ class LessonMasteryView extends StatefulWidget {
     super.key,
     required this.lesson,
     this.segment,
+    this.onAnswerRecorded,
     this.onSubmit,
     this.onFinishLesson,
   });
@@ -204,6 +206,7 @@ class _LessonMasteryViewState extends State<LessonMasteryView> {
                             setState(() {
                               _userAnswers[qId] = opt;
                             });
+                            widget.onAnswerRecorded?.call(qId, opt);
                           },
                           borderRadius: BorderRadius.circular(8),
                           child: Container(
@@ -254,18 +257,35 @@ class _LessonMasteryViewState extends State<LessonMasteryView> {
                 ? null
                 : () {
                     int correct = 0;
-                    for (final ex in exercises) {
-                      final qId = ex['id']?.toString() ?? '';
-                      if (_userAnswers[qId] == ex['correct_answer']?.toString()) {
+                    final enrichedExercises = <Map<String, dynamic>>[];
+                    for (int i = 0; i < exercises.length; i++) {
+                      final ex = exercises[i];
+                      final qId = (ex['id'] ?? 'ex_m_$i').toString();
+                      final userAns = _userAnswers[qId];
+                      final isCorrect = userAns != null &&
+                          userAns.trim().toLowerCase() ==
+                              (ex['correct_answer']?.toString() ?? '').trim().toLowerCase();
+                      if (isCorrect) {
                         correct++;
                       }
+                      if (userAns != null) {
+                        widget.onAnswerRecorded?.call(qId, userAns);
+                      }
+                      enrichedExercises.add({
+                        ...ex,
+                        'id': qId,
+                        'user_answer': userAns,
+                        'selected_option': userAns,
+                        'is_correct': isCorrect,
+                        'score': isCorrect ? 1.0 : 0.0,
+                      });
                     }
                     setState(() {
                       _correctCount = correct;
                       _scorePercent = exercises.isNotEmpty ? correct / exercises.length : 0.0;
                       _isSubmitted = true;
                     });
-                    widget.onSubmit?.call(exercises);
+                    widget.onSubmit?.call(enrichedExercises);
                   },
           ),
           const SizedBox(height: AppSpacing.xxl),

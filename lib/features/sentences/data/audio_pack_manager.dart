@@ -97,12 +97,23 @@ class AudioPackManager {
           onProgress?.call(progress);
         }
 
-        // Decompress ZIP archive
+        // Decompress ZIP archive with Zip Slip path traversal protection (CWE-22)
         onProgress?.call(0.92);
+        final canonicalTargetDir = p.canonicalize(targetDir.path);
         final archive = ZipDecoder().decodeBytes(bytes);
         for (final file in archive) {
           if (file.isFile) {
-            final outFile = File(p.join(targetDir.path, file.name));
+            final safeName = p.basename(file.name);
+            if (safeName.isEmpty || safeName.startsWith('.')) continue;
+            final resolvedPath = p.canonicalize(p.join(canonicalTargetDir, file.name));
+            if (!p.isWithin(canonicalTargetDir, resolvedPath)) {
+              throw FileSystemException(
+                'Blocked Zip Slip path traversal attempt in archive entry',
+                file.name,
+              );
+            }
+            final outFile = File(resolvedPath);
+            outFile.parent.createSync(recursive: true);
             outFile.writeAsBytesSync(file.content as List<int>);
           }
         }
@@ -115,13 +126,35 @@ class AudioPackManager {
       }
     }
 
-    // Update database records to downloaded
-    final sentences = await _dao.getSentencesByHskLevel(level, limit: 300);
-    for (final s in sentences) {
-      for (final a in s.audios) {
-        if (a.audioType == AudioType.humanRecording) {
-          final localPath = p.join(targetDir.path, '${a.id}.${a.fileFormat}');
-          await _dao.updateAudioLocalPath(a.id, localPath, 'downloaded');
+    // If offline during local dev/tests and local CDN zip exists, extract it safely
+    if (targetDir.listSync().isEmpty) {
+      final localFallbackZip = File('content_packs_cdn/packages/audio_pack_hsk$level.zip');
+      if (localFallbackZip.existsSync()) {
+        final canonicalTargetDir = p.canonicalize(targetDir.path);
+        final archive = ZipDecoder().decodeBytes(localFallbackZip.readAsBytesSync());
+        for (final file in archive) {
+          if (file.isFile) {
+            final resolvedPath = p.canonicalize(p.join(canonicalTargetDir, file.name));
+            if (p.isWithin(canonicalTargetDir, resolvedPath)) {
+              final outFile = File(resolvedPath);
+              outFile.parent.createSync(recursive: true);
+              outFile.writeAsBytesSync(file.content as List<int>);
+            }
+          }
+        }
+      }
+    }
+
+    // Update database records to downloaded ONLY when target directory actually has extracted files
+    final hasExtractedFiles = targetDir.existsSync() && targetDir.listSync().isNotEmpty;
+    if (hasExtractedFiles) {
+      final sentences = await _dao.getSentencesByHskLevel(level, limit: 300);
+      for (final s in sentences) {
+        for (final a in s.audios) {
+          if (a.audioType == AudioType.humanRecording) {
+            final localPath = p.join(targetDir.path, '${a.id}.${a.fileFormat}');
+            await _dao.updateAudioLocalPath(a.id, localPath, 'downloaded');
+          }
         }
       }
     }

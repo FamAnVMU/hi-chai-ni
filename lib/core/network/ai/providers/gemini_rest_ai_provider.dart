@@ -219,12 +219,19 @@ class GeminiRestAiProvider implements AiProvider {
     CancelToken? cancelToken,
   }) async {
     final apiKey = await _getApiKeyOrThrow();
-    final model = config?.modelId ?? request.modelId ?? AiModelRegistry.modelGemini35FlashLite;
-    final customProxy = await credentialStorage.getCustomProxyUrl();
-    final base = customProxy?.isNotEmpty == true ? customProxy! : _baseUrl;
+    final model = request.modelId ?? config?.modelId ?? AiModelRegistry.modelGemini35FlashLite;
+    final base = await _resolveSecureBaseUrl();
     final uri = Uri.parse('$base/models/$model:generateContent');
 
-    final bodyJson = json.encode(request.toGeminiRequestBody());
+    final effectiveRequest = AiPromptRequest(
+      contents: request.contents,
+      systemInstruction: request.systemInstruction,
+      temperature: request.temperature ?? config?.temperature,
+      topP: request.topP ?? config?.topP,
+      maxOutputTokens: request.maxOutputTokens ?? config?.maxOutputTokens,
+      modelId: model,
+    );
+    final bodyJson = json.encode(effectiveRequest.toGeminiRequestBody());
     final headers = {
       'Content-Type': 'application/json',
       'x-goog-api-key': apiKey,
@@ -301,12 +308,19 @@ class GeminiRestAiProvider implements AiProvider {
     CancelToken? cancelToken,
   }) async* {
     final apiKey = await _getApiKeyOrThrow();
-    final model = config?.modelId ?? request.modelId ?? AiModelRegistry.modelGemini35FlashLite;
-    final customProxy = await credentialStorage.getCustomProxyUrl();
-    final base = customProxy?.isNotEmpty == true ? customProxy! : _baseUrl;
+    final model = request.modelId ?? config?.modelId ?? AiModelRegistry.modelGemini35FlashLite;
+    final base = await _resolveSecureBaseUrl();
     final uri = Uri.parse('$base/models/$model:streamGenerateContent?alt=sse');
 
-    final bodyJson = json.encode(request.toGeminiRequestBody());
+    final effectiveRequest = AiPromptRequest(
+      contents: request.contents,
+      systemInstruction: request.systemInstruction,
+      temperature: request.temperature ?? config?.temperature,
+      topP: request.topP ?? config?.topP,
+      maxOutputTokens: request.maxOutputTokens ?? config?.maxOutputTokens,
+      modelId: model,
+    );
+    final bodyJson = json.encode(effectiveRequest.toGeminiRequestBody());
     final httpRequest = http.Request('POST', uri);
     httpRequest.headers.addAll({
       'Content-Type': 'application/json',
@@ -342,7 +356,13 @@ class GeminiRestAiProvider implements AiProvider {
         .transform(const LineSplitter());
 
     StreamSubscription<String>? subscription;
-    final controller = StreamController<AiStreamChunk>();
+    late final StreamController<AiStreamChunk> controller;
+    controller = StreamController<AiStreamChunk>(
+      onCancel: () async {
+        await subscription?.cancel();
+        subscription = null;
+      },
+    );
 
     void cancelSubscription() {
       subscription?.cancel();
@@ -416,6 +436,20 @@ class GeminiRestAiProvider implements AiProvider {
     );
 
     yield* controller.stream;
+  }
+
+  Future<String> _resolveSecureBaseUrl() async {
+    final providerType = await credentialStorage.getProviderType();
+    if (providerType == AiProviderType.customProxy) {
+      final customProxy = await credentialStorage.getCustomProxyUrl();
+      if (customProxy != null && customProxy.trim().isNotEmpty) {
+        final parsed = Uri.tryParse(customProxy.trim());
+        if (parsed != null && parsed.scheme == 'https' && parsed.host.isNotEmpty) {
+          return customProxy.trim().replaceAll(RegExp(r'/+$'), '');
+        }
+      }
+    }
+    return _baseUrl;
   }
 
   Future<String> _getApiKeyOrThrow() async {

@@ -41,19 +41,49 @@ class LessonFlowNotifier extends Notifier<LessonFlowState> {
     final sampler = ref.read(adaptiveExerciseSamplerProvider);
     final masteryEngine = ref.read(masteryEngineProvider);
 
+    final mergedAnswers = Map<String, dynamic>.from(state.userAnswers);
+    for (int i = 0; i < questions.length; i++) {
+      final q = questions[i];
+      final qId = (q['id'] ?? 'ex_m_$i').toString();
+      final embeddedAns = q['user_answer'] ?? q['selected_option'];
+      if (!mergedAnswers.containsKey(qId) && embeddedAns != null) {
+        mergedAnswers[qId] = embeddedAns;
+      }
+    }
+
     final result = sampler.evaluateSubmission(
       questions: questions,
-      userAnswers: state.userAnswers,
+      userAnswers: mergedAnswers,
     );
+
+    final incorrectSet = result.incorrectQuestionIds.toSet();
+    final enrichedQuestions = <Map<String, dynamic>>[];
+    for (int i = 0; i < questions.length; i++) {
+      final q = questions[i];
+      final qId = (q['id'] ?? 'ex_m_$i').toString();
+      final userAns = mergedAnswers[qId];
+      final isCorrect = q['is_correct'] is bool
+          ? q['is_correct'] as bool
+          : !incorrectSet.contains(qId) && userAns != null;
+      enrichedQuestions.add({
+        ...q,
+        'id': qId,
+        'user_answer': userAns,
+        'selected_option': userAns,
+        'is_correct': isCorrect,
+        'score': isCorrect ? 1.0 : 0.0,
+      });
+    }
 
     // Record attempt in MasteryEngine & Learning Data Pipeline
     await masteryEngine.recordLessonAttempt(
       lessonId: state.lessonId,
       scorePercent: result.scorePercent,
-      questionResults: questions,
+      questionResults: enrichedQuestions,
     );
 
     state = state.copyWith(
+      userAnswers: mergedAnswers,
       lastScorePercent: result.scorePercent,
       isCompleted: result.isPassed,
     );

@@ -100,6 +100,7 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
         return LessonMasteryView(
           lesson: widget.lesson,
           segment: _getSegment('masteryCheck'),
+          onAnswerRecorded: (qId, ans) => flowNotifier.recordAnswer(qId, ans),
           onSubmit: (questions) => flowNotifier.submitPractice(questions),
           onFinishLesson: () => Navigator.of(context).pop(true),
         );

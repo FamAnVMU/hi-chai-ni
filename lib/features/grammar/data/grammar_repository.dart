@@ -68,9 +68,36 @@ class DefaultGrammarRepository implements GrammarRepository {
     }
   }
 
+  Future<void> _ensureTopicsSeeded() async {
+    try {
+      final count = Sqflite.firstIntValue(
+        await _db.rawQuery('SELECT COUNT(*) FROM ${DatabaseConstants.tableGrammarTopics}'),
+      );
+      if (count != null && count > 0) return;
+
+      final defaultTopics = [
+        {'id': 'word_order', 'name_vi': 'Trật tự từ & Cấu trúc câu', 'name_en': 'Word Order', 'name_zh': '语序与句式', 'display_order': 1},
+        {'id': 'particles', 'name_vi': 'Trợ từ ngữ khí & kết cấu', 'name_en': 'Particles', 'name_zh': '助词', 'display_order': 2},
+        {'id': 'aspect', 'name_vi': 'Thể của động từ (了, 过, 着, 在)', 'name_en': 'Aspect', 'name_zh': '动态与体', 'display_order': 3},
+        {'id': 'complements', 'name_vi': 'Bổ ngữ (Kết quả, Xu hướng, Khả năng)', 'name_en': 'Complements', 'name_zh': '补语', 'display_order': 4},
+        {'id': 'special_structures', 'name_vi': 'Câu đặc biệt (把, 被, 是…的)', 'name_en': 'Special Structures', 'name_zh': '特殊句式', 'display_order': 5},
+        {'id': 'conjunctions', 'name_vi': 'Liên từ & Câu phức', 'name_en': 'Conjunctions', 'name_zh': '连词与复句', 'display_order': 6},
+        {'id': 'comparison', 'name_vi': 'Câu so sánh (比, 没有, 一样)', 'name_en': 'Comparison', 'name_zh': '比较句', 'display_order': 7},
+      ];
+      for (final topic in defaultTopics) {
+        await _db.insert(
+          DatabaseConstants.tableGrammarTopics,
+          topic,
+          conflictAlgorithm: ConflictAlgorithm.ignore,
+        );
+      }
+    } catch (_) {}
+  }
+
   @override
   Future<List<GrammarTopic>> getGrammarTopics() async {
     await _ensureCatalogSeeded();
+    await _ensureTopicsSeeded();
     try {
       final rows = await _db.query(
         DatabaseConstants.tableGrammarTopics,

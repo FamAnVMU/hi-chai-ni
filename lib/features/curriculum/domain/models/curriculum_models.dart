@@ -133,14 +133,22 @@ class CurriculumLesson {
   factory CurriculumLesson.fromMap(Map<String, dynamic> map, {List<LessonSegment> segments = const []}) {
     List<String> prereqs = [];
     if (map['prerequisites_json'] is String && (map['prerequisites_json'] as String).isNotEmpty) {
+      final raw = map['prerequisites_json'] as String;
       try {
-        prereqs = List<String>.from((map['prerequisites_json'] as String)
+        final decoded = json.decode(raw);
+        if (decoded is List) {
+          prereqs = decoded.map((e) => e.toString().trim()).where((s) => s.isNotEmpty).toList();
+        }
+      } catch (_) {
+        prereqs = raw
             .replaceAll('[', '')
             .replaceAll(']', '')
             .replaceAll('"', '')
             .split(',')
-            .where((s) => s.trim().isNotEmpty));
-      } catch (_) {}
+            .map((s) => s.trim())
+            .where((s) => s.isNotEmpty)
+            .toList();
+      }
     }
 
     DateTime? compAt;

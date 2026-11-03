@@ -275,6 +275,60 @@ class DataManagementService {
             }
           }
         }
+
+        if (decoded['dictionary_history'] is List) {
+          for (final row in decoded['dictionary_history'] as List) {
+            if (row is Map<String, dynamic>) {
+              await txn.insert(
+                DatabaseConstants.tableDictionaryHistory,
+                row,
+                conflictAlgorithm: ConflictAlgorithm.replace,
+              );
+            }
+          }
+        }
+
+        if (decoded['reading_progress'] is List) {
+          for (final row in decoded['reading_progress'] as List) {
+            if (row is Map<String, dynamic>) {
+              await txn.insert(
+                DatabaseConstants.tableReadingProgress,
+                row,
+                conflictAlgorithm: ConflictAlgorithm.replace,
+              );
+            }
+          }
+        }
+
+        if (decoded['srs_items'] is List) {
+          for (final row in decoded['srs_items'] as List) {
+            if (row is Map<String, dynamic>) {
+              await txn.insert(
+                DatabaseConstants.tableSrsItems,
+                row,
+                conflictAlgorithm: ConflictAlgorithm.replace,
+              );
+            }
+          }
+        }
+
+        if (decoded['app_settings'] is List) {
+          for (final row in decoded['app_settings'] as List) {
+            if (row is Map<String, dynamic>) {
+              final key = (row['key'] as String? ?? '').toLowerCase();
+              if (!key.contains('api_key') &&
+                  !key.contains('token') &&
+                  !key.contains('secret') &&
+                  !key.contains('password')) {
+                await txn.insert(
+                  DatabaseConstants.tableAppSettings,
+                  row,
+                  conflictAlgorithm: ConflictAlgorithm.replace,
+                );
+              }
+            }
+          }
+        }
       });
 
       return true;
@@ -320,6 +374,11 @@ class DataManagementService {
       await txn.delete(DatabaseConstants.tablePlacementTestSessions);
       await txn.delete(DatabaseConstants.tableGrammarProgress);
       await txn.delete(DatabaseConstants.tableLessonProgress);
+      await txn.delete(DatabaseConstants.tableCurriculumMastery);
+      await txn.delete(DatabaseConstants.tableHanziWritingProgress);
+      await txn.delete(DatabaseConstants.tableSentencePracticeProgress);
+      await txn.delete(DatabaseConstants.tablePinyinProgress);
+      await txn.delete(DatabaseConstants.tableLearnerGoals);
       await txn.delete(DatabaseConstants.tableRoadmapSnapshots);
       await txn.delete(DatabaseConstants.tableGoalHistory);
       await txn.delete(DatabaseConstants.tableUserProfiles);

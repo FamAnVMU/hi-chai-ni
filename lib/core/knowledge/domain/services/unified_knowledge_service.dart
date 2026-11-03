@@ -311,76 +311,119 @@ class DefaultUnifiedKnowledgeService implements UnifiedKnowledgeService {
   }) async {
     final now = DateTime.now().toUtc();
     final nowIso = now.toIso8601String();
-    final evidenceId = 'evid_${now.millisecondsSinceEpoch}_${knowledgeId.hashCode}';
+    final clampedScore = score.clamp(0.0, 1.0);
+    final srsId = 'srs_$knowledgeId';
+    final evidenceId = 'evid_${now.microsecondsSinceEpoch}_${knowledgeId.hashCode.abs()}';
 
-    // 1. Insert immutable evidence into learner_evidence
-    await _db.insert(
-      DatabaseConstants.tableLearnerEvidence,
-      {
-        'id': evidenceId,
-        'srs_item_id': 'srs_$knowledgeId',
-        'content_id': knowledgeId,
-        'content_type': 'knowledge',
-        'source': activityType,
-        'score': score.clamp(0.0, 1.0),
-        'duration_ms': durationMs,
-        'metadata_json': jsonEncode(metadata),
-        'created_at': nowIso,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _db.transaction((txn) async {
+      // 1. Schedule / update SRS item FIRST so learner_evidence.srs_item_id FK is satisfied
+      final initialIntervalDays = clampedScore >= 0.8 ? 3 : 1;
+      final existingSrs = await txn.query(
+        DatabaseConstants.tableSrsItems,
+        where: 'id = ?',
+        whereArgs: [srsId],
+        limit: 1,
+      );
 
-    // 2. Update mastery state in curriculum_mastery
-    final masteryScore = score >= 0.8 ? 1.0 : (score >= 0.5 ? 0.7 : 0.4);
-    final masteryState = score >= 0.8 ? 'completed' : 'in_progress';
+      int nextIntervalDays = initialIntervalDays;
+      double nextEaseFactor = 2.5;
+      int nextRepetitions = 1;
+      int nextLapses = clampedScore < 0.5 ? 1 : 0;
 
-    await _db.rawInsert('''
-      INSERT INTO ${DatabaseConstants.tableCurriculumMastery} (
-        id, item_id, item_type, mastery_state, score,
-        attempts_count, last_attempt_at, due_review_at, created_at, updated_at
-      ) VALUES (?, ?, 'knowledge', ?, ?, 1, ?, ?, ?, ?)
-      ON CONFLICT(item_id) DO UPDATE SET
-        mastery_state = excluded.mastery_state,
-        score = excluded.score,
-        attempts_count = ${DatabaseConstants.tableCurriculumMastery}.attempts_count + 1,
-        last_attempt_at = excluded.last_attempt_at,
-        due_review_at = excluded.due_review_at,
-        updated_at = excluded.updated_at;
-    ''', [
-      'mastery_$knowledgeId',
-      knowledgeId,
-      masteryState,
-      masteryScore,
-      nowIso,
-      now.add(const Duration(days: 3)).toIso8601String(),
-      nowIso,
-      nowIso,
-    ]);
+      if (existingSrs.isNotEmpty) {
+        final row = existingSrs.first;
+        final prevInterval = (row['interval_days'] as num?)?.toInt() ?? 1;
+        final prevEase = (row['ease_factor'] as num?)?.toDouble() ?? 2.5;
+        final prevReps = (row['repetitions'] as num?)?.toInt() ?? 0;
+        final prevLapses = (row['lapses'] as num?)?.toInt() ?? 0;
 
-    // 3. Schedule / update SRS item in srs_items
-    final intervalDays = score >= 0.8 ? 3 : 1;
-    final dueAt = now.add(Duration(days: intervalDays)).toIso8601String();
+        if (clampedScore >= 0.8) {
+          nextRepetitions = prevReps + 1;
+          nextEaseFactor = (prevEase + (clampedScore >= 0.95 ? 0.1 : 0.0)).clamp(1.3, 3.0);
+          nextIntervalDays = prevReps <= 0
+              ? 3
+              : (prevInterval * nextEaseFactor).round().clamp(3, 365);
+          nextLapses = prevLapses;
+        } else {
+          nextRepetitions = 0;
+          nextEaseFactor = (prevEase - 0.2).clamp(1.3, 3.0);
+          nextIntervalDays = 1;
+          nextLapses = prevLapses + 1;
+        }
+      }
 
-    await _db.rawInsert('''
-      INSERT INTO ${DatabaseConstants.tableSrsItems} (
-        id, content_id, content_type, state, interval_days, ease_factor,
-        repetitions, lapses, due_at, last_reviewed_at, created_at, updated_at
-      ) VALUES (?, ?, 'knowledge', 'review', ?, 2.5, 1, 0, ?, ?, ?, ?)
-      ON CONFLICT(id) DO UPDATE SET
-        state = 'review',
-        interval_days = excluded.interval_days,
-        repetitions = ${DatabaseConstants.tableSrsItems}.repetitions + 1,
-        last_reviewed_at = excluded.last_reviewed_at,
-        due_at = excluded.due_at,
-        updated_at = excluded.updated_at;
-    ''', [
-      'srs_$knowledgeId',
-      knowledgeId,
-      intervalDays,
-      dueAt,
-      nowIso,
-      nowIso,
-      nowIso,
-    ]);
+      final dueAt = now.add(Duration(days: nextIntervalDays)).toIso8601String();
+
+      await txn.rawInsert('''
+        INSERT INTO ${DatabaseConstants.tableSrsItems} (
+          id, content_id, content_type, state, interval_days, ease_factor,
+          repetitions, lapses, due_at, last_reviewed_at, created_at, updated_at
+        ) VALUES (?, ?, 'knowledge', 'review', ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          state = 'review',
+          interval_days = excluded.interval_days,
+          ease_factor = excluded.ease_factor,
+          repetitions = excluded.repetitions,
+          lapses = excluded.lapses,
+          last_reviewed_at = excluded.last_reviewed_at,
+          due_at = excluded.due_at,
+          updated_at = excluded.updated_at;
+      ''', [
+        srsId,
+        knowledgeId,
+        nextIntervalDays,
+        nextEaseFactor,
+        nextRepetitions,
+        nextLapses,
+        dueAt,
+        nowIso,
+        nowIso,
+        nowIso,
+      ]);
+
+      // 2. Update mastery state in curriculum_mastery
+      final masteryScore = clampedScore >= 0.8 ? 1.0 : (clampedScore >= 0.5 ? 0.7 : 0.4);
+      final masteryState = clampedScore >= 0.8 ? 'completed' : 'in_progress';
+
+      await txn.rawInsert('''
+        INSERT INTO ${DatabaseConstants.tableCurriculumMastery} (
+          id, item_id, item_type, mastery_state, score,
+          attempts_count, last_attempt_at, due_review_at, created_at, updated_at
+        ) VALUES (?, ?, 'knowledge', ?, ?, 1, ?, ?, ?, ?)
+        ON CONFLICT(item_id) DO UPDATE SET
+          mastery_state = excluded.mastery_state,
+          score = excluded.score,
+          attempts_count = ${DatabaseConstants.tableCurriculumMastery}.attempts_count + 1,
+          last_attempt_at = excluded.last_attempt_at,
+          due_review_at = excluded.due_review_at,
+          updated_at = excluded.updated_at;
+      ''', [
+        'mastery_$knowledgeId',
+        knowledgeId,
+        masteryState,
+        masteryScore,
+        nowIso,
+        dueAt,
+        nowIso,
+        nowIso,
+      ]);
+
+      // 3. Insert append-only evidence into learner_evidence (after srs_items exists)
+      await txn.insert(
+        DatabaseConstants.tableLearnerEvidence,
+        {
+          'id': evidenceId,
+          'srs_item_id': srsId,
+          'content_id': knowledgeId,
+          'content_type': 'knowledge',
+          'source': activityType,
+          'score': clampedScore,
+          'duration_ms': durationMs,
+          'metadata_json': jsonEncode(metadata),
+          'created_at': nowIso,
+        },
+        conflictAlgorithm: ConflictAlgorithm.abort,
+      );
+    });
   }
 }

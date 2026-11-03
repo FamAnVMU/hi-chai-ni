@@ -240,7 +240,16 @@ class DefaultRoadmapRepository implements RoadmapRepository {
       if (rawGaps is String && rawGaps.isNotEmpty) {
         try {
           final decoded = json.decode(rawGaps) as List<dynamic>;
-          knowledgeGaps.addAll(decoded.map((e) => e.toString()));
+          for (final e in decoded) {
+            if (e is Map) {
+              final label = e['label_vi'] ?? e['tag'] ?? e['skill'];
+              if (label != null && label.toString().trim().isNotEmpty) {
+                knowledgeGaps.add(label.toString().trim());
+              }
+            } else if (e != null && e.toString().trim().isNotEmpty) {
+              knowledgeGaps.add(e.toString().trim());
+            }
+          }
         } catch (_) {}
       }
 
@@ -249,11 +258,31 @@ class DefaultRoadmapRepository implements RoadmapRepository {
         try {
           final decoded = json.decode(rawScores) as Map<String, dynamic>;
           decoded.forEach((k, v) {
-            final skill = SkillDimension.values.firstWhere(
-              (s) => s.name == k,
-              orElse: () => SkillDimension.vocabulary,
-            );
-            placementSkillScores[skill] = (v as num).toDouble();
+            SkillDimension? skill;
+            if (k == 'writing') {
+              skill = SkillDimension.writing;
+            } else {
+              for (final s in SkillDimension.values) {
+                if (s.name == k) {
+                  skill = s;
+                  break;
+                }
+              }
+            }
+            skill ??= SkillDimension.vocabulary;
+
+            double? extractedScore;
+            if (v is num) {
+              extractedScore = v.toDouble();
+            } else if (v is Map) {
+              final rawVal = v['score'] ?? v['mastery'] ?? v['theta'];
+              if (rawVal is num) {
+                extractedScore = rawVal.toDouble();
+              }
+            }
+            if (extractedScore != null) {
+              placementSkillScores[skill] = extractedScore.clamp(0.0, 1.0);
+            }
           });
         } catch (_) {}
       }

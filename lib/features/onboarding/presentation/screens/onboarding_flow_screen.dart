@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sqflite/sqflite.dart';
 import '../../../../core/database/app_database.dart';
 import '../../../../core/database/database_constants.dart';
 import '../../../../core/network/ai/ai_service.dart';
@@ -74,31 +75,36 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
     final db = AppDatabase.instance.database;
     final nowIso = DateTime.now().toUtc().toIso8601String();
 
-    // Persist to user profiles & app settings
-    await db.insert(
-      DatabaseConstants.tableAppSettings,
-      {
-        'key': 'daily_learning_minutes',
-        'value': dailyMinutes.toString(),
-        'updated_at': nowIso,
-      },
-    );
-    await db.insert(
-      DatabaseConstants.tableAppSettings,
-      {
-        'key': 'priority_focus_skill',
-        'value': focusSkill,
-        'updated_at': nowIso,
-      },
-    );
-    await db.insert(
-      DatabaseConstants.tableAppSettings,
-      {
-        'key': 'onboarding_completed',
-        'value': 'true',
-        'updated_at': nowIso,
-      },
-    );
+    // Persist to user profiles & app settings idempotently
+    await db.transaction((txn) async {
+      await txn.insert(
+        DatabaseConstants.tableAppSettings,
+        {
+          'key': 'daily_learning_minutes',
+          'value': dailyMinutes.toString(),
+          'updated_at': nowIso,
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      await txn.insert(
+        DatabaseConstants.tableAppSettings,
+        {
+          'key': 'priority_focus_skill',
+          'value': focusSkill,
+          'updated_at': nowIso,
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      await txn.insert(
+        DatabaseConstants.tableAppSettings,
+        {
+          'key': 'onboarding_completed',
+          'value': 'true',
+          'updated_at': nowIso,
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    });
 
     widget.onOnboardingComplete();
   }

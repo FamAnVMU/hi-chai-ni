@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class ContentItem {
   final String id;
   final String contentId;
@@ -30,14 +32,22 @@ class ContentItem {
   factory ContentItem.fromMap(Map<String, dynamic> map) {
     List<String> objs = [];
     if (map['objectives_json'] is String && (map['objectives_json'] as String).isNotEmpty) {
+      final raw = map['objectives_json'] as String;
       try {
-        objs = List<String>.from((map['objectives_json'] as String)
+        final decoded = json.decode(raw);
+        if (decoded is List) {
+          objs = decoded.map((e) => e.toString().trim()).where((s) => s.isNotEmpty).toList();
+        }
+      } catch (_) {
+        objs = raw
             .replaceAll('[', '')
             .replaceAll(']', '')
             .replaceAll('"', '')
             .split(',')
-            .where((s) => s.trim().isNotEmpty));
-      } catch (_) {}
+            .map((s) => s.trim())
+            .where((s) => s.isNotEmpty)
+            .toList();
+      }
     }
 
     return ContentItem(

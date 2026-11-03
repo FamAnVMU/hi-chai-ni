@@ -243,14 +243,25 @@ class PlacementTestIntroScreen extends ConsumerWidget {
                   }
                   await ref.read(activeCatSessionProvider.notifier).startNewTest();
                   if (context.mounted) {
-                    Navigator.of(context).push(
+                    await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => const PlacementTestFlowScreen(),
                       ),
                     );
+                    final updatedResult = ref.read(latestAssessmentResultProvider).asData?.value;
+                    onTestComplete?.call(updatedResult?.recommendedHskLevel);
                   }
                 },
               ),
+              if (onTestComplete != null) ...[
+                const SizedBox(height: AppSpacing.sm),
+                HiButton(
+                  text: 'Bỏ qua bài kiểm tra (Bắt đầu từ HSK 1)',
+                  variant: HiButtonVariant.ghost,
+                  isFullWidth: true,
+                  onPressed: () => onTestComplete?.call(1),
+                ),
+              ],
               const SizedBox(height: AppSpacing.xl),
             ],
           ),

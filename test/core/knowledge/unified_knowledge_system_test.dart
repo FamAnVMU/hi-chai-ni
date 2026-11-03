@@ -17,6 +17,7 @@ void main() {
 
     setUp(() async {
       db = await databaseFactory.openDatabase(inMemoryDatabasePath);
+      await db.execute('PRAGMA foreign_keys = ON;');
 
       // Run full migration suite up to v15
       final engine = MigrationEngine();
