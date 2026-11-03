@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../../core/database/database_constants.dart';
+import '../../curriculum/data/placement_unlock_handler.dart';
 import '../domain/engine/cat_engine.dart';
 import '../domain/models/cat_assessment_result.dart';
 import '../domain/models/cat_session_state.dart';
@@ -266,6 +268,14 @@ class PlacementTestRepository {
         },
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
+
+      // 4. Activate PlacementUnlockHandler to unlock recommended level and auto-credit prior lessons
+      try {
+        final unlockHandler = PlacementUnlockHandler(txn);
+        await unlockHandler.unlockForRecommendedLevel(result.recommendedHskLevel);
+      } catch (e) {
+        debugPrint('[PlacementTestRepository] Warning: PlacementUnlockHandler failed: $e');
+      }
     });
   }
 

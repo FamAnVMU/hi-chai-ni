@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hi_chinese/core/database/app_database.dart';
 import 'package:hi_chinese/core/database/dao/app_settings_dao.dart';
 import 'package:hi_chinese/core/database/database_constants.dart';
 import 'package:hi_chinese/core/database/migrations/migration_engine.dart';
@@ -38,10 +39,20 @@ void main() {
   setUp(() async {
     tempDir = await Directory.systemTemp.createTemp('profile_settings_test_');
     dbPath = '${tempDir.path}/test_profile.db';
-    db = await databaseFactory.openDatabase(dbPath);
-
-    final engine = MigrationEngine();
-    await engine.executeMigrations(db, 0, DatabaseConstants.currentDatabaseVersion);
+    db = await databaseFactory.openDatabase(
+      dbPath,
+      options: OpenDatabaseOptions(
+        version: DatabaseConstants.currentDatabaseVersion,
+        onConfigure: (db) async {
+          await db.execute('PRAGMA foreign_keys = ON;');
+          await db.rawQuery('PRAGMA journal_mode = WAL;');
+        },
+        onCreate: (db, ver) async {
+          final engine = MigrationEngine();
+          await engine.executeMigrations(db, 0, ver);
+        },
+      ),
+    );
 
     profileRepo = DefaultProfileRepository(db);
     settingsDao = AppSettingsDao(db);
@@ -49,7 +60,13 @@ void main() {
   });
 
   tearDown(() async {
-    await db.close();
+    if (dataService.db.isOpen) {
+      await dataService.db.close();
+    }
+    if (db.isOpen) {
+      await db.close();
+    }
+    await AppDatabase.instance.close();
     if (await tempDir.exists()) {
       await tempDir.delete(recursive: true);
     }
@@ -235,6 +252,28 @@ void main() {
       final freshProfile = await profileRepo.getProfile();
       expect(freshProfile.targetHskLevel, 3);
       expect(freshProfile.displayName, 'Người học HI Chinese');
+    });
+
+    test('6. restoreBackup safely flushes WAL, closes connection, restores file, and reconnects', () async {
+      // 1. Establish state and take a backup
+      final initialProfile = await profileRepo.getProfile();
+      await profileRepo.saveProfile(initialProfile.copyWith(displayName: 'Backup Pioneer'));
+      final backupFile = await dataService.createBackup(customName: 'test_restore_target.hibak');
+      expect(await backupFile.exists(), isTrue);
+
+      // 2. Modify state after backup
+      final currentProfile = await profileRepo.getProfile();
+      await profileRepo.saveProfile(currentProfile.copyWith(displayName: 'Altered Pioneer'));
+      final modifiedProfile = await profileRepo.getProfile();
+      expect(modifiedProfile.displayName, 'Altered Pioneer');
+
+      // 3. Restore from backup
+      await dataService.restoreBackup(backupFile);
+
+      // 4. Verify DB was reconnected and data reverted to backup state
+      final restoredRepo = DefaultProfileRepository(dataService.db);
+      final restoredProfile = await restoredRepo.getProfile();
+      expect(restoredProfile.displayName, 'Backup Pioneer');
     });
   });
 

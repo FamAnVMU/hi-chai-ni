@@ -74,6 +74,7 @@ class MigrationEngine {
         debugPrint('[MigrationEngine] Applying migration v${migration.version}: ${migration.description}');
         await migration.up(db);
       }
+      await db.execute('PRAGMA user_version = $newVersion;');
       debugPrint('[MigrationEngine] All migrations up to v$newVersion applied successfully.');
     } catch (e, stackTrace) {
       debugPrint('[MigrationEngine] FATAL: Migration failed at v$oldVersion -> v$newVersion: $e\n$stackTrace');

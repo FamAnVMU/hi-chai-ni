@@ -101,6 +101,48 @@ class CatItem {
       return input == expected;
     }
 
+    if (type == CatItemType.speakingPrompt) {
+      // 1. Direct boolean evaluation result (e.g., from acoustic/scoring evaluator)
+      if (answer is bool) return answer;
+
+      // 2. Numerical score (support both 0.0-1.0 normalized or 0-100 percentage)
+      // Standard passing threshold is 60% (0.60 or 60.0)
+      if (answer is num) {
+        final threshold = answer <= 1.0 ? 0.60 : 60.0;
+        return answer >= threshold;
+      }
+
+      // 3. Map representation (e.g. from PronunciationAssessmentResult or API payload)
+      if (answer is Map) {
+        if (answer['isCorrect'] is bool) {
+          return answer['isCorrect'] as bool;
+        }
+        final score = answer['score'] ?? answer['overallScore'] ?? answer['accuracyRate'];
+        if (score is num) {
+          final threshold = score <= 1.0 ? 0.60 : 60.0;
+          return score >= threshold;
+        }
+      }
+
+      // 4. String transcript or evaluation indicator
+      if (answer is String) {
+        final trimmed = answer.trim().toLowerCase();
+        if (trimmed == 'true' ||
+            trimmed == 'correct' ||
+            trimmed == 'passed' ||
+            trimmed == 'speech_sample_recorded') {
+          return true;
+        }
+        if (correctAnswerText != null && correctAnswerText!.isNotEmpty) {
+          final cleanInput = trimmed.replaceAll(RegExp(r'[\s\p{P}]', unicode: true), '');
+          final cleanTarget = correctAnswerText!.toLowerCase().replaceAll(RegExp(r'[\s\p{P}]', unicode: true), '');
+          return cleanInput.contains(cleanTarget) || cleanTarget.contains(cleanInput);
+        }
+      }
+
+      return false;
+    }
+
     return false;
   }
 }

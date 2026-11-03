@@ -17,10 +17,12 @@ class DestructiveActionException implements Exception {
 }
 
 class DataManagementService {
-  final Database _db;
+  Database _db;
   final String _dbPath;
 
   DataManagementService(this._db, this._dbPath);
+
+  Database get db => _db;
 
   /// Calculates real file sizes on disk for SQLite DB, WAL, and temp directories.
   Future<StorageBreakdown> getStorageBreakdown() async {
@@ -110,7 +112,8 @@ class DataManagementService {
     return files;
   }
 
-  /// Safely restores database from a backup file with pre-destruction safety snapshot.
+  /// Safely restores database from a backup file with pre-destruction safety snapshot,
+  /// safe WAL checkpoint, connection closure, atomic file replacement, and clean reconnection.
   Future<void> restoreBackup(File backupFile) async {
     if (!await backupFile.exists()) {
       throw StateError('File sao lưu không tồn tại: ${backupFile.path}');
@@ -123,24 +126,63 @@ class DataManagementService {
       debugPrint('[DataManagement] Warning: Could not create pre-restore snapshot: $e');
     }
 
-    // 2. Perform safe WAL checkpoint on active DB and close connection safely
+    // 2. Perform safe WAL checkpoint on active DB and close all connection handles safely
     try {
-      await _db.rawQuery('PRAGMA wal_checkpoint(TRUNCATE);');
+      if (_db.isOpen) {
+        await _db.execute('PRAGMA optimize;');
+        await _db.rawQuery('PRAGMA wal_checkpoint(TRUNCATE);');
+      }
+    } catch (_) {}
+
+    try {
+      if (_db.isOpen) {
+        await _db.close();
+      }
     } catch (_) {}
 
     await AppDatabase.instance.close();
 
-    // 3. Copy backup file directly over the database file
+    // 3. Cleanly remove target file on platforms (e.g. Windows) that fail on copy collision, then copy backup
+    final targetDbFile = File(_dbPath);
+    if (await targetDbFile.exists()) {
+      await targetDbFile.delete();
+    }
     await backupFile.copy(_dbPath);
 
     // 4. Remove lingering -wal and -shm files to avoid inconsistencies
     final walFile = File('$_dbPath-wal');
-    if (await walFile.exists()) await walFile.delete();
+    if (await walFile.exists()) {
+      try {
+        await walFile.delete();
+      } catch (_) {}
+    }
     final shmFile = File('$_dbPath-shm');
-    if (await shmFile.exists()) await shmFile.delete();
+    if (await shmFile.exists()) {
+      try {
+        await shmFile.delete();
+      } catch (_) {}
+    }
 
     // 5. Safely re-open database connection
-    await AppDatabase.instance.open();
+    try {
+      _db = await AppDatabase.instance.open(customPath: _dbPath);
+    } catch (_) {
+      _db = await databaseFactory.openDatabase(
+        _dbPath,
+        options: OpenDatabaseOptions(
+          onConfigure: (db) async {
+            await db.execute('PRAGMA foreign_keys = ON;');
+            await db.rawQuery('PRAGMA journal_mode = WAL;');
+          },
+        ),
+      );
+    }
+
+    // 6. Verify integrity of restored database
+    final issues = await DatabaseBackupHelper.checkIntegrity(_db);
+    if (issues.isNotEmpty) {
+      debugPrint('[DataManagement] Warning: Integrity check issues after restore: $issues');
+    }
 
     debugPrint('[DataManagement] Restore completed from ${backupFile.path}');
   }

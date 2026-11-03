@@ -75,4 +75,33 @@ class PlacementUnlockHandler {
 
     return creditedCount;
   }
+
+  /// Automatically unlocks curriculum content corresponding to the CAT placement recommended HSK level.
+  ///
+  /// - Automatically credits all lessons in all lower levels (< [recommendedLevel]) with
+  ///   `credited_by_placement_test`.
+  /// - In [recommendedLevel], credits all lessons prior to [startingLessonOrder] and unlocks
+  ///   [startingLessonOrder] (default: Lesson 1) for immediate study.
+  Future<int> unlockForRecommendedLevel(
+    int recommendedLevel, {
+    int startingLessonOrder = 1,
+  }) async {
+    int totalCredited = 0;
+
+    // 1. Auto-credit all curriculum levels prior to recommendedLevel
+    for (int lvl = 1; lvl < recommendedLevel; lvl++) {
+      totalCredited += await creditLessonsUpToLevel(
+        hskLevel: lvl,
+        targetLessonOrder: 999999, // Exceeds any lesson count, crediting all lessons in level
+      );
+    }
+
+    // 2. In recommendedLevel, unlock starting lesson (and credit lessons before it if startingLessonOrder > 1)
+    totalCredited += await creditLessonsUpToLevel(
+      hskLevel: recommendedLevel,
+      targetLessonOrder: startingLessonOrder,
+    );
+
+    return totalCredited;
+  }
 }

@@ -6,6 +6,7 @@ import 'package:hi_chinese/features/curriculum/data/content_pack_loader.dart';
 import 'package:hi_chinese/features/curriculum/data/curriculum_repository.dart';
 import 'package:hi_chinese/features/curriculum/domain/engine/prerequisite_engine.dart';
 import 'package:hi_chinese/features/curriculum/domain/engine/mastery_engine.dart';
+import 'package:hi_chinese/features/curriculum/domain/models/curriculum_models.dart';
 import 'package:hi_chinese/features/curriculum/data/placement_unlock_handler.dart';
 
 void main() {
@@ -125,6 +126,29 @@ void main() {
       final weakItems = await masteryEngine.getWeakLessons(threshold: 0.70);
       expect(weakItems.length, 1);
       expect(weakItems.first['item_id'], 'lesson_1_1');
+    });
+
+    test('4. PlacementUnlockHandler.unlockForRecommendedLevel unlocks target level and credits prior levels', () async {
+      // Learner tests into HSK 1 with starting lesson 3
+      final credited = await placementHandler.unlockForRecommendedLevel(1, startingLessonOrder: 3);
+      expect(credited, 2); // Lessons 1 and 2 credited
+
+      final l1 = await repo.getLessonById('lesson_1_1');
+      final l2 = await repo.getLessonById('lesson_1_2');
+      final l3 = await repo.getLessonById('lesson_1_3');
+      final l4 = await repo.getLessonById('lesson_1_4');
+
+      expect(l1!.status, LessonStatus.completed);
+      expect(l1.creditedReason, 'credited_by_placement_test');
+      expect(l2!.status, LessonStatus.completed);
+      expect(l2.creditedReason, 'credited_by_placement_test');
+
+      // Lesson 3 is unlocked and not started
+      expect(l3!.isLocked, isFalse);
+      expect(l3.status, LessonStatus.notStarted);
+
+      // Lesson 4 remains locked
+      expect(l4!.isLocked, isTrue);
     });
   });
 }

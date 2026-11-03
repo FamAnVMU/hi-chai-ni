@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hi_chinese/features/placement_test/domain/engine/cat_engine.dart';
 import 'package:hi_chinese/features/placement_test/domain/models/cat_assessment_result.dart';
+import 'package:hi_chinese/features/placement_test/domain/models/cat_item.dart';
 import 'package:hi_chinese/features/placement_test/domain/models/cat_session_state.dart';
 import 'package:hi_chinese/features/placement_test/domain/models/cat_skill.dart';
 
@@ -175,6 +176,83 @@ void main() {
       expect(CatAssessmentResult.disclaimerVi, isNotEmpty);
       expect(CatAssessmentResult.disclaimerVi, contains('ước lượng tham chiếu nội bộ'));
       expect(CatAssessmentResult.disclaimerVi, contains('không có giá trị thay thế chứng chỉ HSK chính thức'));
+    });
+
+    test('8. CatItemType.speakingPrompt handles boolean, numerical, map, and transcript answers in checkAnswer', () {
+      const speakingItem = CatItem(
+        id: 'SPK_TEST_01',
+        skill: CatSkill.speaking,
+        type: CatItemType.speakingPrompt,
+        speakingMode: SpeakingEvaluationMode.acousticAudioAnalyzed,
+        difficulty: -1.0,
+        discrimination: 1.2,
+        hskLevel: 1,
+        prompt: 'Đọc: 你好 (nǐ hǎo)',
+        correctAnswerText: '你好',
+        explanationVi: 'Biến điệu thanh 3',
+        knowledgeGapTag: 'speaking_tone3',
+        knowledgeGapLabelVi: 'Thanh điệu',
+      );
+
+      // Direct boolean evaluation
+      expect(speakingItem.checkAnswer(true), isTrue);
+      expect(speakingItem.checkAnswer(false), isFalse);
+
+      // Numerical score on 0.0-1.0 scale (threshold: 0.60)
+      expect(speakingItem.checkAnswer(0.85), isTrue);
+      expect(speakingItem.checkAnswer(0.60), isTrue);
+      expect(speakingItem.checkAnswer(0.55), isFalse);
+
+      // Numerical score on 0-100 scale (threshold: 60)
+      expect(speakingItem.checkAnswer(85), isTrue);
+      expect(speakingItem.checkAnswer(60.0), isTrue);
+      expect(speakingItem.checkAnswer(45), isFalse);
+
+      // Map evaluation payload
+      expect(speakingItem.checkAnswer({'isCorrect': true}), isTrue);
+      expect(speakingItem.checkAnswer({'isCorrect': false}), isFalse);
+      expect(speakingItem.checkAnswer({'score': 0.75}), isTrue);
+      expect(speakingItem.checkAnswer({'overallScore': 80}), isTrue);
+      expect(speakingItem.checkAnswer({'accuracyRate': 0.40}), isFalse);
+
+      // String transcript and indicators
+      expect(speakingItem.checkAnswer('passed'), isTrue);
+      expect(speakingItem.checkAnswer('speech_sample_recorded'), isTrue);
+      expect(speakingItem.checkAnswer('你好'), isTrue);
+      expect(speakingItem.checkAnswer('nǐ hǎo'), isFalse); // Non-matching text
+      expect(speakingItem.checkAnswer(null), isFalse);
+    });
+
+    test('9. CatEngine processTurn evaluates speakingPrompt turns properly', () {
+      const speakingItem = CatItem(
+        id: 'SPK_TEST_02',
+        skill: CatSkill.speaking,
+        type: CatItemType.speakingPrompt,
+        speakingMode: SpeakingEvaluationMode.acousticAudioAnalyzed,
+        difficulty: -0.5,
+        discrimination: 1.0,
+        hskLevel: 1,
+        prompt: 'Đọc: 谢谢',
+        correctAnswerText: '谢谢',
+        explanationVi: 'Phát âm thanh nhẹ',
+        knowledgeGapTag: 'speaking_neutral_tone',
+        knowledgeGapLabelVi: 'Thanh nhẹ',
+      );
+
+      var state = CatSessionState.initial('SESSION_SPEAKING');
+      state = state.copyWith(activeItem: speakingItem, currentSkill: CatSkill.speaking);
+
+      final initialTheta = state.currentTheta;
+
+      // Pass turn with 0.85 pronunciation score
+      final nextState = engine.processTurn(
+        currentState: state,
+        userAnswer: 0.85,
+        latencyMs: 1500,
+      );
+
+      expect(nextState.responses.last.isCorrect, isTrue);
+      expect(nextState.currentTheta, greaterThan(initialTheta));
     });
   });
 }

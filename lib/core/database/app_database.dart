@@ -52,7 +52,7 @@ class AppDatabase {
 
     if (customPath != null) {
       _databasePath = customPath;
-    } else {
+    } else if (_databasePath == null) {
       final databasesDir = await factory.getDatabasesPath();
       _databasePath = p.join(databasesDir, DatabaseConstants.databaseName);
     }
