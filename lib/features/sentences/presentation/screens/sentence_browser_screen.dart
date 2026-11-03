@@ -57,12 +57,8 @@ class _SentenceBrowserScreenState extends State<SentenceBrowserScreen> {
       list = await widget.repository.searchSentences(_searchQuery);
     } else if (_filterReviewOnly) {
       final reviews = await widget.repository.getSentencesNeedingReview();
-      final fetched = <SentenceItem>[];
-      for (final r in reviews) {
-        final s = await widget.repository.getSentenceById(r.sentenceId);
-        if (s != null) fetched.add(s);
-      }
-      list = fetched;
+      final sentenceIds = reviews.map((r) => r.sentenceId).toList();
+      list = await widget.repository.getSentencesByIds(sentenceIds);
     } else {
       list = await widget.repository.getSentencesByHskLevel(
         _selectedHskLevel,
@@ -71,11 +67,8 @@ class _SentenceBrowserScreenState extends State<SentenceBrowserScreen> {
       );
     }
 
-    final progMap = <String, SentencePracticeProgress>{};
-    for (final s in list) {
-      final p = await widget.repository.getProgress(s.id);
-      if (p != null) progMap[s.id] = p;
-    }
+    final sentenceIds = list.map((s) => s.id).toList();
+    final progMap = await widget.repository.getProgressForSentences(sentenceIds);
 
     if (mounted) {
       setState(() {

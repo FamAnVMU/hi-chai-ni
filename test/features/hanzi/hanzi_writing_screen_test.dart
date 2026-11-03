@@ -54,6 +54,22 @@ class FakeHanziRepository implements HanziRepository {
   Future<HanziWritingProgress?> getProgress(String character) async => _progress[character];
 
   @override
+  Future<Map<String, HanziWritingProgress>> getProgressForCharacters(List<String> characters) async {
+    final map = <String, HanziWritingProgress>{};
+    for (final c in characters) {
+      if (_progress.containsKey(c)) {
+        map[c] = _progress[c]!;
+      }
+    }
+    return map;
+  }
+
+  @override
+  Future<List<HanziCharacter>> getCharactersByGlyphs(List<String> characters) async {
+    return _chars.values.where((c) => characters.contains(c.character)).toList();
+  }
+
+  @override
   Future<void> recordPracticeAttempt({
     required String character,
     required double accuracy,

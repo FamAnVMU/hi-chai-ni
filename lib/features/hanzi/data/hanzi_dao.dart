@@ -119,6 +119,61 @@ class HanziDao {
     }
   }
 
+  /// Fetch handwriting progress for multiple characters in bulk batches
+  Future<Map<String, HanziWritingProgress>> getProgressForCharacters(
+    List<String> characters, {
+    int batchSize = 300,
+  }) async {
+    final unique = characters.where((c) => c.trim().isNotEmpty).toSet().toList();
+    if (unique.isEmpty) return const {};
+
+    final map = <String, HanziWritingProgress>{};
+    for (int i = 0; i < unique.length; i += batchSize) {
+      final end = (i + batchSize < unique.length) ? i + batchSize : unique.length;
+      final batch = unique.sublist(i, end);
+      final placeholders = List.filled(batch.length, '?').join(',');
+
+      final results = await _db.query(
+        DatabaseConstants.tableHanziWritingProgress,
+        where: 'character IN ($placeholders)',
+        whereArgs: batch,
+      );
+
+      for (final row in results) {
+        final progress = HanziWritingProgress.fromMap(row);
+        map[progress.character] = progress;
+      }
+    }
+
+    return map;
+  }
+
+  /// Fetch multiple characters by glyphs in bulk batches
+  Future<List<HanziCharacter>> getCharactersByGlyphs(
+    List<String> characters, {
+    int batchSize = 300,
+  }) async {
+    final unique = characters.where((c) => c.trim().isNotEmpty).toSet().toList();
+    if (unique.isEmpty) return const [];
+
+    final list = <HanziCharacter>[];
+    for (int i = 0; i < unique.length; i += batchSize) {
+      final end = (i + batchSize < unique.length) ? i + batchSize : unique.length;
+      final batch = unique.sublist(i, end);
+      final placeholders = List.filled(batch.length, '?').join(',');
+
+      final results = await _db.query(
+        DatabaseConstants.tableHanziCharacters,
+        where: 'character IN ($placeholders)',
+        whereArgs: batch,
+      );
+
+      list.addAll(results.map(HanziCharacter.fromMap));
+    }
+
+    return list;
+  }
+
   /// Get handwriting progress for a character
   Future<HanziWritingProgress?> getProgress(String character) async {
     final results = await _db.query(

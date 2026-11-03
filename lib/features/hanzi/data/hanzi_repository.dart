@@ -9,6 +9,8 @@ abstract class HanziRepository {
   Future<List<HanziCharacter>> getCharactersByHskLevel(int hskLevel, {int limit = 100, int offset = 0});
   Future<List<HanziCharacter>> searchCharacters(String query, {int limit = 50});
   Future<HanziWritingProgress?> getProgress(String character);
+  Future<Map<String, HanziWritingProgress>> getProgressForCharacters(List<String> characters);
+  Future<List<HanziCharacter>> getCharactersByGlyphs(List<String> characters);
   Future<void> recordPracticeAttempt({
     required String character,
     required double accuracy,
@@ -58,6 +60,17 @@ class DefaultHanziRepository implements HanziRepository {
   @override
   Future<HanziWritingProgress?> getProgress(String character) async {
     return _dao.getProgress(character);
+  }
+
+  @override
+  Future<Map<String, HanziWritingProgress>> getProgressForCharacters(List<String> characters) async {
+    return _dao.getProgressForCharacters(characters);
+  }
+
+  @override
+  Future<List<HanziCharacter>> getCharactersByGlyphs(List<String> characters) async {
+    await _checkAndSeed();
+    return _dao.getCharactersByGlyphs(characters);
   }
 
   @override

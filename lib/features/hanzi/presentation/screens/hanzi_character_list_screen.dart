@@ -51,24 +51,14 @@ class _HanziCharacterListScreenState extends State<HanziCharacterListScreen> {
       chars = await widget.repository.searchCharacters(_searchQuery);
     } else if (_filterReviewOnly) {
       final reviews = await widget.repository.getCharactersNeedingReview();
-      final charList = <HanziCharacter>[];
-      for (final r in reviews) {
-        final c = await widget.repository.getCharacter(r.character);
-        if (c != null) charList.add(c);
-      }
-      chars = charList;
+      final glyphs = reviews.map((r) => r.character).toList();
+      chars = await widget.repository.getCharactersByGlyphs(glyphs);
     } else {
       chars = await widget.repository.getCharactersByHskLevel(_selectedHskLevel, limit: 300);
     }
 
-    // Load progress
-    final map = <String, HanziWritingProgress>{};
-    for (final c in chars) {
-      final p = await widget.repository.getProgress(c.character);
-      if (p != null) {
-        map[c.character] = p;
-      }
-    }
+    final charGlyphs = chars.map((c) => c.character).toList();
+    final map = await widget.repository.getProgressForCharacters(charGlyphs);
 
     if (mounted) {
       setState(() {

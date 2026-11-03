@@ -48,11 +48,16 @@ class SentenceDao {
       offset: offset,
     );
 
+    if (results.isEmpty) return const [];
+
+    final sentenceIds = results.map((r) => r['id'] as String).toList();
+    final audioMap = await getAudiosForSentences(sentenceIds);
+
     final sentences = <SentenceItem>[];
     for (final r in results) {
-      final audios = await getAudiosForSentence(r['id'] as String);
+      final id = r['id'] as String;
       final map = Map<String, dynamic>.from(r);
-      map['audios'] = audios.map((a) => a.toMap()).toList();
+      map['audios'] = (audioMap[id] ?? const []).map((a) => a.toMap()).toList();
       sentences.add(SentenceItem.fromJson(map));
     }
 
@@ -76,31 +81,130 @@ class SentenceDao {
       limit: limit,
     );
 
-    final list = <SentenceItem>[];
-    for (final r in results) {
-      final audios = await getAudiosForSentence(r['id'] as String);
-      final map = Map<String, dynamic>.from(r);
-      map['audios'] = audios.map((a) => a.toMap()).toList();
-      list.add(SentenceItem.fromJson(map));
-    }
+    List<Map<String, dynamic>> rawCandidates = results.map((r) => Map<String, dynamic>.from(r)).toList();
 
-    if (list.isEmpty && normalized.isNotEmpty) {
+    if (rawCandidates.isEmpty && normalized.isNotEmpty) {
       final all = await _db.query(DatabaseConstants.tableSentences, limit: 300);
       for (final r in all) {
         final p = r['pinyin'] as String? ?? '';
         final pNorm = PinyinHelper.removeTones(p).replaceAll(' ', '');
         final queryNorm = normalized.replaceAll(' ', '');
         if (pNorm.contains(queryNorm)) {
-          final audios = await getAudiosForSentence(r['id'] as String);
-          final map = Map<String, dynamic>.from(r);
-          map['audios'] = audios.map((a) => a.toMap()).toList();
-          list.add(SentenceItem.fromJson(map));
-          if (list.length >= limit) break;
+          rawCandidates.add(Map<String, dynamic>.from(r));
+          if (rawCandidates.length >= limit) break;
         }
       }
     }
 
+    if (rawCandidates.isEmpty) return const [];
+
+    final sentenceIds = rawCandidates.map((r) => r['id'] as String).toList();
+    final audioMap = await getAudiosForSentences(sentenceIds);
+
+    final list = <SentenceItem>[];
+    for (final r in rawCandidates) {
+      final id = r['id'] as String;
+      r['audios'] = (audioMap[id] ?? const []).map((a) => a.toMap()).toList();
+      list.add(SentenceItem.fromJson(r));
+    }
+
     return list;
+  }
+
+  /// Fetch audio tracks for multiple sentences in bulk batches
+  Future<Map<String, List<SentenceAudio>>> getAudiosForSentences(
+    List<String> sentenceIds, {
+    int batchSize = 300,
+  }) async {
+    final unique = sentenceIds.where((id) => id.trim().isNotEmpty).toSet().toList();
+    if (unique.isEmpty) return const {};
+
+    final map = <String, List<SentenceAudio>>{};
+    for (int i = 0; i < unique.length; i += batchSize) {
+      final end = (i + batchSize < unique.length) ? i + batchSize : unique.length;
+      final batch = unique.sublist(i, end);
+      final placeholders = List.filled(batch.length, '?').join(',');
+
+      final results = await _db.query(
+        DatabaseConstants.tableSentenceAudio,
+        where: 'sentence_id IN ($placeholders)',
+        whereArgs: batch,
+      );
+
+      for (final row in results) {
+        final audio = SentenceAudio.fromMap(row);
+        map.putIfAbsent(audio.sentenceId, () => []).add(audio);
+      }
+    }
+
+    return map;
+  }
+
+  /// Fetch sentences by IDs in bulk batches with audios
+  Future<List<SentenceItem>> getSentencesByIds(
+    List<String> sentenceIds, {
+    int batchSize = 300,
+  }) async {
+    final unique = sentenceIds.where((id) => id.trim().isNotEmpty).toSet().toList();
+    if (unique.isEmpty) return const [];
+
+    final rawRows = <Map<String, dynamic>>[];
+    for (int i = 0; i < unique.length; i += batchSize) {
+      final end = (i + batchSize < unique.length) ? i + batchSize : unique.length;
+      final batch = unique.sublist(i, end);
+      final placeholders = List.filled(batch.length, '?').join(',');
+
+      final results = await _db.query(
+        DatabaseConstants.tableSentences,
+        where: 'id IN ($placeholders)',
+        whereArgs: batch,
+      );
+
+      rawRows.addAll(results.map((r) => Map<String, dynamic>.from(r)));
+    }
+
+    if (rawRows.isEmpty) return const [];
+
+    final ids = rawRows.map((r) => r['id'] as String).toList();
+    final audioMap = await getAudiosForSentences(ids, batchSize: batchSize);
+
+    final list = <SentenceItem>[];
+    for (final r in rawRows) {
+      final id = r['id'] as String;
+      r['audios'] = (audioMap[id] ?? const []).map((a) => a.toMap()).toList();
+      list.add(SentenceItem.fromJson(r));
+    }
+
+    return list;
+  }
+
+  /// Fetch practice progress for multiple sentences in bulk batches
+  Future<Map<String, SentencePracticeProgress>> getProgressForSentences(
+    List<String> sentenceIds, {
+    int batchSize = 300,
+  }) async {
+    final unique = sentenceIds.where((id) => id.trim().isNotEmpty).toSet().toList();
+    if (unique.isEmpty) return const {};
+
+    final map = <String, SentencePracticeProgress>{};
+    for (int i = 0; i < unique.length; i += batchSize) {
+      final end = (i + batchSize < unique.length) ? i + batchSize : unique.length;
+      final batch = unique.sublist(i, end);
+      final placeholders = List.filled(batch.length, '?').join(',');
+
+      final results = await _db.query(
+        DatabaseConstants.tableSentencePracticeProgress,
+        where: 'sentence_id IN ($placeholders)',
+        whereArgs: batch,
+      );
+
+      for (final row in results) {
+        final progress = SentencePracticeProgress.fromMap(row);
+        map[progress.sentenceId] = progress;
+      }
+    }
+
+    return map;
   }
 
   /// Fetch audio tracks for a given sentence

@@ -13,6 +13,8 @@ abstract class SentenceRepository {
   });
   Future<List<SentenceItem>> searchSentences(String query, {int limit = 30});
   Future<SentencePracticeProgress?> getProgress(String sentenceId);
+  Future<Map<String, SentencePracticeProgress>> getProgressForSentences(List<String> sentenceIds);
+  Future<List<SentenceItem>> getSentencesByIds(List<String> sentenceIds);
   Future<void> recordPracticeAttempt({
     required String sentenceId,
     required String practiceType, // 'listening', 'shadowing', 'reading'
@@ -60,6 +62,17 @@ class DefaultSentenceRepository implements SentenceRepository {
   @override
   Future<SentencePracticeProgress?> getProgress(String sentenceId) async {
     return _dao.getProgress(sentenceId);
+  }
+
+  @override
+  Future<Map<String, SentencePracticeProgress>> getProgressForSentences(List<String> sentenceIds) async {
+    return _dao.getProgressForSentences(sentenceIds);
+  }
+
+  @override
+  Future<List<SentenceItem>> getSentencesByIds(List<String> sentenceIds) async {
+    await _checkAndSeed();
+    return _dao.getSentencesByIds(sentenceIds);
   }
 
   @override

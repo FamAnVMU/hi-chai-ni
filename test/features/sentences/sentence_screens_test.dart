@@ -67,6 +67,22 @@ class FakeSentenceRepository implements SentenceRepository {
   Future<SentencePracticeProgress?> getProgress(String sentenceId) async => _progress[sentenceId];
 
   @override
+  Future<Map<String, SentencePracticeProgress>> getProgressForSentences(List<String> sentenceIds) async {
+    final map = <String, SentencePracticeProgress>{};
+    for (final id in sentenceIds) {
+      if (_progress.containsKey(id)) {
+        map[id] = _progress[id]!;
+      }
+    }
+    return map;
+  }
+
+  @override
+  Future<List<SentenceItem>> getSentencesByIds(List<String> sentenceIds) async {
+    return _sentences.values.where((s) => sentenceIds.contains(s.id)).toList();
+  }
+
+  @override
   Future<void> recordPracticeAttempt({
     required String sentenceId,
     required String practiceType,
