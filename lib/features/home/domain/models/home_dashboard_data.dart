@@ -151,6 +151,68 @@ class RoadmapProgress {
       );
 }
 
+/// Aggregated, deduplicated study time statistics across standard temporal scopes.
+@immutable
+class StudyTimeStats {
+  /// Today's study duration in seconds (sanitized & deduplicated).
+  final int todayDurationSeconds;
+
+  /// This week's study duration in seconds (Monday to current local time).
+  final int weekDurationSeconds;
+
+  /// Total all-time study duration in seconds.
+  final int totalDurationSeconds;
+
+  /// Number of distinct learning items/reviews completed today.
+  final int todayItemsCompleted;
+
+  /// Number of distinct learning items/reviews completed this week.
+  final int weekItemsCompleted;
+
+  /// Number of distinct learning items/reviews completed all time.
+  final int totalItemsCompleted;
+
+  const StudyTimeStats({
+    this.todayDurationSeconds = 0,
+    this.weekDurationSeconds = 0,
+    this.totalDurationSeconds = 0,
+    this.todayItemsCompleted = 0,
+    this.weekItemsCompleted = 0,
+    this.totalItemsCompleted = 0,
+  });
+
+  /// Rounded study duration in minutes
+  int get todayDurationMinutes => (todayDurationSeconds / 60).round();
+  int get weekDurationMinutes => (weekDurationSeconds / 60).round();
+  int get totalDurationMinutes => (totalDurationSeconds / 60).round();
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is StudyTimeStats &&
+          runtimeType == other.runtimeType &&
+          todayDurationSeconds == other.todayDurationSeconds &&
+          weekDurationSeconds == other.weekDurationSeconds &&
+          totalDurationSeconds == other.totalDurationSeconds &&
+          todayItemsCompleted == other.todayItemsCompleted &&
+          weekItemsCompleted == other.weekItemsCompleted &&
+          totalItemsCompleted == other.totalItemsCompleted;
+
+  @override
+  int get hashCode => Object.hash(
+        todayDurationSeconds,
+        weekDurationSeconds,
+        totalDurationSeconds,
+        todayItemsCompleted,
+        weekItemsCompleted,
+        totalItemsCompleted,
+      );
+
+  @override
+  String toString() =>
+      'StudyTimeStats(today: ${todayDurationMinutes}m, week: ${weekDurationMinutes}m, total: ${totalDurationMinutes}m)';
+}
+
 /// Unified, immutably assembled data bundle for the HI Chinese Home Screen.
 @immutable
 class HomeDashboardData {
@@ -162,6 +224,7 @@ class HomeDashboardData {
   final List<RecentActivityItem> recentActivities;
   final int dailyGoalWords;
   final int dailyGoalMinutes;
+  final StudyTimeStats studyStats;
 
   const HomeDashboardData({
     required this.learnerName,
@@ -172,6 +235,7 @@ class HomeDashboardData {
     required this.recentActivities,
     this.dailyGoalWords = 15,
     this.dailyGoalMinutes = 15,
+    this.studyStats = const StudyTimeStats(),
   });
 
   /// Progress ratio towards today's word goal (0.0 to 1.0)
@@ -192,5 +256,6 @@ class HomeDashboardData {
         srsDueCount: 0,
         roadmap: RoadmapProgress.initial(),
         recentActivities: const [],
+        studyStats: const StudyTimeStats(),
       );
 }

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/database/app_database.dart';
+import '../../../profile/presentation/providers/profile_providers.dart';
 import '../../data/srs_repository.dart';
 import '../../domain/srs_models.dart';
 
@@ -10,13 +11,14 @@ final srsRepositoryProvider = Provider<SrsRepository>((ref) {
 });
 
 /// Async notifier providing the reactive SRS due cards count.
-/// Auto-memoized and refreshed whenever reviews occur.
+/// Auto-memoized, filtered by current learner HSK level, and refreshed whenever reviews occur.
 class SrsDueCountNotifier extends AsyncNotifier<int> {
   @override
   Future<int> build() async {
     try {
       final repo = ref.watch(srsRepositoryProvider);
-      return await repo.getDueCardsCount();
+      final profile = ref.watch(userProfileProvider).value;
+      return await repo.getDueCardsCount(hskLevel: profile?.currentHskLevel);
     } catch (_) {
       return 0;
     }
@@ -26,7 +28,11 @@ class SrsDueCountNotifier extends AsyncNotifier<int> {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final repo = ref.read(srsRepositoryProvider);
-      return await repo.getDueCardsCount(forceRefresh: true);
+      final profile = ref.read(userProfileProvider).value;
+      return await repo.getDueCardsCount(
+        hskLevel: profile?.currentHskLevel,
+        forceRefresh: true,
+      );
     });
   }
 }
@@ -40,7 +46,11 @@ class SrsStudySessionNotifier extends AsyncNotifier<SrsStudySession> {
   @override
   Future<SrsStudySession> build() async {
     final repo = ref.watch(srsRepositoryProvider);
-    final cards = await repo.getDueFlashcards(limit: 25);
+    final profile = ref.watch(userProfileProvider).value;
+    final cards = await repo.getDueFlashcards(
+      limit: 25,
+      hskLevel: profile?.currentHskLevel,
+    );
     return SrsStudySession(queue: cards);
   }
 
@@ -108,7 +118,9 @@ class SrsStudySessionNotifier extends AsyncNotifier<SrsStudySession> {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final repo = ref.read(srsRepositoryProvider);
-      final cards = await repo.getDueFlashcards(limit: limit, hskLevel: hskLevel);
+      final profile = ref.read(userProfileProvider).value;
+      final effectiveHsk = hskLevel ?? profile?.currentHskLevel;
+      final cards = await repo.getDueFlashcards(limit: limit, hskLevel: effectiveHsk);
       return SrsStudySession(queue: cards);
     });
   }

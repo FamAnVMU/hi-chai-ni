@@ -203,6 +203,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with AutomaticKee
                                   onSave: (updated) {
                                     ref.read(userProfileProvider.notifier).updateProfile(
                                       displayName: updated.displayName,
+                                      currentHskLevel: updated.currentHskLevel,
                                       avatarStyle: updated.avatarStyle,
                                       interests: updated.interests,
                                     );

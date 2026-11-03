@@ -369,14 +369,17 @@ class SrsRepository {
 
   /// Retrieves the number of cards due for review, with in-memory TTL caching
   /// to eliminate redundant SQLite queries on repeated UI widget evaluations.
+  /// When [hskLevel] is specified for 'vocabulary', joins with vocabularies table
+  /// to count only cards belonging to that specific HSK proficiency level.
   Future<int> getDueCardsCount({
     String contentType = 'vocabulary',
+    int? hskLevel,
     DateTime? asOf,
     Duration ttl = const Duration(seconds: 60),
     bool forceRefresh = false,
   }) async {
     final now = DateTime.now();
-    final cacheKey = contentType;
+    final cacheKey = '$contentType:${hskLevel ?? "all"}';
 
     // Use cache only when asOf is not explicitly customized and not forceRefresh
     if (asOf == null && !forceRefresh) {
@@ -387,13 +390,31 @@ class SrsRepository {
     }
 
     final asOfUtc = (asOf ?? now).toUtc().toIso8601String();
-    final result = await _db.rawQuery(
-      'SELECT COUNT(id) as count FROM ${DatabaseConstants.tableSrsItems} '
-      'WHERE content_type = ? AND due_at <= ? AND deleted_at IS NULL',
-      [contentType, asOfUtc],
-    );
+    int count = 0;
 
-    final count = (result.first['count'] as num?)?.toInt() ?? 0;
+    if (hskLevel != null && contentType == 'vocabulary') {
+      final result = await _db.rawQuery(
+        '''
+        SELECT COUNT(DISTINCT s.id) as count 
+        FROM ${DatabaseConstants.tableSrsItems} s
+        INNER JOIN ${DatabaseConstants.tableVocabularies} v ON (s.content_id = v.id OR s.content_id = v.simplified)
+        WHERE s.content_type = ? 
+          AND s.due_at <= ? 
+          AND s.deleted_at IS NULL 
+          AND v.deleted_at IS NULL 
+          AND v.hsk_level = ?
+        ''',
+        [contentType, asOfUtc, hskLevel],
+      );
+      count = (result.first['count'] as num?)?.toInt() ?? 0;
+    } else {
+      final result = await _db.rawQuery(
+        'SELECT COUNT(id) as count FROM ${DatabaseConstants.tableSrsItems} '
+        'WHERE content_type = ? AND due_at <= ? AND deleted_at IS NULL',
+        [contentType, asOfUtc],
+      );
+      count = (result.first['count'] as num?)?.toInt() ?? 0;
+    }
 
     if (asOf == null) {
       _dueCountCache[cacheKey] = (

@@ -31,6 +31,7 @@ class EditProfileSheet extends StatefulWidget {
 
 class _EditProfileSheetState extends State<EditProfileSheet> {
   late final TextEditingController _nameController;
+  late int _selectedHskLevel;
   late String _selectedAvatar;
   late Set<String> _selectedInterests;
 
@@ -47,6 +48,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.profile.displayName);
+    _selectedHskLevel = widget.profile.currentHskLevel;
     _selectedAvatar = widget.profile.avatarStyle;
     _selectedInterests = widget.profile.interests.toSet();
   }
@@ -60,6 +62,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
   void _save() {
     final updated = widget.profile.copyWith(
       displayName: _nameController.text.trim().isEmpty ? 'Người học HI Chinese' : _nameController.text.trim(),
+      currentHskLevel: _selectedHskLevel,
       avatarStyle: _selectedAvatar,
       interests: _selectedInterests.toList(),
     );
@@ -120,6 +123,30 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
               controller: _nameController,
               hintText: 'Nhập tên của bạn...',
               prefixIcon: const Icon(Icons.badge_outlined),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+
+            // Chọn Cấp Độ HSK Hiện Tại
+            Text(
+              'Cấp độ HSK đang học',
+              style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Wrap(
+              spacing: AppSpacing.sm,
+              children: List.generate(6, (index) {
+                final level = index + 1;
+                final isSelected = _selectedHskLevel == level;
+                return ChoiceChip(
+                  label: Text('HSK $level'),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    if (selected) {
+                      setState(() => _selectedHskLevel = level);
+                    }
+                  },
+                );
+              }),
             ),
             const SizedBox(height: AppSpacing.lg),
 
