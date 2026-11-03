@@ -67,7 +67,7 @@ class SrsRepository {
     await _db.insert(
       DatabaseConstants.tableSrsItems,
       newCard.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
+      conflictAlgorithm: ConflictAlgorithm.ignore,
     );
 
     return newCard;

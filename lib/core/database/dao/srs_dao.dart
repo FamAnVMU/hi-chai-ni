@@ -6,13 +6,60 @@ class SrsDao {
 
   SrsDao(this._db);
 
+  Future<void> _safeUpsert(
+    DatabaseExecutor executor,
+    String table,
+    Map<String, dynamic> item,
+  ) async {
+    final contentId = item['content_id'];
+    final contentType = item['content_type'];
+    if (contentId != null && contentType != null) {
+      final existing = await executor.query(
+        table,
+        columns: ['id'],
+        where: 'content_id = ? AND content_type = ? AND deleted_at IS NULL',
+        whereArgs: [contentId, contentType],
+        limit: 1,
+      );
+      if (existing.isNotEmpty) {
+        final existingId = existing.first['id'];
+        final updatedRow = Map<String, dynamic>.from(item);
+        updatedRow['id'] = existingId;
+        await executor.update(
+          table,
+          updatedRow,
+          where: 'id = ?',
+          whereArgs: [existingId],
+        );
+        return;
+      }
+    }
+    // Also check primary key 'id'
+    final id = item['id'];
+    if (id != null) {
+      final existingById = await executor.query(
+        table,
+        columns: ['id'],
+        where: 'id = ?',
+        whereArgs: [id],
+        limit: 1,
+      );
+      if (existingById.isNotEmpty) {
+        await executor.update(
+          table,
+          item,
+          where: 'id = ?',
+          whereArgs: [id],
+        );
+        return;
+      }
+    }
+    await executor.insert(table, item, conflictAlgorithm: ConflictAlgorithm.ignore);
+  }
+
   Future<void> upsertSrsItem(Map<String, dynamic> item, {Transaction? txn}) async {
     final executor = txn ?? _db;
-    await executor.insert(
-      DatabaseConstants.tableSrsItems,
-      item,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _safeUpsert(executor, DatabaseConstants.tableSrsItems, item);
   }
 
   Future<Map<String, dynamic>?> getSrsItemByContent(String contentId, String contentType) async {

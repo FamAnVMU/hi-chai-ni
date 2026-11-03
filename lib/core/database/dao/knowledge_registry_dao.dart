@@ -8,16 +8,63 @@ class KnowledgeRegistryDao {
 
   DatabaseExecutor _getExecutor(DatabaseExecutor? custom) => custom ?? _db;
 
+  Future<void> _safeUpsert(
+    DatabaseExecutor executor,
+    String table,
+    Map<String, dynamic> row, {
+    String primaryKey = 'id',
+  }) async {
+    final pkVal = row[primaryKey];
+    if (pkVal != null) {
+      final existing = await executor.query(
+        table,
+        columns: [primaryKey],
+        where: '$primaryKey = ?',
+        whereArgs: [pkVal],
+        limit: 1,
+      );
+      if (existing.isNotEmpty) {
+        await executor.update(
+          table,
+          row,
+          where: '$primaryKey = ?',
+          whereArgs: [pkVal],
+        );
+        return;
+      }
+    }
+    await executor.insert(table, row, conflictAlgorithm: ConflictAlgorithm.ignore);
+  }
+
   Future<void> upsertKnowledgeItem(
     Map<String, dynamic> row, {
     DatabaseExecutor? executor,
   }) async {
     final exec = _getExecutor(executor);
-    await exec.insert(
-      DatabaseConstants.tableKnowledgeRegistry,
-      row,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    final entityType = row['entity_type'];
+    final canonicalId = row['canonical_id'];
+    if (entityType != null && canonicalId != null) {
+      final existing = await exec.query(
+        DatabaseConstants.tableKnowledgeRegistry,
+        columns: ['id'],
+        where: 'entity_type = ? AND canonical_id = ?',
+        whereArgs: [entityType, canonicalId],
+        limit: 1,
+      );
+      if (existing.isNotEmpty) {
+        final existingId = existing.first['id'];
+        final updatedRow = Map<String, dynamic>.from(row);
+        updatedRow['id'] = existingId;
+        await exec.update(
+          DatabaseConstants.tableKnowledgeRegistry,
+          updatedRow,
+          where: 'id = ?',
+          whereArgs: [existingId],
+        );
+        return;
+      }
+    }
+    await _safeUpsert(exec, DatabaseConstants.tableKnowledgeRegistry, row);
   }
 
   Future<void> upsertKnowledgeItemsBatch(
@@ -26,15 +73,9 @@ class KnowledgeRegistryDao {
   }) async {
     if (rows.isEmpty) return;
     final exec = _getExecutor(executor);
-    final batch = exec.batch();
     for (final row in rows) {
-      batch.insert(
-        DatabaseConstants.tableKnowledgeRegistry,
-        row,
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+      await upsertKnowledgeItem(row, executor: exec);
     }
-    await batch.commit(noResult: true);
   }
 
   Future<Map<String, dynamic>?> getKnowledgeItemById(
@@ -51,7 +92,7 @@ class KnowledgeRegistryDao {
     return results.isNotEmpty ? results.first : null;
   }
 
-  Future<Map<String, dynamic>?> getKnowledgeItemByTypeAndCanonical(
+  Future<Map<String, dynamic>?> getKnowledgeItemByCanonical(
     String entityType,
     String canonicalId, {
     DatabaseExecutor? executor,
@@ -66,16 +107,17 @@ class KnowledgeRegistryDao {
     return results.isNotEmpty ? results.first : null;
   }
 
-  Future<List<Map<String, dynamic>>> getKnowledgeItemsByLevel(
+  Future<List<Map<String, dynamic>>> getKnowledgeItemsByTypeAndLevel(
+    String entityType,
     int hskLevel, {
     DatabaseExecutor? executor,
   }) async {
     final exec = _getExecutor(executor);
     return exec.query(
       DatabaseConstants.tableKnowledgeRegistry,
-      where: 'hsk_level = ? AND is_deprecated = 0',
-      whereArgs: [hskLevel],
-      orderBy: 'canonical_id ASC',
+      where: 'entity_type = ? AND hsk_level = ? AND is_deprecated = 0',
+      whereArgs: [entityType, hskLevel],
+      orderBy: 'title ASC',
     );
   }
 
@@ -86,9 +128,9 @@ class KnowledgeRegistryDao {
     final exec = _getExecutor(executor);
     return exec.rawQuery('''
       SELECT kr.*, lki.role, lki.sequence_order, lki.is_mandatory
-      FROM ${DatabaseConstants.tableLessonKnowledgeItems} lki
-      INNER JOIN ${DatabaseConstants.tableKnowledgeRegistry} kr 
-        ON lki.knowledge_item_id = kr.id
+      FROM ${DatabaseConstants.tableKnowledgeRegistry} kr
+      INNER JOIN ${DatabaseConstants.tableLessonKnowledgeItems} lki 
+        ON kr.id = lki.knowledge_item_id
       WHERE lki.lesson_id = ?
       ORDER BY lki.sequence_order ASC
     ''', [lessonId]);
@@ -99,11 +141,7 @@ class KnowledgeRegistryDao {
     DatabaseExecutor? executor,
   }) async {
     final exec = _getExecutor(executor);
-    await exec.insert(
-      DatabaseConstants.tableLessonKnowledgeItems,
-      row,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _safeUpsert(exec, DatabaseConstants.tableLessonKnowledgeItems, row);
   }
 
   Future<void> insertLessonKnowledgeItemsBatch(
@@ -112,15 +150,9 @@ class KnowledgeRegistryDao {
   }) async {
     if (rows.isEmpty) return;
     final exec = _getExecutor(executor);
-    final batch = exec.batch();
     for (final row in rows) {
-      batch.insert(
-        DatabaseConstants.tableLessonKnowledgeItems,
-        row,
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+      await _safeUpsert(exec, DatabaseConstants.tableLessonKnowledgeItems, row);
     }
-    await batch.commit(noResult: true);
   }
 
   Future<void> deprecateKnowledgeItem(
@@ -147,11 +179,7 @@ class KnowledgeRegistryDao {
     DatabaseExecutor? executor,
   }) async {
     final exec = _getExecutor(executor);
-    await exec.insert(
-      DatabaseConstants.tableContentIdMappings,
-      row,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _safeUpsert(exec, DatabaseConstants.tableContentIdMappings, row);
   }
 
   /// Resolves the latest active target content ID by following any historical mapping hops.
@@ -171,8 +199,8 @@ class KnowledgeRegistryDao {
         limit: 1,
       );
       if (rows.isEmpty) break;
-      final nextId = rows.first['new_id'] as String?;
-      if (nextId == null || nextId == currentId) break;
+      final nextId = rows.first['new_id'] as String;
+      if (nextId == currentId) break;
       currentId = nextId;
       hops++;
     }

@@ -72,12 +72,20 @@ class VocabularyDao {
   }
 
   Future<List<Map<String, dynamic>>> getSensesByVocabularyId(String vocabId) async {
-    return await _db.query(
-      DatabaseConstants.tableVocabularySenses,
-      where: 'vocabulary_id = ? AND deleted_at IS NULL',
-      whereArgs: [vocabId],
-      orderBy: 'order_index ASC',
-    );
+    try {
+      return await _db.query(
+        DatabaseConstants.tableVocabularySenses,
+        where: 'vocabulary_id = ? AND deleted_at IS NULL',
+        whereArgs: [vocabId],
+        orderBy: 'order_index ASC',
+      );
+    } catch (_) {
+      return await _db.query(
+        DatabaseConstants.tableVocabularySenses,
+        where: 'vocabulary_id = ? AND deleted_at IS NULL',
+        whereArgs: [vocabId],
+      );
+    }
   }
 
   Future<List<Map<String, dynamic>>> getExamplesByVocabularyId(String vocabId) async {
@@ -214,13 +222,24 @@ class VocabularyDao {
       final cleanQuery = PinyinHelper.removeTones(trimmed).toLowerCase().replaceAll(RegExp(r'\s+'), '');
       
       // 1. Exact Pinyin match
-      final exactPinyin = await _db.query(
-        DatabaseConstants.tableVocabularies,
-        where: '(LOWER(pinyin) = ? OR pinyin_clean = ?) AND deleted_at IS NULL',
-        whereArgs: [trimmed.toLowerCase(), cleanQuery],
-      );
-      for (final row in exactPinyin) {
-        resultMap[row['id'] as String] = row;
+      try {
+        final exactPinyin = await _db.query(
+          DatabaseConstants.tableVocabularies,
+          where: '(LOWER(pinyin) = ? OR pinyin_clean = ?) AND deleted_at IS NULL',
+          whereArgs: [trimmed.toLowerCase(), cleanQuery],
+        );
+        for (final row in exactPinyin) {
+          resultMap[row['id'] as String] = row;
+        }
+      } catch (_) {
+        final exactPinyin = await _db.query(
+          DatabaseConstants.tableVocabularies,
+          where: 'LOWER(pinyin) = ? AND deleted_at IS NULL',
+          whereArgs: [trimmed.toLowerCase()],
+        );
+        for (final row in exactPinyin) {
+          resultMap[row['id'] as String] = row;
+        }
       }
 
       // 2. Indexed Pinyin Clean Prefix match
@@ -271,12 +290,12 @@ class VocabularyDao {
         } catch (_) {}
       }
 
-      // 4. Prefix Pinyin match
+      // 4. Prefix & Substring Pinyin match
       if (resultMap.length < limit) {
         final prefixPinyin = await _db.query(
           DatabaseConstants.tableVocabularies,
-          where: 'LOWER(pinyin) LIKE ? AND deleted_at IS NULL',
-          whereArgs: ['${trimmed.toLowerCase()}%'],
+          where: '(LOWER(pinyin) LIKE ? OR LOWER(pinyin) LIKE ?) AND deleted_at IS NULL',
+          whereArgs: ['${trimmed.toLowerCase()}%', '%${trimmed.toLowerCase()}%'],
           limit: limit - resultMap.length,
         );
         for (final row in prefixPinyin) {

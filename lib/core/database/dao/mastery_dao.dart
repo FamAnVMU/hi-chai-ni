@@ -6,12 +6,39 @@ class MasteryDao {
 
   const MasteryDao(this._db);
 
+  Future<void> _safeUpsert(
+    DatabaseExecutor executor,
+    String table,
+    Map<String, dynamic> row, {
+    String uniqueKey = 'item_id',
+  }) async {
+    final keyVal = row[uniqueKey];
+    if (keyVal != null) {
+      final existing = await executor.query(
+        table,
+        columns: ['id', uniqueKey],
+        where: '$uniqueKey = ?',
+        whereArgs: [keyVal],
+        limit: 1,
+      );
+      if (existing.isNotEmpty) {
+        final existingId = existing.first['id'];
+        final updatedRow = Map<String, dynamic>.from(row);
+        updatedRow['id'] = existingId;
+        await executor.update(
+          table,
+          updatedRow,
+          where: '$uniqueKey = ?',
+          whereArgs: [keyVal],
+        );
+        return;
+      }
+    }
+    await executor.insert(table, row, conflictAlgorithm: ConflictAlgorithm.ignore);
+  }
+
   Future<void> upsertMastery(Map<String, dynamic> row) async {
-    await _db.insert(
-      DatabaseConstants.tableCurriculumMastery,
-      row,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _safeUpsert(_db, DatabaseConstants.tableCurriculumMastery, row);
   }
 
   Future<Map<String, dynamic>?> getMastery(String itemId) async {

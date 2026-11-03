@@ -270,17 +270,15 @@ class ContentPackManager {
 
             // Preserve unit lock status if already unlocked by learner
             int isLocked = (uMap['is_locked'] == false || uMap['is_locked'] == 0) ? 0 : 1;
-            if (isUpgrade) {
-              final existingUnit = await txn.query(
-                DatabaseConstants.tableCurriculumUnits,
-                columns: ['is_locked'],
-                where: 'id = ?',
-                whereArgs: [unitId],
-                limit: 1,
-              );
-              if (existingUnit.isNotEmpty) {
-                isLocked = (existingUnit.first['is_locked'] as num?)?.toInt() ?? isLocked;
-              }
+            final existingUnit = await txn.query(
+              DatabaseConstants.tableCurriculumUnits,
+              columns: ['is_locked'],
+              where: 'id = ?',
+              whereArgs: [unitId],
+              limit: 1,
+            );
+            if (existingUnit.isNotEmpty) {
+              isLocked = (existingUnit.first['is_locked'] as num?)?.toInt() ?? isLocked;
             }
 
             await _safeUpsert(
@@ -311,21 +309,19 @@ class ContentPackManager {
               String? completedAt;
               String? creditedReason;
 
-              if (isUpgrade) {
-                final existingLesson = await txn.query(
-                  DatabaseConstants.tableCurriculumLessons,
-                  columns: ['status', 'is_locked', 'completed_at', 'credited_reason'],
-                  where: 'id = ?',
-                  whereArgs: [lessonId],
-                  limit: 1,
-                );
-                if (existingLesson.isNotEmpty) {
-                  final row = existingLesson.first;
-                  lessonStatus = row['status'] as String? ?? lessonStatus;
-                  lessonLocked = (row['is_locked'] as num?)?.toInt() ?? lessonLocked;
-                  completedAt = row['completed_at'] as String?;
-                  creditedReason = row['credited_reason'] as String?;
-                }
+              final existingLesson = await txn.query(
+                DatabaseConstants.tableCurriculumLessons,
+                columns: ['status', 'is_locked', 'completed_at', 'credited_reason'],
+                where: 'id = ?',
+                whereArgs: [lessonId],
+                limit: 1,
+              );
+              if (existingLesson.isNotEmpty) {
+                final row = existingLesson.first;
+                lessonStatus = row['status'] as String? ?? lessonStatus;
+                lessonLocked = (row['is_locked'] as num?)?.toInt() ?? lessonLocked;
+                completedAt = row['completed_at'] as String?;
+                creditedReason = row['credited_reason'] as String?;
               }
 
               await _safeUpsert(

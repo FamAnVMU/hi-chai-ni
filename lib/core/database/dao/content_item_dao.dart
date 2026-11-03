@@ -6,25 +6,46 @@ class ContentItemDao {
 
   const ContentItemDao(this._db);
 
+  Future<void> _safeUpsert(
+    DatabaseExecutor executor,
+    String table,
+    Map<String, dynamic> row, {
+    String conflictKey = 'content_id',
+  }) async {
+    final conflictVal = row[conflictKey];
+    if (conflictVal != null) {
+      final existing = await executor.query(
+        table,
+        columns: ['id', conflictKey],
+        where: '$conflictKey = ?',
+        whereArgs: [conflictVal],
+        limit: 1,
+      );
+      if (existing.isNotEmpty) {
+        // Keep existing internal ID to preserve any foreign key links
+        final updatedRow = Map<String, dynamic>.from(row);
+        updatedRow['id'] = existing.first['id'];
+        await executor.update(
+          table,
+          updatedRow,
+          where: '$conflictKey = ?',
+          whereArgs: [conflictVal],
+        );
+        return;
+      }
+    }
+    await executor.insert(table, row, conflictAlgorithm: ConflictAlgorithm.ignore);
+  }
+
   Future<void> insertContentItem(Map<String, dynamic> row) async {
-    await _db.insert(
-      DatabaseConstants.tableContentItems,
-      row,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _safeUpsert(_db, DatabaseConstants.tableContentItems, row);
   }
 
   Future<void> insertContentItemsBatch(List<Map<String, dynamic>> rows) async {
     if (rows.isEmpty) return;
-    final batch = _db.batch();
     for (final row in rows) {
-      batch.insert(
-        DatabaseConstants.tableContentItems,
-        row,
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+      await _safeUpsert(_db, DatabaseConstants.tableContentItems, row);
     }
-    await batch.commit(noResult: true);
   }
 
   Future<Map<String, dynamic>?> getContentItemByContentId(String contentId) async {
