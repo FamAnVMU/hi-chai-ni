@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/database/app_database.dart';
 import '../../../../core/database/database_constants.dart';
+import '../../../../core/network/ai/security/ai_credential_storage.dart';
 import '../../../placement_test/presentation/screens/placement_test_intro_screen.dart';
 import 'onboarding_api_key_screen.dart';
 import 'onboarding_personalization_screen.dart';
@@ -22,16 +23,7 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
   int _currentStepIndex = 0;
 
   void _onApiKeySaved(String apiKey) async {
-    final db = AppDatabase.instance.database;
-    final nowIso = DateTime.now().toUtc().toIso8601String();
-    await db.insert(
-      DatabaseConstants.tableAppSettings,
-      {
-        'key': 'gemini_api_key',
-        'value': apiKey,
-        'updated_at': nowIso,
-      },
-    );
+    await AiCredentialStorage().saveApiKey(apiKey);
     setState(() => _currentStepIndex = 1);
   }
 

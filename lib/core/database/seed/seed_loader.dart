@@ -220,7 +220,7 @@ class SeedLoader {
                 id, entity_type, canonical_id, hsk_level, title,
                 package_id, created_at, updated_at
               ) VALUES (?, 'vocabulary', ?, ?, ?, ?, ?, ?)
-              ON CONFLICT(id) DO UPDATE SET
+              ON CONFLICT(entity_type, canonical_id) DO UPDATE SET
                 title = excluded.title,
                 hsk_level = excluded.hsk_level,
                 updated_at = excluded.updated_at;

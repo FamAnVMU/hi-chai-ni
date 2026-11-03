@@ -21,6 +21,34 @@ class ContentPackManager {
 
   const ContentPackManager(this._db);
 
+  static Future<void> _safeUpsert(
+    DatabaseExecutor executor,
+    String table,
+    Map<String, dynamic> values, {
+    String primaryKey = 'id',
+  }) async {
+    final pkVal = values[primaryKey];
+    if (pkVal != null) {
+      final existing = await executor.query(
+        table,
+        columns: [primaryKey],
+        where: '$primaryKey = ?',
+        whereArgs: [pkVal],
+        limit: 1,
+      );
+      if (existing.isNotEmpty) {
+        await executor.update(
+          table,
+          values,
+          where: '$primaryKey = ?',
+          whereArgs: [pkVal],
+        );
+        return;
+      }
+    }
+    await executor.insert(table, values, conflictAlgorithm: ConflictAlgorithm.ignore);
+  }
+
   static String computeChecksum(String rawJson) {
     return sha256.convert(utf8.encode(rawJson)).toString();
   }
@@ -149,12 +177,39 @@ class ContentPackManager {
         );
         final isUpgrade = existingPack.isNotEmpty;
 
+        // Early Idempotency Check: if pack with same version is already installed/bundled
+        // and curriculum records exist in DB, skip re-importing.
+        if (isUpgrade &&
+            existingPack.first['version'] == manifest.version &&
+            (existingPack.first['status'] == 'installed' || existingPack.first['status'] == 'bundled')) {
+          final targetCurr = curriculumMap?['id'] as String? ?? 'curr_${manifest.packId}';
+          final countRes = await txn.rawQuery(
+            'SELECT COUNT(*) as cnt FROM ${DatabaseConstants.tableCurriculums} WHERE id = ?',
+            [targetCurr],
+          );
+          final cnt = Sqflite.firstIntValue(countRes) ?? 0;
+          if (cnt > 0) {
+            final lessonsRes = await txn.rawQuery(
+              'SELECT COUNT(*) as cnt FROM ${DatabaseConstants.tableCurriculumLessons} WHERE unit_id IN (SELECT id FROM ${DatabaseConstants.tableCurriculumUnits} WHERE curriculum_id = ?)',
+              [targetCurr],
+            );
+            totalLessons = Sqflite.firstIntValue(lessonsRes) ?? 0;
+            final contentRes = await txn.rawQuery(
+              'SELECT COUNT(*) as cnt FROM ${DatabaseConstants.tableContentItems} WHERE curriculum_id = ?',
+              [targetCurr],
+            );
+            totalContentItems = Sqflite.firstIntValue(contentRes) ?? 0;
+            debugPrint('[ContentPackManager] Pack "${manifest.packId}" v${manifest.version} already installed ($totalLessons lessons, $totalContentItems items). Skipping re-import.');
+            return;
+          }
+        }
+
         // 2. Upsert Content Pack metadata
         final packStatus = isBundled ? 'bundled' : 'installed';
-        await txn.insert(
+        await _safeUpsert(
+          txn,
           DatabaseConstants.tableContentPacks,
           manifest.toMap(status: packStatus, installedAt: isUpgrade ? (existingPack.first['installed_at'] as String?) : nowUtc),
-          conflictAlgorithm: ConflictAlgorithm.replace,
         );
 
         // 3. Process Content ID Mappings (for schema migrations/renames)
@@ -164,7 +219,8 @@ class ContentPackManager {
           final newId = mapping['new_id'] as String? ?? '';
           final type = mapping['mapping_type'] as String? ?? 'replaced_by';
           if (oldId.isNotEmpty && newId.isNotEmpty) {
-            await txn.insert(
+            await _safeUpsert(
+              txn,
               DatabaseConstants.tableContentIdMappings,
               {
                 'id': 'map_${oldId}_$newId',
@@ -175,7 +231,6 @@ class ContentPackManager {
                 'notes': mapping['notes'] as String?,
                 'created_at': nowUtc,
               },
-              conflictAlgorithm: ConflictAlgorithm.replace,
             );
           }
         }
@@ -193,7 +248,8 @@ class ContentPackManager {
             totalLessons += lessons.length;
           }
 
-          await txn.insert(
+          await _safeUpsert(
+            txn,
             DatabaseConstants.tableCurriculums,
             {
               'id': curriculumId,
@@ -205,7 +261,6 @@ class ContentPackManager {
               'total_lessons': totalLessons,
               'created_at': nowUtc,
             },
-            conflictAlgorithm: ConflictAlgorithm.replace,
           );
 
           // Units & Lessons & Segments
@@ -228,7 +283,8 @@ class ContentPackManager {
               }
             }
 
-            await txn.insert(
+            await _safeUpsert(
+              txn,
               DatabaseConstants.tableCurriculumUnits,
               {
                 'id': unitId,
@@ -241,7 +297,6 @@ class ContentPackManager {
                 'is_locked': isLocked,
                 'created_at': nowUtc,
               },
-              conflictAlgorithm: ConflictAlgorithm.replace,
             );
 
             final lessonsList = uMap['lessons'] as List<dynamic>? ?? [];
@@ -273,7 +328,8 @@ class ContentPackManager {
                 }
               }
 
-              await txn.insert(
+              await _safeUpsert(
+                txn,
                 DatabaseConstants.tableCurriculumLessons,
                 {
                   'id': lessonId,
@@ -291,7 +347,6 @@ class ContentPackManager {
                   'credited_reason': creditedReason,
                   'created_at': nowUtc,
                 },
-                conflictAlgorithm: ConflictAlgorithm.replace,
               );
 
               final segmentsList = lMap['segments'] as List<dynamic>? ?? [];
@@ -304,7 +359,8 @@ class ContentPackManager {
                   refToLessons.putIfAbsent(refId, () => []).add(lessonId);
                 }
 
-                await txn.insert(
+                await _safeUpsert(
+                  txn,
                   DatabaseConstants.tableLessonSegments,
                   {
                     'id': segId,
@@ -315,7 +371,6 @@ class ContentPackManager {
                     'content_ref_id': refId,
                     'created_at': nowUtc,
                   },
-                  conflictAlgorithm: ConflictAlgorithm.replace,
                 );
               }
             }
@@ -338,7 +393,8 @@ class ContentPackManager {
               : json.encode(item['content_json'] ?? {});
 
           // Upsert CMS content item
-          await txn.insert(
+          await _safeUpsert(
+            txn,
             DatabaseConstants.tableContentItems,
             {
               'id': 'ci_$contentId',
@@ -356,7 +412,6 @@ class ContentPackManager {
               'created_at': nowUtc,
               'updated_at': nowUtc,
             },
-            conflictAlgorithm: ConflictAlgorithm.replace,
           );
           totalContentItems++;
 
@@ -464,11 +519,13 @@ class ContentPackManager {
               final existingKnow = await txn.query(
                 DatabaseConstants.tableKnowledgeRegistry,
                 columns: ['id'],
-                where: 'id = ?',
-                whereArgs: [knowId],
+                where: 'id = ? OR (entity_type = ? AND canonical_id = ?)',
+                whereArgs: [knowId, 'vocabulary', simplified],
                 limit: 1,
               );
+              String activeKnowId = knowId;
               if (existingKnow.isNotEmpty) {
+                activeKnowId = existingKnow.first['id'] as String;
                 await txn.update(
                   DatabaseConstants.tableKnowledgeRegistry,
                   {
@@ -477,7 +534,7 @@ class ContentPackManager {
                     'updated_at': nowUtc,
                   },
                   where: 'id = ?',
-                  whereArgs: [knowId],
+                  whereArgs: [activeKnowId],
                 );
               } else {
                 await txn.insert(
@@ -495,13 +552,14 @@ class ContentPackManager {
                     'created_at': nowUtc,
                     'updated_at': nowUtc,
                   },
+                  conflictAlgorithm: ConflictAlgorithm.ignore,
                 );
                 totalKnowledgeItems++;
               }
 
               // 4. Link to lessons
               for (final lessonId in linkedLessons) {
-                final linkId = 'lki_${lessonId}_$knowId';
+                final linkId = 'lki_${lessonId}_$activeKnowId';
                 final existingLink = await txn.query(
                   DatabaseConstants.tableLessonKnowledgeItems,
                   columns: ['id'],
@@ -526,7 +584,7 @@ class ContentPackManager {
                     {
                       'id': linkId,
                       'lesson_id': lessonId,
-                      'knowledge_item_id': knowId,
+                      'knowledge_item_id': activeKnowId,
                       'role': 'instruction',
                       'sequence_order': order,
                       'is_mandatory': 1,
@@ -604,11 +662,13 @@ class ContentPackManager {
               final existingKnowGram = await txn.query(
                 DatabaseConstants.tableKnowledgeRegistry,
                 columns: ['id'],
-                where: 'id = ?',
-                whereArgs: [knowId],
+                where: 'id = ? OR (entity_type = ? AND canonical_id = ?)',
+                whereArgs: [knowId, 'grammar', gramCode],
                 limit: 1,
               );
+              String activeGramId = knowId;
               if (existingKnowGram.isNotEmpty) {
+                activeGramId = existingKnowGram.first['id'] as String;
                 await txn.update(
                   DatabaseConstants.tableKnowledgeRegistry,
                   {
@@ -617,7 +677,7 @@ class ContentPackManager {
                     'updated_at': nowUtc,
                   },
                   where: 'id = ?',
-                  whereArgs: [knowId],
+                  whereArgs: [activeGramId],
                 );
               } else {
                 await txn.insert(
@@ -635,13 +695,14 @@ class ContentPackManager {
                     'created_at': nowUtc,
                     'updated_at': nowUtc,
                   },
+                  conflictAlgorithm: ConflictAlgorithm.ignore,
                 );
                 totalKnowledgeItems++;
               }
 
               // 3. Link to lessons
               for (final lessonId in linkedLessons) {
-                final linkId = 'lki_${lessonId}_$knowId';
+                final linkId = 'lki_${lessonId}_$activeGramId';
                 final existingLink = await txn.query(
                   DatabaseConstants.tableLessonKnowledgeItems,
                   columns: ['id'],
@@ -666,7 +727,7 @@ class ContentPackManager {
                     {
                       'id': linkId,
                       'lesson_id': lessonId,
-                      'knowledge_item_id': knowId,
+                      'knowledge_item_id': activeGramId,
                       'role': 'instruction',
                       'sequence_order': order,
                       'is_mandatory': 1,
@@ -682,7 +743,8 @@ class ContentPackManager {
 
         // 6. Level Exit Exam
         if (exitExamMap != null) {
-          await txn.insert(
+          await _safeUpsert(
+            txn,
             DatabaseConstants.tableLevelExitExams,
             {
               'id': exitExamMap['id'] as String? ?? 'exit_exam_${manifest.hskLevel}',
@@ -696,7 +758,6 @@ class ContentPackManager {
                   : json.encode(exitExamMap['exam_data_json'] ?? {}),
               'created_at': nowUtc,
             },
-            conflictAlgorithm: ConflictAlgorithm.replace,
           );
         }
       }

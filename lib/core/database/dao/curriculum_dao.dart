@@ -6,13 +6,36 @@ class CurriculumDao {
 
   const CurriculumDao(this._db);
 
+  Future<void> _safeUpsert(
+    String table,
+    Map<String, dynamic> row, {
+    String primaryKey = 'id',
+  }) async {
+    final pkVal = row[primaryKey];
+    if (pkVal != null) {
+      final existing = await _db.query(
+        table,
+        columns: [primaryKey],
+        where: '$primaryKey = ?',
+        whereArgs: [pkVal],
+        limit: 1,
+      );
+      if (existing.isNotEmpty) {
+        await _db.update(
+          table,
+          row,
+          where: '$primaryKey = ?',
+          whereArgs: [pkVal],
+        );
+        return;
+      }
+    }
+    await _db.insert(table, row, conflictAlgorithm: ConflictAlgorithm.ignore);
+  }
+
   // Content Packs
   Future<void> insertContentPack(Map<String, dynamic> row) async {
-    await _db.insert(
-      DatabaseConstants.tableContentPacks,
-      row,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _safeUpsert(DatabaseConstants.tableContentPacks, row);
   }
 
   Future<Map<String, dynamic>?> getContentPack(String id) async {
@@ -34,11 +57,7 @@ class CurriculumDao {
 
   // Curriculums
   Future<void> insertCurriculum(Map<String, dynamic> row) async {
-    await _db.insert(
-      DatabaseConstants.tableCurriculums,
-      row,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _safeUpsert(DatabaseConstants.tableCurriculums, row);
   }
 
   Future<Map<String, dynamic>?> getCurriculumByLevel(int level) async {
@@ -53,11 +72,7 @@ class CurriculumDao {
 
   // Units
   Future<void> insertUnit(Map<String, dynamic> row) async {
-    await _db.insert(
-      DatabaseConstants.tableCurriculumUnits,
-      row,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _safeUpsert(DatabaseConstants.tableCurriculumUnits, row);
   }
 
   Future<List<Map<String, dynamic>>> getUnitsByCurriculumId(String curriculumId) async {
@@ -71,11 +86,7 @@ class CurriculumDao {
 
   // Lessons
   Future<void> insertLesson(Map<String, dynamic> row) async {
-    await _db.insert(
-      DatabaseConstants.tableCurriculumLessons,
-      row,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _safeUpsert(DatabaseConstants.tableCurriculumLessons, row);
   }
 
   Future<Map<String, dynamic>?> getLesson(String id) async {
@@ -128,29 +139,22 @@ class CurriculumDao {
 
   // Segments
   Future<void> insertSegment(Map<String, dynamic> row) async {
-    await _db.insert(
-      DatabaseConstants.tableLessonSegments,
-      row,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _safeUpsert(DatabaseConstants.tableLessonSegments, row);
   }
 
   Future<List<Map<String, dynamic>>> getSegmentsByLessonId(String lessonId) async {
-    return _db.query(
-      DatabaseConstants.tableLessonSegments,
-      where: 'lesson_id = ?',
-      whereArgs: [lessonId],
-      orderBy: 'step_order ASC',
-    );
+    return _db.rawQuery('''
+      SELECT ls.*, ci.content_json AS content_payload
+      FROM ${DatabaseConstants.tableLessonSegments} ls
+      LEFT JOIN ${DatabaseConstants.tableContentItems} ci ON ls.content_ref_id = ci.content_id
+      WHERE ls.lesson_id = ?
+      ORDER BY ls.step_order ASC
+    ''', [lessonId]);
   }
 
   // Level Exit Exams
   Future<void> insertExitExam(Map<String, dynamic> row) async {
-    await _db.insert(
-      DatabaseConstants.tableLevelExitExams,
-      row,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _safeUpsert(DatabaseConstants.tableLevelExitExams, row);
   }
 
   Future<Map<String, dynamic>?> getExitExamByLevel(int level) async {

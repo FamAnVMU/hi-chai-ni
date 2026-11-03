@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
+import '../../../../core/database/app_database.dart';
 import '../../../../core/database/database_backup_helper.dart';
 import '../../../../core/database/database_constants.dart';
 import '../../domain/models/app_settings.dart';
@@ -122,10 +123,12 @@ class DataManagementService {
       debugPrint('[DataManagement] Warning: Could not create pre-restore snapshot: $e');
     }
 
-    // 2. Perform safe WAL checkpoint on active DB
+    // 2. Perform safe WAL checkpoint on active DB and close connection safely
     try {
       await _db.rawQuery('PRAGMA wal_checkpoint(TRUNCATE);');
     } catch (_) {}
+
+    await AppDatabase.instance.close();
 
     // 3. Copy backup file directly over the database file
     await backupFile.copy(_dbPath);
@@ -135,6 +138,9 @@ class DataManagementService {
     if (await walFile.exists()) await walFile.delete();
     final shmFile = File('$_dbPath-shm');
     if (await shmFile.exists()) await shmFile.delete();
+
+    // 5. Safely re-open database connection
+    await AppDatabase.instance.open();
 
     debugPrint('[DataManagement] Restore completed from ${backupFile.path}');
   }
@@ -148,6 +154,15 @@ class DataManagementService {
     final readingProgressRows = await _db.query(DatabaseConstants.tableReadingProgress);
     final srsRows = await _db.query(DatabaseConstants.tableSrsItems);
     final appSettingsRows = await _db.query(DatabaseConstants.tableAppSettings);
+
+    // Sanitize sensitive credentials (%api_key%, %token%, %secret%, %password%)
+    final safeAppSettingsRows = appSettingsRows.where((row) {
+      final key = (row['key'] as String? ?? '').toLowerCase();
+      return !key.contains('api_key') &&
+          !key.contains('token') &&
+          !key.contains('secret') &&
+          !key.contains('password');
+    }).toList();
 
     final exportMap = {
       'metadata': {
@@ -164,7 +179,7 @@ class DataManagementService {
       'dictionary_history': dictHistoryRows,
       'reading_progress': readingProgressRows,
       'srs_items': srsRows,
-      'app_settings': appSettingsRows,
+      'app_settings': safeAppSettingsRows,
     };
 
     return const JsonEncoder.withIndent('  ').convert(exportMap);

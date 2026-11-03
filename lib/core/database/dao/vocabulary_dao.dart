@@ -7,31 +7,47 @@ class VocabularyDao {
 
   VocabularyDao(this._db);
 
+  Future<void> _safeUpsert(
+    DatabaseExecutor executor,
+    String table,
+    Map<String, dynamic> row, {
+    String primaryKey = 'id',
+  }) async {
+    final pkVal = row[primaryKey];
+    if (pkVal != null) {
+      final existing = await executor.query(
+        table,
+        columns: [primaryKey],
+        where: '$primaryKey = ?',
+        whereArgs: [pkVal],
+        limit: 1,
+      );
+      if (existing.isNotEmpty) {
+        await executor.update(
+          table,
+          row,
+          where: '$primaryKey = ?',
+          whereArgs: [pkVal],
+        );
+        return;
+      }
+    }
+    await executor.insert(table, row, conflictAlgorithm: ConflictAlgorithm.ignore);
+  }
+
   Future<void> insertVocabulary(Map<String, dynamic> row, {Transaction? txn}) async {
     final executor = txn ?? _db;
-    await executor.insert(
-      DatabaseConstants.tableVocabularies,
-      row,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _safeUpsert(executor, DatabaseConstants.tableVocabularies, row);
   }
 
   Future<void> insertSense(Map<String, dynamic> row, {Transaction? txn}) async {
     final executor = txn ?? _db;
-    await executor.insert(
-      DatabaseConstants.tableVocabularySenses,
-      row,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _safeUpsert(executor, DatabaseConstants.tableVocabularySenses, row);
   }
 
   Future<void> insertExample(Map<String, dynamic> row, {Transaction? txn}) async {
     final executor = txn ?? _db;
-    await executor.insert(
-      DatabaseConstants.tableVocabularyExamples,
-      row,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _safeUpsert(executor, DatabaseConstants.tableVocabularyExamples, row);
   }
 
   Future<Map<String, dynamic>?> getVocabularyById(String id) async {

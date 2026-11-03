@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Curriculum {
   final String id;
   final String packId;
@@ -184,6 +186,25 @@ class LessonSegment {
   });
 
   factory LessonSegment.fromMap(Map<String, dynamic> map, {Map<String, dynamic>? contentPayload}) {
+    Map<String, dynamic>? payload = contentPayload;
+    if (payload == null && map['content_payload'] != null) {
+      if (map['content_payload'] is Map<String, dynamic>) {
+        payload = map['content_payload'] as Map<String, dynamic>;
+      } else if (map['content_payload'] is String) {
+        try {
+          payload = json.decode(map['content_payload'] as String) as Map<String, dynamic>;
+        } catch (_) {}
+      }
+    } else if (payload == null && map['content_json'] != null) {
+      if (map['content_json'] is Map<String, dynamic>) {
+        payload = map['content_json'] as Map<String, dynamic>;
+      } else if (map['content_json'] is String) {
+        try {
+          payload = json.decode(map['content_json'] as String) as Map<String, dynamic>;
+        } catch (_) {}
+      }
+    }
+
     return LessonSegment(
       id: map['id'] as String,
       lessonId: map['lesson_id'] as String,
@@ -191,7 +212,7 @@ class LessonSegment {
       segmentType: map['segment_type'] as String,
       title: map['title'] as String,
       contentRefId: map['content_ref_id'] as String?,
-      contentPayload: contentPayload,
+      contentPayload: payload,
     );
   }
 }

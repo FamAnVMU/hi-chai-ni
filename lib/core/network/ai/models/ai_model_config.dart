@@ -118,37 +118,25 @@ class AiModelConfig {
 /// - Verifies capabilities via [AiModelCapability] struct, never by regex matching names.
 class AiModelRegistry {
   /// Standard cost-effective, high-speed flash model recommended for chat & mobile.
-  static const String modelGemini35FlashLite = 'gemini-3.5-flash-lite';
+  static const String modelGemini25FlashLite = 'gemini-2.5-flash-lite';
 
   /// Premier production flash model for multimodal understanding, grammar, and reading.
-  static const String modelGemini38Flash = 'gemini-3.8-flash';
+  static const String modelGemini25Flash = 'gemini-2.5-flash';
 
   /// Advanced reasoning model for deep pedagogical analysis and complex breakdown.
-  static const String modelGemini31ProPreview = 'gemini-3.1-pro-preview';
+  static const String modelGemini25Pro = 'gemini-2.5-pro';
 
-  /// Real-time bidirectional streaming model for Live voice dialogue.
-  static const String modelGemini38Live = 'gemini-3.8-live';
+  // Backwards compatibility aliases
+  static const String modelGemini35FlashLite = modelGemini25FlashLite;
+  static const String modelGemini38Flash = modelGemini25Flash;
+  static const String modelGemini31ProPreview = modelGemini25Pro;
+  static const String modelGemini38Live = modelGemini25Flash;
 
   /// Master catalog of supported models with explicit capabilities.
   static final Map<String, AiModelSpec> _catalog = {
-    modelGemini35FlashLite: const AiModelSpec(
-      modelId: modelGemini35FlashLite,
-      displayName: 'Gemini 3.5 Flash Lite',
-      description: 'Mô hình siêu nhanh, tối ưu hóa chi phí và độ trễ cho gia sư AI di động.',
-      capabilities: AiModelCapability(
-        supportsText: true,
-        supportsStreaming: true,
-        supportsAudioInput: true,
-        supportsTts: false,
-        supportsLiveApi: false,
-        supportsVision: true,
-      ),
-      recommendedFor: 'Gia sư đàm thoại, tra cứu từ điển nhanh, giải thích từ ngữ.',
-      isDefault: true,
-    ),
-    modelGemini38Flash: const AiModelSpec(
-      modelId: modelGemini38Flash,
-      displayName: 'Gemini 3.8 Flash',
+    modelGemini25Flash: const AiModelSpec(
+      modelId: modelGemini25Flash,
+      displayName: 'Gemini 2.5 Flash',
       description: 'Mô hình đa phương thức thế hệ mới cân bằng hoàn hảo giữa tốc độ và tư duy.',
       capabilities: AiModelCapability(
         supportsText: true,
@@ -159,11 +147,26 @@ class AiModelRegistry {
         supportsVision: true,
       ),
       recommendedFor: 'Phân tích ngữ pháp nâng cao, đọc hiểu đoạn văn, sửa lỗi câu phức tạp.',
+      isDefault: true,
+    ),
+    modelGemini25FlashLite: const AiModelSpec(
+      modelId: modelGemini25FlashLite,
+      displayName: 'Gemini 2.5 Flash Lite',
+      description: 'Mô hình siêu nhanh, tối ưu hóa chi phí và độ trễ cho gia sư AI di động.',
+      capabilities: AiModelCapability(
+        supportsText: true,
+        supportsStreaming: true,
+        supportsAudioInput: true,
+        supportsTts: false,
+        supportsLiveApi: false,
+        supportsVision: true,
+      ),
+      recommendedFor: 'Gia sư đàm thoại, tra cứu từ điển nhanh, giải thích từ ngữ.',
       isDefault: false,
     ),
-    modelGemini31ProPreview: const AiModelSpec(
-      modelId: modelGemini31ProPreview,
-      displayName: 'Gemini 3.1 Pro Preview',
+    modelGemini25Pro: const AiModelSpec(
+      modelId: modelGemini25Pro,
+      displayName: 'Gemini 2.5 Pro',
       description: 'Mô hình tư duy chuyên sâu cho các bài phân tích ngôn ngữ học và dịch thuật chuyên biệt.',
       capabilities: AiModelCapability(
         supportsText: true,
@@ -176,21 +179,6 @@ class AiModelRegistry {
       recommendedFor: 'Phân tích chuyên sâu cấu trúc ngữ pháp cổ ngữ/thành ngữ.',
       isDefault: false,
     ),
-    modelGemini38Live: const AiModelSpec(
-      modelId: modelGemini38Live,
-      displayName: 'Gemini 3.8 Live (Audio/Voice)',
-      description: 'Mô hình giao tiếp giọng nói thời gian thực hai chiều (Bidirectional Audio Streaming).',
-      capabilities: AiModelCapability(
-        supportsText: true,
-        supportsStreaming: true,
-        supportsAudioInput: true,
-        supportsTts: true,
-        supportsLiveApi: true,
-        supportsVision: false,
-      ),
-      recommendedFor: 'Luyện nói phản xạ song ngữ thời gian thực (Live Voice Chat).',
-      isDefault: false,
-    ),
   };
 
   final Map<AiTaskType, AiModelConfig> _taskRouteConfigs;
@@ -199,36 +187,36 @@ class AiModelRegistry {
   AiModelRegistry({
     Map<AiTaskType, AiModelConfig>? customRoutes,
     String? defaultModelId,
-  })  : _activeDefaultModelId = defaultModelId ?? modelGemini35FlashLite,
+  })  : _activeDefaultModelId = defaultModelId ?? modelGemini25Flash,
         _taskRouteConfigs = customRoutes ??
             {
               AiTaskType.chatTutor: const AiModelConfig(
-                modelId: modelGemini35FlashLite,
+                modelId: modelGemini25FlashLite,
                 temperature: 0.7,
                 maxOutputTokens: 2048,
               ),
               AiTaskType.dictionaryExplanation: const AiModelConfig(
-                modelId: modelGemini35FlashLite,
+                modelId: modelGemini25FlashLite,
                 temperature: 0.2, // Low temperature for deterministic definitions
                 maxOutputTokens: 1024,
               ),
               AiTaskType.grammarCorrection: const AiModelConfig(
-                modelId: modelGemini38Flash,
+                modelId: modelGemini25Flash,
                 temperature: 0.3,
                 maxOutputTokens: 1536,
               ),
               AiTaskType.pronunciationEvaluation: const AiModelConfig(
-                modelId: modelGemini35FlashLite,
+                modelId: modelGemini25FlashLite,
                 temperature: 0.2,
                 maxOutputTokens: 512,
               ),
               AiTaskType.readingComprehension: const AiModelConfig(
-                modelId: modelGemini38Flash,
+                modelId: modelGemini25Flash,
                 temperature: 0.5,
                 maxOutputTokens: 2048,
               ),
               AiTaskType.generalText: const AiModelConfig(
-                modelId: modelGemini35FlashLite,
+                modelId: modelGemini25Flash,
                 temperature: 0.7,
                 maxOutputTokens: 2048,
               ),
