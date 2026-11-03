@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import '../../../core/database/dao/curriculum_dao.dart';
 import '../../../core/database/dao/content_item_dao.dart';
 import '../../../core/database/database_constants.dart';
+import '../../../core/utils/app_clock.dart';
 import '../domain/models/curriculum_models.dart';
 import '../domain/models/content_item_models.dart';
 import 'placement_unlock_handler.dart';
@@ -90,9 +91,9 @@ class CurriculumRepository {
     required int durationSeconds,
     required int itemsCount,
   }) async {
-    final now = DateTime.now().toUtc();
+    final now = AppClock.nowUtc();
     final nowIso = now.toIso8601String();
-    final todayDate = nowIso.substring(0, 10);
+    final todayDate = AppClock.todayLocalDateString();
     final scoreRatio = (totalScore > 0 ? (score / totalScore) : 0.0).clamp(0.0, 1.0);
     final itemId = 'exit_exam_hsk$hskLevel';
 
@@ -151,6 +152,7 @@ class CurriculumRepository {
           'items_count': itemsCount,
           'activity_date': todayDate,
           'created_at': nowIso,
+          'timezone_offset_minutes': AppClock.currentOffset.inMinutes,
         },
         conflictAlgorithm: ConflictAlgorithm.ignore,
       );

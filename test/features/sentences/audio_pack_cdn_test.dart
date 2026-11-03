@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:hi_chinese/core/database/database_constants.dart';
 import 'package:hi_chinese/core/database/migrations/migration_engine.dart';
 import 'package:hi_chinese/features/sentences/data/audio_pack_manager.dart';
 import 'package:hi_chinese/features/sentences/data/sentence_dao.dart';
@@ -19,10 +20,10 @@ void main() {
     late Directory tempStorageDir;
 
     setUp(() async {
-      db = await openDatabase(inMemoryDatabasePath, version: 15,
+      db = await openDatabase(inMemoryDatabasePath, version: DatabaseConstants.currentDatabaseVersion,
           onCreate: (db, version) async {
         final engine = MigrationEngine();
-        await engine.executeMigrations(db, 0, 15);
+        await engine.executeMigrations(db, 0, version);
       });
       dao = SentenceDao(db);
 

@@ -4,6 +4,7 @@ import 'package:sqflite/sqflite.dart';
 import '../../../../core/database/dao/activity_dao.dart';
 import '../../../../core/database/dao/learner_evidence_dao.dart';
 import '../../../../core/database/database_constants.dart';
+import '../../../../core/utils/app_clock.dart';
 import '../domain/catalog/grammar_catalog.dart';
 import '../domain/models/grammar_models.dart';
 
@@ -428,8 +429,9 @@ class DefaultGrammarRepository implements GrammarRepository {
             'activity_type': 'grammar',
             'duration_seconds': durationSeconds,
             'items_count': exercisesCount,
-            'activity_date': nowUtc.substring(0, 10),
+            'activity_date': AppClock.todayLocalDateString(),
             'created_at': nowUtc,
+            'timezone_offset_minutes': AppClock.currentOffset.inMinutes,
           },
           txn: executor is Transaction ? executor : null,
         );

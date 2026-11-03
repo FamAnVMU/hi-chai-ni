@@ -84,25 +84,29 @@ class StreakCalculator {
   static DateTime toLocalDate(DateTime utcDateTime, {Duration? timeZoneOffset}) {
     final local = timeZoneOffset != null
         ? utcDateTime.toUtc().add(timeZoneOffset)
-        : utcDateTime.toLocal();
+        : (utcDateTime.isUtc ? utcDateTime.toLocal() : utcDateTime);
     return DateTime(local.year, local.month, local.day);
   }
 
-  /// Calculates the [LearningStreak] from a collection of meaningful UTC event timestamps.
-  ///
-  /// [meaningfulEventTimesUtc]: List of UTC timestamps of genuine learning activities.
-  /// [referenceTimeUtc]: The evaluation timestamp (defaults to `DateTime.now().toUtc()`).
-  /// [timeZoneOffset]: Optional local timezone offset. If omitted, uses system local time.
-  /// [todayDurationSeconds]: Aggregated seconds of study today.
-  /// [todayItemsCompleted]: Aggregated items/reviews completed today.
+  static String toDateString(DateTime date) {
+    final y = date.year.toString().padLeft(4, '0');
+    final m = date.month.toString().padLeft(2, '0');
+    final d = date.day.toString().padLeft(2, '0');
+    return '$y-$m-$d';
+  }
+
   LearningStreak calculate({
     required Iterable<DateTime> meaningfulEventTimesUtc,
+    Iterable<DateTime>? meaningfulLocalDates,
     DateTime? referenceTimeUtc,
     Duration? timeZoneOffset,
     int todayDurationSeconds = 0,
     int todayItemsCompleted = 0,
   }) {
-    if (meaningfulEventTimesUtc.isEmpty) {
+    final hasUtcEvents = meaningfulEventTimesUtc.isNotEmpty;
+    final hasLocalDates = meaningfulLocalDates != null && meaningfulLocalDates.isNotEmpty;
+
+    if (!hasUtcEvents && !hasLocalDates) {
       return LearningStreak(
         currentStreak: 0,
         bestStreak: 0,
@@ -114,43 +118,42 @@ class StreakCalculator {
 
     final refUtc = referenceTimeUtc ?? DateTime.now().toUtc();
     final today = toLocalDate(refUtc, timeZoneOffset: timeZoneOffset);
-    final yesterday = today.subtract(const Duration(days: 1));
+    final yesterday = DateTime(today.year, today.month, today.day - 1);
 
-    // Map each UTC event to its local calendar day
     final activeDays = <DateTime>{};
-    for (final eventUtc in meaningfulEventTimesUtc) {
-      activeDays.add(toLocalDate(eventUtc, timeZoneOffset: timeZoneOffset));
+    if (meaningfulLocalDates != null && meaningfulLocalDates.isNotEmpty) {
+      for (final localDate in meaningfulLocalDates) {
+        activeDays.add(DateTime(localDate.year, localDate.month, localDate.day));
+      }
+    } else {
+      for (final eventUtc in meaningfulEventTimesUtc) {
+        activeDays.add(toLocalDate(eventUtc, timeZoneOffset: timeZoneOffset));
+      }
     }
 
     final hasStudiedToday = activeDays.contains(today);
 
-    // Calculate current streak
     int currentStreak = 0;
     if (hasStudiedToday) {
-      // User studied today: count today and consecutive past days
       currentStreak = 1;
-      var checkDate = today.subtract(const Duration(days: 1));
+      var checkDate = DateTime(today.year, today.month, today.day - 1);
       while (activeDays.contains(checkDate)) {
         currentStreak++;
-        checkDate = checkDate.subtract(const Duration(days: 1));
+        checkDate = DateTime(checkDate.year, checkDate.month, checkDate.day - 1);
       }
     } else if (activeDays.contains(yesterday)) {
-      // User hasn't studied today, but studied yesterday: streak is alive
       currentStreak = 1;
-      var checkDate = yesterday.subtract(const Duration(days: 1));
+      var checkDate = DateTime(yesterday.year, yesterday.month, yesterday.day - 1);
       while (activeDays.contains(checkDate)) {
         currentStreak++;
-        checkDate = checkDate.subtract(const Duration(days: 1));
+        checkDate = DateTime(checkDate.year, checkDate.month, checkDate.day - 1);
       }
     } else {
-      // Both today and yesterday have no activity -> streak broken
       currentStreak = 0;
     }
 
-    // Calculate all-time best streak
     final bestStreak = _calculateBestStreak(activeDays);
 
-    // Find the latest active calendar day
     DateTime? lastActive;
     for (final d in activeDays) {
       if (lastActive == null || d.isAfter(lastActive)) {
@@ -168,10 +171,9 @@ class StreakCalculator {
     );
   }
 
-  /// Calculates the maximum number of consecutive active calendar days across all history.
   int _calculateBestStreak(Set<DateTime> activeDays) {
     if (activeDays.isEmpty) return 0;
-    final sorted = activeDays.toList()..sort();
+    final sorted = activeDays.map((d) => DateTime(d.year, d.month, d.day)).toSet().toList()..sort();
 
     int maxStreak = 1;
     int currentRun = 1;
@@ -180,17 +182,15 @@ class StreakCalculator {
       final prev = sorted[i - 1];
       final curr = sorted[i];
 
-      // Difference in days between calendar dates
-      final diff = curr.difference(prev).inDays;
-      if (diff == 1) {
+      final expectedNext = DateTime(prev.year, prev.month, prev.day + 1);
+      if (curr == expectedNext) {
         currentRun++;
         if (currentRun > maxStreak) {
           maxStreak = currentRun;
         }
-      } else if (diff > 1) {
+      } else if (curr.isAfter(expectedNext)) {
         currentRun = 1;
       }
-      // diff == 0 should not occur in a Set, but safe if it does
     }
 
     return maxStreak;

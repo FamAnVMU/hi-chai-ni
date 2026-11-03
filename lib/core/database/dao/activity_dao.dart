@@ -31,4 +31,26 @@ class ActivityDao {
     );
     return Sqflite.firstIntValue(result) ?? 0;
   }
+
+  Future<List<String>> getDistinctActiveDates() async {
+    final result = await _db.rawQuery(
+      'SELECT DISTINCT activity_date FROM ${DatabaseConstants.tableLearningActivities} '
+      'WHERE activity_type NOT IN (\'sample_data\', \'seed\') '
+      'AND (duration_seconds >= 30 OR items_count >= 1) '
+      'ORDER BY activity_date ASC',
+    );
+    return result
+        .map((r) => r['activity_date'] as String?)
+        .whereType<String>()
+        .toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getActivitiesForDateRange(String startYyyyMmDd, String endYyyyMmDd) async {
+    return await _db.query(
+      DatabaseConstants.tableLearningActivities,
+      where: 'activity_date >= ? AND activity_date <= ?',
+      whereArgs: [startYyyyMmDd, endYyyyMmDd],
+      orderBy: 'activity_date ASC, created_at ASC',
+    );
+  }
 }

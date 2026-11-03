@@ -5,6 +5,7 @@ import 'package:hi_chinese/core/theme/theme.dart';
 import 'package:hi_chinese/core/utils/permission_helper.dart';
 import 'package:hi_chinese/features/pronunciation/presentation/widgets/waveform_visualizer.dart';
 import 'package:hi_chinese/features/shadowing/shadowing.dart';
+import '../../helpers/mock_audio_platform.dart';
 
 class FakeShadowingRepository implements ShadowingRepository {
   final List<ShadowingAssessmentResult> recorded = [];
@@ -14,6 +15,7 @@ class FakeShadowingRepository implements ShadowingRepository {
   Future<String> recordShadowingSession({
     required ShadowingAssessmentResult assessment,
     DateTime? timestamp,
+    Duration? timeZoneOffset,
   }) async {
     recorded.add(assessment);
     return 'FAKE_EVI_SHADOW_${assessment.segmentId}';
@@ -38,9 +40,15 @@ class FakeShadowingRepository implements ShadowingRepository {
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   late FakeShadowingRepository fakeRepo;
 
+  setUpAll(() {
+    MockAudioPlatformHelper.setupMockPlatformChannels();
+  });
+
   setUp(() {
+    MockAudioPlatformHelper.reset();
     fakeRepo = FakeShadowingRepository();
     PermissionHelper.mockPermissionResult = AudioPermissionResult.granted;
   });

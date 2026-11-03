@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../../core/database/database_constants.dart';
+import '../../../core/utils/app_clock.dart';
 import '../../curriculum/data/placement_unlock_handler.dart';
 import '../domain/engine/cat_engine.dart';
 import '../domain/models/cat_assessment_result.dart';
@@ -263,8 +264,9 @@ class PlacementTestRepository {
           'activity_type': 'cat_placement_test',
           'duration_seconds': durationSec > 0 ? durationSec : 300,
           'items_count': sessionState.responses.length,
-          'activity_date': nowUtcStr.substring(0, 10),
+          'activity_date': AppClock.todayLocalDateString(),
           'created_at': nowUtcStr,
+          'timezone_offset_minutes': AppClock.currentOffset.inMinutes,
         },
         conflictAlgorithm: ConflictAlgorithm.replace,
       );

@@ -13,6 +13,7 @@ class FakeHanziWritingRepository implements HanziWritingRepository {
     required WritingEvaluationResult evaluation,
     int durationMs = 0,
     DateTime? timestamp,
+    Duration? timeZoneOffset,
   }) async {
     recordedSessions.add({
       'character': character,
@@ -229,7 +230,7 @@ void main() {
 
       // Notice banner must be visible
       expect(
-        find.text('Chưa có dữ liệu thứ tự nét cho chữ "国". Bạn có thể tự do luyện viết trên ô lưới.'),
+        find.textContaining('Chưa có dữ liệu nét chuẩn cho chữ "国"'),
         findsOneWidget,
       );
 

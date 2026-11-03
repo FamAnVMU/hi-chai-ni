@@ -14,9 +14,12 @@ final hanziWritingRepositoryProvider = Provider<HanziWritingRepository>((ref) {
 
 /// Exposes the Hanzi Stroke Bank connected to the shared Hanzi database.
 final hanziStrokeBankProvider = Provider<HanziStrokeBank>((ref) {
-  final db = AppDatabase.instance.database;
-  final dao = HanziDao(db);
-  return HanziStrokeBank(dao);
+  if (AppDatabase.instance.isOpen) {
+    final db = AppDatabase.instance.database;
+    final dao = HanziDao(db);
+    return HanziStrokeBank(dao);
+  }
+  return const HanziStrokeBank();
 });
 
 /// Exposes the pure mathematical Stroke Evaluator.

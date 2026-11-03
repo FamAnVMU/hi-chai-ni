@@ -4,6 +4,7 @@ import '../../../../core/database/dao/activity_dao.dart';
 import '../../../../core/database/dao/learner_evidence_dao.dart';
 import '../../../../core/database/database_constants.dart';
 import '../../../../core/knowledge/domain/services/knowledge_identity_registry.dart';
+import '../../../../core/utils/app_clock.dart';
 import '../domain/catalog/curriculum_catalog.dart';
 import '../domain/engine/adaptive_roadmap_engine.dart';
 import '../domain/models/roadmap_models.dart';
@@ -200,8 +201,9 @@ class DefaultRoadmapRepository implements RoadmapRepository {
           'activity_type': 'lesson',
           'duration_seconds': lesson.estimatedMinutes * 60,
           'items_count': 1,
-          'activity_date': nowUtc.substring(0, 10),
+          'activity_date': AppClock.todayLocalDateString(),
           'created_at': nowUtc,
+          'timezone_offset_minutes': AppClock.currentOffset.inMinutes,
         },
         txn: txn,
       );

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 import '../../../core/database/database_constants.dart';
 import '../../../core/knowledge/domain/services/knowledge_identity_registry.dart';
+import '../../../core/utils/app_clock.dart';
 import '../../learning_pipeline/data/learning_pipeline_coordinator.dart';
 import '../../learning_pipeline/domain/models/learning_evidence.dart';
 import '../domain/sm2_engine.dart';
@@ -330,6 +331,7 @@ class SrsRepository {
     required SrsRating rating,
     int durationMs = 0,
     DateTime? reviewTime,
+    Duration? timeZoneOffset,
   }) async {
     final result = await processReview(
       contentId: item.id,
@@ -346,18 +348,20 @@ class SrsRepository {
     );
 
     try {
-      final now = reviewTime?.toUtc() ?? DateTime.now().toUtc();
-      final dateStr =
-          '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+      final now = reviewTime ?? AppClock.now();
+      final nowUtc = now.toUtc();
+      final offset = timeZoneOffset ?? AppClock.currentOffset;
+      final dateStr = AppClock.toLocalDateString(now, timeZoneOffset: offset);
       await _db.insert(
         DatabaseConstants.tableLearningActivities,
         {
-          'id': 'ACT_${now.microsecondsSinceEpoch}_${item.id}',
+          'id': 'ACT_${nowUtc.microsecondsSinceEpoch}_${item.id}',
           'activity_type': 'srs_review',
           'duration_seconds': (durationMs / 1000).ceil().clamp(1, 300),
           'items_count': 1,
           'activity_date': dateStr,
-          'created_at': now.toIso8601String(),
+          'created_at': nowUtc.toIso8601String(),
+          'timezone_offset_minutes': offset.inMinutes,
         },
       );
     } catch (_) {

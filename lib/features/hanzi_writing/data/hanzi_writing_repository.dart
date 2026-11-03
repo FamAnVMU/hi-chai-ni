@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 import '../../../core/database/database_constants.dart';
+import '../../../core/utils/app_clock.dart';
 import '../domain/models/stroke_models.dart';
 
 /// Repository managing persistence of Hanzi handwriting sessions and learner evidence.
@@ -16,10 +17,12 @@ class HanziWritingRepository {
     required WritingEvaluationResult evaluation,
     int durationMs = 0,
     DateTime? timestamp,
+    Duration? timeZoneOffset,
   }) async {
-    final nowUtc = (timestamp ?? DateTime.now()).toUtc();
-    final dateStr =
-        '${nowUtc.year.toString().padLeft(4, '0')}-${nowUtc.month.toString().padLeft(2, '0')}-${nowUtc.day.toString().padLeft(2, '0')}';
+    final now = timestamp ?? AppClock.now();
+    final nowUtc = now.toUtc();
+    final offset = timeZoneOffset ?? AppClock.currentOffset;
+    final dateStr = AppClock.toLocalDateString(now, timeZoneOffset: offset);
 
     final metadata = {
       'character': character,
@@ -62,6 +65,7 @@ class HanziWritingRepository {
           'items_count': 1,
           'activity_date': dateStr,
           'created_at': nowUtc.toIso8601String(),
+          'timezone_offset_minutes': offset.inMinutes,
         },
       );
     });

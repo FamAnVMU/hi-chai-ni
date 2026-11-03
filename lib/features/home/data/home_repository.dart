@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import '../../../core/database/database_constants.dart';
+import '../../../core/utils/app_clock.dart';
 import '../../vocabulary_srs/data/srs_repository.dart';
 import '../domain/models/home_dashboard_data.dart';
 import '../domain/models/learning_streak.dart';
@@ -172,6 +173,7 @@ class HomeRepository {
   /// 5. Deduplicates identical sync/retry events occurring within a 2-second timestamp window.
   Future<({
     List<DateTime> eventTimestampsUtc,
+    List<DateTime> activeLocalDates,
     StudyTimeStats stats,
   })> getSanitizedStudySessionsAndStats({
     DateTime? referenceTimeUtc,
@@ -218,13 +220,22 @@ class HomeRepository {
         }
         seenActivityKeys.add(dedupKey);
 
+        DateTime localDate;
+        final activityDateStr = row['activity_date'] as String?;
+        if (activityDateStr != null && RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(activityDateStr)) {
+          final parts = activityDateStr.split('-');
+          localDate = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+        } else {
+          localDate = StreakCalculator.toLocalDate(parsedUtc, timeZoneOffset: timeZoneOffset);
+        }
+
         validActivities.add(_ProcessedSession(
           id: id,
           type: type,
           durationSeconds: durationSec,
           itemsCount: items,
           timestampUtc: parsedUtc,
-          localDate: StreakCalculator.toLocalDate(parsedUtc, timeZoneOffset: timeZoneOffset),
+          localDate: localDate,
         ));
       }
     } catch (_) {
@@ -306,24 +317,22 @@ class HomeRepository {
     int totalItems = 0;
 
     final eventTimestampsUtc = <DateTime>[];
+    final activeLocalDates = <DateTime>[];
 
     for (final session in allSessions) {
-      // Meaningful learning event for streak: duration >= 30s or items >= 1
       if (session.durationSeconds >= 30 || session.itemsCount >= 1) {
         eventTimestampsUtc.add(session.timestampUtc);
+        activeLocalDates.add(session.localDate);
       }
 
-      // All time
       totalDuration += session.durationSeconds;
       totalItems += session.itemsCount;
 
-      // This week (Monday to today)
       if (!session.localDate.isBefore(startOfWeekLocal) && !session.localDate.isAfter(todayLocal)) {
         weekDuration += session.durationSeconds;
         weekItems += session.itemsCount;
       }
 
-      // Today
       if (session.localDate == todayLocal) {
         todayDuration += session.durationSeconds;
         todayItems += session.itemsCount;
@@ -332,6 +341,7 @@ class HomeRepository {
 
     return (
       eventTimestampsUtc: eventTimestampsUtc,
+      activeLocalDates: activeLocalDates,
       stats: StudyTimeStats(
         todayDurationSeconds: todayDuration,
         weekDurationSeconds: weekDuration,
@@ -431,6 +441,7 @@ class HomeRepository {
 
     return streakCalculator.calculate(
       meaningfulEventTimesUtc: sessionData.eventTimestampsUtc,
+      meaningfulLocalDates: sessionData.activeLocalDates,
       referenceTimeUtc: nowUtc,
       timeZoneOffset: timeZoneOffset,
       todayDurationSeconds: sessionData.stats.todayDurationSeconds,
@@ -612,10 +623,12 @@ class HomeRepository {
     required int durationSeconds,
     required int itemsCount,
     DateTime? activityTimeUtc,
+    Duration? timeZoneOffset,
   }) async {
-    final nowUtc = (activityTimeUtc ?? DateTime.now().toUtc());
+    final nowUtc = (activityTimeUtc ?? AppClock.nowUtc());
     final id = 'ACT_${nowUtc.microsecondsSinceEpoch}';
-    final dateStr = nowUtc.toIso8601String().substring(0, 10);
+    final offset = timeZoneOffset ?? AppClock.currentOffset;
+    final dateStr = AppClock.toLocalDateString(nowUtc, timeZoneOffset: offset);
 
     await _db.insert(
       DatabaseConstants.tableLearningActivities,
@@ -626,6 +639,7 @@ class HomeRepository {
         'items_count': itemsCount,
         'activity_date': dateStr,
         'created_at': nowUtc.toIso8601String(),
+        'timezone_offset_minutes': offset.inMinutes,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );

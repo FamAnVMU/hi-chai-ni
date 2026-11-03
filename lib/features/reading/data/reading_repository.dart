@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import '../../../../core/database/dao/activity_dao.dart';
 import '../../../../core/database/dao/learner_evidence_dao.dart';
 import '../../../../core/database/dao/reading_dao.dart';
+import '../../../../core/utils/app_clock.dart';
 import '../domain/models/reading_models.dart';
 
 abstract class ReadingRepository {
@@ -134,8 +135,9 @@ class DefaultReadingRepository implements ReadingRepository {
             'activity_type': 'reading',
             'duration_seconds': readingTimeSeconds,
             'items_count': 1,
-            'activity_date': nowUtc.substring(0, 10),
+            'activity_date': AppClock.todayLocalDateString(),
             'created_at': nowUtc,
+            'timezone_offset_minutes': AppClock.currentOffset.inMinutes,
           },
           txn: txn,
         );

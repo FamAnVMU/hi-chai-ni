@@ -14,6 +14,7 @@ class FakePronunciationRepository implements PronunciationRepository {
   Future<String> recordPronunciationSession({
     required PronunciationAssessmentResult assessment,
     DateTime? timestamp,
+    Duration? timeZoneOffset,
   }) async {
     recorded.add(assessment);
     return 'FAKE_EVI_${assessment.targetId}';

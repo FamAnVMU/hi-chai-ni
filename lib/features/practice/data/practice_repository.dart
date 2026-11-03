@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 import '../../../../core/database/database_constants.dart';
+import '../../../../core/utils/app_clock.dart';
 import '../../learning_pipeline/data/learning_pipeline_coordinator.dart';
 import '../domain/catalog/practice_seed_catalog.dart';
 import '../domain/models/practice_models.dart';
@@ -318,8 +319,9 @@ class DefaultPracticeRepository implements PracticeRepository {
             'activity_type': 'practice',
             'duration_seconds': (totalDurationMs / 1000).round(),
             'items_count': attempts.length,
-            'activity_date': nowUtc.toIso8601String().substring(0, 10),
+            'activity_date': AppClock.todayLocalDateString(),
             'created_at': nowUtc.toIso8601String(),
+            'timezone_offset_minutes': AppClock.currentOffset.inMinutes,
           },
           conflictAlgorithm: ConflictAlgorithm.replace,
         );
