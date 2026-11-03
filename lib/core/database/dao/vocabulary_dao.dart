@@ -25,6 +25,15 @@ class VocabularyDao {
     );
   }
 
+  Future<void> insertExample(Map<String, dynamic> row, {Transaction? txn}) async {
+    final executor = txn ?? _db;
+    await executor.insert(
+      DatabaseConstants.tableVocabularyExamples,
+      row,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
   Future<Map<String, dynamic>?> getVocabularyById(String id) async {
     final results = await _db.query(
       DatabaseConstants.tableVocabularies,
@@ -39,8 +48,10 @@ class VocabularyDao {
     final vocab = await getVocabularyById(id);
     if (vocab == null) return null;
     final senses = await getSensesByVocabularyId(id);
+    final examples = await getExamplesByVocabularyId(id);
     final result = Map<String, dynamic>.from(vocab);
     result['senses'] = senses;
+    result['examples'] = examples;
     return result;
   }
 
@@ -49,7 +60,21 @@ class VocabularyDao {
       DatabaseConstants.tableVocabularySenses,
       where: 'vocabulary_id = ? AND deleted_at IS NULL',
       whereArgs: [vocabId],
+      orderBy: 'order_index ASC',
     );
+  }
+
+  Future<List<Map<String, dynamic>>> getExamplesByVocabularyId(String vocabId) async {
+    try {
+      return await _db.query(
+        DatabaseConstants.tableVocabularyExamples,
+        where: 'vocabulary_id = ?',
+        whereArgs: [vocabId],
+        orderBy: 'order_index ASC',
+      );
+    } catch (_) {
+      return [];
+    }
   }
 
   /// Batch fetches senses for multiple vocabulary IDs in a single query.
@@ -64,6 +89,7 @@ class VocabularyDao {
       DatabaseConstants.tableVocabularySenses,
       where: 'vocabulary_id IN ($placeholders) AND deleted_at IS NULL',
       whereArgs: vocabIds,
+      orderBy: 'order_index ASC',
     );
 
     final map = <String, List<Map<String, dynamic>>>{};
@@ -72,6 +98,32 @@ class VocabularyDao {
       map.putIfAbsent(vid, () => []).add(row);
     }
     return map;
+  }
+
+  /// Batch fetches verified examples for multiple vocabulary IDs.
+  Future<Map<String, List<Map<String, dynamic>>>> getExamplesByVocabularyIds(
+    List<String> vocabIds,
+  ) async {
+    if (vocabIds.isEmpty) return const {};
+
+    try {
+      final placeholders = List.filled(vocabIds.length, '?').join(',');
+      final rows = await _db.query(
+        DatabaseConstants.tableVocabularyExamples,
+        where: 'vocabulary_id IN ($placeholders)',
+        whereArgs: vocabIds,
+        orderBy: 'order_index ASC',
+      );
+
+      final map = <String, List<Map<String, dynamic>>>{};
+      for (final row in rows) {
+        final vid = row['vocabulary_id'] as String;
+        map.putIfAbsent(vid, () => []).add(row);
+      }
+      return map;
+    } catch (_) {
+      return const {};
+    }
   }
 
   Future<List<Map<String, dynamic>>> getVocabulariesByHsk(int hskLevel, {int limit = 50, int offset = 0}) async {
@@ -91,8 +143,9 @@ class VocabularyDao {
 
   /// Advanced multi-mode search:
   /// 1. Chinese characters (Exact & Prefix match on simplified / traditional)
-  /// 2. Pinyin (Exact & Prefix match with or without tones, numbers)
-  /// 3. Vietnamese meanings in senses
+  /// 2. Pinyin (Exact & Prefix match on pinyin or indexed pinyin_clean)
+  /// 3. Han-Viet reading match (e.g. "Ai", "Bac Kinh")
+  /// 4. Vietnamese meanings in senses
   /// Returns deduplicated results ranked by relevance.
   Future<List<Map<String, dynamic>>> searchVocabulariesAdvanced(
     String query, {
@@ -142,18 +195,67 @@ class VocabularyDao {
         }
       }
     } else {
-      // Input is Pinyin or Vietnamese text
+      final cleanQuery = PinyinHelper.removeTones(trimmed).toLowerCase().replaceAll(RegExp(r'\s+'), '');
+      
       // 1. Exact Pinyin match
       final exactPinyin = await _db.query(
         DatabaseConstants.tableVocabularies,
-        where: 'LOWER(pinyin) = ? AND deleted_at IS NULL',
-        whereArgs: [trimmed.toLowerCase()],
+        where: '(LOWER(pinyin) = ? OR pinyin_clean = ?) AND deleted_at IS NULL',
+        whereArgs: [trimmed.toLowerCase(), cleanQuery],
       );
       for (final row in exactPinyin) {
         resultMap[row['id'] as String] = row;
       }
 
-      // 2. Prefix Pinyin match
+      // 2. Indexed Pinyin Clean Prefix match
+      if (resultMap.length < limit && cleanQuery.isNotEmpty) {
+        try {
+          final prefixClean = await _db.query(
+            DatabaseConstants.tableVocabularies,
+            where: 'pinyin_clean LIKE ? AND deleted_at IS NULL',
+            whereArgs: ['$cleanQuery%'],
+            limit: limit - resultMap.length,
+          );
+          for (final row in prefixClean) {
+            resultMap.putIfAbsent(row['id'] as String, () => row);
+          }
+        } catch (_) {}
+      }
+
+      // 3. Compact fallback comparison on raw pinyin for legacy / un-indexed rows
+      if (resultMap.length < limit && cleanQuery.isNotEmpty) {
+        final candidateRows = await _db.query(
+          DatabaseConstants.tableVocabularies,
+          where: 'deleted_at IS NULL',
+          orderBy: 'frequency_rank ASC',
+          limit: 300,
+        );
+        for (final row in candidateRows) {
+          final rowPinyin = row['pinyin'] as String? ?? '';
+          final compactRow = PinyinHelper.toCompactPinyin(rowPinyin);
+          if (compactRow == cleanQuery || compactRow.startsWith(cleanQuery)) {
+            resultMap.putIfAbsent(row['id'] as String, () => row);
+            if (resultMap.length >= limit) break;
+          }
+        }
+      }
+
+      // 3. Exact & Prefix Han-Viet match
+      if (resultMap.length < limit) {
+        try {
+          final hvMatches = await _db.query(
+            DatabaseConstants.tableVocabularies,
+            where: '(LOWER(hanviet) = ? OR LOWER(hanviet) LIKE ?) AND deleted_at IS NULL',
+            whereArgs: [trimmed.toLowerCase(), '${trimmed.toLowerCase()}%'],
+            limit: limit - resultMap.length,
+          );
+          for (final row in hvMatches) {
+            resultMap.putIfAbsent(row['id'] as String, () => row);
+          }
+        } catch (_) {}
+      }
+
+      // 4. Prefix Pinyin match
       if (resultMap.length < limit) {
         final prefixPinyin = await _db.query(
           DatabaseConstants.tableVocabularies,
@@ -162,40 +264,6 @@ class VocabularyDao {
           limit: limit - resultMap.length,
         );
         for (final row in prefixPinyin) {
-          resultMap.putIfAbsent(row['id'] as String, () => row);
-        }
-      }
-
-      // 3. Compact normalized tone-free Pinyin match
-      if (resultMap.length < limit) {
-        final compactQuery = PinyinHelper.toCompactPinyin(trimmed);
-        if (compactQuery.isNotEmpty) {
-          final candidateRows = await _db.query(
-            DatabaseConstants.tableVocabularies,
-            where: 'deleted_at IS NULL',
-            orderBy: 'frequency_rank ASC',
-            limit: 300,
-          );
-          for (final row in candidateRows) {
-            final rowPinyin = row['pinyin'] as String? ?? '';
-            final compactRow = PinyinHelper.toCompactPinyin(rowPinyin);
-            if (compactRow == compactQuery || compactRow.startsWith(compactQuery)) {
-              resultMap.putIfAbsent(row['id'] as String, () => row);
-              if (resultMap.length >= limit) break;
-            }
-          }
-        }
-      }
-
-      // 4. Substring Pinyin match
-      if (resultMap.length < limit) {
-        final subPinyin = await _db.query(
-          DatabaseConstants.tableVocabularies,
-          where: 'LOWER(pinyin) LIKE ? AND deleted_at IS NULL',
-          whereArgs: ['%${trimmed.toLowerCase()}%'],
-          limit: limit - resultMap.length,
-        );
-        for (final row in subPinyin) {
           resultMap.putIfAbsent(row['id'] as String, () => row);
         }
       }
@@ -223,6 +291,34 @@ class VocabularyDao {
     }
 
     return resultMap.values.toList();
+  }
+
+  /// Queries the offline comprehensive dictionary (122k words) for words not found in core HSK list.
+  Future<List<Map<String, dynamic>>> searchDictionaryEntries(String query, {int limit = 30}) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) return [];
+
+    try {
+      final isChinese = RegExp(r'[\u4e00-\u9fa5]').hasMatch(trimmed);
+      if (isChinese) {
+        return await _db.query(
+          DatabaseConstants.tableDictionaryEntries,
+          where: 'simplified = ? OR traditional = ? OR simplified LIKE ?',
+          whereArgs: [trimmed, trimmed, '$trimmed%'],
+          limit: limit,
+        );
+      } else {
+        final clean = PinyinHelper.removeTones(trimmed).toLowerCase().replaceAll(RegExp(r'\s+'), '');
+        return await _db.query(
+          DatabaseConstants.tableDictionaryEntries,
+          where: 'pinyin_clean = ? OR pinyin_clean LIKE ? OR LOWER(meaning_vi) LIKE ?',
+          whereArgs: [clean, '$clean%', '%${trimmed.toLowerCase()}%'],
+          limit: limit,
+        );
+      }
+    } catch (_) {
+      return [];
+    }
   }
 
   Future<int> softDeleteVocabulary(String id, {Transaction? txn}) async {

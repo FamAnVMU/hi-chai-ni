@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../core/database/app_database.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../hanzi/hanzi.dart';
+import '../../../sentences/sentences.dart';
 import '../../data/dictionary_repository.dart';
 import '../../domain/models/dictionary_models.dart';
 import '../widgets/dictionary_detail_sheet.dart';
@@ -126,6 +128,45 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
     return Scaffold(
       appBar: AppBar(
         title: const Text('Từ Điển Thông Minh'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.headphones_rounded),
+            tooltip: 'Kho câu & Luyện nghe HSK',
+            onPressed: () {
+              final db = _repository.database;
+              if (db != null) {
+                final sentenceDao = SentenceDao(db);
+                final sentenceRepo = DefaultSentenceRepository(sentenceDao);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => SentenceBrowserScreen(
+                      repository: sentenceRepo,
+                      dao: sentenceDao,
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.edit_note_rounded),
+            tooltip: 'Kho chữ Hán & Luyện viết',
+            onPressed: () {
+              final db = _repository.database;
+              if (db != null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => HanziCharacterListScreen(
+                      repository: DefaultHanziRepository(HanziDao(db)),
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: AppColors.primaryBlueDark,
@@ -250,6 +291,17 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
+                                  if (entry.hanviet != null && entry.hanviet!.isNotEmpty) ...[
+                                    const SizedBox(width: AppSpacing.xs),
+                                    Text(
+                                      '(${entry.hanviet})',
+                                      style: theme.textTheme.bodySmall?.copyWith(
+                                        color: Colors.amber[800],
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ],
                                   const Spacer(),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -258,7 +310,7 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
-                                      'HSK ${entry.hskLevel}',
+                                      entry.hskLevel > 0 ? 'HSK ${entry.hskLevel}' : 'Từ điển',
                                       style: theme.textTheme.labelSmall?.copyWith(
                                         fontWeight: FontWeight.bold,
                                         color: AppColors.primaryBlueDark,
@@ -294,6 +346,40 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.md),
       children: [
+        Card(
+          elevation: 0,
+          color: AppColors.primaryBlueLight.withAlpha(50),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: AppColors.primaryBlueDark.withAlpha(50)),
+          ),
+          child: ListTile(
+            leading: const CircleAvatar(
+              backgroundColor: AppColors.primaryBlueDark,
+              child: Icon(Icons.headphones_rounded, color: Colors.white, size: 20),
+            ),
+            title: const Text('Kho Câu Ví Dụ & Luyện Nghe Offline', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            subtitle: const Text('10,000+ câu HSK 1–6, giọng người thật & shadowing'),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () {
+              final db = _repository.database;
+              if (db != null) {
+                final sentenceDao = SentenceDao(db);
+                final sentenceRepo = DefaultSentenceRepository(sentenceDao);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => SentenceBrowserScreen(
+                      repository: sentenceRepo,
+                      dao: sentenceDao,
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
         Text(
           'Gợi Ý Tra Cứu Nhanh',
           style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),

@@ -25,6 +25,18 @@ final selectedGrammarHskProvider =
   SelectedGrammarHskNotifier.new,
 );
 
+class SelectedGrammarTopicNotifier extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void selectTopic(String? topic) => state = topic;
+}
+
+final selectedGrammarTopicProvider =
+    NotifierProvider<SelectedGrammarTopicNotifier, String?>(
+  SelectedGrammarTopicNotifier.new,
+);
+
 class SelectedGrammarTagNotifier extends Notifier<String?> {
   @override
   String? build() => null;
@@ -49,14 +61,22 @@ final grammarSearchQueryProvider =
   GrammarSearchQueryNotifier.new,
 );
 
+final grammarTopicsProvider =
+    FutureProvider.autoDispose<List<GrammarTopic>>((ref) async {
+  final repo = ref.watch(grammarRepositoryProvider);
+  return await repo.getGrammarTopics();
+});
+
 final grammarListProvider = FutureProvider.autoDispose<List<GrammarItem>>((ref) async {
   final repo = ref.watch(grammarRepositoryProvider);
   final hsk = ref.watch(selectedGrammarHskProvider);
+  final topic = ref.watch(selectedGrammarTopicProvider);
   final tag = ref.watch(selectedGrammarTagProvider);
   final query = ref.watch(grammarSearchQueryProvider);
 
   return await repo.getGrammarItems(
     hskLevel: hsk,
+    topicCategory: topic,
     tag: tag,
     query: query.isEmpty ? null : query,
   );

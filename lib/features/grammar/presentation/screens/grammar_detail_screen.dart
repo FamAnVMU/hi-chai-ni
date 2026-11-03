@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
+import '../../domain/engine/grammar_exercise_generator.dart';
 import '../../domain/models/grammar_models.dart';
 import '../providers/grammar_providers.dart';
 import '../widgets/contrastive_example_card.dart';
@@ -24,6 +25,7 @@ class _GrammarDetailScreenState extends ConsumerState<GrammarDetailScreen>
   final Map<int, ExerciseEvaluationResult> _exerciseResults = {};
   bool _isSavingProgress = false;
   late final Stopwatch _stopwatch;
+  List<GrammarExercise>? _cachedGeneratedExercises;
 
   @override
   void initState() {
@@ -104,6 +106,14 @@ class _GrammarDetailScreenState extends ConsumerState<GrammarDetailScreen>
         final progress = progressAsync.value;
         final status = progress?.status ?? GrammarProgressStatus.unlearned;
 
+        // Ensure exercises exist
+        if (item.exercises.isNotEmpty) {
+          _cachedGeneratedExercises = item.exercises;
+        } else {
+          _cachedGeneratedExercises ??= GrammarExerciseGenerator().generateExercises(item);
+        }
+        final activeExercises = _cachedGeneratedExercises!;
+
         return Scaffold(
           appBar: AppBar(
             title: Text(item.title),
@@ -119,7 +129,7 @@ class _GrammarDetailScreenState extends ConsumerState<GrammarDetailScreen>
           body: TabBarView(
             controller: _tabController,
             children: [
-              // Tab 1: Structure & Rules
+              // Tab 1: Structure & Rules & Taxonomy Metadata
               ListView(
                 padding: AppSpacing.screenPadding,
                 children: [
@@ -134,9 +144,28 @@ class _GrammarDetailScreenState extends ConsumerState<GrammarDetailScreen>
                           style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: AppSpacing.xs),
-                        Text(item.explanationVi, style: theme.textTheme.bodyMedium),
-                        if (item.tags.isNotEmpty) ...[
+                        Text(
+                          item.explanationVi.isNotEmpty ? item.explanationVi : item.meaningVi,
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                        if (item.topicNameVi.isNotEmpty) ...[
                           const SizedBox(height: AppSpacing.md),
+                          Row(
+                            children: [
+                              Icon(Icons.category_rounded, size: 16, color: AppColors.secondaryText),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Chủ đề: ${item.topicNameVi}',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.secondaryText,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                        if (item.tags.isNotEmpty) ...[
+                          const SizedBox(height: AppSpacing.sm),
                           Wrap(
                             spacing: AppSpacing.xs,
                             runSpacing: AppSpacing.xs,
@@ -146,37 +175,115 @@ class _GrammarDetailScreenState extends ConsumerState<GrammarDetailScreen>
                       ],
                     ),
                   ),
+                  const SizedBox(height: AppSpacing.md),
+
+                  // Open Source Source & License Attribution Card
+                  HiCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.verified_rounded, size: 16, color: AppColors.success),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Nguồn Dữ Liệu & Bản Quyền',
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryText,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Nguồn: ${item.source}',
+                          style: theme.textTheme.bodySmall?.copyWith(color: AppColors.secondaryText),
+                        ),
+                        if (item.originalLevel.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            'Cấp độ gốc: ${item.originalLevel}',
+                            style: theme.textTheme.bodySmall?.copyWith(color: AppColors.secondaryText),
+                          ),
+                        ],
+                        if (item.mappingBasis.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            'Căn cứ phân cấp: ${item.mappingBasis}',
+                            style: theme.textTheme.bodySmall?.copyWith(color: AppColors.secondaryText),
+                          ),
+                        ],
+                        if (item.license.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            'Giấy phép: ${item.license}',
+                            style: theme.textTheme.bodySmall?.copyWith(color: AppColors.secondaryText),
+                          ),
+                        ],
+                        if (item.attribution.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surfaceContainerHighest.withAlpha(50),
+                              borderRadius: BorderRadius.circular(AppRadius.sm),
+                            ),
+                            child: Text(
+                              item.attribution,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: AppColors.mutedText,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xxl),
                 ],
               ),
 
-              // Tab 2: Examples & Contrastive Mistakes
+              // Tab 2: Authentic Examples & Contrastive Mistakes
               ListView(
                 padding: AppSpacing.screenPadding,
                 children: [
                   Text(
-                    'Câu Ví Dụ Chuẩn Xác',
+                    'Câu Ví Dụ Chuẩn Xác (${item.examples.length} câu)',
                     style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: AppSpacing.xs),
-                  ...item.examples.map((ex) => _buildStandardExampleCard(context, ex)),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(
-                    'Lỗi Thường Gặp & Ví Dụ Đối Chiếu (L1 Transfer)',
-                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    'Phân tích các lỗi sai phổ biến do người học áp dụng trật tự ngữ pháp tiếng Việt.',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+                  if (item.examples.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24),
+                      child: Center(child: Text('Chưa có câu ví dụ nguyên bản.')),
+                    )
+                  else
+                    ...item.examples.map((ex) => _buildStandardExampleCard(context, ex)),
+
+                  if (item.contrastiveExamples.isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(
+                      'Lỗi Thường Gặp & Ví Dụ Đối Chiếu (L1 Transfer)',
+                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  ...item.contrastiveExamples.map((ce) => ContrastiveExampleCard(example: ce)),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      'Phân tích các lỗi sai phổ biến do người học áp dụng trật tự ngữ pháp tiếng Việt.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    ...item.contrastiveExamples.map((ce) => ContrastiveExampleCard(example: ce)),
+                  ],
+                  const SizedBox(height: AppSpacing.xxl),
                 ],
               ),
 
-              // Tab 3: Practice Exercises
+              // Tab 3: Interactive Practice Exercises
               ListView(
                 padding: AppSpacing.screenPadding,
                 children: [
@@ -184,7 +291,7 @@ class _GrammarDetailScreenState extends ConsumerState<GrammarDetailScreen>
                     children: [
                       Expanded(
                         child: Text(
-                          'Bài Tập Áp Dụng (${item.exercises.length} câu)',
+                          'Bài Tập Áp Dụng (${activeExercises.length} câu)',
                           style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -198,27 +305,34 @@ class _GrammarDetailScreenState extends ConsumerState<GrammarDetailScreen>
                     ],
                   ),
                   const SizedBox(height: AppSpacing.sm),
-                  ...List.generate(item.exercises.length, (idx) {
-                    final ex = item.exercises[idx];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                      child: GrammarExerciseWidget(
-                        exercise: ex,
-                        exerciseIndex: idx,
-                        onEvaluated: (result) {
-                          _exerciseResults[idx] = result;
-                        },
-                      ),
-                    );
-                  }),
-                  const SizedBox(height: AppSpacing.md),
-                  HiButton(
-                    text: _isSavingProgress ? 'Đang lưu kết quả...' : 'Hoàn thành bài tập & Lưu tiến độ',
-                    isLoading: _isSavingProgress,
-                    variant: HiButtonVariant.primary,
-                    icon: const Icon(Icons.check_circle_rounded, size: 18),
-                    onPressed: _isSavingProgress ? null : () => _handleCompleteExercises(item),
-                  ),
+                  if (activeExercises.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 32),
+                      child: Center(child: Text('Chưa có bài tập cho điểm ngữ pháp này.')),
+                    )
+                  else ...[
+                    ...List.generate(activeExercises.length, (idx) {
+                      final ex = activeExercises[idx];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                        child: GrammarExerciseWidget(
+                          exercise: ex,
+                          exerciseIndex: idx,
+                          onEvaluated: (result) {
+                            _exerciseResults[idx] = result;
+                          },
+                        ),
+                      );
+                    }),
+                    const SizedBox(height: AppSpacing.md),
+                    HiButton(
+                      text: _isSavingProgress ? 'Đang lưu kết quả...' : 'Hoàn thành bài tập & Lưu tiến độ',
+                      isLoading: _isSavingProgress,
+                      variant: HiButtonVariant.primary,
+                      icon: const Icon(Icons.check_circle_rounded, size: 18),
+                      onPressed: _isSavingProgress ? null : () => _handleCompleteExercises(item),
+                    ),
+                  ],
                   const SizedBox(height: AppSpacing.xxl),
                 ],
               ),
@@ -251,32 +365,37 @@ class _GrammarDetailScreenState extends ConsumerState<GrammarDetailScreen>
                 fontSize: 18,
               ),
             ),
-            const SizedBox(height: 2),
-            Text(
-              example.pinyin,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.primary,
-                fontWeight: FontWeight.w600,
+            if (example.pinyin.isNotEmpty) ...[
+              const SizedBox(height: 2),
+              Text(
+                example.pinyin,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
+            ],
             const SizedBox(height: 4),
-            Text(example.translationVi, style: theme.textTheme.bodyMedium),
-            if (example.breakdown != null) ...[
-              const SizedBox(height: 6),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest.withAlpha(50),
-                  borderRadius: BorderRadius.circular(AppRadius.sm),
-                ),
-                child: Text(
-                  example.breakdown!,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                    fontSize: 11,
+            Text(
+              example.translationVi.isNotEmpty
+                  ? example.translationVi
+                  : (example.translationEn ?? ''),
+              style: theme.textTheme.bodyMedium,
+            ),
+            if (example.source != null && example.source!.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(Icons.source_rounded, size: 11, color: AppColors.mutedText),
+                  const SizedBox(width: 4),
+                  Text(
+                    example.source!,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: AppColors.mutedText,
+                      fontSize: 10,
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ],

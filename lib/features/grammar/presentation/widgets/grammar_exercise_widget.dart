@@ -106,7 +106,9 @@ class _GrammarExerciseWidgetState extends State<GrammarExerciseWidget> {
           const SizedBox(height: AppSpacing.md),
 
           // Exercise Type Specific UI
-          if (ex.type == GrammarExerciseType.multipleChoice) ...[
+          if (ex.type == GrammarExerciseType.multipleChoice ||
+              ex.type == GrammarExerciseType.fillInBlank ||
+              ex.type == GrammarExerciseType.errorRecognition) ...[
             if (ex.sentenceWithBlank != null) ...[
               Text(
                 ex.sentenceWithBlank!,

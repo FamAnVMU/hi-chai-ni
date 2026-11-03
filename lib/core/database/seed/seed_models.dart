@@ -104,12 +104,14 @@ class SeedSenseItem {
   final String id;
   final String partOfSpeech;
   final String meaningVi;
+  final String? meaningEn;
   final List<SeedExampleItem> examples;
 
   const SeedSenseItem({
     required this.id,
     required this.partOfSpeech,
     required this.meaningVi,
+    this.meaningEn,
     this.examples = const [],
   });
 
@@ -117,8 +119,9 @@ class SeedSenseItem {
     final rawExamples = json['examples'] as List<dynamic>? ?? [];
     return SeedSenseItem(
       id: json['id'] as String? ?? '',
-      partOfSpeech: json['partOfSpeech'] as String? ?? 'Từ',
-      meaningVi: json['meaningVi'] as String? ?? '',
+      partOfSpeech: json['partOfSpeech'] as String? ?? json['part_of_speech'] as String? ?? 'Từ',
+      meaningVi: json['meaningVi'] as String? ?? json['meaning_vi'] as String? ?? '',
+      meaningEn: json['meaningEn'] as String? ?? json['meaning_en'] as String?,
       examples: rawExamples
           .map((e) => SeedExampleItem.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -129,6 +132,7 @@ class SeedSenseItem {
         'id': id,
         'partOfSpeech': partOfSpeech,
         'meaningVi': meaningVi,
+        if (meaningEn != null) 'meaningEn': meaningEn,
         'examples': examples.map((e) => e.toJson()).toList(),
       };
 }
@@ -139,11 +143,13 @@ class SeedVocabularyItem {
   final String? traditional;
   final String pinyin;
   final String? pinyinClean;
+  final String? hanviet;
   final int hskLevel;
   final String hskVersion;
   final int? frequency;
   final List<SeedSenseItem> senses;
   final String? source;
+  final String? license;
   final String? syllabusVersion;
 
   const SeedVocabularyItem({
@@ -152,11 +158,13 @@ class SeedVocabularyItem {
     this.traditional,
     required this.pinyin,
     this.pinyinClean,
+    this.hanviet,
     required this.hskLevel,
     this.hskVersion = 'HSK2.0',
     this.frequency,
     this.senses = const [],
     this.source,
+    this.license,
     this.syllabusVersion,
   });
 
@@ -167,14 +175,16 @@ class SeedVocabularyItem {
       simplified: json['simplified'] as String? ?? '',
       traditional: json['traditional'] as String?,
       pinyin: json['pinyin'] as String? ?? '',
-      pinyinClean: json['pinyinClean'] as String?,
-      hskLevel: json['hskLevel'] as int? ?? 1,
-      hskVersion: json['hskVersion'] as String? ?? 'HSK2.0',
-      frequency: json['frequency'] as int?,
+      pinyinClean: json['pinyinClean'] as String? ?? json['pinyin_clean'] as String?,
+      hanviet: json['hanviet'] as String?,
+      hskLevel: json['hskLevel'] as int? ?? json['hsk_level'] as int? ?? 1,
+      hskVersion: json['hskVersion'] as String? ?? json['hsk_version'] as String? ?? 'HSK2.0',
+      frequency: json['frequency'] as int? ?? json['frequency_rank'] as int?,
       senses: rawSenses
           .map((s) => SeedSenseItem.fromJson(s as Map<String, dynamic>))
           .toList(),
       source: json['source'] as String?,
+      license: json['license'] as String?,
       syllabusVersion: json['syllabusVersion'] as String?,
     );
   }

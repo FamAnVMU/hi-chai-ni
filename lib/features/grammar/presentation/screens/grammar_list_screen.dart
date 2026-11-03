@@ -5,7 +5,8 @@ import '../../domain/models/grammar_models.dart';
 import '../providers/grammar_providers.dart';
 import 'grammar_detail_screen.dart';
 
-/// Screen listing Chinese grammar points with HSK filtering, tag chips, and search.
+/// Screen listing Chinese grammar points with dual-mode HSK level & topic filtering,
+/// real-time search, and learner mastery progress status.
 class GrammarListScreen extends ConsumerWidget {
   const GrammarListScreen({super.key});
 
@@ -15,28 +16,42 @@ class GrammarListScreen extends ConsumerWidget {
     final grammarListAsync = ref.watch(grammarListProvider);
     final progressMapAsync = ref.watch(grammarProgressMapProvider);
     final selectedHsk = ref.watch(selectedGrammarHskProvider);
-    final selectedTag = ref.watch(selectedGrammarTagProvider);
+    final selectedTopic = ref.watch(selectedGrammarTopicProvider);
+    final topicsAsync = ref.watch(grammarTopicsProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Ngữ Pháp Tiếng Hán'),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1.0),
+          child: Container(color: AppColors.border, height: 1.0),
+        ),
       ),
       body: SafeArea(
         child: Column(
           children: [
-            // Search Bar & Filter Chips
+            // Search Bar & Filter Section
             Padding(
               padding: const EdgeInsets.all(AppSpacing.md),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   HiTextField(
-                    hintText: 'Tìm điểm ngữ pháp, cấu trúc (把, 比, 是...)...',
+                    hintText: 'Tìm ngữ pháp (把, 比, 了, 着, 在, vì sao...)...',
                     prefixIcon: const Icon(Icons.search_rounded),
                     onChanged: (q) => ref.read(grammarSearchQueryProvider.notifier).setQuery(q),
                   ),
                   const SizedBox(height: AppSpacing.sm),
 
-                  // HSK Level Filters
+                  // 1. HSK Level Filters (HSK 1 to 6)
+                  Text(
+                    'Phân cấp theo trình độ (HSK 1–6):',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.secondaryText,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -49,7 +64,7 @@ class GrammarListScreen extends ConsumerWidget {
                             onTap: () => ref.read(selectedGrammarHskProvider.notifier).selectLevel(null),
                           ),
                         ),
-                        ...[1, 2, 3, 4, 5].map((lvl) {
+                        ...[1, 2, 3, 4, 5, 6].map((lvl) {
                           return Padding(
                             padding: const EdgeInsets.only(right: AppSpacing.xs),
                             child: HiChip(
@@ -62,33 +77,48 @@ class GrammarListScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.xs),
+                  const SizedBox(height: AppSpacing.sm),
 
-                  // Popular Tag Filters
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(right: AppSpacing.xs),
-                          child: HiChip(
-                            label: 'Tất cả chủ đề',
-                            isSelected: selectedTag == null,
-                            onTap: () => ref.read(selectedGrammarTagProvider.notifier).selectTag(null),
-                          ),
-                        ),
-                        ...['câu_phán_đoán', 'câu_hỏi', 'giới_từ_địa_điểm', 'câu_so_sánh', 'câu_chữ_bả'].map((t) {
-                          return Padding(
-                            padding: const EdgeInsets.only(right: AppSpacing.xs),
-                            child: HiChip(
-                              label: '#$t',
-                              isSelected: selectedTag == t,
-                              onTap: () => ref.read(selectedGrammarTagProvider.notifier).selectTag(t),
-                            ),
-                          );
-                        }),
-                      ],
+                  // 2. Grammatical Topic Filters
+                  Text(
+                    'Phân loại theo chủ đề ngữ pháp:',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.secondaryText,
                     ),
+                  ),
+                  const SizedBox(height: 4),
+                  topicsAsync.when(
+                    loading: () => const SizedBox(height: 32, child: Center(child: LinearProgressIndicator())),
+                    error: (e, s) => const SizedBox.shrink(),
+                    data: (topics) {
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(right: AppSpacing.xs),
+                              child: HiChip(
+                                label: 'Tất cả chủ đề',
+                                isSelected: selectedTopic == null,
+                                onTap: () => ref.read(selectedGrammarTopicProvider.notifier).selectTopic(null),
+                              ),
+                            ),
+                            ...topics.map((top) {
+                              final isSel = selectedTopic == top.code;
+                              return Padding(
+                                padding: const EdgeInsets.only(right: AppSpacing.xs),
+                                child: HiChip(
+                                  label: top.nameZh.isNotEmpty ? '${top.nameZh} ${top.nameVi.split(" ")[0]}' : top.nameVi,
+                                  isSelected: isSel,
+                                  onTap: () => ref.read(selectedGrammarTopicProvider.notifier).selectTopic(top.code),
+                                ),
+                              );
+                            }),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -102,11 +132,18 @@ class GrammarListScreen extends ConsumerWidget {
                 data: (items) {
                   if (items.isEmpty) {
                     return Center(
-                      child: Text(
-                        'Không tìm thấy điểm ngữ pháp phù hợp.',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.search_off_rounded, size: 48, color: AppColors.mutedText),
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            'Không tìm thấy điểm ngữ pháp phù hợp.',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
                       ),
                     );
                   }
@@ -157,6 +194,8 @@ class GrammarListScreen extends ConsumerWidget {
         break;
     }
 
+    final isGushi = item.source.contains('Gushi') || item.source.contains('HSK 3.0');
+
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: InkWell(
@@ -183,18 +222,37 @@ class GrammarListScreen extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryBlueLight,
+                      color: isGushi
+                          ? AppColors.primaryBlueLight
+                          : AppColors.secondaryBackground,
                       borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
                     child: Text(
                       'HSK ${item.hskLevel}',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: AppColors.primaryBlueDark,
+                        color: isGushi ? AppColors.primaryBlueDark : AppColors.primaryText,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.xs),
+                  if (item.topicNameVi.isNotEmpty) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest.withAlpha(120),
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
+                      ),
+                      child: Text(
+                        item.topicNameVi.split(' ')[0],
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          fontSize: 10,
+                          color: AppColors.secondaryText,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                  ],
                   Expanded(
                     child: Text(
                       item.title,
@@ -202,12 +260,14 @@ class GrammarListScreen extends ConsumerWidget {
                         fontWeight: FontWeight.bold,
                         color: AppColors.primaryText,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   Icon(statusIcon, color: statusColor, size: 18),
                 ],
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Text(
                 item.structure,
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -216,14 +276,40 @@ class GrammarListScreen extends ConsumerWidget {
                   fontFamily: 'monospace',
                 ),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 4),
               Text(
-                item.meaningVi,
+                item.explanationVi.isNotEmpty ? item.explanationVi : item.meaningVi,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppColors.secondaryText,
                 ),
+              ),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  Icon(Icons.verified_rounded, size: 12, color: AppColors.success),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      item.source,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: AppColors.mutedText,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${item.examples.length} ví dụ',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: AppColors.mutedText,
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

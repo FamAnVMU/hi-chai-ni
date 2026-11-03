@@ -1,0 +1,103 @@
+```mermaid
+graph TB
+    subgraph Presentation_Layer ["Presentation Layer (Flutter UI & Riverpod)"]
+        UI_Shell["AppShell (5-Tab Persistent Navigation)"]
+        UI_Home["Home Dashboard (Streak, Quick Actions, Daily Goal)"]
+        UI_Learn["Learning Roadmap & Curriculum Syllabus"]
+        UI_Tutor["AI Tutor (Text Chat & Voice Conversation)"]
+        UI_Review["SRS Review & Vocabulary Flashcards"]
+        UI_Profile["User Profile & Data Management"]
+        UI_Pinyin["Pinyin Foundation & 5-Degree Tone Visualizer"]
+        UI_Skills["Skill Labs (Hanzi Canvas, Pronunciation, Shadowing, Reading, Listening)"]
+        UI_Packs["Content & Audio Pack Managers"]
+        
+        State_Providers["Riverpod Notifiers & State Providers<br/>(AppSettings, AudioPacks, Pinyin, Curriculum, AI, SRS)"]
+    end
+
+    subgraph Domain_Layer ["Domain & Pedagogical Engines"]
+        Eng_LearningPipeline["LearningPipelineCoordinator (Mastery, SRS Intake, Evidence)"]
+        Eng_SM2["SM-2 Spaced Repetition Engine"]
+        Eng_CAT["Computerized Adaptive Testing (CAT 2PL IRT) Engine"]
+        Eng_Roadmap["Adaptive Roadmap Engine"]
+        Eng_Pinyin["Deterministic Pinyin Evaluation Engine"]
+        Eng_Stroke["Hanzi Stroke & Direction Evaluator"]
+        Eng_TutorContext["TutorContextBuilder & Response Parser"]
+        Eng_Coverage["AudioCoverageAuditor"]
+    end
+
+    subgraph Data_Layer ["Data Access Layer (Repositories & DAOs)"]
+        Repo_Curriculum["CurriculumRepository & ContentPackLoader"]
+        Repo_Pinyin["PinyinRepository"]
+        Repo_Audio["AudioAssetDao & AudioStorageManager"]
+        Repo_SRS["SrsRepository"]
+        Repo_Placement["PlacementTestRepository"]
+        Repo_Roadmap["RoadmapRepository"]
+        Repo_Profile["ProfileRepository"]
+        Repo_Dict["DictionaryRepository"]
+        Repo_Grammar["GrammarRepository"]
+        Repo_Practice["PracticeRepository"]
+        Repo_Writing["HanziWritingRepository"]
+        Repo_Voice["VoiceConversationService"]
+    end
+
+    subgraph Infrastructure_Layer ["Infrastructure & Persistence"]
+        DB_SQLite["SQLite Engine (WAL Mode, 8MB Cache, Schema v11)<br/>39 Relational Tables"]
+        FS_Storage["App Support Directory<br/>content_packs/{pack_id}/audio/ & .tmp/"]
+        Sec_Store["FlutterSecureStorage<br/>(Gemini API Key, Secure Credentials)"]
+        Aud_Engine["UnifiedAudioPlaybackService & AudioRecorderService"]
+    end
+
+    subgraph External_Services ["External Static & AI Endpoints"]
+        Ext_Gemini["Google Gemini REST / Live WebSocket API<br/>(gemini-3.5-flash-lite, gemini-3.8-flash, gemini-3.8-live)"]
+        Ext_CDN["GitHub Raw / Releases Content Distribution<br/>(hsk3_pack_v1.json, Audio ZIP Packs)"]
+    end
+
+    %% Presentation to Domain
+    UI_Shell --> State_Providers
+    UI_Home --> State_Providers
+    UI_Learn --> State_Providers
+    UI_Tutor --> State_Providers
+    UI_Review --> State_Providers
+    UI_Profile --> State_Providers
+    UI_Pinyin --> State_Providers
+    UI_Skills --> State_Providers
+    UI_Packs --> State_Providers
+
+    State_Providers --> Eng_LearningPipeline
+    State_Providers --> Eng_CAT
+    State_Providers --> Eng_Pinyin
+    State_Providers --> Eng_TutorContext
+    State_Providers --> Eng_Coverage
+
+    %% Domain to Repositories
+    Eng_LearningPipeline --> Repo_Curriculum
+    Eng_LearningPipeline --> Repo_SRS
+    Eng_LearningPipeline --> Repo_Audio
+    Eng_CAT --> Repo_Placement
+    Eng_Roadmap --> Repo_Roadmap
+    Eng_Pinyin --> Repo_Pinyin
+    Eng_SM2 --> Repo_SRS
+
+    %% Repositories to Infrastructure
+    Repo_Curriculum --> DB_SQLite
+    Repo_Pinyin --> DB_SQLite
+    Repo_Audio --> DB_SQLite
+    Repo_Audio --> FS_Storage
+    Repo_SRS --> DB_SQLite
+    Repo_Placement --> DB_SQLite
+    Repo_Roadmap --> DB_SQLite
+    Repo_Profile --> DB_SQLite
+    Repo_Dict --> DB_SQLite
+    Repo_Grammar --> DB_SQLite
+    Repo_Practice --> DB_SQLite
+    Repo_Writing --> DB_SQLite
+
+    Repo_Voice --> Aud_Engine
+    Aud_Engine --> FS_Storage
+    Eng_TutorContext --> Sec_Store
+    Eng_TutorContext --> Ext_Gemini
+
+    %% External
+    Repo_Curriculum -.-> Ext_CDN
+    Repo_Audio -.-> Ext_CDN
+```

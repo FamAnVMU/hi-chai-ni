@@ -43,6 +43,8 @@ dependencies:
   web_socket_channel: ^3.0.3
   permission_handler: ^13.0.2
   crypto: ^3.0.8
+  flutter_tts: ^4.2.5
+  archive: ^4.6.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -71,6 +73,8 @@ flutter:
     - assets/data/
     - assets/data/content_packs/hsk1/
     - assets/data/content_packs/hsk2/
+    - assets/audio/hsk1/
+    - assets/audio/hsk2/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

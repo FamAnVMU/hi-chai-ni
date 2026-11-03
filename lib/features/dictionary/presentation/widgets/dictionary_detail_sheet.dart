@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/audio/audio_player_service.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../hanzi/hanzi.dart';
+import '../../../sentences/sentences.dart';
 import '../../data/dictionary_repository.dart';
 import '../../domain/models/dictionary_models.dart';
 
@@ -155,6 +157,30 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
     }
   }
 
+  void _handleOpenWriting() {
+    final chars = _entry.simplified
+        .split('')
+        .where((c) => c.trim().isNotEmpty && (c.codeUnitAt(0) >= 0x4e00 && c.codeUnitAt(0) <= 0x9fff))
+        .toList();
+    if (chars.isEmpty) return;
+
+    final db = widget.repository.database;
+    if (db == null) return;
+    final hanziRepo = DefaultHanziRepository(HanziDao(db));
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => HanziWritingScreen(
+          initialCharacter: chars.first,
+          wordCharacters: chars,
+          wordTitle: _entry.simplified,
+          repository: hanziRepo,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -228,13 +254,30 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                'HSK ${_entry.hskLevel}',
+                                _entry.hskLevel > 0 ? 'HSK ${_entry.hskLevel}' : 'Từ điển',
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: isDark ? AppColors.primaryBlueDark : AppColors.primaryBlueDark,
                                 ),
                               ),
                             ),
+                            if (_entry.hanviet != null && _entry.hanviet!.isNotEmpty) ...[
+                              const SizedBox(width: AppSpacing.sm),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.amber.withAlpha(isDark ? 60 : 35),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  'Hán-Việt: ${_entry.hanviet}',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark ? Colors.amber[200] : Colors.amber[900],
+                                  ),
+                                ),
+                              ),
+                            ],
                             if (_entry.traditional != null && _entry.traditional != _entry.simplified) ...[
                               const SizedBox(width: AppSpacing.sm),
                               Text(
@@ -279,6 +322,17 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                     ),
                     onPressed: _handleToggleSave,
                     tooltip: _entry.isSaved ? 'Đã lưu' : 'Lưu từ vựng',
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+
+                  // Handwriting / Stroke Order Button
+                  IconButton.filledTonal(
+                    icon: const Icon(
+                      Icons.draw_rounded,
+                      color: Color(0xFF2563EB),
+                    ),
+                    onPressed: _handleOpenWriting,
+                    tooltip: 'Luyện viết chữ Hán',
                   ),
                 ],
               ),
@@ -432,6 +486,75 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                                           fontStyle: FontStyle.italic,
                                         ),
                                       ),
+                                    const SizedBox(height: 6),
+                                    Row(
+                                      children: [
+                                        TextButton.icon(
+                                          icon: const Icon(Icons.headphones_rounded, size: 14),
+                                          label: const Text('Luyện nghe', style: TextStyle(fontSize: 11)),
+                                          style: TextButton.styleFrom(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                            minimumSize: Size.zero,
+                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                          ),
+                                          onPressed: () {
+                                            final db = widget.repository.database;
+                                            if (db != null) {
+                                              final item = SentenceItem(
+                                                id: 'dict_${_entry.id}_$idx',
+                                                chinese: sense.exampleCn!,
+                                                pinyin: sense.examplePinyin ?? '',
+                                                translationVi: sense.exampleVi ?? '',
+                                                hskLevel: _entry.hskLevel > 0 ? _entry.hskLevel : 1,
+                                              );
+                                              final repo = DefaultSentenceRepository(SentenceDao(db));
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => SentenceListeningScreen(
+                                                    sentence: item,
+                                                    sentenceList: [item],
+                                                    repository: repo,
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                        ),
+                                        const SizedBox(width: 8),
+                                        TextButton.icon(
+                                          icon: const Icon(Icons.record_voice_over_rounded, size: 14),
+                                          label: const Text('Shadowing', style: TextStyle(fontSize: 11)),
+                                          style: TextButton.styleFrom(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                            minimumSize: Size.zero,
+                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                          ),
+                                          onPressed: () {
+                                            final db = widget.repository.database;
+                                            if (db != null) {
+                                              final item = SentenceItem(
+                                                id: 'dict_${_entry.id}_$idx',
+                                                chinese: sense.exampleCn!,
+                                                pinyin: sense.examplePinyin ?? '',
+                                                translationVi: sense.exampleVi ?? '',
+                                                hskLevel: _entry.hskLevel > 0 ? _entry.hskLevel : 1,
+                                              );
+                                              final repo = DefaultSentenceRepository(SentenceDao(db));
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => SentenceShadowingScreen(
+                                                    sentence: item,
+                                                    repository: repo,
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ),
                                   ],
                                 ),
                               ),
@@ -472,6 +595,79 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                             style: theme.textTheme.bodySmall,
                           ),
                         ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                  ],
+
+                  // Verified Graded Examples
+                  if (_entry.examples.isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      'Câu Ví Dụ Chuẩn HSK',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    ..._entry.examples.map((ex) => Container(
+                          margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+                          padding: const EdgeInsets.all(AppSpacing.sm),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest.withAlpha(50),
+                            borderRadius: BorderRadius.circular(AppRadius.sm),
+                            border: const Border(
+                              left: BorderSide(
+                                color: AppColors.primaryBlueDark,
+                                width: 3,
+                              ),
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                ex.exampleCn,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                ex.examplePinyin,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              if (ex.exampleVi != null && ex.exampleVi!.isNotEmpty)
+                                Text(
+                                  ex.exampleVi!,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                )
+                              else if (ex.exampleEn != null && ex.exampleEn!.isNotEmpty)
+                                Text(
+                                  ex.exampleEn!,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    fontStyle: FontStyle.italic,
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        )),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
+
+                  // Attribution & Open Source License
+                  if (_entry.source != null) ...[
+                    Center(
+                      child: Text(
+                        'Nguồn: ${_entry.source} • Giấy phép: ${_entry.license ?? "Open Source"}',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant.withAlpha(160),
+                          fontSize: 10,
+                        ),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),

@@ -24,41 +24,63 @@ extension GrammarProgressStatusExtension on GrammarProgressStatus {
 enum GrammarExerciseType {
   multipleChoice,
   reorderWords,
+  fillInBlank,
+  errorRecognition,
   openTranslation,
 }
 
 /// A standard authentic Chinese sentence example illustrating the grammar point
 class GrammarExample {
   final String hanzi;
+  final String? chineseSegmented;
   final String pinyin;
   final String translationVi;
+  final String? translationEn;
   final String? audioUri;
   final String? breakdown;
+  final String? source;
 
   const GrammarExample({
     required this.hanzi,
+    this.chineseSegmented,
     required this.pinyin,
     required this.translationVi,
+    this.translationEn,
     this.audioUri,
     this.breakdown,
+    this.source,
   });
 
   factory GrammarExample.fromMap(Map<String, dynamic> map) {
+    final text = map['chinese'] as String? ?? map['hanzi'] as String? ?? '';
+    final en = map['translation_en'] as String? ?? map['en'] as String?;
+    var vi = map['translation_vi'] as String? ?? map['vi'] as String? ?? '';
+    if (vi.isEmpty && en != null && en.isNotEmpty) {
+      vi = en;
+    }
     return GrammarExample(
-      hanzi: map['hanzi'] as String? ?? '',
+      hanzi: text,
+      chineseSegmented: map['chinese_segmented'] as String?,
       pinyin: map['pinyin'] as String? ?? '',
-      translationVi: map['translation_vi'] as String? ?? '',
-      audioUri: map['audio_uri'] as String?,
+      translationVi: vi,
+      translationEn: en,
+      audioUri: map['audio_uri'] as String? ?? map['sound_ref'] as String?,
       breakdown: map['breakdown'] as String?,
+      source: map['source'] as String?,
     );
   }
 
   Map<String, dynamic> toMap() => {
         'hanzi': hanzi,
+        'chinese': hanzi,
+        if (chineseSegmented != null) 'chinese_segmented': chineseSegmented,
         'pinyin': pinyin,
         'translation_vi': translationVi,
+        if (translationEn != null) 'translation_en': translationEn,
         if (audioUri != null) 'audio_uri': audioUri,
+        if (audioUri != null) 'sound_ref': audioUri,
         if (breakdown != null) 'breakdown': breakdown,
+        if (source != null) 'source': source,
       };
 }
 
@@ -186,6 +208,19 @@ class GrammarItem {
   final String sentencePositionVi;
   final String explanationVi;
   final String source;
+  final String grammarId;
+  final String topicCategory;
+  final String topicNameVi;
+  final String categoryChinese;
+  final String categoryEnglish;
+  final String originalLevel;
+  final int hskLevelMapped;
+  final String mappingBasis;
+  final bool isReferenceOnly;
+  final String verificationStatus;
+  final String license;
+  final String attribution;
+  final String? wikiLink;
   final List<String> tags;
   final List<String> relatedVocabIds;
   final List<String> relatedGrammarIds;
@@ -207,6 +242,19 @@ class GrammarItem {
     required this.sentencePositionVi,
     required this.explanationVi,
     this.source = 'HSK Standard Course',
+    this.grammarId = '',
+    this.topicCategory = 'other',
+    this.topicNameVi = '',
+    this.categoryChinese = '',
+    this.categoryEnglish = '',
+    this.originalLevel = '',
+    int? hskLevelMapped,
+    this.mappingBasis = '',
+    this.isReferenceOnly = false,
+    this.verificationStatus = 'verified_open_source',
+    this.license = '',
+    this.attribution = '',
+    this.wikiLink,
     this.tags = const [],
     this.relatedVocabIds = const [],
     this.relatedGrammarIds = const [],
@@ -216,7 +264,7 @@ class GrammarItem {
     this.exercises = const [],
     required this.createdAt,
     required this.updatedAt,
-  });
+  }) : hskLevelMapped = hskLevelMapped ?? hskLevel;
 
   factory GrammarItem.fromMap(Map<String, dynamic> map) {
     List<GrammarExample> parseExamples(dynamic raw) {
@@ -283,18 +331,35 @@ class GrammarItem {
       return [];
     }
 
+    final id = map['id'] as String? ?? '';
+    final hskLevel = map['hsk_level'] as int? ?? 1;
+    final code = map['code'] as String? ?? id;
+
     return GrammarItem(
-      id: map['id'] as String? ?? '',
-      hskLevel: map['hsk_level'] as int? ?? 1,
-      code: map['code'] as String? ?? '',
+      id: id,
+      hskLevel: hskLevel,
+      code: code,
       title: map['title'] as String? ?? map['title_vi'] as String? ?? '',
       structure: map['structure'] as String? ?? map['pattern'] as String? ?? '',
       meaningVi: map['meaning_vi'] as String? ?? '',
       usageConditionsVi: map['usage_conditions_vi'] as String? ?? '',
       sentencePositionVi: map['sentence_position_vi'] as String? ?? '',
-      explanationVi: map['explanation_vi'] as String? ?? '',
+      explanationVi: map['explanation_vi'] as String? ?? map['explanation'] as String? ?? '',
       source: map['source'] as String? ?? 'HSK Standard Course',
-      tags: parseStringList(map['tags_json']),
+      grammarId: map['grammar_id'] as String? ?? id,
+      topicCategory: map['topic_category'] as String? ?? 'other',
+      topicNameVi: map['topic_name_vi'] as String? ?? '',
+      categoryChinese: map['category_chinese'] as String? ?? '',
+      categoryEnglish: map['category_english'] as String? ?? '',
+      originalLevel: map['original_level'] as String? ?? '',
+      hskLevelMapped: map['hsk_level_mapped'] as int? ?? hskLevel,
+      mappingBasis: map['mapping_basis'] as String? ?? '',
+      isReferenceOnly: (map['is_reference_only'] == 1 || map['is_reference_only'] == true),
+      verificationStatus: map['verification_status'] as String? ?? 'verified_open_source',
+      license: map['license'] as String? ?? '',
+      attribution: map['attribution'] as String? ?? '',
+      wikiLink: map['wiki_link'] as String?,
+      tags: parseStringList(map['tags_json'] ?? map['tags']),
       relatedVocabIds: parseStringList(map['related_vocab_ids_json']),
       relatedGrammarIds: parseStringList(map['related_grammar_ids_json']),
       prerequisiteGrammarIds: parseStringList(map['prerequisite_grammar_ids_json']),
@@ -308,6 +373,7 @@ class GrammarItem {
 
   Map<String, dynamic> toMap() => {
         'id': id,
+        'grammar_id': grammarId.isNotEmpty ? grammarId : id,
         'hsk_level': hskLevel,
         'code': code,
         'title': title,
@@ -319,6 +385,18 @@ class GrammarItem {
         'sentence_position_vi': sentencePositionVi,
         'explanation_vi': explanationVi,
         'source': source,
+        'topic_category': topicCategory,
+        'topic_name_vi': topicNameVi,
+        'category_chinese': categoryChinese,
+        'category_english': categoryEnglish,
+        'original_level': originalLevel,
+        'hsk_level_mapped': hskLevelMapped,
+        'mapping_basis': mappingBasis,
+        'is_reference_only': isReferenceOnly ? 1 : 0,
+        'verification_status': verificationStatus,
+        'license': license,
+        'attribution': attribution,
+        'wiki_link': wikiLink,
         'tags_json': json.encode(tags),
         'related_vocab_ids_json': json.encode(relatedVocabIds),
         'related_grammar_ids_json': json.encode(relatedGrammarIds),
@@ -328,6 +406,41 @@ class GrammarItem {
         'exercises_json': json.encode(exercises.map((e) => e.toMap()).toList()),
         'created_at': createdAt.toUtc().toIso8601String(),
         'updated_at': updatedAt.toUtc().toIso8601String(),
+      };
+}
+
+/// Grammar Topic domain entity for taxonomy browsing
+class GrammarTopic {
+  final String code;
+  final String nameVi;
+  final String nameZh;
+  final String? descriptionVi;
+  final int displayOrder;
+
+  const GrammarTopic({
+    required this.code,
+    required this.nameVi,
+    required this.nameZh,
+    this.descriptionVi,
+    this.displayOrder = 0,
+  });
+
+  factory GrammarTopic.fromMap(Map<String, dynamic> map) {
+    return GrammarTopic(
+      code: map['code'] as String? ?? '',
+      nameVi: map['name_vi'] as String? ?? '',
+      nameZh: map['name_zh'] as String? ?? '',
+      descriptionVi: map['description_vi'] as String?,
+      displayOrder: map['display_order'] as int? ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toMap() => {
+        'code': code,
+        'name_vi': nameVi,
+        'name_zh': nameZh,
+        'description_vi': descriptionVi,
+        'display_order': displayOrder,
       };
 }
 

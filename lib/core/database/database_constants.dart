@@ -2,13 +2,17 @@ class DatabaseConstants {
   DatabaseConstants._();
 
   static const String databaseName = 'hi_chinese.db';
-  static const int currentDatabaseVersion = 11;
+  static const int currentDatabaseVersion = 15;
 
   // Table names
   static const String tableVocabularies = 'vocabularies';
   static const String tableVocabularySenses = 'vocabulary_senses';
+  static const String tableVocabularyExamples = 'vocabulary_examples';
+  static const String tableDictionaryEntries = 'dictionary_entries';
   static const String tableGrammarItems = 'grammar_items';
   static const String tableGrammarProgress = 'grammar_progress';
+  static const String tableGrammarExamples = 'grammar_examples';
+  static const String tableGrammarTopics = 'grammar_topics';
   static const String tableReadingPassages = 'reading_passages';
   static const String tableSrsItems = 'srs_items';
   static const String tableLearnerEvidence = 'learner_evidence';
@@ -50,4 +54,13 @@ class DatabaseConstants {
   // Schema v11 Offline Audio Asset Management & Pinyin Foundation
   static const String tableAudioAssets = 'audio_assets';
   static const String tablePinyinProgress = 'pinyin_progress';
+
+  // Schema v14 Offline Hanzi Stroke Order & Handwriting Engine
+  static const String tableHanziCharacters = 'hanzi_characters';
+  static const String tableHanziWritingProgress = 'hanzi_writing_progress';
+
+  // Schema v15 Sentence Library, Offline Audio Packs & Shadowing Engine
+  static const String tableSentences = 'sentences';
+  static const String tableSentenceAudio = 'sentence_audio';
+  static const String tableSentencePracticeProgress = 'sentence_practice_progress';
 }

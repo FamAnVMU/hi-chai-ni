@@ -86,32 +86,38 @@ class GrammarRuleCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.md),
 
-          // Meaning
-          _buildDetailRow(
-            context,
-            icon: Icons.lightbulb_outline_rounded,
-            title: 'Ý nghĩa:',
-            content: item.meaningVi,
-          ),
-          const SizedBox(height: AppSpacing.sm),
+          // Meaning / Explanation
+          if (item.meaningVi.isNotEmpty || item.explanationVi.isNotEmpty) ...[
+            _buildDetailRow(
+              context,
+              icon: Icons.lightbulb_outline_rounded,
+              title: 'Ý nghĩa:',
+              content: item.meaningVi.isNotEmpty ? item.meaningVi : item.explanationVi,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+          ],
 
           // Sentence Position
-          _buildDetailRow(
-            context,
-            icon: Icons.alt_route_rounded,
-            title: 'Vị trí trong câu:',
-            content: item.sentencePositionVi,
-          ),
-          const SizedBox(height: AppSpacing.sm),
+          if (item.sentencePositionVi.isNotEmpty) ...[
+            _buildDetailRow(
+              context,
+              icon: Icons.alt_route_rounded,
+              title: 'Vị trí trong câu:',
+              content: item.sentencePositionVi,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+          ],
 
           // Usage Conditions
-          _buildDetailRow(
-            context,
-            icon: Icons.rule_rounded,
-            title: 'Điều kiện sử dụng:',
-            content: item.usageConditionsVi,
-          ),
-          const SizedBox(height: AppSpacing.md),
+          if (item.usageConditionsVi.isNotEmpty) ...[
+            _buildDetailRow(
+              context,
+              icon: Icons.rule_rounded,
+              title: 'Điều kiện sử dụng:',
+              content: item.usageConditionsVi,
+            ),
+            const SizedBox(height: AppSpacing.md),
+          ],
 
           // Source attribution
           Row(

@@ -8,10 +8,21 @@ class FakeGrammarRepository implements GrammarRepository {
   final Map<String, GrammarProgress> progressMap = {};
 
   @override
-  Future<List<GrammarItem>> getGrammarItems({int? hskLevel, String? tag, String? query}) async {
+  Future<List<GrammarTopic>> getGrammarTopics() async => const [];
+
+  @override
+  Future<List<GrammarItem>> getGrammarItems({
+    int? hskLevel,
+    String? topicCategory,
+    String? tag,
+    String? query,
+  }) async {
     var res = List<GrammarItem>.from(items);
     if (hskLevel != null) {
       res = res.where((i) => i.hskLevel == hskLevel).toList();
+    }
+    if (topicCategory != null && topicCategory.isNotEmpty) {
+      res = res.where((i) => i.topicCategory == topicCategory).toList();
     }
     if (tag != null) {
       res = res.where((i) => i.tags.contains(tag)).toList();
@@ -21,6 +32,19 @@ class FakeGrammarRepository implements GrammarRepository {
     }
     return res;
   }
+
+  @override
+  Future<List<GrammarExample>> getExamplesForGrammar(String grammarId) async {
+    try {
+      final it = items.firstWhere((i) => i.id == grammarId);
+      return it.examples;
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  @override
+  Future<void> importGrammarDataset(List<Map<String, dynamic>> rawItems) async {}
 
   @override
   Future<GrammarItem?> getGrammarItemById(String id) async {

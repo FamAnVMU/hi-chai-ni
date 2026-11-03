@@ -1,0 +1,93 @@
+```mermaid
+graph TD
+    %% Core Foundation
+    Core_Theme["core/theme<br/>(Clean Modern Tokens)"]
+    Core_DB["core/database<br/>(AppDatabase & Migrations v1-v11)"]
+    Core_Audio["core/audio<br/>(UnifiedAudioPlaybackService)"]
+    Core_Network["core/network/ai<br/>(Gemini REST & Security)"]
+    Core_Startup["core/startup<br/>(AppStartupProvider)"]
+
+    %% Pedagogical Layer
+    Feat_LearningPipeline["features/learning_pipeline<br/>(Coordinator, Mastery, Evidence)"]
+    Feat_Curriculum["features/curriculum<br/>(Lessons, Syllabus, ContentPackLoader)"]
+    Feat_ContentPacks["features/content_packs<br/>(ContentPackManager, RemoteService)"]
+    Feat_AudioMgmt["features/audio_management<br/>(AudioStorageManager, Downloader)"]
+    Feat_Pinyin["features/pinyin_foundation<br/>(6 Units, 10 Exercises, Chart)"]
+
+    %% Learning Skill Modules
+    Feat_SRS["features/vocabulary_srs<br/>(SM-2 Engine, Flashcards)"]
+    Feat_Practice["features/practice<br/>(Scoring Engine, Exercises)"]
+    Feat_Roadmap["features/roadmap<br/>(Adaptive Roadmap Engine)"]
+    Feat_Placement["features/placement_test<br/>(CAT 2PL IRT Engine)"]
+    Feat_Dict["features/dictionary<br/>(Search Engine, Saved Words)"]
+    Feat_Grammar["features/grammar<br/>(Grammar Evaluation Engine)"]
+    Feat_Writing["features/hanzi_writing<br/>(Stroke Evaluator, Canvas)"]
+    Feat_Pronunciation["features/pronunciation<br/>(Pronunciation Lab)"]
+    Feat_Shadowing["features/shadowing<br/>(Shadowing Evaluator)"]
+    Feat_Reading["features/reading<br/>(Passage Viewer & Interactive Words)"]
+    Feat_Listening["features/listening<br/>(Audio Comprehension)"]
+
+    %% High-level Feature Modules
+    Feat_AITutor["features/ai_tutor<br/>(Text Chat & Voice Conversation)"]
+    Feat_Profile["features/profile<br/>(UserProfile & Goal History)"]
+    Feat_Settings["features/settings<br/>(DataManagementService, Backups)"]
+    Feat_Home["features/home<br/>(Dashboard, Quick Actions, Streak)"]
+    Feat_Shell["features/app_shell<br/>(5-Tab IndexedStack)"]
+
+    %% Dependencies
+    Feat_Curriculum --> Core_DB
+    Feat_ContentPacks --> Core_DB
+    Feat_AudioMgmt --> Core_DB
+    Feat_AudioMgmt --> Core_Audio
+    Feat_Pinyin --> Core_DB
+    Feat_Pinyin --> Core_Audio
+
+    Feat_LearningPipeline --> Core_DB
+    Feat_LearningPipeline --> Feat_Curriculum
+    Feat_LearningPipeline --> Feat_SRS
+
+    Feat_Curriculum --> Feat_LearningPipeline
+    Feat_Curriculum --> Feat_ContentPacks
+    Feat_Curriculum --> Feat_AudioMgmt
+
+    Feat_Roadmap --> Core_DB
+    Feat_Roadmap --> Feat_Curriculum
+    Feat_Roadmap --> Feat_Pinyin
+    Feat_Placement --> Core_DB
+    Feat_Placement --> Feat_Roadmap
+
+    Feat_Practice --> Feat_LearningPipeline
+    Feat_SRS --> Core_DB
+    Feat_SRS --> Feat_LearningPipeline
+
+    Feat_Writing --> Core_DB
+    Feat_Pronunciation --> Core_DB
+    Feat_Pronunciation --> Core_Audio
+    Feat_Shadowing --> Core_DB
+    Feat_Shadowing --> Core_Audio
+    Feat_Reading --> Core_DB
+    Feat_Listening --> Core_DB
+    Feat_Listening --> Core_Audio
+
+    Feat_AITutor --> Core_DB
+    Feat_AITutor --> Core_Network
+    Feat_AITutor --> Core_Audio
+    Feat_AITutor --> Feat_LearningPipeline
+
+    Feat_Home --> Core_DB
+    Feat_Home --> Feat_Roadmap
+    Feat_Home --> Feat_SRS
+    Feat_Home --> Feat_AITutor
+
+    Feat_Profile --> Core_DB
+    Feat_Profile --> Feat_Roadmap
+    Feat_Settings --> Core_DB
+    Feat_Settings --> Feat_AudioMgmt
+
+    Feat_Shell --> Feat_Home
+    Feat_Shell --> Feat_Roadmap
+    Feat_Shell --> Feat_AITutor
+    Feat_Shell --> Feat_SRS
+    Feat_Shell --> Feat_Profile
+    Feat_Shell --> Core_Startup
+```

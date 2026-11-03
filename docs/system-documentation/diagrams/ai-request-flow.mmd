@@ -1,0 +1,46 @@
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Learner as Learner
+    participant UI as AiTutorTextChatScreen
+    participant Repo as AiTutorRepository
+    participant ContextSvc as LearnerContextService
+    participant PromptBuilder as TutorSystemPromptBuilder
+    participant CredStore as AiCredentialStorage
+    participant RestProvider as GeminiRestAiProvider
+    participant GeminiAPI as Google Gemini API Endpoint
+    participant DB as SQLite (chat_messages & learner_evidence)
+
+    Learner->>UI: Types question or practice dialogue
+    UI->>Repo: sendMessage(sessionId, userMessage)
+    Repo->>DB: Save user message in chat_messages
+    
+    %% Context Construction
+    Repo->>ContextSvc: buildLearnerContext()
+    ContextSvc->>DB: Fetch recent errors, mastery gaps & target HSK level
+    ContextSvc-->>Repo: LearnerContext (weak items, vocabulary scope)
+    
+    Repo->>PromptBuilder: buildSystemPrompt(persona, scenario, learnerContext)
+    PromptBuilder-->>Repo: Strict JSON System Instruction (Anti-Hallucination rules)
+
+    %% Credential & Network
+    Repo->>CredStore: getGeminiApiKey()
+    CredStore-->>Repo: Decrypted API Key (from FlutterSecureStorage)
+    
+    Repo->>RestProvider: generateContent(messages, config, systemPrompt)
+    RestProvider->>GeminiAPI: POST https://generativelanguage.googleapis.com/...
+    GeminiAPI-->>RestProvider: 200 OK (Candidates JSON)
+    
+    %% Response Validation & Parsing
+    RestProvider-->>Repo: AiCompletionResponse
+    Repo->>Repo: TutorResponseParser.parse(text)
+    Note over Repo: Validates JSON format: reply_zh, pinyin, reply_vi, corrections, evidence_proposal
+    
+    Repo->>DB: Save tutor response in chat_messages
+    alt Valid Evidence Proposal Returned
+        Repo->>DB: Save approved evidence proposal to learner_evidence
+    end
+
+    Repo-->>UI: TutorResponse State Update
+    UI-->>Learner: Display Tutor Message with Ruby Text & Correction Chips
+```

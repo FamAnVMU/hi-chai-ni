@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../../../core/database/dao/activity_dao.dart';
 import '../../../../core/database/dao/learner_evidence_dao.dart';
@@ -7,8 +8,15 @@ import '../domain/catalog/grammar_catalog.dart';
 import '../domain/models/grammar_models.dart';
 
 abstract class GrammarRepository {
-  Future<List<GrammarItem>> getGrammarItems({int? hskLevel, String? tag, String? query});
+  Future<List<GrammarTopic>> getGrammarTopics();
+  Future<List<GrammarItem>> getGrammarItems({
+    int? hskLevel,
+    String? topicCategory,
+    String? tag,
+    String? query,
+  });
   Future<GrammarItem?> getGrammarItemById(String id);
+  Future<List<GrammarExample>> getExamplesForGrammar(String grammarId);
   Future<GrammarProgress?> getProgress(String grammarId);
   Future<Map<String, GrammarProgress>> getAllProgressMap();
   Future<void> recordStudySession({
@@ -17,6 +25,7 @@ abstract class GrammarRepository {
     required int durationSeconds,
     required int exercisesCount,
   });
+  Future<void> importGrammarDataset(List<Map<String, dynamic>> rawItems);
 }
 
 class DefaultGrammarRepository implements GrammarRepository {
@@ -39,6 +48,16 @@ class DefaultGrammarRepository implements GrammarRepository {
     );
 
     if (count == null || count == 0) {
+      try {
+        final jsonStr = await rootBundle.loadString('assets/data/hsk_grammar_all.json');
+        final decoded = json.decode(jsonStr) as List<dynamic>;
+        final items = decoded.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+        await importGrammarDataset(items);
+        return;
+      } catch (_) {
+        // Fallback for tests or environments where rootBundle is unavailable
+      }
+
       for (final item in GrammarCatalog.items) {
         await _db.insert(
           DatabaseConstants.tableGrammarItems,
@@ -50,15 +69,40 @@ class DefaultGrammarRepository implements GrammarRepository {
   }
 
   @override
-  Future<List<GrammarItem>> getGrammarItems({int? hskLevel, String? tag, String? query}) async {
+  Future<List<GrammarTopic>> getGrammarTopics() async {
+    await _ensureCatalogSeeded();
+    try {
+      final rows = await _db.query(
+        DatabaseConstants.tableGrammarTopics,
+        orderBy: 'display_order ASC',
+      );
+      return rows.map((r) => GrammarTopic.fromMap(r)).toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  @override
+  Future<List<GrammarItem>> getGrammarItems({
+    int? hskLevel,
+    String? topicCategory,
+    String? tag,
+    String? query,
+  }) async {
     await _ensureCatalogSeeded();
 
     final whereClauses = <String>[];
     final whereArgs = <dynamic>[];
 
     if (hskLevel != null) {
-      whereClauses.add('hsk_level = ?');
+      whereClauses.add('(hsk_level = ? OR hsk_level_mapped = ?)');
       whereArgs.add(hskLevel);
+      whereArgs.add(hskLevel);
+    }
+
+    if (topicCategory != null && topicCategory.isNotEmpty && topicCategory != 'all') {
+      whereClauses.add('topic_category = ?');
+      whereArgs.add(topicCategory);
     }
 
     final rows = await _db.query(
@@ -83,6 +127,7 @@ class DefaultGrammarRepository implements GrammarRepository {
             it.meaningVi.toLowerCase().contains(q) ||
             it.explanationVi.toLowerCase().contains(q) ||
             it.usageConditionsVi.toLowerCase().contains(q) ||
+            it.categoryChinese.toLowerCase().contains(q) ||
             it.tags.any((t) => t.toLowerCase().contains(q));
       }).toList();
     }
@@ -96,13 +141,69 @@ class DefaultGrammarRepository implements GrammarRepository {
 
     final rows = await _db.query(
       DatabaseConstants.tableGrammarItems,
-      where: 'id = ?',
-      whereArgs: [id],
+      where: 'id = ? OR grammar_id = ? OR code = ?',
+      whereArgs: [id, id, id],
       limit: 1,
     );
 
     if (rows.isEmpty) return null;
-    return GrammarItem.fromMap(rows.first);
+    final item = GrammarItem.fromMap(rows.first);
+
+    // If relational examples exist, enrich with them
+    final relationalExamples = await getExamplesForGrammar(item.id);
+    if (relationalExamples.isNotEmpty) {
+      return GrammarItem(
+        id: item.id,
+        hskLevel: item.hskLevel,
+        code: item.code,
+        title: item.title,
+        structure: item.structure,
+        meaningVi: item.meaningVi,
+        usageConditionsVi: item.usageConditionsVi,
+        sentencePositionVi: item.sentencePositionVi,
+        explanationVi: item.explanationVi,
+        source: item.source,
+        grammarId: item.grammarId,
+        topicCategory: item.topicCategory,
+        topicNameVi: item.topicNameVi,
+        categoryChinese: item.categoryChinese,
+        categoryEnglish: item.categoryEnglish,
+        originalLevel: item.originalLevel,
+        hskLevelMapped: item.hskLevelMapped,
+        mappingBasis: item.mappingBasis,
+        isReferenceOnly: item.isReferenceOnly,
+        verificationStatus: item.verificationStatus,
+        license: item.license,
+        attribution: item.attribution,
+        wikiLink: item.wikiLink,
+        tags: item.tags,
+        relatedVocabIds: item.relatedVocabIds,
+        relatedGrammarIds: item.relatedGrammarIds,
+        prerequisiteGrammarIds: item.prerequisiteGrammarIds,
+        examples: relationalExamples,
+        contrastiveExamples: item.contrastiveExamples,
+        exercises: item.exercises,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+      );
+    }
+
+    return item;
+  }
+
+  @override
+  Future<List<GrammarExample>> getExamplesForGrammar(String grammarId) async {
+    try {
+      final rows = await _db.query(
+        DatabaseConstants.tableGrammarExamples,
+        where: 'grammar_id = ?',
+        whereArgs: [grammarId],
+        orderBy: 'order_index ASC',
+      );
+      return rows.map((r) => GrammarExample.fromMap(r)).toList();
+    } catch (_) {
+      return const [];
+    }
   }
 
   @override
@@ -136,7 +237,6 @@ class DefaultGrammarRepository implements GrammarRepository {
     required int durationSeconds,
     required int exercisesCount,
   }) async {
-    // Academic honesty check: Only record session when exercises were actually evaluated!
     if (exercisesCount <= 0) return;
 
     final item = await getGrammarItemById(grammarId);
@@ -152,7 +252,6 @@ class DefaultGrammarRepository implements GrammarRepository {
     final totalExercises = (existingProgress?.exercisesCompleted ?? 0) + exercisesCount;
 
     Future<void> executeWithDb(dynamic executor) async {
-      // 1. Update/insert grammar_progress
       await executor.insert(
         DatabaseConstants.tableGrammarProgress,
         {
@@ -169,7 +268,6 @@ class DefaultGrammarRepository implements GrammarRepository {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
 
-      // 2. Persist learner evidence
       final evidenceId = 'ev_grm_${DateTime.now().microsecondsSinceEpoch}';
       if (_db is Database) {
         await _evidenceDao.appendEvidence(
@@ -190,7 +288,6 @@ class DefaultGrammarRepository implements GrammarRepository {
           txn: executor is Transaction ? executor : null,
         );
 
-        // 3. Log activity for daily streak
         final activityId = 'act_grm_${DateTime.now().microsecondsSinceEpoch}';
         await _activityDao.logActivity(
           {
@@ -213,6 +310,54 @@ class DefaultGrammarRepository implements GrammarRepository {
       });
     } else {
       await executeWithDb(_db);
+    }
+  }
+
+  @override
+  Future<void> importGrammarDataset(List<Map<String, dynamic>> rawItems) async {
+    final nowUtc = DateTime.now().toUtc().toIso8601String();
+
+    Future<void> performImport(dynamic executor) async {
+      for (final raw in rawItems) {
+        final item = GrammarItem.fromMap(raw);
+        await executor.insert(
+          DatabaseConstants.tableGrammarItems,
+          item.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+
+        // Also normalize examples into tableGrammarExamples
+        if (item.examples.isNotEmpty) {
+          int order = 0;
+          for (final ex in item.examples) {
+            await executor.insert(
+              DatabaseConstants.tableGrammarExamples,
+              {
+                'grammar_id': item.id,
+                'chinese': ex.hanzi,
+                'chinese_segmented': ex.chineseSegmented,
+                'pinyin': ex.pinyin,
+                'translation_en': ex.translationEn,
+                'translation_vi': ex.translationVi,
+                'sound_ref': ex.audioUri,
+                'source': ex.source ?? item.source,
+                'order_index': order++,
+                'created_at': nowUtc,
+              },
+              conflictAlgorithm: ConflictAlgorithm.replace,
+            );
+          }
+        }
+      }
+    }
+
+    final db = _db;
+    if (db is Database) {
+      await db.transaction((txn) async {
+        await performImport(txn);
+      });
+    } else {
+      await performImport(_db);
     }
   }
 }

@@ -180,23 +180,56 @@ class SeedLoader {
           for (final v in chunk) {
             batch.rawInsert('''
               INSERT INTO ${DatabaseConstants.tableVocabularies} (
-                id, simplified, traditional, pinyin, hsk_level,
-                frequency_rank, created_at, updated_at
-              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                id, simplified, traditional, pinyin, pinyin_clean, hanviet, hsk_level,
+                frequency_rank, source, license, verification_status, created_at, updated_at
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
               ON CONFLICT(id) DO UPDATE SET
                 simplified = excluded.simplified,
                 traditional = excluded.traditional,
                 pinyin = excluded.pinyin,
+                pinyin_clean = excluded.pinyin_clean,
+                hanviet = excluded.hanviet,
                 hsk_level = excluded.hsk_level,
                 frequency_rank = excluded.frequency_rank,
+                source = excluded.source,
+                license = excluded.license,
+                verification_status = excluded.verification_status,
                 updated_at = excluded.updated_at;
             ''', [
               v.id,
               v.simplified,
               v.traditional ?? v.simplified,
               v.pinyin,
+              v.pinyinClean,
+              v.hanviet,
               v.hskLevel,
               v.frequency,
+              v.source ?? 'clem109;drkameleon;CVDICT;no7z',
+              v.license ?? 'MIT;CC-BY-SA-4.0',
+              'verified',
+              now,
+              now,
+            ]);
+
+            // Upsert into knowledge_registry for seamless learning pipeline integration
+            final knowId = v.pinyinClean != null
+                ? 'KNOW_VOCAB_${v.simplified}_${v.pinyinClean}'
+                : 'KNOW_VOCAB_${v.simplified}';
+            batch.rawInsert('''
+              INSERT INTO ${DatabaseConstants.tableKnowledgeRegistry} (
+                id, entity_type, canonical_id, hsk_level, title,
+                package_id, created_at, updated_at
+              ) VALUES (?, 'vocabulary', ?, ?, ?, ?, ?, ?)
+              ON CONFLICT(id) DO UPDATE SET
+                title = excluded.title,
+                hsk_level = excluded.hsk_level,
+                updated_at = excluded.updated_at;
+            ''', [
+              knowId,
+              v.simplified,
+              v.hskLevel,
+              v.simplified,
+              bundle.bundleName,
               now,
               now,
             ]);
@@ -206,27 +239,65 @@ class SeedLoader {
 
               batch.rawInsert('''
                 INSERT INTO ${DatabaseConstants.tableVocabularySenses} (
-                  id, vocabulary_id, part_of_speech, meaning_vi,
-                  example_cn, example_pinyin, example_vi, created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                  id, vocabulary_id, part_of_speech, meaning_vi, meaning_en,
+                  example_cn, example_pinyin, example_vi, source, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(id) DO UPDATE SET
                   part_of_speech = excluded.part_of_speech,
                   meaning_vi = excluded.meaning_vi,
+                  meaning_en = excluded.meaning_en,
                   example_cn = excluded.example_cn,
                   example_pinyin = excluded.example_pinyin,
                   example_vi = excluded.example_vi,
+                  source = excluded.source,
                   updated_at = excluded.updated_at;
               ''', [
                 sense.id,
                 v.id,
                 sense.partOfSpeech,
                 sense.meaningVi,
+                sense.meaningEn,
                 firstEx?.zh,
                 firstEx?.pinyin,
                 firstEx?.vi,
+                'CVDICT;CC-CEDICT',
                 now,
                 now,
               ]);
+
+              // Insert all examples into vocabulary_examples table
+              int exIdx = 1;
+              for (final ex in sense.examples) {
+                if (ex.zh.isEmpty) continue;
+                final exId = 'EX_${sense.id}_$exIdx';
+                batch.rawInsert('''
+                  INSERT INTO ${DatabaseConstants.tableVocabularyExamples} (
+                    id, vocabulary_id, sense_id, hsk_level, example_cn,
+                    example_pinyin, example_vi, example_en, source, order_index,
+                    created_at, updated_at
+                  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                  ON CONFLICT(id) DO UPDATE SET
+                    example_cn = excluded.example_cn,
+                    example_pinyin = excluded.example_pinyin,
+                    example_vi = excluded.example_vi,
+                    example_en = excluded.example_en,
+                    updated_at = excluded.updated_at;
+                ''', [
+                  exId,
+                  v.id,
+                  sense.id,
+                  v.hskLevel,
+                  ex.zh,
+                  ex.pinyin,
+                  ex.vi,
+                  null,
+                  'no7z/hsk-sentences-audio;clem109',
+                  exIdx,
+                  now,
+                  now,
+                ]);
+                exIdx++;
+              }
             }
           }
 

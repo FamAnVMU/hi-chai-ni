@@ -1,0 +1,177 @@
+```mermaid
+erDiagram
+    %% Core Vocabulary & Grammar
+    vocabularies ||--o{ vocabulary_senses : "has definitions"
+    vocabularies ||--o{ srs_items : "indexed in flashcards"
+    grammar_items ||--o{ grammar_progress : "tracked by"
+
+    %% Curriculum & Content Packs
+    content_packs ||--o{ curriculums : "contains"
+    curriculums ||--o{ curriculum_units : "structured into"
+    curriculum_units ||--o{ curriculum_lessons : "divided into"
+    curriculum_lessons ||--o{ lesson_segments : "composed of"
+    curriculum_lessons ||--o{ lesson_progress : "completed by"
+    curriculums ||--o{ curriculum_mastery : "scored in"
+    curriculums ||--o{ level_exit_exams : "tested via"
+
+    %% Normalized Knowledge Architecture
+    knowledge_registry ||--o{ lesson_knowledge_items : "mapped to lessons"
+    curriculum_lessons ||--o{ lesson_knowledge_items : "teaches"
+    knowledge_registry ||--o{ content_id_mappings : "legacy alias"
+
+    %% Pedagogical Evidence & Mastery
+    knowledge_registry ||--o{ learner_evidence : "evidenced by"
+    knowledge_registry ||--o{ mastery_snapshots : "evaluated in"
+    curriculum_lessons ||--o{ learner_evidence : "generated during"
+    
+    %% Practice Subsystem
+    practice_sessions ||--o{ practice_attempts : "contains"
+    practice_exercises ||--o{ practice_attempts : "evaluated in"
+
+    %% Placement Testing
+    placement_test_sessions ||--o{ placement_test_responses : "records"
+
+    %% Audio Asset Management
+    content_packs ||--o{ audio_assets : "bundled in"
+
+    %% User Profile & Learning Goals
+    user_profiles ||--o{ goal_history : "logs changes"
+    user_profiles ||--o{ learner_goals : "active roadmap goal"
+
+    vocabularies {
+        TEXT id PK
+        TEXT simplified
+        TEXT traditional
+        TEXT pinyin
+        INTEGER hsk_level
+        INTEGER stroke_count
+        TEXT radicals
+        TEXT audio_uri
+        TEXT created_at
+    }
+
+    vocabulary_senses {
+        TEXT id PK
+        TEXT vocabulary_id FK
+        TEXT part_of_speech
+        TEXT meaning_vi
+        TEXT example_cn
+        TEXT example_pinyin
+        TEXT example_vi
+    }
+
+    content_packs {
+        TEXT id PK
+        INTEGER hsk_level
+        TEXT version
+        TEXT title
+        INTEGER is_bundled
+        TEXT status
+        INTEGER size_bytes
+        TEXT checksum_sha256
+    }
+
+    curriculums {
+        TEXT id PK
+        TEXT pack_id FK
+        TEXT code
+        TEXT standard_name
+        INTEGER hsk_level
+        INTEGER total_units
+        INTEGER total_lessons
+    }
+
+    curriculum_lessons {
+        TEXT id PK
+        TEXT unit_id FK
+        INTEGER order_index
+        TEXT title_vi
+        TEXT title_zh
+        TEXT pinyin
+        INTEGER is_locked
+        REAL unlock_score_threshold
+    }
+
+    knowledge_registry {
+        TEXT id PK
+        TEXT entity_type
+        TEXT canonical_id
+        INTEGER hsk_level
+        TEXT title
+        INTEGER is_deprecated
+        TEXT metadata_json
+    }
+
+    lesson_knowledge_items {
+        TEXT id PK
+        TEXT lesson_id FK
+        TEXT knowledge_item_id FK
+        TEXT role
+        INTEGER sequence_order
+        INTEGER is_mandatory
+    }
+
+    learner_evidence {
+        TEXT id PK
+        TEXT user_id
+        TEXT knowledge_item_id FK
+        TEXT lesson_id FK
+        TEXT evidence_type
+        REAL score
+        TEXT activity_context
+        TEXT created_at
+    }
+
+    mastery_snapshots {
+        TEXT id PK
+        TEXT knowledge_item_id FK
+        TEXT mastery_state
+        REAL score
+        INTEGER repetitions
+        TEXT last_evaluated_at
+    }
+
+    srs_items {
+        TEXT id PK
+        TEXT vocabulary_id FK
+        TEXT knowledge_item_id FK
+        INTEGER interval_days
+        REAL ease_factor
+        INTEGER repetitions
+        INTEGER lapses
+        TEXT due_at
+        TEXT state
+    }
+
+    audio_assets {
+        TEXT id PK
+        TEXT package_id FK
+        TEXT content_id
+        TEXT audio_type
+        INTEGER hsk_level
+        TEXT checksum_sha256
+        TEXT local_path
+        INTEGER file_size_bytes
+        TEXT status
+    }
+
+    pinyin_progress {
+        TEXT id PK
+        TEXT pinyin_item_id UK
+        TEXT category
+        TEXT mastery_level
+        REAL accuracy_score
+        INTEGER total_attempts
+        INTEGER correct_attempts
+    }
+
+    user_profiles {
+        TEXT id PK
+        TEXT display_name
+        INTEGER current_hsk_level
+        INTEGER target_hsk_level
+        INTEGER daily_target_minutes
+        TEXT learning_purpose
+        INTEGER streak_count
+    }
+```

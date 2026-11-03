@@ -15,6 +15,7 @@ abstract class DictionaryRepository {
   Future<List<DictionaryHistoryItem>> getRecentSearches({int limit = 20});
   Future<void> clearSearchHistory();
   Future<String> explainWordWithAi(String word, {String? contextSentence});
+  Database? get database => null;
 }
 
 class DefaultDictionaryRepository implements DictionaryRepository {
@@ -22,6 +23,9 @@ class DefaultDictionaryRepository implements DictionaryRepository {
   late final VocabularyDao _vocabDao;
   late final UserSavedWordsDao _savedWordsDao;
   late final DictionaryHistoryDao _historyDao;
+
+  @override
+  Database? get database => _db;
 
   DefaultDictionaryRepository(this._db) {
     _vocabDao = VocabularyDao(_db);
@@ -54,6 +58,7 @@ class DefaultDictionaryRepository implements DictionaryRepository {
 
     final vocabIds = rawResults.map((r) => r['id'] as String).toList();
     final sensesMap = await _vocabDao.getSensesByVocabularyIds(vocabIds);
+    final examplesMap = await _vocabDao.getExamplesByVocabularyIds(vocabIds);
     final savedMap = await _savedWordsDao.getSavedWordsByIds(vocabIds);
 
     final entries = <DictionaryEntry>[];
@@ -61,14 +66,46 @@ class DefaultDictionaryRepository implements DictionaryRepository {
       final id = row['id'] as String;
       final rawSenses = sensesMap[id] ?? const [];
       final senses = rawSenses.map((s) => DictionarySense.fromMap(s)).toList();
+      final rawExamples = examplesMap[id] ?? const [];
+      final examples = rawExamples.map((e) => DictionaryExample.fromMap(e)).toList();
       final savedData = savedMap[id];
 
       entries.add(DictionaryEntry.fromMap(
         row,
         senses: senses,
+        examples: examples,
         isSaved: savedData != null && (savedData['is_favorite'] == 1),
         customNote: savedData?['custom_note'] as String?,
       ));
+    }
+
+    // Fallback: If no core HSK word matched and limit permits, search 122k general offline dictionary
+    if (entries.length < limit) {
+      final dictRows = await _vocabDao.searchDictionaryEntries(trimmed, limit: limit - entries.length);
+      for (final d in dictRows) {
+        final dId = 'dict_${d['id'] ?? d['simplified']}';
+        if (entries.any((e) => e.simplified == d['simplified'])) continue;
+
+        entries.add(DictionaryEntry(
+          id: dId,
+          simplified: d['simplified'] as String,
+          traditional: d['traditional'] as String?,
+          pinyin: d['pinyin'] as String,
+          pinyinClean: d['pinyin_clean'] as String?,
+          hanviet: d['hanviet'] as String?,
+          hskLevel: (d['hsk_level'] as num?)?.toInt() ?? 0,
+          source: d['source'] as String? ?? 'CVDICT',
+          senses: [
+            DictionarySense(
+              id: 'sns_$dId',
+              partOfSpeech: 'từ vựng',
+              meaningVi: d['meaning_vi'] as String? ?? '',
+              meaningEn: d['meaning_en'] as String?,
+              source: 'CVDICT',
+            )
+          ],
+        ));
+      }
     }
 
     return entries;
@@ -81,11 +118,14 @@ class DefaultDictionaryRepository implements DictionaryRepository {
 
     final rawSenses = await _vocabDao.getSensesByVocabularyId(id);
     final senses = rawSenses.map((s) => DictionarySense.fromMap(s)).toList();
+    final rawExamples = await _vocabDao.getExamplesByVocabularyId(id);
+    final examples = rawExamples.map((e) => DictionaryExample.fromMap(e)).toList();
     final savedData = await _savedWordsDao.getSavedWord(id);
 
     return DictionaryEntry.fromMap(
       row,
       senses: senses,
+      examples: examples,
       isSaved: savedData != null && (savedData['is_favorite'] == 1),
       customNote: savedData?['custom_note'] as String?,
     );
@@ -147,12 +187,6 @@ class DefaultDictionaryRepository implements DictionaryRepository {
 
   @override
   Future<String> explainWordWithAi(String word, {String? contextSentence}) async {
-    // Academic & Architectural Honesty:
-    // Local SQLite is the single source of truth for dictionary data.
-    // AI serves as an advisory assistant for nuances and colloquial context.
-    if (contextSentence != null && contextSentence.trim().isNotEmpty) {
-      return 'Giải thích bổ sung AI: Trong ngữ cảnh "$contextSentence", từ "$word" thể hiện sắc thái tự nhiên và thường được dùng trong khẩu ngữ hàng ngày.';
-    }
-    return 'Giải thích bổ sung AI: Từ "$word" có thể kết hợp với các phó từ hoặc lượng từ tương ứng để tăng tính biểu cảm trong giao tiếp.';
+    return 'Phân tích từ "$word" bằng trợ lý AI.';
   }
 }

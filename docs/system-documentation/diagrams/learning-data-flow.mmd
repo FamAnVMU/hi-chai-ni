@@ -1,0 +1,53 @@
+```mermaid
+flowchart TD
+    subgraph UI_Activity ["User Learning Actions"]
+        Act_Lesson["Complete Curriculum Lesson<br/>(Warmup, Vocab, Grammar, Dialogue)"]
+        Act_Exercise["Submit Practice / Quiz Attempt<br/>(Multiple Choice, Fill-in, Pinyin)"]
+        Act_SRS["Review Flashcard<br/>(Again, Hard, Good, Easy)"]
+        Act_Placement["Complete Placement Test<br/>(CAT 2PL Adaptive Assessment)"]
+        Act_Pinyin["Practice Pinyin Pronunciation<br/>(10 Deterministic Audio Tasks)"]
+    end
+
+    subgraph Coordinator ["Learning Pipeline Coordinator (Atomic Transactions)"]
+        Pipe_Lesson["recordLessonCompletion()<br/>- Validate 100% segment completion<br/>- Calculate aggregate mastery<br/>- Extract taught knowledge items"]
+        Pipe_Attempt["recordExerciseAttempt()<br/>- Deterministic scoring & idempotency check<br/>- Associate knowledge items"]
+        Pipe_SRS["recordSrsReview()<br/>- SM-2 interval & ease factor calculation<br/>- Calculate next due_at timestamp"]
+        Pipe_Pinyin["recordItemAttempt()<br/>- Evaluate phonetic accuracy<br/>- Update pinyin_progress"]
+    end
+
+    subgraph Data_Storage ["SQLite Database Tables"]
+        T_Progress["lesson_progress<br/>(status: in_progress -> completed)"]
+        T_Evidence["learner_evidence<br/>(Immutable chronological log)"]
+        T_Mastery["mastery_snapshots<br/>(unseen -> exposed -> practicing -> mastered)"]
+        T_SRS["srs_items<br/>(state: learning -> review -> graduated)"]
+        T_Curriculum["curriculum_lessons<br/>(Unlock next sequential lesson)"]
+        T_Pinyin["pinyin_progress<br/>(accuracy_score, total_attempts)"]
+        T_Roadmap["roadmap_snapshots & learner_goals<br/>(Dynamic next action recommendation)"]
+    end
+
+    %% Flow connections
+    Act_Lesson --> Pipe_Lesson
+    Act_Exercise --> Pipe_Attempt
+    Act_SRS --> Pipe_SRS
+    Act_Pinyin --> Pipe_Pinyin
+
+    Pipe_Lesson -->|1. Mark Completed| T_Progress
+    Pipe_Lesson -->|2. Append Log| T_Evidence
+    Pipe_Lesson -->|3. Evaluate State| T_Mastery
+    Pipe_Lesson -->|4. Auto Intake unstudied words| T_SRS
+    Pipe_Lesson -->|5. Check Prerequisites| T_Curriculum
+
+    Pipe_Attempt -->|1. Store Raw Score| T_Evidence
+    Pipe_Attempt -->|2. Update Score & Threshold| T_Mastery
+    Pipe_Attempt -->|3. Weak Item Intake| T_SRS
+
+    Pipe_SRS -->|1. Log Review Record| T_Evidence
+    Pipe_SRS -->|2. Advance Retention Level| T_Mastery
+    Pipe_SRS -->|3. Update Interval & Due Date| T_SRS
+
+    Pipe_Pinyin -->|1. Update Pinyin Progress| T_Pinyin
+    Pipe_Pinyin -->|2. Register Pinyin Evidence| T_Evidence
+
+    Act_Placement -->|Calibrate Theta & HSK Level| T_Roadmap
+    T_Mastery -->|Recalculate Knowledge Gaps| T_Roadmap
+```

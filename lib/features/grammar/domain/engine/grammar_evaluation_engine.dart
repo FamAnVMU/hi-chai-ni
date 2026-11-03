@@ -14,6 +14,8 @@ class GrammarEvaluationEngine {
   }) {
     switch (exercise.type) {
       case GrammarExerciseType.multipleChoice:
+      case GrammarExerciseType.fillInBlank:
+      case GrammarExerciseType.errorRecognition:
         return _evaluateMultipleChoice(exercise, selectedOptionIndex);
       case GrammarExerciseType.reorderWords:
         return _evaluateReorderWords(exercise, orderedTokens);

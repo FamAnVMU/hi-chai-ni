@@ -1,0 +1,2014 @@
+{
+  "pack_id": "audio_pack_hsk6",
+  "title": "Gói âm thanh chuẩn bản xứ HSK 6",
+  "hsk_level": 6,
+  "version": "1.0.0",
+  "sentence_count": 250,
+  "archive_filename": "audio_pack_hsk6.zip",
+  "archive_size_bytes": 3891931,
+  "archive_sha256": "0863021ff150c239ac9e85131e543cdec1986160182cb22204242ede51ea6ee4",
+  "total_uncompressed_bytes": 4487904,
+  "download_url": "https://raw.githubusercontent.com/FamAnVMU/hi-chai-ni/main/content_packs_cdn/packages/audio_pack_hsk6.zip",
+  "assets": [
+    {
+      "audio_id": "1276699",
+      "sentence_id": "tat_13",
+      "relative_path": "1276699.mp3",
+      "file_size_bytes": 18144,
+      "checksum_sha256": "dea51e530272e4ef294808531f1376c534f478f2d9f823c9215cfd76f73c961a",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25403",
+      "sentence_id": "tat_332426",
+      "relative_path": "25403.mp3",
+      "file_size_bytes": 11952,
+      "checksum_sha256": "2dd71d1e51a95b222ef484254e16979f88e9ac2b6c248cc4bb7178d5e5f86fe9",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25421",
+      "sentence_id": "tat_332444",
+      "relative_path": "25421.mp3",
+      "file_size_bytes": 18144,
+      "checksum_sha256": "476744177f172152f074b7a1c3ddfa7d7ffc23d18d48f8022cfd9dd3bb7ded74",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25422",
+      "sentence_id": "tat_332445",
+      "relative_path": "25422.mp3",
+      "file_size_bytes": 11664,
+      "checksum_sha256": "3952073b9b79dd1dc31f1652a142570ffa0512045b148424da066ff8b6b5d3d7",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25430",
+      "sentence_id": "tat_332453",
+      "relative_path": "25430.mp3",
+      "file_size_bytes": 17856,
+      "checksum_sha256": "dc39df377e2be96fbfa372738c811f0b9dbf0b6d7a0e531816d71f9032aa0efb",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25432",
+      "sentence_id": "tat_332456",
+      "relative_path": "25432.mp3",
+      "file_size_bytes": 23184,
+      "checksum_sha256": "4c4db1850e9bc63ebd2bc3b1710fadba3eb710e4cc1b86b577ff84c468b8ec26",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25435",
+      "sentence_id": "tat_332459",
+      "relative_path": "25435.mp3",
+      "file_size_bytes": 19008,
+      "checksum_sha256": "60ff92c13f8af6671c851aa10c860e8a54009f18d7f6feea76fc19e734372127",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25436",
+      "sentence_id": "tat_332460",
+      "relative_path": "25436.mp3",
+      "file_size_bytes": 12096,
+      "checksum_sha256": "ad0176e368756e137d1221e450a253892477d8c769feef5f796d660d8c891eca",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25454",
+      "sentence_id": "tat_332481",
+      "relative_path": "25454.mp3",
+      "file_size_bytes": 19152,
+      "checksum_sha256": "996775457fe6cb506669c6a9bc8e4ad66ce40ecb33c1fb97013d1727d1cb963b",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25468",
+      "sentence_id": "tat_332495",
+      "relative_path": "25468.mp3",
+      "file_size_bytes": 12384,
+      "checksum_sha256": "0620bf57aeefd3b274f733b4593b12d05f1d2a552f1f5b1afb48d53a1e9bb144",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25471",
+      "sentence_id": "tat_332498",
+      "relative_path": "25471.mp3",
+      "file_size_bytes": 24768,
+      "checksum_sha256": "385a1b554dbddac682aeb7aa755e0a6276fa74929d3d57b427f8fe3b3f2ae105",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25478",
+      "sentence_id": "tat_332505",
+      "relative_path": "25478.mp3",
+      "file_size_bytes": 20304,
+      "checksum_sha256": "234e1c63d87be5424c561571ab1e51e25cd5f361dd9dd233f686015b166f25d8",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25479",
+      "sentence_id": "tat_332506",
+      "relative_path": "25479.mp3",
+      "file_size_bytes": 25056,
+      "checksum_sha256": "30eab68734b1f1ee1dd2a65991e8987592bd6708b076aa2d7dc846817d742453",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25481",
+      "sentence_id": "tat_332508",
+      "relative_path": "25481.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "87a47064a3ed44546dbbdd68f23ee73c0b9017b618ca5d181541748525005133",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25485",
+      "sentence_id": "tat_332513",
+      "relative_path": "25485.mp3",
+      "file_size_bytes": 17856,
+      "checksum_sha256": "5eeea4354385058117c22a1ba26eb9c82658e93a632ce9805255ec2dcc620462",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25493",
+      "sentence_id": "tat_332522",
+      "relative_path": "25493.mp3",
+      "file_size_bytes": 18000,
+      "checksum_sha256": "96c5c8a25b8678e64c5c822d113c1ab918f6a20864d71fcad0eef71cc1bf292c",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25495",
+      "sentence_id": "tat_332524",
+      "relative_path": "25495.mp3",
+      "file_size_bytes": 18864,
+      "checksum_sha256": "9e59019958eeb52939995ddad4d2749d30317c0cf2fb92082402271d3538e62b",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25496",
+      "sentence_id": "tat_332525",
+      "relative_path": "25496.mp3",
+      "file_size_bytes": 22320,
+      "checksum_sha256": "ba481dab30bc0e52f985179c6712ce1f6df248224c51da4eb2d9f7201dd395c1",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25500",
+      "sentence_id": "tat_332529",
+      "relative_path": "25500.mp3",
+      "file_size_bytes": 19872,
+      "checksum_sha256": "e5b83df7db04691bbf6173a505764e466ae254c5ec8096b5dc786e4ade6e90e4",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25506",
+      "sentence_id": "tat_332535",
+      "relative_path": "25506.mp3",
+      "file_size_bytes": 22896,
+      "checksum_sha256": "0d9c398455ea121a441efefe77a12e641e1ec03f0da2ac08b5eb1876bdf2ba6b",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25507",
+      "sentence_id": "tat_332536",
+      "relative_path": "25507.mp3",
+      "file_size_bytes": 16128,
+      "checksum_sha256": "647bec3b11de1558bfe27a4dedd07bd73c8a8f14afcc08467cb6308e8237c47d",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25512",
+      "sentence_id": "tat_332541",
+      "relative_path": "25512.mp3",
+      "file_size_bytes": 28656,
+      "checksum_sha256": "00151d5cc7611b979f11f4013cb69ba18e3d6a085877c137461e100381f653f5",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25515",
+      "sentence_id": "tat_332544",
+      "relative_path": "25515.mp3",
+      "file_size_bytes": 17712,
+      "checksum_sha256": "711f3c6b46a67368839aa9c8ba3482dafa956b504e3fe022f434a8e5a2a795ee",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25516",
+      "sentence_id": "tat_332545",
+      "relative_path": "25516.mp3",
+      "file_size_bytes": 13824,
+      "checksum_sha256": "ae8474272b876652a34579e9877f6c958fbec587446376f72754ed029b0d6d1e",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25521",
+      "sentence_id": "tat_332550",
+      "relative_path": "25521.mp3",
+      "file_size_bytes": 18144,
+      "checksum_sha256": "b889422dd60b9194d78436a5bd26370dca5d963fb9d5d60612f37a3c4ec645a9",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25525",
+      "sentence_id": "tat_332554",
+      "relative_path": "25525.mp3",
+      "file_size_bytes": 19296,
+      "checksum_sha256": "8783802380a0a6e3a337f2c58c1b2bfe358a1d29f64e77af00712230d48ab3ea",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25528",
+      "sentence_id": "tat_332557",
+      "relative_path": "25528.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "d5757ec81d8b9ffa20786cef34ec7d5b923755470a0dec5acfe3e8221dec51b7",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25533",
+      "sentence_id": "tat_332562",
+      "relative_path": "25533.mp3",
+      "file_size_bytes": 14832,
+      "checksum_sha256": "b108d4092cb9d729fc666a57bca7ed13021878ec682fee648bd4084370d9e96d",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25538",
+      "sentence_id": "tat_332567",
+      "relative_path": "25538.mp3",
+      "file_size_bytes": 15264,
+      "checksum_sha256": "7a9b9f4779b69a40521a920f20c43b8c1d18e1699b81bd5a2da3993fa6ccef68",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25543",
+      "sentence_id": "tat_332572",
+      "relative_path": "25543.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "fbb68f3636a424c568509c0f864d5878623e6fdd28186a226983f4f3e06b0cc1",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25556",
+      "sentence_id": "tat_332586",
+      "relative_path": "25556.mp3",
+      "file_size_bytes": 18432,
+      "checksum_sha256": "2ec8b6f6ee6587d1f1eb9b030fdccfcfe0388e5ff5b22c4a9c4dec6c6f68a484",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25560",
+      "sentence_id": "tat_332590",
+      "relative_path": "25560.mp3",
+      "file_size_bytes": 19008,
+      "checksum_sha256": "307c936c0a452cf45b93674b3dc14d5ac3faba0cbf75b09db6e787e217871a2f",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25565",
+      "sentence_id": "tat_332595",
+      "relative_path": "25565.mp3",
+      "file_size_bytes": 15408,
+      "checksum_sha256": "f1a378b35f403ad26340beb71bb3dd9e1a33a15d8f11895692ef70515df48729",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25566",
+      "sentence_id": "tat_332596",
+      "relative_path": "25566.mp3",
+      "file_size_bytes": 19296,
+      "checksum_sha256": "4bb24f2bc48de4bff5f3d38b6cee3ef3b22a8f037d4d7bea69b48d5fb1eabd94",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25567",
+      "sentence_id": "tat_332597",
+      "relative_path": "25567.mp3",
+      "file_size_bytes": 12672,
+      "checksum_sha256": "4387969bfac3eed90d13d5f97be7fd9e6bdc763b22910a0066d1c1b538381d06",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25568",
+      "sentence_id": "tat_332598",
+      "relative_path": "25568.mp3",
+      "file_size_bytes": 19728,
+      "checksum_sha256": "32b7ec2602b7ba56e9f5f07b3948a013e949abbd563132816d5a88806beb5902",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25574",
+      "sentence_id": "tat_332604",
+      "relative_path": "25574.mp3",
+      "file_size_bytes": 24048,
+      "checksum_sha256": "d1cd57b2e6c48f6c5aff8085ba5fcbffa3ac54a75d6c12bd56852b48027365ca",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25583",
+      "sentence_id": "tat_332613",
+      "relative_path": "25583.mp3",
+      "file_size_bytes": 15264,
+      "checksum_sha256": "aa9896190492cce3cea622a20e50e8ca68f498c7776d817c2ceb7abfcf659979",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25585",
+      "sentence_id": "tat_332615",
+      "relative_path": "25585.mp3",
+      "file_size_bytes": 16416,
+      "checksum_sha256": "5dfa419f606f4514325586831bf53ed860de21edcf623e645100b6b141115e72",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25599",
+      "sentence_id": "tat_332634",
+      "relative_path": "25599.mp3",
+      "file_size_bytes": 23040,
+      "checksum_sha256": "8054419940a4e9cb49958421202f7e9fe5f29eb464e8c4f2e14935812c480b0d",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25603",
+      "sentence_id": "tat_332638",
+      "relative_path": "25603.mp3",
+      "file_size_bytes": 12240,
+      "checksum_sha256": "78a163f79f576d1448c14f9702f982dea42709ec64904c7d5baa327605df5855",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25605",
+      "sentence_id": "tat_332640",
+      "relative_path": "25605.mp3",
+      "file_size_bytes": 16272,
+      "checksum_sha256": "45e3ecf12c56a183e58516d05cffc6f8d20f38635287498503f986aa0b28dfb2",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25610",
+      "sentence_id": "tat_332645",
+      "relative_path": "25610.mp3",
+      "file_size_bytes": 18144,
+      "checksum_sha256": "ab5f25c1dbda1d013801149bbae4b58e87fa32a3066f9b7a39fe6763e2527774",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25614",
+      "sentence_id": "tat_332651",
+      "relative_path": "25614.mp3",
+      "file_size_bytes": 25344,
+      "checksum_sha256": "3c1f32b48b017de38011b0b10500039d582deb8cf88b18959d19b809b916669a",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25616",
+      "sentence_id": "tat_332653",
+      "relative_path": "25616.mp3",
+      "file_size_bytes": 11664,
+      "checksum_sha256": "9106cba5dab41c4a8d9abff58130726a355c676e2b628bb10d59e4ff66b4dcbc",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25617",
+      "sentence_id": "tat_332654",
+      "relative_path": "25617.mp3",
+      "file_size_bytes": 16272,
+      "checksum_sha256": "7034dfc2f7fb3da6a7f14d4395bed5de11c0c5a2e6d912b4d0893d66d7f03391",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25619",
+      "sentence_id": "tat_332656",
+      "relative_path": "25619.mp3",
+      "file_size_bytes": 15552,
+      "checksum_sha256": "f9bd0f9a64a9bad517832a0b9b30f103773752b8998dbf0ab0a220657f0b94ae",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25626",
+      "sentence_id": "tat_332663",
+      "relative_path": "25626.mp3",
+      "file_size_bytes": 13536,
+      "checksum_sha256": "8f3a9bee9bcdf6b6fde22c8ce7e70d8cfe8b33e5687da727ffeb18d3c0a19119",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25629",
+      "sentence_id": "tat_332666",
+      "relative_path": "25629.mp3",
+      "file_size_bytes": 17424,
+      "checksum_sha256": "43af5d648d9d5ef7b8f4c50b47f47ad53d3e3df1e92a75f804649a9207dcd4d3",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25631",
+      "sentence_id": "tat_332668",
+      "relative_path": "25631.mp3",
+      "file_size_bytes": 15696,
+      "checksum_sha256": "3d0a11f2d7732ec7aeee21f767914cbfee76ff4f65da09c0a0790c0a0e9a9ad4",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25639",
+      "sentence_id": "tat_332676",
+      "relative_path": "25639.mp3",
+      "file_size_bytes": 14976,
+      "checksum_sha256": "54e38dcb7cc43d2d718c57d4d9ffbbb1ed728be7bb4431df0a312cf6aa90c910",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25640",
+      "sentence_id": "tat_332677",
+      "relative_path": "25640.mp3",
+      "file_size_bytes": 15696,
+      "checksum_sha256": "a6c3afa1cd571eee4e244da1c1b6417327e1d9d607ccf1556360fe3b1b28dbbe",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25646",
+      "sentence_id": "tat_332683",
+      "relative_path": "25646.mp3",
+      "file_size_bytes": 20736,
+      "checksum_sha256": "e01d0f3cd3e59f67357ee7613293bfd58d0813e8ff8f6afd6b7e116ef907e0ab",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25647",
+      "sentence_id": "tat_332684",
+      "relative_path": "25647.mp3",
+      "file_size_bytes": 22608,
+      "checksum_sha256": "9d5f1cb24c2823ba8d0b2a2a3633ef8c5b652076704a9d0096e6a9a93d328d00",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25648",
+      "sentence_id": "tat_332685",
+      "relative_path": "25648.mp3",
+      "file_size_bytes": 39312,
+      "checksum_sha256": "fd5d213ea7e67b4350f18005f255981007a5e51599c7856295ed5553fceb0871",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25652",
+      "sentence_id": "tat_332689",
+      "relative_path": "25652.mp3",
+      "file_size_bytes": 24048,
+      "checksum_sha256": "12100d497f6a5bb30aaeb7ea8687a59904f508815d3811deff1cf2f34ef4e0d2",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25654",
+      "sentence_id": "tat_332691",
+      "relative_path": "25654.mp3",
+      "file_size_bytes": 22464,
+      "checksum_sha256": "b2b09125b38d6577dcea930a84c08a3867ae8f119be5e87997202b7cc0166caf",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25660",
+      "sentence_id": "tat_332698",
+      "relative_path": "25660.mp3",
+      "file_size_bytes": 18576,
+      "checksum_sha256": "72fd546a45ea62ba70dfcf1c169571658ced5effad4cf8d5b4226d1901dd3283",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25665",
+      "sentence_id": "tat_332705",
+      "relative_path": "25665.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "d8be184fd9474de36c8c63bf7ecd37ab5877f04cc84439d799e7d979f5949484",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25668",
+      "sentence_id": "tat_332710",
+      "relative_path": "25668.mp3",
+      "file_size_bytes": 16992,
+      "checksum_sha256": "f80fed66d0ae2a82635622f1eff2faa03795adf556d21039b50862cd3914b1ed",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25669",
+      "sentence_id": "tat_332711",
+      "relative_path": "25669.mp3",
+      "file_size_bytes": 14688,
+      "checksum_sha256": "0960ae2bb63fe24b7384d1391b2bb03ad3f1313b6cf4fbf804d81587fe33cda5",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25677",
+      "sentence_id": "tat_332724",
+      "relative_path": "25677.mp3",
+      "file_size_bytes": 23184,
+      "checksum_sha256": "458963e8dd13070f282ed2b283de18b691fca6685338de6ef052129114eabab5",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25693",
+      "sentence_id": "tat_332765",
+      "relative_path": "25693.mp3",
+      "file_size_bytes": 16416,
+      "checksum_sha256": "ba253c0c64a8f2414e80ee5eedf4df1f89ad73d321d1b8c9d02a81a1ccf46bfb",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25706",
+      "sentence_id": "tat_332779",
+      "relative_path": "25706.mp3",
+      "file_size_bytes": 23328,
+      "checksum_sha256": "0bbff7577db4299290ee310888b3a56f2bd76dc8acac159b0295ecf1c6db7211",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25711",
+      "sentence_id": "tat_332784",
+      "relative_path": "25711.mp3",
+      "file_size_bytes": 10080,
+      "checksum_sha256": "5f7a349c2f3fb83a3542004fee2a612ed4617443cb098364402ee9091bd8cd7c",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25712",
+      "sentence_id": "tat_332785",
+      "relative_path": "25712.mp3",
+      "file_size_bytes": 14544,
+      "checksum_sha256": "cc5ede76c4516ba7fb8ae3aa1a4c5a1b7e28df33a61363264a6f7ac8468da671",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25715",
+      "sentence_id": "tat_332788",
+      "relative_path": "25715.mp3",
+      "file_size_bytes": 31104,
+      "checksum_sha256": "f03c917ef263ff2fffce074094fd1f0b9bf23f6240a10494d83bf05e1fe49ab8",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25724",
+      "sentence_id": "tat_332797",
+      "relative_path": "25724.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "b481db14fcd5c6d35811444871a8d0c664b9d1e5b04119db02c08f7f1c458f18",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25728",
+      "sentence_id": "tat_332801",
+      "relative_path": "25728.mp3",
+      "file_size_bytes": 11520,
+      "checksum_sha256": "d8efec9918c8344fb4ee8926b46ed6674f82fc071010297ec664254edac49278",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25729",
+      "sentence_id": "tat_332802",
+      "relative_path": "25729.mp3",
+      "file_size_bytes": 19872,
+      "checksum_sha256": "9ed4a1856bd9ca83f25e0e35f1fa2715fc1aa673502f8ffa177aa36786f800eb",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25740",
+      "sentence_id": "tat_332813",
+      "relative_path": "25740.mp3",
+      "file_size_bytes": 14400,
+      "checksum_sha256": "b84598aa787910a74d9965f5bbff53bd2bd67ab3c6bd5adb4ae634dec880a20b",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25742",
+      "sentence_id": "tat_332815",
+      "relative_path": "25742.mp3",
+      "file_size_bytes": 15264,
+      "checksum_sha256": "362bc1276fc674876d4b64bcabf22044a7d9c1197ef17995828ccfba7fe7a52c",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25752",
+      "sentence_id": "tat_332826",
+      "relative_path": "25752.mp3",
+      "file_size_bytes": 13536,
+      "checksum_sha256": "3e782786b6f643d99c0284a509c8512be799d5d87e8e4b82cea1b6fc7a72b693",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25754",
+      "sentence_id": "tat_332828",
+      "relative_path": "25754.mp3",
+      "file_size_bytes": 14112,
+      "checksum_sha256": "445387f9705842ec23d8b44915c499cc28b1768bd20d48965ab5541e0bae823b",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25762",
+      "sentence_id": "tat_332836",
+      "relative_path": "25762.mp3",
+      "file_size_bytes": 23184,
+      "checksum_sha256": "a62594d8d5ddaaa9cbb6841c3b5097484da239ea6e8a1b7be57ccb7cc5308739",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25770",
+      "sentence_id": "tat_332844",
+      "relative_path": "25770.mp3",
+      "file_size_bytes": 19440,
+      "checksum_sha256": "4815dcdc10e7f29b9ad8074e432667575d8154be0c0d4c3e1b50f60c679171f0",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25781",
+      "sentence_id": "tat_332856",
+      "relative_path": "25781.mp3",
+      "file_size_bytes": 28368,
+      "checksum_sha256": "016847ece61129e830e01685d987919faaf94c81150220d1693ac8976c7297ac",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25786",
+      "sentence_id": "tat_332861",
+      "relative_path": "25786.mp3",
+      "file_size_bytes": 13248,
+      "checksum_sha256": "9a497ff05ee7390ee2d61a89057a06eb89fd01a7ac35669c8d3075f9887a685f",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25796",
+      "sentence_id": "tat_332872",
+      "relative_path": "25796.mp3",
+      "file_size_bytes": 13536,
+      "checksum_sha256": "d169c6a5a024c1a86f161247a421e9284aa4c9a3ae95310d3018409fcf4fc1cf",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25817",
+      "sentence_id": "tat_332893",
+      "relative_path": "25817.mp3",
+      "file_size_bytes": 12960,
+      "checksum_sha256": "542f8c57961e35c458b4e645437fb1eff68d761039e1cc5f7097017a4330c860",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25820",
+      "sentence_id": "tat_332896",
+      "relative_path": "25820.mp3",
+      "file_size_bytes": 21600,
+      "checksum_sha256": "a79232484773676dfa9ab6086a923c5c179362a0c3a666942c5abeb6f9e297fc",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25828",
+      "sentence_id": "tat_332904",
+      "relative_path": "25828.mp3",
+      "file_size_bytes": 13392,
+      "checksum_sha256": "088328665a2c5fc0d5a5aa69b7d7fec1ad982a9bdc33b6bad9a8bb95760c60e7",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25842",
+      "sentence_id": "tat_332919",
+      "relative_path": "25842.mp3",
+      "file_size_bytes": 25920,
+      "checksum_sha256": "286b426e125c183e765847bebd23c9cc1954f6a5c97194122178ac2a7ecb7426",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25845",
+      "sentence_id": "tat_332922",
+      "relative_path": "25845.mp3",
+      "file_size_bytes": 18144,
+      "checksum_sha256": "9102311eb71e416d4441ce8bead5d0f38ec65c653e927f84c7271a64f0d92314",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25850",
+      "sentence_id": "tat_332927",
+      "relative_path": "25850.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "dc1bf716f1199232fb58c6dfc9da1d94b90123cc82b07bb3bc797202cc29e0c6",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25851",
+      "sentence_id": "tat_332928",
+      "relative_path": "25851.mp3",
+      "file_size_bytes": 23616,
+      "checksum_sha256": "0d6728927f46ccd8d8fe051a60d100c607ae6e24808d8ad0a7c6b902dbd74cf3",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25854",
+      "sentence_id": "tat_332931",
+      "relative_path": "25854.mp3",
+      "file_size_bytes": 20016,
+      "checksum_sha256": "b2068896d76f1b11b900e92e8b7b0f7b992f6b0e2a6ae350311338b1b1d07a76",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25865",
+      "sentence_id": "tat_332942",
+      "relative_path": "25865.mp3",
+      "file_size_bytes": 17424,
+      "checksum_sha256": "6d98da3108332efdc58d070d3ca6554bf32967890ff5f026e6c35c4160244031",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25870",
+      "sentence_id": "tat_332947",
+      "relative_path": "25870.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "af0a98328543bd1b6e46eb1739c760e2eb3a243666586c0760f31e866fc163aa",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25871",
+      "sentence_id": "tat_332948",
+      "relative_path": "25871.mp3",
+      "file_size_bytes": 17136,
+      "checksum_sha256": "d227b78c7c8061f7442ccafbedfacff0c071d4ef8a6df7363f131776ec3085aa",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25888",
+      "sentence_id": "tat_332967",
+      "relative_path": "25888.mp3",
+      "file_size_bytes": 13248,
+      "checksum_sha256": "ed9cef131c91fff4904443c8eb9b0426c95545529a822db0a9d6c67cde5a6655",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25889",
+      "sentence_id": "tat_332968",
+      "relative_path": "25889.mp3",
+      "file_size_bytes": 22752,
+      "checksum_sha256": "390000f1d1bf93757fb371e1ad2bc4e42fc5648e48d7bf2e864e4e86063bf264",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25891",
+      "sentence_id": "tat_332970",
+      "relative_path": "25891.mp3",
+      "file_size_bytes": 17424,
+      "checksum_sha256": "7455ab7831007b295a1384253d7230110c4b6ec1439db29a5102b744684f28dc",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25905",
+      "sentence_id": "tat_332984",
+      "relative_path": "25905.mp3",
+      "file_size_bytes": 29952,
+      "checksum_sha256": "e2047686302a17a09522531058abcfcf200eb1260520dfbf5d771d5a188b9947",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25907",
+      "sentence_id": "tat_332986",
+      "relative_path": "25907.mp3",
+      "file_size_bytes": 12096,
+      "checksum_sha256": "ca1b45cd2b43864351d43222bc8e6be8138f8591394eaaf12b9c4cd9fabd0e4f",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25909",
+      "sentence_id": "tat_332988",
+      "relative_path": "25909.mp3",
+      "file_size_bytes": 13392,
+      "checksum_sha256": "921bb3d608aab73385a0f3875559716dbb64f736b769c2ef6aba81b2848913d9",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25917",
+      "sentence_id": "tat_332996",
+      "relative_path": "25917.mp3",
+      "file_size_bytes": 18576,
+      "checksum_sha256": "bcb7aa9e9039b090ea5f89c4883ea56090b1a7776e1904f05c07e5ec251e8238",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25922",
+      "sentence_id": "tat_333001",
+      "relative_path": "25922.mp3",
+      "file_size_bytes": 26640,
+      "checksum_sha256": "a28b777b8bf398fd08f0c523a1fbfe55d1fd10b79eee8cceceb48ecccdc63701",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25923",
+      "sentence_id": "tat_333002",
+      "relative_path": "25923.mp3",
+      "file_size_bytes": 18000,
+      "checksum_sha256": "989c9e9d6e4489afc3fc6b00078c085864b297bdf9f7d251b3c1f5518304cc4c",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25944",
+      "sentence_id": "tat_333028",
+      "relative_path": "25944.mp3",
+      "file_size_bytes": 14112,
+      "checksum_sha256": "fd8bb8eda66611ce6aa574475a4a5b291b99e7895abc154238e9671a25933625",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25946",
+      "sentence_id": "tat_333030",
+      "relative_path": "25946.mp3",
+      "file_size_bytes": 15264,
+      "checksum_sha256": "92ef0566f8314a7c00236a09ccd23bfb559531f81eeaac207531e82382da579e",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25957",
+      "sentence_id": "tat_333042",
+      "relative_path": "25957.mp3",
+      "file_size_bytes": 14976,
+      "checksum_sha256": "e7bab6d165ee55712eb4cf5a14056fe31de33531cd8a9cca473d43d2313f8ff8",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25968",
+      "sentence_id": "tat_333053",
+      "relative_path": "25968.mp3",
+      "file_size_bytes": 15984,
+      "checksum_sha256": "9e3b9927be8ab43ebf1ebc1268ef403b91af59d50c9e045d7987bf34600b121f",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25970",
+      "sentence_id": "tat_333055",
+      "relative_path": "25970.mp3",
+      "file_size_bytes": 13680,
+      "checksum_sha256": "aae3a95e1c33f2f29a54e3461ae9a797018e48ae20f510c4a8a88c83abbbfb6d",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25981",
+      "sentence_id": "tat_333067",
+      "relative_path": "25981.mp3",
+      "file_size_bytes": 23328,
+      "checksum_sha256": "3a410817f853afc1ebcfe46590c5b018ef76201d4c3eae0dd3a11eec105bc537",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25992",
+      "sentence_id": "tat_333078",
+      "relative_path": "25992.mp3",
+      "file_size_bytes": 16848,
+      "checksum_sha256": "3ef6a0f6d92461af4b089abe6ccdebe23920638ad63456ce3f902e27d239d920",
+      "status": "ready"
+    },
+    {
+      "audio_id": "25995",
+      "sentence_id": "tat_333081",
+      "relative_path": "25995.mp3",
+      "file_size_bytes": 18144,
+      "checksum_sha256": "1def573838e1440e6d7d414d634b5992f68eeedae59bf1944de05528db716ee6",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26015",
+      "sentence_id": "tat_333102",
+      "relative_path": "26015.mp3",
+      "file_size_bytes": 15840,
+      "checksum_sha256": "895c7a39dcb3013eefe488b82022d78c7079a9cff8bf9a687aff5c4f8c2fd0ac",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26031",
+      "sentence_id": "tat_333118",
+      "relative_path": "26031.mp3",
+      "file_size_bytes": 13680,
+      "checksum_sha256": "da923881c87fd37ad143dccfe5302df03250187598ecd2692a17fb892bfd0877",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26058",
+      "sentence_id": "tat_333147",
+      "relative_path": "26058.mp3",
+      "file_size_bytes": 16992,
+      "checksum_sha256": "194c32cfdb9903b106b7f9a0e63ac60ebedb1b7312f6eba912469f783f5c3b0f",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26060",
+      "sentence_id": "tat_333149",
+      "relative_path": "26060.mp3",
+      "file_size_bytes": 18576,
+      "checksum_sha256": "5fc8f6d1cbc0fd0642f50c9207a1489eb4a9ecf955c53c8bc9763a5bae19fe92",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26074",
+      "sentence_id": "tat_333171",
+      "relative_path": "26074.mp3",
+      "file_size_bytes": 13968,
+      "checksum_sha256": "6554268d293ef1c5d2d639c063911a32072872ef7ff0e95726c12b414a275d87",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26085",
+      "sentence_id": "tat_333182",
+      "relative_path": "26085.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "1179e3fbc954e958c9d32377bc85bc08a5f5055a71de5a75ee54f16e4e04b7c2",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26087",
+      "sentence_id": "tat_333185",
+      "relative_path": "26087.mp3",
+      "file_size_bytes": 18432,
+      "checksum_sha256": "24d8a447c95df536573a02d3a3634c10244bb976dbbeecb65342331552cb35f6",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26096",
+      "sentence_id": "tat_333195",
+      "relative_path": "26096.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "362ca0e9f93150e90ae7478696abd36ead5f285574b4705e71b1c2d7c006b928",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26100",
+      "sentence_id": "tat_333200",
+      "relative_path": "26100.mp3",
+      "file_size_bytes": 12960,
+      "checksum_sha256": "6b907761a0bd2229a13d9371b1cb1e61c50cc6d22fc525b3b055fde983962d89",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26111",
+      "sentence_id": "tat_333211",
+      "relative_path": "26111.mp3",
+      "file_size_bytes": 12384,
+      "checksum_sha256": "dfec749d0e8a813df06ed50fed77cce54ddad76244e2584730847792d7743fa4",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26112",
+      "sentence_id": "tat_333212",
+      "relative_path": "26112.mp3",
+      "file_size_bytes": 15984,
+      "checksum_sha256": "e6124ec7d8dd0e30eca0aa6349a977cb2195a885c6131cf0e368f84a92eabe05",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26114",
+      "sentence_id": "tat_333214",
+      "relative_path": "26114.mp3",
+      "file_size_bytes": 16560,
+      "checksum_sha256": "b18f2851bd47baba1e5f00904b111eaf3a8c224c035c3298ea3abb47a4a22b17",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26117",
+      "sentence_id": "tat_333217",
+      "relative_path": "26117.mp3",
+      "file_size_bytes": 18432,
+      "checksum_sha256": "51951bab2e0c876a9a9711833914c040a18cfdaf3880091040ec43452654461a",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26127",
+      "sentence_id": "tat_333227",
+      "relative_path": "26127.mp3",
+      "file_size_bytes": 11376,
+      "checksum_sha256": "13eec6ad89e4bb6193b19cbcbb38b3cce1174d4fcf37b66231f23c2c671b75d8",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26129",
+      "sentence_id": "tat_333229",
+      "relative_path": "26129.mp3",
+      "file_size_bytes": 21600,
+      "checksum_sha256": "10169607eee1388830b9e552f01286c2d8a8db7aa1b7070ef6ce5332ada87681",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26137",
+      "sentence_id": "tat_333237",
+      "relative_path": "26137.mp3",
+      "file_size_bytes": 13968,
+      "checksum_sha256": "2225c1b62c2f865d9aef7c8e0201512931ab54aa402363be334f4b8c515899ac",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26160",
+      "sentence_id": "tat_333261",
+      "relative_path": "26160.mp3",
+      "file_size_bytes": 19008,
+      "checksum_sha256": "41f1a93356b2f137b14a767c200556a5e9e9d961c591430143ed85889d9c1e3f",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26169",
+      "sentence_id": "tat_333270",
+      "relative_path": "26169.mp3",
+      "file_size_bytes": 31680,
+      "checksum_sha256": "2a6bc5902db543553d1b27983055c75f5631f6ff086f113058701989a16dc1a2",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26178",
+      "sentence_id": "tat_333279",
+      "relative_path": "26178.mp3",
+      "file_size_bytes": 24912,
+      "checksum_sha256": "f7c94ebaf2ca94312445e49e8ee1070bbe8a560c3b14c529d0a3eb947331c48b",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26191",
+      "sentence_id": "tat_333292",
+      "relative_path": "26191.mp3",
+      "file_size_bytes": 27504,
+      "checksum_sha256": "f33a038af9a2c8d8c453025c0a72d1e1036a6c2d3ed1167a2d863e687e92dc3e",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26200",
+      "sentence_id": "tat_333301",
+      "relative_path": "26200.mp3",
+      "file_size_bytes": 16416,
+      "checksum_sha256": "eaf95815a89b2c96c6f2b211ddfcb5217434574182f78141eea0e8bddfb83629",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26209",
+      "sentence_id": "tat_333311",
+      "relative_path": "26209.mp3",
+      "file_size_bytes": 20016,
+      "checksum_sha256": "28b4f547e0c2a72e5aa893c4a1aea00a42dcf73ba831bd9c5f03221f35c3d320",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26211",
+      "sentence_id": "tat_333313",
+      "relative_path": "26211.mp3",
+      "file_size_bytes": 14256,
+      "checksum_sha256": "45baa8d7e77788864dd902cf0ca6c425de28e584894c2e08feca0894af127eb7",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26233",
+      "sentence_id": "tat_333337",
+      "relative_path": "26233.mp3",
+      "file_size_bytes": 25776,
+      "checksum_sha256": "0857dfbe230df85afdfd08c572fb45f79c56fa93b2ee3a63e7612072c5e0b58a",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26258",
+      "sentence_id": "tat_333367",
+      "relative_path": "26258.mp3",
+      "file_size_bytes": 20592,
+      "checksum_sha256": "be791d953703aef9ff0634c63af493baea847593db634c7c5dc95c126ab04193",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26264",
+      "sentence_id": "tat_333374",
+      "relative_path": "26264.mp3",
+      "file_size_bytes": 16128,
+      "checksum_sha256": "4f331b3e0d5d1ef85f7b75a2064912a5f7da550f27a46fb101b541fed0572db3",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26268",
+      "sentence_id": "tat_333378",
+      "relative_path": "26268.mp3",
+      "file_size_bytes": 19584,
+      "checksum_sha256": "70d8d27600c8ea4e879d32d8de97e8fdeafb69adc01a346642267e0ffd05b190",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26285",
+      "sentence_id": "tat_333396",
+      "relative_path": "26285.mp3",
+      "file_size_bytes": 18576,
+      "checksum_sha256": "995bc350fe1482defaed59a67fab1228bab581ed21092d288afdbf15304096a5",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26289",
+      "sentence_id": "tat_333400",
+      "relative_path": "26289.mp3",
+      "file_size_bytes": 25488,
+      "checksum_sha256": "70bb089e0d148145c04773ce8cf96dc52c55dfc09a59d55b81a45211fb753831",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26290",
+      "sentence_id": "tat_333401",
+      "relative_path": "26290.mp3",
+      "file_size_bytes": 12384,
+      "checksum_sha256": "5e81d8c18c81a4dd98c82af35a7c011672e9c08ec6b6da7379ae1c136ed94c58",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26317",
+      "sentence_id": "tat_333429",
+      "relative_path": "26317.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "a5656b0353e37e4f9fb917de8d1858502909ca03bc790c1f2aed5e6809a62be6",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26320",
+      "sentence_id": "tat_333432",
+      "relative_path": "26320.mp3",
+      "file_size_bytes": 17712,
+      "checksum_sha256": "d38220a125fb60c16c5a17fa4ae8a7fbd621e841cb67a43d21fd9827f5a3c8bf",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26334",
+      "sentence_id": "tat_333462",
+      "relative_path": "26334.mp3",
+      "file_size_bytes": 19440,
+      "checksum_sha256": "ec4605a01c5d40c1a470c56ff62859e5ab6dc42692d6ef292b6d8944e88a0e22",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26336",
+      "sentence_id": "tat_333464",
+      "relative_path": "26336.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "981e18f3159127afb784dfd9d521d51480544c281fe9e3d2f3054f6780012aaa",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26340",
+      "sentence_id": "tat_333468",
+      "relative_path": "26340.mp3",
+      "file_size_bytes": 18144,
+      "checksum_sha256": "e4b11b64cec4bd5595aa323e8acbcd1994c111db5521cb05bb834c7d20491c85",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26344",
+      "sentence_id": "tat_333498",
+      "relative_path": "26344.mp3",
+      "file_size_bytes": 19008,
+      "checksum_sha256": "63e595298de0f15494087c86ffd513b924a2828cdded590c090c63d8c9a8c575",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26352",
+      "sentence_id": "tat_333506",
+      "relative_path": "26352.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "920442e6eae7b5eb999f8004ec94ade0bf2f798db712990e3322bcb3415e61a7",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26353",
+      "sentence_id": "tat_333507",
+      "relative_path": "26353.mp3",
+      "file_size_bytes": 17712,
+      "checksum_sha256": "e87ee8e5ec7726bda4f6c0736388369b397a5145acfd764172e60680af143baf",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26356",
+      "sentence_id": "tat_333510",
+      "relative_path": "26356.mp3",
+      "file_size_bytes": 15264,
+      "checksum_sha256": "af0788303cd599e795069c5e3b9541a58902626d4f98887b843fff83490f672a",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26413",
+      "sentence_id": "tat_333567",
+      "relative_path": "26413.mp3",
+      "file_size_bytes": 16416,
+      "checksum_sha256": "78372d4495188555b8eb2f35619f6f503d8e36672a6d3b4de15dbd9b12dcb33d",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26421",
+      "sentence_id": "tat_333575",
+      "relative_path": "26421.mp3",
+      "file_size_bytes": 13248,
+      "checksum_sha256": "03ff847dece45a3dc60b28d87eb22882060b046dd76f7bf1232d5816484004e3",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26427",
+      "sentence_id": "tat_333581",
+      "relative_path": "26427.mp3",
+      "file_size_bytes": 21168,
+      "checksum_sha256": "03dcb0c80f1cab7e0655a4059d4d18f0f18f231e8a20422db9d4ab26c79e311b",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26430",
+      "sentence_id": "tat_333584",
+      "relative_path": "26430.mp3",
+      "file_size_bytes": 27936,
+      "checksum_sha256": "ad6a8e6d058e2d612f4a5c3f1ea332e0f9bd3440dac96bc936f936bfab2e51d1",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26433",
+      "sentence_id": "tat_333587",
+      "relative_path": "26433.mp3",
+      "file_size_bytes": 17856,
+      "checksum_sha256": "2d9262a5a05dddd7dd91824ae0c7bc47f44d017a5c7150bc6218770d977bd0e8",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26434",
+      "sentence_id": "tat_333588",
+      "relative_path": "26434.mp3",
+      "file_size_bytes": 13968,
+      "checksum_sha256": "1bb7afff2b7e04521d7af3edbb4855f8c6d7d471e85003eb60e3571268e79339",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26435",
+      "sentence_id": "tat_333589",
+      "relative_path": "26435.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "22945d0a601a07f8dc67d6f749e92ba2d8b5f7e1b146b4fc4295691459fcbce7",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26438",
+      "sentence_id": "tat_333649",
+      "relative_path": "26438.mp3",
+      "file_size_bytes": 24768,
+      "checksum_sha256": "6e4c2967973d6ace28689267e4055b640e9783a4a35ef9ef8f36ac6c7f0afa92",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26440",
+      "sentence_id": "tat_333651",
+      "relative_path": "26440.mp3",
+      "file_size_bytes": 19440,
+      "checksum_sha256": "02a6d2f8de4f62dfe614faad287f499dab4d25498ac8fc5a581ac62c864c5c60",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26442",
+      "sentence_id": "tat_333653",
+      "relative_path": "26442.mp3",
+      "file_size_bytes": 22032,
+      "checksum_sha256": "f602ffc8f6ab71d3cbeb0b5fdd8e9d34625a372b805c375dffa32931fe5cfd37",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26445",
+      "sentence_id": "tat_333658",
+      "relative_path": "26445.mp3",
+      "file_size_bytes": 12816,
+      "checksum_sha256": "c137711cbe446aa96b236907f1f400dcbe3b3b5ad245f26121c146a3e1fe8f68",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26447",
+      "sentence_id": "tat_333660",
+      "relative_path": "26447.mp3",
+      "file_size_bytes": 15984,
+      "checksum_sha256": "1ef540ff9be65d4fb4efb599ec260010265d8706f6f8cc322c7582ecad65f352",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26448",
+      "sentence_id": "tat_333661",
+      "relative_path": "26448.mp3",
+      "file_size_bytes": 14976,
+      "checksum_sha256": "ef497e773fab11fb759ae6200bb69c61ba1eb3dacd308296a969500a88b082f1",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26452",
+      "sentence_id": "tat_333665",
+      "relative_path": "26452.mp3",
+      "file_size_bytes": 12816,
+      "checksum_sha256": "ad288a43a99cea047bb17426f57a6add520031fb5c18f751bfaf413585207ff3",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26458",
+      "sentence_id": "tat_333671",
+      "relative_path": "26458.mp3",
+      "file_size_bytes": 17712,
+      "checksum_sha256": "05b372d6e7fe82174f11e4c920dc795e39e75fe33f4f7e1d9af101d72a13c5b8",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26463",
+      "sentence_id": "tat_333676",
+      "relative_path": "26463.mp3",
+      "file_size_bytes": 14256,
+      "checksum_sha256": "dfe61eaf5185f06016d6df7b10026e90e14538400fdf8beb634497d4778f09b8",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26499",
+      "sentence_id": "tat_333713",
+      "relative_path": "26499.mp3",
+      "file_size_bytes": 20016,
+      "checksum_sha256": "f39c33b29fa7d05ed53c28f92ed5c8eb0022f3beb00def3977bf0e528d1c2a70",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26511",
+      "sentence_id": "tat_333725",
+      "relative_path": "26511.mp3",
+      "file_size_bytes": 18288,
+      "checksum_sha256": "36d5ba45bd5f4e2f61cb29ab7f69e4836b8e3b48ae449a806ed07613d1379f0d",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26520",
+      "sentence_id": "tat_333734",
+      "relative_path": "26520.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "1f01e35898fe11a92f74e80908b071ebc362d7965b92d160d71b2ad7d0f98bf3",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26528",
+      "sentence_id": "tat_333742",
+      "relative_path": "26528.mp3",
+      "file_size_bytes": 45072,
+      "checksum_sha256": "0443529340abab1b4b8b8491d3f88e472e012d325ea89db5a436a7548ac307e1",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26544",
+      "sentence_id": "tat_333759",
+      "relative_path": "26544.mp3",
+      "file_size_bytes": 21456,
+      "checksum_sha256": "44423167f2fc2ad5219f11ea2912491fb19366cfcc5ea8f75ee4263da87f6bab",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26546",
+      "sentence_id": "tat_333761",
+      "relative_path": "26546.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "519b81f60bbd8f3ffac5aaa0627d8c647c0990efdcdc5f717487478b685b7a00",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26562",
+      "sentence_id": "tat_333777",
+      "relative_path": "26562.mp3",
+      "file_size_bytes": 18432,
+      "checksum_sha256": "576d19722bcbe03a849c2bd2ebd1c197533b4081a316bf4daa9ad7eff71a080b",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26567",
+      "sentence_id": "tat_333782",
+      "relative_path": "26567.mp3",
+      "file_size_bytes": 25344,
+      "checksum_sha256": "3206c888b1c5d12c4200ee31e35b31b87b33b625ea496a02d673de26e5778dad",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26570",
+      "sentence_id": "tat_333785",
+      "relative_path": "26570.mp3",
+      "file_size_bytes": 25632,
+      "checksum_sha256": "9ef2af30521b9934c4e17ab4f124a77918592c1b3178aeafa095e44f66eb5ed3",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26586",
+      "sentence_id": "tat_333820",
+      "relative_path": "26586.mp3",
+      "file_size_bytes": 17856,
+      "checksum_sha256": "08202ad77706319b58312b2f5c1b10545a9f2e74cbe0053a351a3917b9d1200d",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26587",
+      "sentence_id": "tat_333821",
+      "relative_path": "26587.mp3",
+      "file_size_bytes": 12816,
+      "checksum_sha256": "8a7624bd8c6cbc65ef535cc3fc787093d8f6de85a81a6f9b3b36f2240c8659db",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26603",
+      "sentence_id": "tat_333837",
+      "relative_path": "26603.mp3",
+      "file_size_bytes": 20880,
+      "checksum_sha256": "479adcc172d325d0149b8a79ef8cc0b9a53f043e0e10ce7673e9b8e2b7aa2e0b",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26606",
+      "sentence_id": "tat_333840",
+      "relative_path": "26606.mp3",
+      "file_size_bytes": 14832,
+      "checksum_sha256": "d8d411b38d7a8435dc3ba2ebef66cbee34ae6c2a48aa82062270bb6f345f5bc9",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26625",
+      "sentence_id": "tat_333859",
+      "relative_path": "26625.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "d4fbc4598ea4b348088ef17c85e100eac80f936207f2c11633916c5c35d08487",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26662",
+      "sentence_id": "tat_333903",
+      "relative_path": "26662.mp3",
+      "file_size_bytes": 22752,
+      "checksum_sha256": "6d0fed2bd30996d6ee123a63f5789750588180a41f9dc5fc120887594dccc7e6",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26664",
+      "sentence_id": "tat_333905",
+      "relative_path": "26664.mp3",
+      "file_size_bytes": 11664,
+      "checksum_sha256": "4a362a8bef567518028524ac2ab8b974635a85197a319da60732a2458899c89d",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26665",
+      "sentence_id": "tat_333906",
+      "relative_path": "26665.mp3",
+      "file_size_bytes": 17856,
+      "checksum_sha256": "d6b95ad1594a6782fc12ad11c9d5df6a53dd5757e8cebdfe3a2839f2575655a9",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26670",
+      "sentence_id": "tat_333911",
+      "relative_path": "26670.mp3",
+      "file_size_bytes": 19728,
+      "checksum_sha256": "76217fcc8a764df0a9e34316ae1861e020e4b3f5def4ad7fff531108e8446cc8",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26676",
+      "sentence_id": "tat_333917",
+      "relative_path": "26676.mp3",
+      "file_size_bytes": 16848,
+      "checksum_sha256": "3ae4971a9570ae67c5407c2cff45bc18e35362eba9e4c3f3884906560a6c0aa1",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26697",
+      "sentence_id": "tat_333941",
+      "relative_path": "26697.mp3",
+      "file_size_bytes": 15696,
+      "checksum_sha256": "7a554fa8e22d3645b5420feb6f962448de9de81c9af4fa68a6bc7745bf439bce",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26699",
+      "sentence_id": "tat_333943",
+      "relative_path": "26699.mp3",
+      "file_size_bytes": 26784,
+      "checksum_sha256": "bdcdb155e791dfa105234fbe920047a1f8cd72a6d85c113d395056b43c978f92",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26700",
+      "sentence_id": "tat_333944",
+      "relative_path": "26700.mp3",
+      "file_size_bytes": 19872,
+      "checksum_sha256": "e99ab4c07dec2e662b8de5938c64da682270841a827349257f9313adc7356e46",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26703",
+      "sentence_id": "tat_333947",
+      "relative_path": "26703.mp3",
+      "file_size_bytes": 16704,
+      "checksum_sha256": "9c60828f40568c967b99294df7e9f6bd40f039c51909c4a92dc7e05d3f76bc70",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26707",
+      "sentence_id": "tat_333951",
+      "relative_path": "26707.mp3",
+      "file_size_bytes": 27936,
+      "checksum_sha256": "1c43fa03494f1bfcbc7709eaf9bec4f79fb6a5d706a5c5fac05b13c030140767",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26722",
+      "sentence_id": "tat_333966",
+      "relative_path": "26722.mp3",
+      "file_size_bytes": 17712,
+      "checksum_sha256": "26e5a40cfb5910e7dd73205af010beb928ebde217be4163d9a3de3eeafa18030",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26725",
+      "sentence_id": "tat_333969",
+      "relative_path": "26725.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "e13daf52135e74a4a825690b7962f674c4a57362c6467f2b0b3b14572921641c",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26784",
+      "sentence_id": "tat_334030",
+      "relative_path": "26784.mp3",
+      "file_size_bytes": 31968,
+      "checksum_sha256": "674025d10ec7583beda59326cf4e6ec32e4ec5a3b9f1437b113c707cdae0eeee",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26787",
+      "sentence_id": "tat_334033",
+      "relative_path": "26787.mp3",
+      "file_size_bytes": 16272,
+      "checksum_sha256": "f1aa591c21d5c35207ea903ce2d3475188f3326fd5f3319bfa8abcfc21396678",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26797",
+      "sentence_id": "tat_334043",
+      "relative_path": "26797.mp3",
+      "file_size_bytes": 18576,
+      "checksum_sha256": "bd186a22195f7e59f4c99407817c44b5161ca226810ba0f21603d5d6c3a7e14a",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26803",
+      "sentence_id": "tat_334049",
+      "relative_path": "26803.mp3",
+      "file_size_bytes": 14400,
+      "checksum_sha256": "999ed5b0c363240fc1f5f6f0d2df753444f85dda7d101a7ca20fa845a8b2faaf",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26807",
+      "sentence_id": "tat_334053",
+      "relative_path": "26807.mp3",
+      "file_size_bytes": 18432,
+      "checksum_sha256": "79463facb24e7813628b47c810c28de4c7d965205ffcda00a92cc24ca832f166",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26821",
+      "sentence_id": "tat_334067",
+      "relative_path": "26821.mp3",
+      "file_size_bytes": 16704,
+      "checksum_sha256": "66319655310b6db5dbe6ff5ee88f5d8c03fa0137f5f6d15905acf8c88924cc97",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26845",
+      "sentence_id": "tat_334093",
+      "relative_path": "26845.mp3",
+      "file_size_bytes": 11952,
+      "checksum_sha256": "4fd2d2630e1bdd2c4070a0f80b93ef25cc336d56d9ff81572a73bb5ac0e0de4c",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26866",
+      "sentence_id": "tat_334127",
+      "relative_path": "26866.mp3",
+      "file_size_bytes": 11808,
+      "checksum_sha256": "d978293f31550a17b7610cc619b1f513f5024a7758be64aaf44ff4a27b87715f",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26867",
+      "sentence_id": "tat_334128",
+      "relative_path": "26867.mp3",
+      "file_size_bytes": 15984,
+      "checksum_sha256": "61de3a7c4b728df9ff48d56cd0e4f29f1d9bc926b1ff97f337c2d4b706b6414b",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26869",
+      "sentence_id": "tat_334130",
+      "relative_path": "26869.mp3",
+      "file_size_bytes": 19728,
+      "checksum_sha256": "4fec16c0554aae36acd790ec9d25fcd10046dd0f7c00fc9b3deedeb01050b6a4",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26889",
+      "sentence_id": "tat_334151",
+      "relative_path": "26889.mp3",
+      "file_size_bytes": 17280,
+      "checksum_sha256": "c9e6787a608bb71ebbc327214ff72b757f4d70e9386cdb288b25c57a97ff45d9",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26894",
+      "sentence_id": "tat_334157",
+      "relative_path": "26894.mp3",
+      "file_size_bytes": 17856,
+      "checksum_sha256": "653c13b9d5fa519d40438663cc69e1244fdeb69d9e1cea691185195f41c5d1ea",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26905",
+      "sentence_id": "tat_334174",
+      "relative_path": "26905.mp3",
+      "file_size_bytes": 26496,
+      "checksum_sha256": "fdb46cb11ae7cdb0b360cf718ba0757dea167e2689d0e7e07f5e92f456524cab",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26909",
+      "sentence_id": "tat_334182",
+      "relative_path": "26909.mp3",
+      "file_size_bytes": 21888,
+      "checksum_sha256": "cb93d37fc637ec000780362474b9498d44fa1162187b9be1e6b11976751f485d",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26910",
+      "sentence_id": "tat_334183",
+      "relative_path": "26910.mp3",
+      "file_size_bytes": 28368,
+      "checksum_sha256": "78e61f85f8e1900b567205d4c939265f8a6c3f3f15d1147b0285debee3ba518a",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26927",
+      "sentence_id": "tat_334204",
+      "relative_path": "26927.mp3",
+      "file_size_bytes": 12384,
+      "checksum_sha256": "02b2e92efe070f4b7f21554f577910de35dc793d00cbbbd0f9ea8da9b862c232",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26929",
+      "sentence_id": "tat_334207",
+      "relative_path": "26929.mp3",
+      "file_size_bytes": 11952,
+      "checksum_sha256": "79d815fcb959629032482112fa54d36b71f904f9898a902ed7c8078e2e4393e8",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26930",
+      "sentence_id": "tat_334208",
+      "relative_path": "26930.mp3",
+      "file_size_bytes": 17136,
+      "checksum_sha256": "555ba904f0c92dbaab0646224ad593f53aaceb078d4924ed25b544a7fbb2f13a",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26940",
+      "sentence_id": "tat_334231",
+      "relative_path": "26940.mp3",
+      "file_size_bytes": 22464,
+      "checksum_sha256": "b7d8f68345af0c18806c06188526e23d29afb190cf8253f5ed316192d88f1275",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26961",
+      "sentence_id": "tat_334254",
+      "relative_path": "26961.mp3",
+      "file_size_bytes": 21312,
+      "checksum_sha256": "fe30d53820db2e72f9c020ab5c09beb338ee08be794714468ce255d884e014ca",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26987",
+      "sentence_id": "tat_334280",
+      "relative_path": "26987.mp3",
+      "file_size_bytes": 13968,
+      "checksum_sha256": "a0eb12c689a1e1e292d809e28ba1d94b426a88a34c38c4a3fda2e681999b8a14",
+      "status": "ready"
+    },
+    {
+      "audio_id": "26990",
+      "sentence_id": "tat_334283",
+      "relative_path": "26990.mp3",
+      "file_size_bytes": 14112,
+      "checksum_sha256": "e5ea292e2e77e955e1649018ebfae096d5a8b27542d32ed73fafdbe118c4c582",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27004",
+      "sentence_id": "tat_334298",
+      "relative_path": "27004.mp3",
+      "file_size_bytes": 19872,
+      "checksum_sha256": "10ca257687d254e8d0bdc4372f981e5ce8cdd498ba049dfb221b922cc5f2cf73",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27006",
+      "sentence_id": "tat_334300",
+      "relative_path": "27006.mp3",
+      "file_size_bytes": 16704,
+      "checksum_sha256": "10fe90e04a181385c4c65551994850db49d4dd1ec4f7b701b289ccbfdcac66e5",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27028",
+      "sentence_id": "tat_334324",
+      "relative_path": "27028.mp3",
+      "file_size_bytes": 33984,
+      "checksum_sha256": "750ea50cfbc747ff79c524c9d0fb87b494da358524a2224248dae68a52f1b5ab",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27035",
+      "sentence_id": "tat_334332",
+      "relative_path": "27035.mp3",
+      "file_size_bytes": 12240,
+      "checksum_sha256": "78c5cfa12da2158721ce5c5d8fa5892bf97028e7c9edf1f9785bd0b2dae651a1",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27036",
+      "sentence_id": "tat_334333",
+      "relative_path": "27036.mp3",
+      "file_size_bytes": 15696,
+      "checksum_sha256": "4dc5d933a96187044c9183faa70cc25aa0182d0b4bdaa5cef007fa4547f645f2",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27048",
+      "sentence_id": "tat_334378",
+      "relative_path": "27048.mp3",
+      "file_size_bytes": 25200,
+      "checksum_sha256": "0cfa944f06fab802a06f4bafccb3e28cb2d57d2c9159ba713da614ec4dea7381",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27049",
+      "sentence_id": "tat_334379",
+      "relative_path": "27049.mp3",
+      "file_size_bytes": 12240,
+      "checksum_sha256": "31912293ccb7587d3be8c6b83d14f43d52ead60faa2cdf45f225b00cf988787f",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27062",
+      "sentence_id": "tat_334392",
+      "relative_path": "27062.mp3",
+      "file_size_bytes": 19728,
+      "checksum_sha256": "41937a14a1a55275d76fb67f15de0e056ae3619ab119ecb40fc35b19651cbd55",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27085",
+      "sentence_id": "tat_334419",
+      "relative_path": "27085.mp3",
+      "file_size_bytes": 12672,
+      "checksum_sha256": "7373c961ce1930f754d9a0becb2be130f0193a5a12ab7cf123bbffdf6a27731a",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27101",
+      "sentence_id": "tat_334439",
+      "relative_path": "27101.mp3",
+      "file_size_bytes": 31104,
+      "checksum_sha256": "b4e74064402c06a776e0c9d618a2a390da6b8fdaf87b5d20a0c72c43830879a1",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27107",
+      "sentence_id": "tat_334447",
+      "relative_path": "27107.mp3",
+      "file_size_bytes": 19440,
+      "checksum_sha256": "1b4aec40bcfa66dab06ea56973f11100c25fd4fd68ea55cf6af0ac17d6b95a32",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27110",
+      "sentence_id": "tat_334451",
+      "relative_path": "27110.mp3",
+      "file_size_bytes": 16272,
+      "checksum_sha256": "f029d1d6c63ba49519241e5ef49be7b49550270896ad376c82eaa3c1e88f1f5b",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27111",
+      "sentence_id": "tat_334452",
+      "relative_path": "27111.mp3",
+      "file_size_bytes": 20880,
+      "checksum_sha256": "bff4ffcbc061a5211e4b55c773a0b5ddf4e67077b3454efefa014b51c129ca1a",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27112",
+      "sentence_id": "tat_334453",
+      "relative_path": "27112.mp3",
+      "file_size_bytes": 32976,
+      "checksum_sha256": "875571e15e93b4b6eb121691eec6195752d2f34763b608b31ca2bba90ca623e0",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27117",
+      "sentence_id": "tat_334461",
+      "relative_path": "27117.mp3",
+      "file_size_bytes": 16704,
+      "checksum_sha256": "0eca894d831d1e6c3f809b7b04eb5c236a1da53b4c69f915a614ebee071f5284",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27131",
+      "sentence_id": "tat_334479",
+      "relative_path": "27131.mp3",
+      "file_size_bytes": 25632,
+      "checksum_sha256": "12227b4b4e2fbf3861018bbcde6e281b79ad2fd33ba8f196cfb8e0ac680c75aa",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27142",
+      "sentence_id": "tat_334500",
+      "relative_path": "27142.mp3",
+      "file_size_bytes": 12096,
+      "checksum_sha256": "e7396faec147d7a52c57fb03f80804901d7116040c81d07c659f3bab680e94a9",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27143",
+      "sentence_id": "tat_334501",
+      "relative_path": "27143.mp3",
+      "file_size_bytes": 13248,
+      "checksum_sha256": "b9dcab5d8e9150123ef00009bbbb77770b2e28da10515ca20a9ff2915ff10b1c",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27144",
+      "sentence_id": "tat_334502",
+      "relative_path": "27144.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "2410a0778ffd1dfeb7140fe859b46a91657e5b61291544c1733741dc3219d4a4",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27145",
+      "sentence_id": "tat_334503",
+      "relative_path": "27145.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "edc13daf6a3f52bcc38a2081784b666d0f1635f379c2bdd1ee9a1910d07c4c23",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27146",
+      "sentence_id": "tat_334504",
+      "relative_path": "27146.mp3",
+      "file_size_bytes": 22176,
+      "checksum_sha256": "f82b9f284eb3eb5613a4008b96d9dfef562127621763255f10b1923f66777d05",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27147",
+      "sentence_id": "tat_334505",
+      "relative_path": "27147.mp3",
+      "file_size_bytes": 23184,
+      "checksum_sha256": "0ea75147b3e62d6cc9826584187fd58255b1efc1eea0bc118072fb969616364c",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27159",
+      "sentence_id": "tat_334533",
+      "relative_path": "27159.mp3",
+      "file_size_bytes": 14976,
+      "checksum_sha256": "d10c9a3f21294379e020aeabad1cfaed8405899f4109621e577c8f569e4fca5a",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27163",
+      "sentence_id": "tat_334537",
+      "relative_path": "27163.mp3",
+      "file_size_bytes": 17712,
+      "checksum_sha256": "5a1bcdc4a079f3f9b28c26446b6e7e1b0205fe50431a81937b4d0a4f8b2949f6",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27164",
+      "sentence_id": "tat_334538",
+      "relative_path": "27164.mp3",
+      "file_size_bytes": 11664,
+      "checksum_sha256": "2f4c10c96a5c9a1146b916b1744881f2d520e7e24da611dc34cd7807c8e5e62b",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27170",
+      "sentence_id": "tat_334544",
+      "relative_path": "27170.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "9430900aed8f3823f0a4dae22fbd35a67e500dc63a1eb27e254ef9c37afe618b",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27171",
+      "sentence_id": "tat_334545",
+      "relative_path": "27171.mp3",
+      "file_size_bytes": 11232,
+      "checksum_sha256": "3eff2dff5de1db6daeaa2345ed1bddc1c049b1b626393b344a2129bcfb280193",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27180",
+      "sentence_id": "tat_334554",
+      "relative_path": "27180.mp3",
+      "file_size_bytes": 11808,
+      "checksum_sha256": "e65ce43c265ed2c045fa3dfed2aae4a72895958b602ea90d611f4bc558568d65",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27187",
+      "sentence_id": "tat_334561",
+      "relative_path": "27187.mp3",
+      "file_size_bytes": 22176,
+      "checksum_sha256": "2258451e7ce0fc3273144a08236e219bf88fe4229fdd4c2ccd5f6feddbca8fc4",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27200",
+      "sentence_id": "tat_334577",
+      "relative_path": "27200.mp3",
+      "file_size_bytes": 21168,
+      "checksum_sha256": "fe5ae637c823816281286b05723500b96313cb54b246eec624ca8da7aa9b94da",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27221",
+      "sentence_id": "tat_334598",
+      "relative_path": "27221.mp3",
+      "file_size_bytes": 18000,
+      "checksum_sha256": "58a675ab98b0cf2af2eb3715c95552db26362de087dbe912cc06b22342f5492a",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27222",
+      "sentence_id": "tat_334599",
+      "relative_path": "27222.mp3",
+      "file_size_bytes": 14688,
+      "checksum_sha256": "d940e50df75feccb583c84b5b06ad93925314aac2bec1db3741888581f55af75",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27226",
+      "sentence_id": "tat_334604",
+      "relative_path": "27226.mp3",
+      "file_size_bytes": 17712,
+      "checksum_sha256": "227b8dbd55bbaa96593179ea820d39f796e7f0846b22bc09f08f9e93ea3ee707",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27230",
+      "sentence_id": "tat_334609",
+      "relative_path": "27230.mp3",
+      "file_size_bytes": 12960,
+      "checksum_sha256": "602004d7ebff0ef72bc8aff93c02119ece6f302ed58a689340b710048a2cb36c",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27233",
+      "sentence_id": "tat_334612",
+      "relative_path": "27233.mp3",
+      "file_size_bytes": 20736,
+      "checksum_sha256": "9c7e5ba3ea61b2fe185623e531bdca5791cf39664b05398e9569b040a8494528",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27235",
+      "sentence_id": "tat_334614",
+      "relative_path": "27235.mp3",
+      "file_size_bytes": 21168,
+      "checksum_sha256": "80fcab04db837c74164166d1ef2bca0d536b78a614962b962a9b21e1941250de",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27257",
+      "sentence_id": "tat_334636",
+      "relative_path": "27257.mp3",
+      "file_size_bytes": 13680,
+      "checksum_sha256": "fa55eca593b48a08cde89d4531007c3e4d1417287bb2845f21af238640a5f5b3",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27262",
+      "sentence_id": "tat_334641",
+      "relative_path": "27262.mp3",
+      "file_size_bytes": 12672,
+      "checksum_sha256": "e6e3e876806675d274b0a0b0e4b2f34b393198debd8aff6fd5bcfe6f7078c7ca",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27277",
+      "sentence_id": "tat_334657",
+      "relative_path": "27277.mp3",
+      "file_size_bytes": 18000,
+      "checksum_sha256": "b381dcb302ae5f6532fa88aa1b12fe1dfe92681cdc0bf50fd94fab22a4f8d018",
+      "status": "ready"
+    },
+    {
+      "audio_id": "27294",
+      "sentence_id": "tat_334674",
+      "relative_path": "27294.mp3",
+      "file_size_bytes": 27216,
+      "checksum_sha256": "028206ba3e6099b3bfda3d4b6dacc40824a5ed444a819397248d10b6cdc4b1b7",
+      "status": "ready"
+    }
+  ]
+}

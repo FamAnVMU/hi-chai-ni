@@ -1,0 +1,42 @@
+```mermaid
+flowchart LR
+    subgraph Client_App ["HI Chinese Android App (Offline-First)"]
+        UI_Settings["Settings & Data Management Screen"]
+        Mgr_Content["ContentPackRemoteService"]
+        Mgr_Audio["AudioPackDownloader & AudioStorageManager"]
+        Svc_Data["DataManagementService"]
+        DB_Local[("Local SQLite hi_chinese.db<br/>(WAL Mode, Schema v11)")]
+        FS_Audio[("Local Audio Storage<br/>content_packs/{pack_id}/audio/")]
+        FS_Backup[("Local Backup Directory<br/>appSupport/backups/*.db")]
+    end
+
+    subgraph Static_Distribution ["Static CDN / Content Distribution"]
+        CDN_Packs["GitHub Raw / Release CDN<br/>content_packs_cdn/hsk3_pack_v1.json"]
+        CDN_Audio["Audio Asset Mirror / CDN<br/>audio_pack_*.zip / *.mp3"]
+    end
+
+    subgraph Cloud_AI ["Google Cloud AI Services"]
+        API_Gemini["Google Gemini Generative Language API<br/>(api.generativelanguage.googleapis.com)"]
+    end
+
+    %% Content Distribution Flows
+    Mgr_Content -->|1. HTTP GET Manifest & Pack JSON| CDN_Packs
+    CDN_Packs -->|2. Stream Content JSON| Mgr_Content
+    Mgr_Content -->|3. Validate SHA-256 & Load in Isolate| DB_Local
+
+    Mgr_Audio -->|1. HTTP Chunked Download| CDN_Audio
+    CDN_Audio -->|2. Staged download into .tmp/| Mgr_Audio
+    Mgr_Audio -->|3. Verify SHA-256 & Promote| FS_Audio
+    Mgr_Audio -->|4. Register Metadata| DB_Local
+
+    %% Local Backup Flow
+    UI_Settings --> Svc_Data
+    Svc_Data -->|Atomic VACUUM INTO| FS_Backup
+    Svc_Data -->|Export Progress JSON| UI_Settings
+
+    %% AI Query Flow
+    Client_App -->|Authenticated HTTPS REST / WSS| API_Gemini
+
+    %% Verified Architectural Note
+    note1["<b>KIỂM CHỨNG KIẾN TRÚC THỰC TẾ:</b><br/>1. Không có Server Backend hoặc Database tập trung tùy biến.<br/>2. Không có kết nối Cloudflare Tunnel.<br/>3. Toàn bộ tiến độ và hồ sơ học viên lưu trữ hoàn toàn cục bộ trên SQLite.<br/>4. Tải học liệu theo cơ chế tĩnh 1 chiều (One-way Static CDN pull)."]
+```
