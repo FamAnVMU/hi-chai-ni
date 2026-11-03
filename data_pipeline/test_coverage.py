@@ -2,8 +2,9 @@ import os
 import json
 import csv
 import ast
+from pipeline_config import get_raw_dir
 
-base_dir = r'c:\Users\phama\Downloads\hi_chinese\data_pipeline\raw'
+base_dir = str(get_raw_dir())
 
 # Load hanviet.csv
 hv_path = os.path.join(base_dir, 'hanviet', 'hanviet.csv')

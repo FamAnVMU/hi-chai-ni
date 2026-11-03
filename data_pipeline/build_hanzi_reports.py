@@ -1,9 +1,9 @@
 import json
 import os
+from pipeline_config import get_processed_dir, get_reports_dir
 
-BASE_DIR = r"C:\Users\phama\Downloads\hi_chinese"
-PROCESSED_DIR = os.path.join(BASE_DIR, "data_pipeline", "processed")
-REPORTS_DIR = os.path.join(BASE_DIR, "data_pipeline", "reports")
+PROCESSED_DIR = get_processed_dir()
+REPORTS_DIR = get_reports_dir()
 
 with open(os.path.join(PROCESSED_DIR, "hanzi_all.json"), "r", encoding="utf-8") as f:
     data = json.load(f)

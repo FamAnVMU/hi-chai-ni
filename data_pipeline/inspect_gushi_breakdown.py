@@ -1,15 +1,9 @@
-import urllib.request
-import ssl
-import json
 from collections import Counter
-
-ctx = ssl.create_default_context()
-ctx.check_hostname = False
-ctx.verify_mode = ssl.CERT_NONE
+import json
+from pipeline_config import secure_open_url
 
 base = 'https://gushi-chinese.online/hsk-3.0/downloads'
-req = urllib.request.Request(f'{base}/hsk-3.0-grammar-all.json', headers={'User-Agent': 'Mozilla/5.0'})
-with urllib.request.urlopen(req, context=ctx, timeout=15) as resp:
+with secure_open_url(f'{base}/hsk-3.0-grammar-all.json', timeout=15) as resp:
     obj = json.loads(resp.read().decode('utf-8'))
     data = obj.get('data', [])
     levels = Counter([d['level'] for d in data])

@@ -168,9 +168,10 @@ def load_sentences(sentences_path):
     return word_to_sentences
 
 def main():
-    base_dir = r"c:\Users\phama\Downloads\hi_chinese\data_pipeline"
-    raw_dir = os.path.join(base_dir, "raw")
-    processed_dir = os.path.join(base_dir, "processed")
+    from pipeline_config import get_data_pipeline_dir, get_processed_dir, get_raw_dir
+    base_dir = str(get_data_pipeline_dir())
+    raw_dir = str(get_raw_dir())
+    processed_dir = str(get_processed_dir())
     os.makedirs(processed_dir, exist_ok=True)
 
     cvdict_path = os.path.join(raw_dir, "cvdict", "CVDICT.u8")

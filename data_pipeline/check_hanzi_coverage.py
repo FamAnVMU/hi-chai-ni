@@ -1,8 +1,9 @@
 import json
 import os
+from pipeline_config import get_processed_dir, get_raw_dir
 
-RAW_DIR = r"C:\Users\phama\Downloads\hi_chinese\data_pipeline\raw\hanzi"
-VOCAB_FILE = r"C:\Users\phama\Downloads\hi_chinese\data_pipeline\processed\hsk_all_vocab.json"
+RAW_DIR = str(get_raw_dir("hanzi"))
+VOCAB_FILE = str(get_processed_dir() / "hsk_all_vocab.json")
 
 # Load HSK 1-6 vocabulary
 with open(VOCAB_FILE, "r", encoding="utf-8") as f:

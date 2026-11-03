@@ -1,12 +1,19 @@
 import json
 import os
 import re
+from pipeline_config import (
+    get_assets_data_dir,
+    get_data_pipeline_dir,
+    get_processed_dir,
+    get_raw_dir,
+    get_reports_dir,
+)
 
-BASE_DIR = r"C:\Users\phama\Downloads\hi_chinese"
-RAW_DIR = os.path.join(BASE_DIR, "data_pipeline", "raw", "hanzi")
-PROCESSED_DIR = os.path.join(BASE_DIR, "data_pipeline", "processed")
-REPORTS_DIR = os.path.join(BASE_DIR, "data_pipeline", "reports")
-ASSETS_DIR = os.path.join(BASE_DIR, "assets", "data")
+RAW_DIR = get_raw_dir("hanzi")
+PROCESSED_DIR = get_processed_dir()
+REPORTS_DIR = get_reports_dir()
+ASSETS_DIR = get_assets_data_dir()
+DATA_PIPELINE_DIR = get_data_pipeline_dir()
 
 os.makedirs(PROCESSED_DIR, exist_ok=True)
 os.makedirs(REPORTS_DIR, exist_ok=True)
@@ -61,7 +68,7 @@ for v in vocab_list:
 print(f"Loaded {len(char_info)} unique characters from HSK 1-6 vocabulary.")
 
 # 2. Load Han-Viet dictionary for standalone characters
-hanviet_file = os.path.join(BASE_DIR, "data_pipeline", "raw", "hanviet", "hanviet.csv")
+hanviet_file = os.path.join(DATA_PIPELINE_DIR, "raw", "hanviet", "hanviet.csv")
 hanviet_map = {}
 if os.path.exists(hanviet_file):
     with open(hanviet_file, "r", encoding="utf-8") as f:

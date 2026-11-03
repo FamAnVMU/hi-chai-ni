@@ -1,7 +1,8 @@
 import os
 import json
+from pipeline_config import get_raw_dir
 
-base_dir = r'c:\Users\phama\Downloads\hi_chinese\data_pipeline\raw'
+base_dir = str(get_raw_dir())
 
 sent_path = os.path.join(base_dir, 'sentences', 'sentences.json')
 with open(sent_path, 'r', encoding='utf-8') as f:

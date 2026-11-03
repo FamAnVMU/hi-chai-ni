@@ -4,14 +4,19 @@ import json
 import zipfile
 import hashlib
 import edge_tts
+from pipeline_config import (
+    get_assets_data_dir,
+    get_data_pipeline_dir,
+    get_project_root,
+)
 
-BASE_DIR = r"C:\Users\phama\Downloads\hi_chinese"
-CORPUS_PATH = os.path.join(BASE_DIR, "assets", "data", "sentences_corpus.json")
-ASSETS_AUDIO_DIR = os.path.join(BASE_DIR, "assets", "audio")
-CDN_DIR = os.path.join(BASE_DIR, "content_packs_cdn")
-PACKAGES_DIR = os.path.join(CDN_DIR, "packages")
-MANIFESTS_DIR = os.path.join(CDN_DIR, "manifests")
-STAGING_DIR = os.path.join(BASE_DIR, "data_pipeline", "audio_staging")
+PROJECT_ROOT = get_project_root()
+CORPUS_PATH = str(get_assets_data_dir() / "sentences_corpus.json")
+ASSETS_AUDIO_DIR = str(PROJECT_ROOT / "assets" / "audio")
+CDN_DIR = str(PROJECT_ROOT / "content_packs_cdn")
+PACKAGES_DIR = str(PROJECT_ROOT / "content_packs_cdn" / "packages")
+MANIFESTS_DIR = str(PROJECT_ROOT / "content_packs_cdn" / "manifests")
+STAGING_DIR = str(get_data_pipeline_dir() / "audio_staging")
 
 os.makedirs(os.path.join(ASSETS_AUDIO_DIR, "hsk1"), exist_ok=True)
 os.makedirs(os.path.join(ASSETS_AUDIO_DIR, "hsk2"), exist_ok=True)

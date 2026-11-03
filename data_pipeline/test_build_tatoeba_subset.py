@@ -2,12 +2,17 @@ import os
 import bz2
 import json
 import re
+from pipeline_config import (
+    get_assets_data_dir,
+    get_processed_dir,
+    get_raw_dir,
+    get_reports_dir,
+)
 
-BASE_DIR = r"C:\Users\phama\Downloads\hi_chinese"
-RAW_DIR = os.path.join(BASE_DIR, "data_pipeline", "raw", "tatoeba")
-PROCESSED_DIR = os.path.join(BASE_DIR, "data_pipeline", "processed")
-REPORTS_DIR = os.path.join(BASE_DIR, "data_pipeline", "reports")
-ASSETS_DIR = os.path.join(BASE_DIR, "assets", "data")
+RAW_DIR = str(get_raw_dir("tatoeba"))
+PROCESSED_DIR = str(get_processed_dir())
+REPORTS_DIR = str(get_reports_dir())
+ASSETS_DIR = str(get_assets_data_dir())
 
 # 1. Load HSK Vocabulary for matching
 vocab_file = os.path.join(PROCESSED_DIR, "hsk_all_vocab.json")

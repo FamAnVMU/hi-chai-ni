@@ -1,8 +1,9 @@
 import os
 import urllib.request
 import time
+from pipeline_config import get_raw_dir
 
-RAW_DIR = r"C:\Users\phama\Downloads\hi_chinese\data_pipeline\raw\tatoeba"
+RAW_DIR = str(get_raw_dir("tatoeba"))
 os.makedirs(RAW_DIR, exist_ok=True)
 
 TATOEBA_URLS = {
