@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:hi_chinese/core/startup/app_startup_provider.dart';
 import 'package:hi_chinese/core/theme/theme.dart';
 import 'package:hi_chinese/features/app_shell/presentation/providers/app_shell_providers.dart';
@@ -296,7 +297,7 @@ class _MockAppStartupNotifier extends AppStartupNotifier {
   }
 
   @override
-  Future<void> initialize() async {
+  Future<void> initialize({AssetBundle? bundle, Database? databaseOverride}) async {
     onRetry?.call();
   }
 }

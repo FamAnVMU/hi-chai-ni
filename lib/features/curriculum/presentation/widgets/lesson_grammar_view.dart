@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/models/curriculum_models.dart';
+import 'lesson_content_empty_state.dart';
 
 class LessonGrammarView extends StatelessWidget {
   final CurriculumLesson lesson;
@@ -22,14 +23,19 @@ class LessonGrammarView extends StatelessWidget {
     final rawPoints = (segment?.contentPayload?['points'] as List<dynamic>?) ??
         (segment?.contentPayload?['grammar_points'] as List<dynamic>?) ??
         [];
-    final points = rawPoints.map((e) => e as Map<String, dynamic>).toList();
+    final points = rawPoints.whereType<Map<String, dynamic>>().toList();
 
     if (points.isEmpty) {
-      return Center(
-        child: Text(
-          'Đang nạp các điểm ngữ pháp...',
-          style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.secondaryText),
-        ),
+      return LessonContentEmptyState(
+        title: 'Nội dung ngữ pháp đang được chuẩn bị',
+        message: 'Chưa tìm thấy các điểm ngữ pháp cho phần học này trong cơ sở dữ liệu hiện tại.',
+        icon: Icons.auto_stories_outlined,
+        buttonText: 'Tiếp tục bài học',
+        onAction: onNext,
+        segmentId: segment?.id,
+        contentRefId: segment?.contentRefId,
+        segmentType: segment?.segmentType,
+        lessonId: lesson.id,
       );
     }
 

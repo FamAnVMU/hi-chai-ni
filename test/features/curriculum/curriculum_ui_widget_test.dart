@@ -122,7 +122,7 @@ void main() {
 
   final sampleUnit = CurriculumUnit(
     id: 'hsk1_u1',
-    curriculumId: 'hsk_1_official',
+    curriculumId: 'curr_hsk1',
     orderIndex: 1,
     titleVi: 'Chủ đề 1: Chào hỏi & Làm quen',
     titleZh: '第一单元: 问候',

@@ -8,7 +8,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:hi_chinese/core/database/app_database.dart';
 import 'package:hi_chinese/core/database/dao/curriculum_dao.dart';
-import 'package:hi_chinese/core/database/dao/vocabulary_dao.dart';
 import 'package:hi_chinese/core/database/database_constants.dart';
 import 'package:hi_chinese/core/network/ai/models/ai_model_config.dart';
 import 'package:hi_chinese/core/network/ai/security/ai_credential_storage.dart';

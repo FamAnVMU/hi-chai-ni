@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/models/curriculum_models.dart';
+import 'lesson_content_empty_state.dart';
 
 class LessonPracticeView extends StatefulWidget {
   final CurriculumLesson lesson;
@@ -30,15 +31,22 @@ class _LessonPracticeViewState extends State<LessonPracticeView> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final rawExercises = (widget.segment?.contentPayload?['exercises'] as List<dynamic>?) ?? [];
-    final exercises = rawExercises.map((e) => e as Map<String, dynamic>).toList();
+    final rawExercises = (widget.segment?.contentPayload?['exercises'] as List<dynamic>?) ??
+        (widget.segment?.contentPayload?['questions'] as List<dynamic>?) ??
+        [];
+    final exercises = rawExercises.whereType<Map<String, dynamic>>().toList();
 
     if (exercises.isEmpty) {
-      return Center(
-        child: Text(
-          'Đang nạp các bài tập luyện tập...',
-          style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.secondaryText),
-        ),
+      return LessonContentEmptyState(
+        title: 'Bài tập luyện tập đang được chuẩn bị',
+        message: 'Chưa tìm thấy danh sách câu hỏi luyện tập cho phần học này.',
+        icon: Icons.assignment_outlined,
+        buttonText: 'Tiếp tục bài học',
+        onAction: widget.onNext,
+        segmentId: widget.segment?.id,
+        contentRefId: widget.segment?.contentRefId,
+        segmentType: widget.segment?.segmentType,
+        lessonId: widget.lesson.id,
       );
     }
 

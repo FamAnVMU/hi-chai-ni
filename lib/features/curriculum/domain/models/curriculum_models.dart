@@ -1,4 +1,5 @@
 import 'dart:convert';
+export '../constants/curriculum_constants.dart';
 
 class Curriculum {
   final String id;

@@ -15,7 +15,7 @@ class CurriculumSyllabusScreen extends ConsumerWidget {
     super.key,
     this.units,
     this.curriculumTitle = 'Giáo trình HSK 1 Chuẩn',
-    this.curriculumId = 'curr_hsk1',
+    this.curriculumId = CurriculumConstants.currHsk1,
   });
 
   @override

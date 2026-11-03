@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../hanzi_writing/presentation/screens/hanzi_writing_screen.dart';
 import '../../domain/models/curriculum_models.dart';
+import 'lesson_content_empty_state.dart';
 
 class LessonVocabView extends StatelessWidget {
   final CurriculumLesson lesson;
@@ -19,14 +20,19 @@ class LessonVocabView extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final rawWords = (segment?.contentPayload?['words'] as List<dynamic>?) ?? [];
-    final words = rawWords.map((e) => e as Map<String, dynamic>).toList();
+    final words = rawWords.whereType<Map<String, dynamic>>().toList();
 
     if (words.isEmpty) {
-      return Center(
-        child: Text(
-          'Đang nạp dữ liệu từ vựng...',
-          style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.secondaryText),
-        ),
+      return LessonContentEmptyState(
+        title: 'Nội dung từ vựng đang được chuẩn bị',
+        message: 'Chưa tìm thấy danh sách từ vựng cho phần học này trong cơ sở dữ liệu hiện tại.',
+        icon: Icons.menu_book_outlined,
+        buttonText: 'Tiếp tục bài học',
+        onAction: onNext,
+        segmentId: segment?.id,
+        contentRefId: segment?.contentRefId,
+        segmentType: segment?.segmentType,
+        lessonId: lesson.id,
       );
     }
 

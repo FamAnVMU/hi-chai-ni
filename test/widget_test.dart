@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:hi_chinese/core/constants/app_constants.dart';
 import 'package:hi_chinese/core/startup/app_startup_provider.dart';
 import 'package:hi_chinese/features/home/home.dart';
@@ -14,7 +15,7 @@ class _TestAppStartupNotifier extends AppStartupNotifier {
   }
 
   @override
-  Future<void> initialize() async {}
+  Future<void> initialize({AssetBundle? bundle, Database? databaseOverride}) async {}
 }
 
 void main() {

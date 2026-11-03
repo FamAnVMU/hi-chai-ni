@@ -17,7 +17,14 @@ class LessonWarmupView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    if (segment?.contentPayload == null) {
+      debugPrint(
+        '[CurriculumUI] Warmup content payload missing: '
+        'lessonId=${lesson.id}, segmentId=${segment?.id}, refId=${segment?.contentRefId}',
+      );
+    }
     final introText = (segment?.contentPayload?['intro'] as String?) ??
+        (segment?.contentPayload?['objective'] as String?) ??
         'Chào mừng bạn đến với bài học "${lesson.titleZh}". Hãy cùng khởi động và nắm vững kiến thức nhé!';
 
     return SingleChildScrollView(

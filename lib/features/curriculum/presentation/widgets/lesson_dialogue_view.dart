@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/models/curriculum_models.dart';
+import 'lesson_content_empty_state.dart';
 
 class LessonDialogueView extends StatelessWidget {
   final CurriculumLesson lesson;
@@ -20,14 +21,19 @@ class LessonDialogueView extends StatelessWidget {
     final rawLines = (segment?.contentPayload?['lines'] as List<dynamic>?) ??
         (segment?.contentPayload?['dialogue']?['lines'] as List<dynamic>?) ??
         [];
-    final lines = rawLines.map((e) => e as Map<String, dynamic>).toList();
+    final lines = rawLines.whereType<Map<String, dynamic>>().toList();
 
     if (lines.isEmpty) {
-      return Center(
-        child: Text(
-          'Đang nạp bài hội thoại...',
-          style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.secondaryText),
-        ),
+      return LessonContentEmptyState(
+        title: 'Nội dung hội thoại đang được chuẩn bị',
+        message: 'Chưa tìm thấy đoạn hội thoại cho phần học này trong cơ sở dữ liệu hiện tại.',
+        icon: Icons.chat_bubble_outline_rounded,
+        buttonText: 'Tiếp tục bài học',
+        onAction: onNext,
+        segmentId: segment?.id,
+        contentRefId: segment?.contentRefId,
+        segmentType: segment?.segmentType,
+        lessonId: lesson.id,
       );
     }
 
