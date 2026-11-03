@@ -117,41 +117,28 @@ class AiModelConfig {
 /// - Allows changing active model without modifying UI code in multiple places.
 /// - Verifies capabilities via [AiModelCapability] struct, never by regex matching names.
 class AiModelRegistry {
-  /// Standard cost-effective, high-speed flash model recommended for chat & mobile.
-  static const String modelGemini25FlashLite = 'gemini-2.5-flash-lite';
+  /// Official Gemini 3.5 Flash-Lite: Ultra-fast, cost-effective multimodal chat & tutor.
+  static const String modelGemini35FlashLite = 'gemini-3.5-flash-lite';
 
-  /// Premier production flash model for multimodal understanding, grammar, and reading.
+  /// Official Gemini 3.8 Flash (GA): Premier production multimodal model for grammar & reading.
+  static const String modelGemini38Flash = 'gemini-3.8-flash';
+
+  /// Official Gemini 3.1 Pro Preview: Deep reasoning for linguistics and syntax analysis.
+  static const String modelGemini31ProPreview = 'gemini-3.1-pro-preview';
+
+  /// Official Gemini 3.8 Live: Real-time bidirectional audio streaming & live voice dialogue.
+  static const String modelGemini38Live = 'gemini-3.8-live';
+
+  /// Stable fallback generation (Gemini 2.5 series)
   static const String modelGemini25Flash = 'gemini-2.5-flash';
-
-  /// Advanced reasoning model for deep pedagogical analysis and complex breakdown.
+  static const String modelGemini25FlashLite = 'gemini-2.5-flash-lite';
   static const String modelGemini25Pro = 'gemini-2.5-pro';
-
-  // Backwards compatibility aliases
-  static const String modelGemini35FlashLite = modelGemini25FlashLite;
-  static const String modelGemini38Flash = modelGemini25Flash;
-  static const String modelGemini31ProPreview = modelGemini25Pro;
-  static const String modelGemini38Live = modelGemini25Flash;
 
   /// Master catalog of supported models with explicit capabilities.
   static final Map<String, AiModelSpec> _catalog = {
-    modelGemini25Flash: const AiModelSpec(
-      modelId: modelGemini25Flash,
-      displayName: 'Gemini 2.5 Flash',
-      description: 'Mô hình đa phương thức thế hệ mới cân bằng hoàn hảo giữa tốc độ và tư duy.',
-      capabilities: AiModelCapability(
-        supportsText: true,
-        supportsStreaming: true,
-        supportsAudioInput: true,
-        supportsTts: false,
-        supportsLiveApi: false,
-        supportsVision: true,
-      ),
-      recommendedFor: 'Phân tích ngữ pháp nâng cao, đọc hiểu đoạn văn, sửa lỗi câu phức tạp.',
-      isDefault: true,
-    ),
-    modelGemini25FlashLite: const AiModelSpec(
-      modelId: modelGemini25FlashLite,
-      displayName: 'Gemini 2.5 Flash Lite',
+    modelGemini35FlashLite: const AiModelSpec(
+      modelId: modelGemini35FlashLite,
+      displayName: 'Gemini 3.5 Flash Lite',
       description: 'Mô hình siêu nhanh, tối ưu hóa chi phí và độ trễ cho gia sư AI di động.',
       capabilities: AiModelCapability(
         supportsText: true,
@@ -162,11 +149,26 @@ class AiModelRegistry {
         supportsVision: true,
       ),
       recommendedFor: 'Gia sư đàm thoại, tra cứu từ điển nhanh, giải thích từ ngữ.',
+      isDefault: true,
+    ),
+    modelGemini38Flash: const AiModelSpec(
+      modelId: modelGemini38Flash,
+      displayName: 'Gemini 3.8 Flash',
+      description: 'Mô hình đa phương thức thế hệ mới cân bằng hoàn hảo giữa tốc độ và tư duy.',
+      capabilities: AiModelCapability(
+        supportsText: true,
+        supportsStreaming: true,
+        supportsAudioInput: true,
+        supportsTts: false,
+        supportsLiveApi: false,
+        supportsVision: true,
+      ),
+      recommendedFor: 'Phân tích ngữ pháp nâng cao, đọc hiểu đoạn văn, sửa lỗi câu phức tạp.',
       isDefault: false,
     ),
-    modelGemini25Pro: const AiModelSpec(
-      modelId: modelGemini25Pro,
-      displayName: 'Gemini 2.5 Pro',
+    modelGemini31ProPreview: const AiModelSpec(
+      modelId: modelGemini31ProPreview,
+      displayName: 'Gemini 3.1 Pro Preview',
       description: 'Mô hình tư duy chuyên sâu cho các bài phân tích ngôn ngữ học và dịch thuật chuyên biệt.',
       capabilities: AiModelCapability(
         supportsText: true,
@@ -177,6 +179,66 @@ class AiModelRegistry {
         supportsVision: true,
       ),
       recommendedFor: 'Phân tích chuyên sâu cấu trúc ngữ pháp cổ ngữ/thành ngữ.',
+      isDefault: false,
+    ),
+    modelGemini38Live: const AiModelSpec(
+      modelId: modelGemini38Live,
+      displayName: 'Gemini 3.8 Live (Audio/Voice)',
+      description: 'Mô hình giao tiếp giọng nói thời gian thực hai chiều (Bidirectional Audio Streaming).',
+      capabilities: AiModelCapability(
+        supportsText: true,
+        supportsStreaming: true,
+        supportsAudioInput: true,
+        supportsTts: true,
+        supportsLiveApi: true,
+        supportsVision: false,
+      ),
+      recommendedFor: 'Luyện nói phản xạ song ngữ thời gian thực (Live Voice Chat).',
+      isDefault: false,
+    ),
+    modelGemini25Flash: const AiModelSpec(
+      modelId: modelGemini25Flash,
+      displayName: 'Gemini 2.5 Flash',
+      description: 'Mô hình dự phòng ổn định thế hệ 2.5 cho đa phương thức.',
+      capabilities: AiModelCapability(
+        supportsText: true,
+        supportsStreaming: true,
+        supportsAudioInput: true,
+        supportsTts: false,
+        supportsLiveApi: false,
+        supportsVision: true,
+      ),
+      recommendedFor: 'Dự phòng ổn định cho phân tích ngữ pháp và đoạn văn.',
+      isDefault: false,
+    ),
+    modelGemini25FlashLite: const AiModelSpec(
+      modelId: modelGemini25FlashLite,
+      displayName: 'Gemini 2.5 Flash Lite',
+      description: 'Mô hình dự phòng siêu nhanh thế hệ 2.5.',
+      capabilities: AiModelCapability(
+        supportsText: true,
+        supportsStreaming: true,
+        supportsAudioInput: true,
+        supportsTts: false,
+        supportsLiveApi: false,
+        supportsVision: true,
+      ),
+      recommendedFor: 'Dự phòng tác vụ tra cứu nhanh và gia sư nhẹ.',
+      isDefault: false,
+    ),
+    modelGemini25Pro: const AiModelSpec(
+      modelId: modelGemini25Pro,
+      displayName: 'Gemini 2.5 Pro',
+      description: 'Mô hình tư duy chuyên sâu dự phòng thế hệ 2.5.',
+      capabilities: AiModelCapability(
+        supportsText: true,
+        supportsStreaming: true,
+        supportsAudioInput: false,
+        supportsTts: false,
+        supportsLiveApi: false,
+        supportsVision: true,
+      ),
+      recommendedFor: 'Dự phòng phân tích ngôn ngữ học nâng cao.',
       isDefault: false,
     ),
   };

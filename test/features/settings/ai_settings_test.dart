@@ -73,7 +73,7 @@ void main() {
     test('Dynamic default model update alters chat and general task routes', () {
       expect(
         registry.getConfigForTask(AiTaskType.chatTutor).modelId,
-        AiModelRegistry.modelGemini35FlashLite,
+        AiModelRegistry.modelGemini25FlashLite,
       );
 
       registry.setDefaultModel(AiModelRegistry.modelGemini38Flash);
