@@ -202,14 +202,65 @@ class CurriculumCatalog {
     );
   }
 
+  static const Map<String, String> _catalogAliases = {
+    'lesson_1_1': 'LES_HSK1_01_TONES',
+    'lesson_hsk1_u1_l1': 'LES_HSK1_01_TONES',
+    'c_hsk1_l1': 'LES_HSK1_01_TONES',
+
+    'lesson_1_2': 'LES_HSK1_02_WRITING_BASICS',
+    'lesson_hsk1_u1_l2': 'LES_HSK1_02_WRITING_BASICS',
+    'c_hsk1_l2': 'LES_HSK1_02_WRITING_BASICS',
+
+    'lesson_1_3': 'LES_HSK1_03_GREETINGS',
+    'lesson_hsk1_u1_l3': 'LES_HSK1_03_GREETINGS',
+    'c_hsk1_l3': 'LES_HSK1_03_GREETINGS',
+
+    'lesson_1_4': 'LES_HSK1_04_GRAMMAR_SHI',
+    'lesson_hsk1_u2_l4': 'LES_HSK1_04_GRAMMAR_SHI',
+    'c_hsk1_l4': 'LES_HSK1_04_GRAMMAR_SHI',
+
+    'lesson_1_5': 'LES_HSK1_05_READING_FRIEND',
+    'lesson_hsk1_u2_l5': 'LES_HSK1_05_READING_FRIEND',
+    'c_hsk1_l5': 'LES_HSK1_05_READING_FRIEND',
+
+    'lesson_1_6': 'LES_HSK1_06_SHADOWING_GREETING',
+    'lesson_hsk1_u2_l6': 'LES_HSK1_06_SHADOWING_GREETING',
+    'c_hsk1_l6': 'LES_HSK1_06_SHADOWING_GREETING',
+
+    'lesson_2_1': 'LES_HSK2_01_RESTAURANT_VOCAB',
+    'lesson_hsk2_u1_l1': 'LES_HSK2_01_RESTAURANT_VOCAB',
+    'c_hsk2_l1': 'LES_HSK2_01_RESTAURANT_VOCAB',
+
+    'lesson_2_2': 'LES_HSK2_02_GRAMMAR_LE',
+    'lesson_hsk2_u1_l2': 'LES_HSK2_02_GRAMMAR_LE',
+    'c_hsk2_l2': 'LES_HSK2_02_GRAMMAR_LE',
+
+    'lesson_2_3': 'LES_HSK2_03_READING_RESTAURANT',
+    'lesson_hsk2_u1_l3': 'LES_HSK2_03_READING_RESTAURANT',
+    'c_hsk2_l3': 'LES_HSK2_03_READING_RESTAURANT',
+  };
+
   static CurriculumLesson? findLessonById(String id) {
+    final cleanId = id.trim();
     for (final lvl in levels) {
       for (final unit in lvl.units) {
         for (final les in unit.lessons) {
-          if (les.id == id) return les;
+          if (les.id == cleanId) return les;
         }
       }
     }
+
+    final mappedId = _catalogAliases[cleanId];
+    if (mappedId != null) {
+      for (final lvl in levels) {
+        for (final unit in lvl.units) {
+          for (final les in unit.lessons) {
+            if (les.id == mappedId) return les;
+          }
+        }
+      }
+    }
+
     return null;
   }
 }

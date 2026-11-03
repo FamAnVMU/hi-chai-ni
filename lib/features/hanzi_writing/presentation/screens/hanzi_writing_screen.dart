@@ -49,7 +49,8 @@ class _HanziWritingScreenState extends ConsumerState<HanziWritingScreen> {
 
   void _handleEvaluate() {
     final character = ref.read(selectedHanziCharacterProvider);
-    final strokeData = ref.read(currentHanziStrokeDataProvider);
+    final bank = ref.read(hanziStrokeBankProvider);
+    final strokeData = ref.read(currentHanziStrokeDataProvider).value ?? bank.getStrokeData(character);
     final evaluator = ref.read(strokeEvaluatorProvider);
 
     final canvasSize = _canvasController.canvasSize;
@@ -99,11 +100,19 @@ class _HanziWritingScreenState extends ConsumerState<HanziWritingScreen> {
   }
 
   void _handleStepReplay() {
-    final strokeData = ref.read(currentHanziStrokeDataProvider);
-    if (strokeData == null || strokeData.strokes.isEmpty) return;
+    final character = ref.read(selectedHanziCharacterProvider);
+    final bank = ref.read(hanziStrokeBankProvider);
+    final strokeData = ref.read(currentHanziStrokeDataProvider).value ?? bank.getStrokeData(character);
+    if (strokeData == null || !strokeData.isVerified || strokeData.strokes.isEmpty) {
+      HiSnackBar.showInfo(
+        context,
+        'Chữ "$character" chưa có dữ liệu nét chuẩn để xem lại thứ tự nét.',
+      );
+      return;
+    }
 
     final current = _highlightedStrokeOrder ?? 0;
-    final next = (current % strokeData.totalStrokes) + 1;
+    final next = ((current % strokeData.totalStrokes) + 1).toInt();
 
     setState(() {
       _highlightedStrokeOrder = next;
@@ -131,13 +140,16 @@ class _HanziWritingScreenState extends ConsumerState<HanziWritingScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final character = ref.watch(selectedHanziCharacterProvider);
-    final strokeData = ref.watch(currentHanziStrokeDataProvider);
+    final strokeDataAsync = ref.watch(currentHanziStrokeDataProvider);
     final bank = ref.watch(hanziStrokeBankProvider);
+    final strokeData = strokeDataAsync.value ?? bank.getStrokeData(character);
+    final availableCharsAsync = ref.watch(availableHanziCharactersProvider);
+    final availableList = availableCharsAsync.value ?? bank.availableCharacters;
 
     final pinyin = strokeData?.pinyin ?? '';
     final meaning = strokeData?.meaningVi ?? 'Chữ Hán';
     final strokeCount = strokeData?.totalStrokes ?? 0;
-    final hasStrokeData = strokeData != null;
+    final hasStrokeData = strokeData != null && strokeData.isVerified && strokeData.strokes.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(
@@ -148,7 +160,7 @@ class _HanziWritingScreenState extends ConsumerState<HanziWritingScreen> {
             tooltip: 'Chọn chữ Hán luyện tập',
             onSelected: _switchCharacter,
             itemBuilder: (context) {
-              return bank.availableCharacters.map((char) {
+              return availableList.map((char) {
                 final data = bank.getStrokeData(char);
                 return PopupMenuItem(
                   value: char,
@@ -238,7 +250,7 @@ class _HanziWritingScreenState extends ConsumerState<HanziWritingScreen> {
                       const SizedBox(width: AppSpacing.xs),
                       Expanded(
                         child: Text(
-                          'Chưa có dữ liệu thứ tự nét cho chữ "$character". Bạn có thể tự do luyện viết trên ô lưới.',
+                          'Chưa có dữ liệu nét chuẩn cho chữ "$character", chỉ hỗ trợ viết tự do / hiển thị font chữ thông thường trên ô lưới Mễ tự cách.',
                           style: theme.textTheme.bodySmall,
                         ),
                       ),

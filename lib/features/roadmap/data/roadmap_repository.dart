@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import '../../../../core/database/dao/activity_dao.dart';
 import '../../../../core/database/dao/learner_evidence_dao.dart';
 import '../../../../core/database/database_constants.dart';
+import '../../../../core/knowledge/domain/services/knowledge_identity_registry.dart';
 import '../domain/catalog/curriculum_catalog.dart';
 import '../domain/engine/adaptive_roadmap_engine.dart';
 import '../domain/models/roadmap_models.dart';
@@ -21,13 +22,16 @@ class DefaultRoadmapRepository implements RoadmapRepository {
   final Database _db;
   late final LearnerEvidenceDao _evidenceDao;
   late final ActivityDao _activityDao;
+  late final KnowledgeIdentityRegistry _identityRegistry;
   final AdaptiveRoadmapEngine engine;
 
   DefaultRoadmapRepository(
     this._db, {
     this.engine = const AdaptiveRoadmapEngine(),
+    KnowledgeIdentityRegistry? identityRegistry,
   })  : _evidenceDao = LearnerEvidenceDao(_db),
-        _activityDao = ActivityDao(_db);
+        _activityDao = ActivityDao(_db),
+        _identityRegistry = identityRegistry ?? KnowledgeIdentityRegistry(_db);
 
   @override
   Future<LearnerGoal> getActiveGoal() async {
@@ -73,6 +77,15 @@ class DefaultRoadmapRepository implements RoadmapRepository {
     for (final r in rows) {
       final progress = LessonProgress.fromMap(r);
       map[progress.lessonId] = progress;
+
+      // Index by canonical ID and all aliases for seamless roadmap/curriculum sync
+      final canonical = await _identityRegistry.toCanonicalLessonId(progress.lessonId);
+      map[canonical] = progress;
+
+      final aliases = await _identityRegistry.getAliasesFor(canonical);
+      for (final alias in aliases) {
+        map[alias] = progress;
+      }
     }
     return map;
   }
@@ -83,10 +96,12 @@ class DefaultRoadmapRepository implements RoadmapRepository {
     final lesson = CurriculumCatalog.findLessonById(lessonId);
     if (lesson == null) return;
 
+    final canonicalId = await _identityRegistry.toCanonicalLessonId(lessonId);
+
     final existingRows = await _db.query(
       DatabaseConstants.tableLessonProgress,
-      where: 'lesson_id = ?',
-      whereArgs: [lessonId],
+      where: 'lesson_id = ? OR lesson_id = ?',
+      whereArgs: [lessonId, canonicalId],
       limit: 1,
     );
 
@@ -119,8 +134,8 @@ class DefaultRoadmapRepository implements RoadmapRepository {
             'last_studied_at': nowUtc,
             'updated_at': nowUtc,
           },
-          where: 'lesson_id = ?',
-          whereArgs: [lessonId],
+          where: 'id = ?',
+          whereArgs: [existing.id],
         );
       }
     }
@@ -131,6 +146,7 @@ class DefaultRoadmapRepository implements RoadmapRepository {
     final lesson = CurriculumCatalog.findLessonById(lessonId);
     if (lesson == null) return;
 
+    final canonicalId = await _identityRegistry.toCanonicalLessonId(lessonId);
     final nowUtc = DateTime.now().toUtc().toIso8601String();
     final clampedScore = score.clamp(0.0, 1.0);
 
@@ -169,6 +185,7 @@ class DefaultRoadmapRepository implements RoadmapRepository {
             'lesson_title': lesson.title,
             'unit_id': lesson.unitId,
             'hsk_level': lesson.level,
+            'canonical_id': canonicalId,
           }),
           'created_at': nowUtc,
         },

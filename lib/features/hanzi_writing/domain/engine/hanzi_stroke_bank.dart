@@ -1,9 +1,16 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../../../hanzi/data/hanzi_dao.dart';
+import '../../../hanzi/domain/models/hanzi_models.dart';
 import '../models/stroke_models.dart';
 
 /// Curated, verified repository of Chinese stroke order data (GB/T 13000 / Hanban standard).
+/// Connects to the shared 2,632-character Hanzi database while maintaining verified curated fallbacks.
 class HanziStrokeBank {
-  const HanziStrokeBank();
+  final HanziDao? _hanziDao;
+  static final Map<String, HanziStrokeData> _dynamicCache = {};
+
+  const HanziStrokeBank([this._hanziDao]);
 
   static final Map<String, HanziStrokeData> _verifiedBank = {
     // 1. 一 (1 stroke: 横)
@@ -245,13 +252,198 @@ class HanziStrokeBank {
     ),
   };
 
-  /// Retrieves verified standard stroke sequence for a character, or null if unverified.
+  /// Retrieves verified standard stroke sequence for a character synchronously,
+  /// checking curated bank first and then dynamic cache.
   HanziStrokeData? getStrokeData(String character) {
     final trimmed = character.trim();
     if (trimmed.isEmpty) return null;
-    return _verifiedBank[trimmed.characters.first];
+    final char = trimmed.characters.first;
+    if (_verifiedBank.containsKey(char)) {
+      return _verifiedBank[char];
+    }
+    return _dynamicCache[char];
   }
 
-  /// List of all characters with verified stroke order available for study.
+  /// Asynchronously retrieves standard stroke order data from curated bank,
+  /// dynamic cache, or shared Hanzi SQLite database (2,632 characters).
+  Future<HanziStrokeData?> getStrokeDataAsync(String character) async {
+    final trimmed = character.trim();
+    if (trimmed.isEmpty) return null;
+    final char = trimmed.characters.first;
+
+    // 1. Verified curated bank (highest priority)
+    if (_verifiedBank.containsKey(char)) {
+      return _verifiedBank[char];
+    }
+
+    // 2. Dynamic in-memory cache
+    if (_dynamicCache.containsKey(char)) {
+      return _dynamicCache[char];
+    }
+
+    // 3. Shared HanziDao database lookup
+    if (_hanziDao != null) {
+      final hanziChar = await _hanziDao.getCharacter(char);
+      if (hanziChar != null) {
+        final strokeData = _convertFromHanziCharacter(hanziChar);
+        _dynamicCache[char] = strokeData;
+        return strokeData;
+      }
+    }
+
+    return null;
+  }
+
+  /// Converts a [HanziCharacter] from shared database into [HanziStrokeData].
+  /// Characters without stroke or median data are strictly marked as unverified.
+  static HanziStrokeData _convertFromHanziCharacter(HanziCharacter c) {
+    if (c.medians.isEmpty || c.strokes.isEmpty) {
+      return HanziStrokeData(
+        character: c.character,
+        totalStrokes: c.strokeCount,
+        strokes: const [],
+        radical: c.radical.isNotEmpty ? c.radical : null,
+        pinyin: c.pinyin.isNotEmpty ? c.pinyin : null,
+        meaningVi: c.meaningVi.isNotEmpty ? c.meaningVi : null,
+        isVerified: false,
+      );
+    }
+
+    final List<StandardStroke> strokes = [];
+    for (int i = 0; i < c.medians.length; i++) {
+      final median = c.medians[i];
+      if (median.length < 2) continue;
+
+      final startPt = median.first;
+      final endPt = median.last;
+
+      // Font coordinate space [0..1024, -124..900] to normalized [0..1]
+      final normStart = Offset(
+        (startPt.x / 1024.0).clamp(0.0, 1.0),
+        ((900.0 - startPt.y) / 1024.0).clamp(0.0, 1.0),
+      );
+      final normEnd = Offset(
+        (endPt.x / 1024.0).clamp(0.0, 1.0),
+        ((900.0 - endPt.y) / 1024.0).clamp(0.0, 1.0),
+      );
+
+      final controlPoints = <Offset>[];
+      if (median.length > 2) {
+        for (int p = 1; p < median.length - 1; p++) {
+          controlPoints.add(Offset(
+            (median[p].x / 1024.0).clamp(0.0, 1.0),
+            ((900.0 - median[p].y) / 1024.0).clamp(0.0, 1.0),
+          ));
+        }
+      }
+
+      final type = _classifyStrokeType(median, normStart, normEnd);
+
+      strokes.add(StandardStroke(
+        order: i + 1,
+        type: type,
+        nameVi: 'Nét ${i + 1}: ${type.nameVi}',
+        normalizedStart: normStart,
+        normalizedEnd: normEnd,
+        controlPoints: controlPoints,
+      ));
+    }
+
+    return HanziStrokeData(
+      character: c.character,
+      totalStrokes: c.strokeCount > 0 ? c.strokeCount : strokes.length,
+      strokes: strokes,
+      radical: c.radical.isNotEmpty ? c.radical : null,
+      pinyin: c.pinyin.isNotEmpty ? c.pinyin : null,
+      meaningVi: c.meaningVi.isNotEmpty ? c.meaningVi : null,
+      isVerified: strokes.isNotEmpty,
+    );
+  }
+
+  /// Classifies stroke geometry into canonical Chinese stroke types.
+  static StrokeType _classifyStrokeType(
+    List<Point2D> median,
+    Offset normStart,
+    Offset normEnd,
+  ) {
+    if (median.length < 2) return StrokeType.heng;
+
+    final dx = normEnd.dx - normStart.dx;
+    final dy = normEnd.dy - normStart.dy;
+    final length = math.sqrt(dx * dx + dy * dy);
+    final angleDeg = math.atan2(dy, dx) * 180.0 / math.pi;
+
+    // Detect sharp directional inflection (gập / móc)
+    bool hasSharpTurn = false;
+    bool isHook = false;
+
+    if (median.length >= 3) {
+      for (int i = 0; i < median.length - 2; i++) {
+        final v1x = median[i + 1].x - median[i].x;
+        final v1y = (900.0 - median[i + 1].y) - (900.0 - median[i].y);
+        final v2x = median[i + 2].x - median[i + 1].x;
+        final v2y = (900.0 - median[i + 2].y) - (900.0 - median[i + 1].y);
+        final len1 = math.sqrt(v1x * v1x + v1y * v1y);
+        final len2 = math.sqrt(v2x * v2x + v2y * v2y);
+
+        if (len1 > 20.0 && len2 > 20.0) {
+          final dot = (v1x * v2x + v1y * v2y) / (len1 * len2);
+          final clampedDot = dot.clamp(-1.0, 1.0);
+          final turnDeg = math.acos(clampedDot) * 180.0 / math.pi;
+
+          if (turnDeg > 65.0) {
+            hasSharpTurn = true;
+            if (i >= median.length - 4 && (v2y < -10.0 || (v2x < -10.0 && v2y.abs() < 50.0))) {
+              isHook = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    if (isHook) return StrokeType.gou;
+    if (hasSharpTurn) return StrokeType.zhe;
+
+    if (length < 0.22 && angleDeg >= 20.0 && angleDeg <= 75.0) {
+      return StrokeType.dian;
+    }
+    if (angleDeg >= -30.0 && angleDeg <= 30.0) {
+      return StrokeType.heng;
+    }
+    if (angleDeg >= 65.0 && angleDeg <= 115.0) {
+      return StrokeType.shu;
+    }
+    if (angleDeg > 115.0 && angleDeg <= 170.0) {
+      return StrokeType.pie;
+    }
+    if (angleDeg > 30.0 && angleDeg < 65.0) {
+      return StrokeType.na;
+    }
+    if (angleDeg >= -75.0 && angleDeg < -30.0) {
+      return StrokeType.ti;
+    }
+
+    return StrokeType.heng;
+  }
+
+  /// List of verified characters available immediately without DB access.
   List<String> get availableCharacters => _verifiedBank.keys.toList();
+
+  /// Retrieves available characters from shared Hanzi database.
+  Future<List<String>> getAvailableCharactersAsync({
+    int limit = 100,
+    int offset = 0,
+    int? hskLevel,
+  }) async {
+    if (_hanziDao != null) {
+      final list = hskLevel != null
+          ? await _hanziDao.getCharactersByHskLevel(hskLevel, limit: limit, offset: offset)
+          : await _hanziDao.getCharactersByHskLevel(1, limit: limit, offset: offset);
+      if (list.isNotEmpty) {
+        return list.map((c) => c.character).toList();
+      }
+    }
+    return availableCharacters;
+  }
 }

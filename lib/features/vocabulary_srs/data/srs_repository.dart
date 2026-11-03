@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 import '../../../core/database/database_constants.dart';
+import '../../../core/knowledge/domain/services/knowledge_identity_registry.dart';
 import '../../learning_pipeline/data/learning_pipeline_coordinator.dart';
 import '../../learning_pipeline/domain/models/learning_evidence.dart';
 import '../domain/sm2_engine.dart';
@@ -20,6 +21,7 @@ class SrsRepository {
   final Database _db;
   final Sm2Engine _engine;
   final LearningPipelineCoordinator _pipelineCoordinator;
+  final KnowledgeIdentityRegistry _identityRegistry;
 
   // In-memory concurrency guards for double-tap and duplicate request prevention
   final Set<String> _inFlightContentIds = {};
@@ -35,21 +37,29 @@ class SrsRepository {
     this._db, {
     Sm2Engine? engine,
     LearningPipelineCoordinator? pipelineCoordinator,
+    KnowledgeIdentityRegistry? identityRegistry,
     this.debounceCooldownMs = 800,
   })  : _engine = engine ?? const Sm2Engine(),
-        _pipelineCoordinator = pipelineCoordinator ?? LearningPipelineCoordinator(_db);
+        _pipelineCoordinator = pipelineCoordinator ?? LearningPipelineCoordinator(_db),
+        _identityRegistry = identityRegistry ?? KnowledgeIdentityRegistry(_db);
 
   Sm2Engine get engine => _engine;
+  KnowledgeIdentityRegistry get identityRegistry => _identityRegistry;
 
   /// Retrieves an existing [SrsCardState] from the database or creates an initial new state.
+  /// Resolves any vocabulary reference (alias, raw Hanzi, knowledge ID) to canonical vocabulary PK.
   Future<SrsCardState> getOrCreateCardState({
     required String contentId,
     String contentType = 'vocabulary',
   }) async {
+    final effectiveContentId = (contentType == 'vocabulary')
+        ? (await _identityRegistry.toCanonicalVocabularyId(contentId) ?? contentId)
+        : contentId;
+
     final rows = await _db.query(
       DatabaseConstants.tableSrsItems,
       where: 'content_id = ? AND content_type = ? AND deleted_at IS NULL',
-      whereArgs: [contentId, contentType],
+      whereArgs: [effectiveContentId, contentType],
       limit: 1,
     );
 
@@ -58,8 +68,8 @@ class SrsRepository {
     }
 
     final newCard = SrsCardState.newCard(
-      id: 'SRS_${contentType.toUpperCase()}_$contentId',
-      contentId: contentId,
+      id: 'SRS_${contentType.toUpperCase()}_$effectiveContentId',
+      contentId: effectiveContentId,
       contentType: contentType,
       initialEaseFactor: _engine.config.initialEaseFactor,
     );
@@ -84,7 +94,11 @@ class SrsRepository {
     String source = 'srs_flashcard',
     Map<String, dynamic>? additionalMetadata,
   }) async {
-    final lockKey = '${contentType}_$contentId';
+    final effectiveContentId = (contentType == 'vocabulary')
+        ? (await _identityRegistry.toCanonicalVocabularyId(contentId) ?? contentId)
+        : contentId;
+
+    final lockKey = '${contentType}_$effectiveContentId';
     final nowUtc = (reviewTime ?? DateTime.now()).toUtc();
 
     // 1. Double-tap and rapid replay guard
@@ -109,7 +123,7 @@ class SrsRepository {
     try {
       // 2. Fetch current state
       final currentState = await getOrCreateCardState(
-        contentId: contentId,
+        contentId: effectiveContentId,
         contentType: contentType,
       );
 
@@ -133,7 +147,7 @@ class SrsRepository {
         );
 
         // Append to immutable learner_evidence (never overwriting prior evidence)
-        final evidenceId = 'EVI_${DateTime.now().microsecondsSinceEpoch}_$contentId';
+        final evidenceId = 'EVI_${DateTime.now().microsecondsSinceEpoch}_$effectiveContentId';
         final metadata = {
           'activity_type': ActivityType.retention.value,
           'is_success': reviewResult.isSuccessful,
@@ -152,7 +166,7 @@ class SrsRepository {
           {
             'id': evidenceId,
             'srs_item_id': nextState.id,
-            'content_id': contentId,
+            'content_id': effectiveContentId,
             'content_type': contentType,
             'source': source,
             'score': reviewResult.isSuccessful ? 1.0 : 0.0,
@@ -166,7 +180,7 @@ class SrsRepository {
         // Synchronize with unified Learning Pipeline to update curriculum_mastery
         await _pipelineCoordinator.recordSrsReview(
           reviewResult: reviewResult,
-          contentId: contentId,
+          contentId: effectiveContentId,
           contentType: contentType,
           txn: txn,
         );
@@ -234,13 +248,18 @@ class SrsRepository {
 
     final query = '''
       SELECT s.*, 
-             v.simplified, v.traditional, v.pinyin, v.hsk_level, v.stroke_count, v.radicals, v.audio_uri,
+             v.id AS vocab_id, v.simplified, v.traditional, v.pinyin, v.hsk_level, v.stroke_count, v.radicals, v.audio_uri,
              vs.part_of_speech, vs.meaning_vi, vs.example_cn, vs.example_pinyin, vs.example_vi
       FROM ${DatabaseConstants.tableSrsItems} s
       INNER JOIN ${DatabaseConstants.tableVocabularies} v ON s.content_id = v.id
-      LEFT JOIN ${DatabaseConstants.tableVocabularySenses} vs ON vs.vocabulary_id = v.id
+      LEFT JOIN ${DatabaseConstants.tableVocabularySenses} vs ON vs.id = (
+        SELECT vs2.id
+        FROM ${DatabaseConstants.tableVocabularySenses} vs2
+        WHERE vs2.vocabulary_id = v.id AND vs2.deleted_at IS NULL
+        ORDER BY COALESCE(vs2.order_index, 999999) ASC, vs2.id ASC
+        LIMIT 1
+      )
       WHERE $whereClause
-      GROUP BY s.id
       ORDER BY s.due_at ASC
       LIMIT $limit
     ''';
@@ -251,8 +270,9 @@ class SrsRepository {
     for (final row in rows) {
       final srsState = SrsCardState.fromMap(row);
       final intervals = _engine.previewIntervals(srsState);
+      final vocabId = (row['vocab_id'] ?? row['content_id'] ?? row['id']) as String;
       results.add(SrsFlashcardItem.fromDatabaseRow(
-        row: row,
+        row: {...row, 'id': vocabId},
         srsState: srsState,
         estimatedIntervalDays: intervals,
       ));
@@ -263,16 +283,22 @@ class SrsRepository {
       final remaining = limit - results.length;
       final newWhere = hskLevel != null ? 'AND v.hsk_level = ?' : '';
       final newVocabsQuery = '''
-        SELECT v.*, vs.part_of_speech, vs.meaning_vi, vs.example_cn, vs.example_pinyin, vs.example_vi
+        SELECT v.*, v.id AS vocab_id,
+               vs.part_of_speech, vs.meaning_vi, vs.example_cn, vs.example_pinyin, vs.example_vi
         FROM ${DatabaseConstants.tableVocabularies} v
-        LEFT JOIN ${DatabaseConstants.tableVocabularySenses} vs ON vs.vocabulary_id = v.id
+        LEFT JOIN ${DatabaseConstants.tableVocabularySenses} vs ON vs.id = (
+          SELECT vs2.id
+          FROM ${DatabaseConstants.tableVocabularySenses} vs2
+          WHERE vs2.vocabulary_id = v.id AND vs2.deleted_at IS NULL
+          ORDER BY COALESCE(vs2.order_index, 999999) ASC, vs2.id ASC
+          LIMIT 1
+        )
         WHERE v.deleted_at IS NULL
           AND NOT EXISTS (
             SELECT 1 FROM ${DatabaseConstants.tableSrsItems} s 
             WHERE s.content_id = v.id AND s.deleted_at IS NULL
           )
         $newWhere
-        GROUP BY v.id
         ORDER BY v.frequency_rank ASC
         LIMIT $remaining
       ''';
@@ -283,11 +309,11 @@ class SrsRepository {
       );
 
       for (final row in newRows) {
-        final vocabId = row['id'] as String;
+        final vocabId = (row['vocab_id'] ?? row['id']) as String;
         final srsState = await getOrCreateCardState(contentId: vocabId);
         final intervals = _engine.previewIntervals(srsState);
         results.add(SrsFlashcardItem.fromDatabaseRow(
-          row: row,
+          row: {...row, 'id': vocabId},
           srsState: srsState,
           estimatedIntervalDays: intervals,
         ));
@@ -377,6 +403,136 @@ class SrsRepository {
     }
 
     return count;
+  }
+
+  /// Migrates legacy or alias vocabulary IDs in [srs_items] into canonical vocabulary PKs (Nhiệm vụ C).
+  /// Resolves the 4 conventions:
+  /// - `voc_hsk1_001` (canonical PK)
+  /// - `KNOW_VOCAB_...` (knowledge registry ID)
+  /// - Raw Hanzi (e.g. '你好')
+  /// - Legacy curriculum format (e.g. 'VOCAB_001_NIHAO')
+  ///
+  /// If duplicate cards exist for the same word, merges review metrics
+  /// (max repetitions, max interval, max ease factor, latest due date),
+  /// re-links `learner_evidence` audit logs, and soft-deletes the duplicate card.
+  Future<({int migratedCount, int mergedCount})> migrateSrsItemsToCanonical() async {
+    int migratedCount = 0;
+    int mergedCount = 0;
+
+    final rows = await _db.query(
+      DatabaseConstants.tableSrsItems,
+      where: "content_type = 'vocabulary' AND deleted_at IS NULL",
+    );
+
+    final nowUtc = DateTime.now().toUtc().toIso8601String();
+
+    for (final row in rows) {
+      final oldSrsId = row['id'] as String;
+      final oldContentId = row['content_id'] as String;
+
+      final canonicalId = await _identityRegistry.toCanonicalVocabularyId(oldContentId);
+      if (canonicalId == null || canonicalId == oldContentId) {
+        continue;
+      }
+
+      await _db.transaction((txn) async {
+        // Check if a card already exists with content_id = canonicalId
+        final existingCanonicalRows = await txn.query(
+          DatabaseConstants.tableSrsItems,
+          where: "content_id = ? AND content_type = 'vocabulary' AND deleted_at IS NULL",
+          whereArgs: [canonicalId],
+          limit: 1,
+        );
+
+        if (existingCanonicalRows.isEmpty) {
+          // No duplicate card exists: promote current card to canonical ID
+          final newSrsId = 'SRS_VOCABULARY_$canonicalId';
+          await txn.update(
+            DatabaseConstants.tableSrsItems,
+            {
+              'id': newSrsId,
+              'content_id': canonicalId,
+              'updated_at': nowUtc,
+            },
+            where: 'id = ?',
+            whereArgs: [oldSrsId],
+          );
+
+          // Update learner_evidence references
+          await txn.update(
+            DatabaseConstants.tableLearnerEvidence,
+            {
+              'srs_item_id': newSrsId,
+              'content_id': canonicalId,
+            },
+            where: 'srs_item_id = ? OR content_id = ?',
+            whereArgs: [oldSrsId, oldContentId],
+          );
+
+          migratedCount++;
+        } else {
+          // A canonical card ALREADY exists! Merge progress to preserve user's learning state.
+          final canonicalRow = existingCanonicalRows.first;
+          final canonicalSrsId = canonicalRow['id'] as String;
+
+          final oldReps = (row['repetitions'] as num?)?.toInt() ?? 0;
+          final canonReps = (canonicalRow['repetitions'] as num?)?.toInt() ?? 0;
+          final mergedReps = oldReps > canonReps ? oldReps : canonReps;
+
+          final oldInterval = (row['interval_days'] as num?)?.toInt() ?? 0;
+          final canonInterval = (canonicalRow['interval_days'] as num?)?.toInt() ?? 0;
+          final mergedInterval = oldInterval > canonInterval ? oldInterval : canonInterval;
+
+          final oldEase = (row['ease_factor'] as num?)?.toDouble() ?? 2.5;
+          final canonEase = (canonicalRow['ease_factor'] as num?)?.toDouble() ?? 2.5;
+          final mergedEase = oldEase > canonEase ? oldEase : canonEase;
+
+          final oldDue = DateTime.parse(row['due_at'] as String);
+          final canonDue = DateTime.parse(canonicalRow['due_at'] as String);
+          final mergedDue = oldDue.isAfter(canonDue) ? oldDue : canonDue;
+
+          // Update canonical card with merged metrics
+          await txn.update(
+            DatabaseConstants.tableSrsItems,
+            {
+              'repetitions': mergedReps,
+              'interval_days': mergedInterval,
+              'ease_factor': mergedEase,
+              'due_at': mergedDue.toUtc().toIso8601String(),
+              'updated_at': nowUtc,
+            },
+            where: 'id = ?',
+            whereArgs: [canonicalSrsId],
+          );
+
+          // Re-link evidence from duplicate card to canonical card
+          await txn.update(
+            DatabaseConstants.tableLearnerEvidence,
+            {
+              'srs_item_id': canonicalSrsId,
+              'content_id': canonicalId,
+            },
+            where: 'srs_item_id = ? OR content_id = ?',
+            whereArgs: [oldSrsId, oldContentId],
+          );
+
+          // Soft-delete duplicate card
+          await txn.update(
+            DatabaseConstants.tableSrsItems,
+            {
+              'deleted_at': nowUtc,
+              'updated_at': nowUtc,
+            },
+            where: 'id = ?',
+            whereArgs: [oldSrsId],
+          );
+
+          mergedCount++;
+        }
+      });
+    }
+
+    return (migratedCount: migratedCount, mergedCount: mergedCount);
   }
 
   /// Clears in-memory debounce, in-flight, and due count caches.
