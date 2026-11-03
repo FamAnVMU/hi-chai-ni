@@ -84,6 +84,8 @@ async def main():
                     s["audios"][0]["local_path"] = f"assets/audio/hsk{lvl}/{audio_id}.mp3"
                     s["audios"][0]["file_size_bytes"] = fsize
                     s["audios"][0]["checksum_sha256"] = sha
+                    s["audios"][0]["audio_type"] = "studio_simulation"
+                    s["audios"][0]["contributor"] = "Microsoft Edge TTS (XiaoxiaoNeural)"
 
     # 2. Process HSK 3, 4, 5, 6 into staging, create zip packages and manifests
     for lvl in [3, 4, 5, 6]:
@@ -130,6 +132,8 @@ async def main():
                         s["audios"][0]["status"] = "remote"
                         s["audios"][0]["file_size_bytes"] = fsize
                         s["audios"][0]["checksum_sha256"] = sha
+                        s["audios"][0]["audio_type"] = "studio_simulation"
+                        s["audios"][0]["contributor"] = "Microsoft Edge TTS (XiaoxiaoNeural)"
 
         pack_sha256 = compute_sha256(zip_path)
         pack_size = os.path.getsize(zip_path)
@@ -138,7 +142,7 @@ async def main():
         # Write manifest
         manifest_data = {
             "pack_id": f"audio_pack_hsk{lvl}",
-            "title": f"Gói âm thanh chuẩn bản xứ HSK {lvl}",
+            "title": f"Gói âm thanh AI Studio HSK {lvl}",
             "hsk_level": lvl,
             "version": "1.0.0",
             "sentence_count": len(manifest_assets),

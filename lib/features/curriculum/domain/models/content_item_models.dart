@@ -39,14 +39,25 @@ class ContentItem {
           objs = decoded.map((e) => e.toString().trim()).where((s) => s.isNotEmpty).toList();
         }
       } catch (_) {
-        objs = raw
-            .replaceAll('[', '')
-            .replaceAll(']', '')
-            .replaceAll('"', '')
-            .split(',')
-            .map((s) => s.trim())
+        final quotedMatches = RegExp(r'"([^"]*)"')
+            .allMatches(raw)
+            .map((m) => m.group(1)!.trim())
             .where((s) => s.isNotEmpty)
             .toList();
+        if (quotedMatches.isNotEmpty) {
+          objs = quotedMatches;
+        } else if (!raw.contains('[')) {
+          objs = [raw.trim()];
+        } else {
+          objs = raw
+              .replaceAll('[', '')
+              .replaceAll(']', '')
+              .replaceAll('"', '')
+              .split(',')
+              .map((s) => s.trim())
+              .where((s) => s.isNotEmpty)
+              .toList();
+        }
       }
     }
 

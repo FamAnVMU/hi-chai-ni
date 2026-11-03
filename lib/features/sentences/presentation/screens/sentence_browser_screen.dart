@@ -299,44 +299,73 @@ class _SentenceBrowserScreenState extends State<SentenceBrowserScreen> {
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.blue.shade700),
                 ),
               ),
-              if (s.hasHumanAudio)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.record_voice_over, size: 13, color: Colors.green.shade700),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Người thật (${s.contributor.isNotEmpty ? s.contributor : 'Tatoeba'})',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.green.shade800),
-                      ),
-                    ],
-                  ),
-                )
-              else
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.smart_toy_outlined, size: 13, color: Colors.grey),
-                      SizedBox(width: 4),
-                      Text(
-                        'Giọng OS TTS',
-                        style: TextStyle(fontSize: 11, color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                ),
+              () {
+                final isStudioTts = s.contributor.toLowerCase().contains('edge_tts') ||
+                    s.contributor.toLowerCase().contains('xiaoxiao') ||
+                    s.audios.any((a) => a.audioType == AudioType.studioSimulation);
+
+                if (isStudioTts) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.graphic_eq_rounded, size: 13, color: Colors.blue.shade700),
+                        const SizedBox(width: 4),
+                        Text(
+                          'AI Studio (Edge TTS)',
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.blue.shade800),
+                        ),
+                      ],
+                    ),
+                  );
+                } else if (s.hasHumanAudio) {
+                  final speaker = s.contributor.isNotEmpty && !s.contributor.toLowerCase().contains('edge')
+                      ? s.contributor
+                      : 'Tatoeba';
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.record_voice_over, size: 13, color: Colors.green.shade700),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Người thật ($speaker)',
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.green.shade800),
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.smart_toy_outlined, size: 13, color: Colors.grey),
+                        SizedBox(width: 4),
+                        Text(
+                          'Giọng OS TTS',
+                          style: TextStyle(fontSize: 11, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              }(),
             ],
           ),
 

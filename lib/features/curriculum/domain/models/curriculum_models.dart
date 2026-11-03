@@ -140,14 +140,25 @@ class CurriculumLesson {
           prereqs = decoded.map((e) => e.toString().trim()).where((s) => s.isNotEmpty).toList();
         }
       } catch (_) {
-        prereqs = raw
-            .replaceAll('[', '')
-            .replaceAll(']', '')
-            .replaceAll('"', '')
-            .split(',')
-            .map((s) => s.trim())
+        final quotedMatches = RegExp(r'"([^"]*)"')
+            .allMatches(raw)
+            .map((m) => m.group(1)!.trim())
             .where((s) => s.isNotEmpty)
             .toList();
+        if (quotedMatches.isNotEmpty) {
+          prereqs = quotedMatches;
+        } else if (!raw.contains('[')) {
+          prereqs = [raw.trim()];
+        } else {
+          prereqs = raw
+              .replaceAll('[', '')
+              .replaceAll(']', '')
+              .replaceAll('"', '')
+              .split(',')
+              .map((s) => s.trim())
+              .where((s) => s.isNotEmpty)
+              .toList();
+        }
       }
     }
 

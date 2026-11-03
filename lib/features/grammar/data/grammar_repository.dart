@@ -75,20 +75,126 @@ class DefaultGrammarRepository implements GrammarRepository {
       );
       if (count != null && count > 0) return;
 
-      final defaultTopics = [
-        {'id': 'word_order', 'name_vi': 'Trật tự từ & Cấu trúc câu', 'name_en': 'Word Order', 'name_zh': '语序与句式', 'display_order': 1},
-        {'id': 'particles', 'name_vi': 'Trợ từ ngữ khí & kết cấu', 'name_en': 'Particles', 'name_zh': '助词', 'display_order': 2},
-        {'id': 'aspect', 'name_vi': 'Thể của động từ (了, 过, 着, 在)', 'name_en': 'Aspect', 'name_zh': '动态与体', 'display_order': 3},
-        {'id': 'complements', 'name_vi': 'Bổ ngữ (Kết quả, Xu hướng, Khả năng)', 'name_en': 'Complements', 'name_zh': '补语', 'display_order': 4},
-        {'id': 'special_structures', 'name_vi': 'Câu đặc biệt (把, 被, 是…的)', 'name_en': 'Special Structures', 'name_zh': '特殊句式', 'display_order': 5},
-        {'id': 'conjunctions', 'name_vi': 'Liên từ & Câu phức', 'name_en': 'Conjunctions', 'name_zh': '连词与复句', 'display_order': 6},
-        {'id': 'comparison', 'name_vi': 'Câu so sánh (比, 没有, 一样)', 'name_en': 'Comparison', 'name_zh': '比较句', 'display_order': 7},
+      final standardTopics = [
+        {
+          'code': 'particle',
+          'name_vi': 'Trợ từ (的, 地, 得, 了, 过, 着, 吗, 呢, 吧)',
+          'name_zh': '助词',
+          'description_vi': 'Trợ từ kết cấu, trợ từ động thái và trợ từ ngữ khí',
+          'display_order': 1,
+        },
+        {
+          'code': 'preposition',
+          'name_vi': 'Giới từ (在, 从, 往, 跟, 对, 向, 给, 离...)',
+          'name_zh': '介词',
+          'description_vi': 'Giới từ chỉ thời gian, địa điểm, phương hướng, đối tượng',
+          'display_order': 2,
+        },
+        {
+          'code': 'conjunction',
+          'name_vi': 'Liên từ & câu phức (虽然...但是, 因为...所以...)',
+          'name_zh': '连词与复句',
+          'description_vi': 'Liên từ kết nối và các mẫu câu phức thường gặp',
+          'display_order': 3,
+        },
+        {
+          'code': 'adverb',
+          'name_vi': 'Phó từ (也, 都, 很, 太, 不, 没, 就, 才, 已经...)',
+          'name_zh': '副词',
+          'description_vi': 'Phó từ chỉ mức độ, phạm vi, thời gian, phủ định và liên kết',
+          'display_order': 4,
+        },
+        {
+          'code': 'comparison',
+          'name_vi': 'Câu so sánh (A 比 B, 跟...一样, 越来越...)',
+          'name_zh': '比较句',
+          'description_vi': 'Các cấu trúc so sánh hơn, bằng, kém và tăng tiến',
+          'display_order': 5,
+        },
+        {
+          'code': 'conditional',
+          'name_vi': 'Câu điều kiện & giả thiết (如果...就, 只要...就)',
+          'name_zh': '条件与假设',
+          'description_vi': 'Biểu đạt điều kiện cần, điều kiện đủ và giả thiết tình huống',
+          'display_order': 6,
+        },
+        {
+          'code': 'passive',
+          'name_vi': 'Câu bị động (被, 让, 叫)',
+          'name_zh': '被动句',
+          'description_vi': 'Cấu trúc câu biểu thị ý nghĩa bị động trong tiếng Trung',
+          'display_order': 7,
+        },
+        {
+          'code': 'ba_sentence',
+          'name_vi': 'Câu chữ 把 (把字句)',
+          'name_zh': '把字句',
+          'description_vi': 'Mẫu câu đặc biệt xử lý tân ngữ và kết quả hành động',
+          'display_order': 8,
+        },
+        {
+          'code': 'complement',
+          'name_vi': 'Câu bổ ngữ (Kết quả, xu hướng, khả năng, trạng thái)',
+          'name_zh': '补语',
+          'description_vi': 'Hệ thống bổ ngữ biểu thị kết quả, thời lượng, khả năng',
+          'display_order': 9,
+        },
+        {
+          'code': 'modal_verb',
+          'name_vi': 'Động từ năng nguyện (会, 能, 可以, 想, 要, 应该)',
+          'name_zh': '能愿动词',
+          'description_vi': 'Động từ biểu thị năng lực, nguyện vọng, khả năng',
+          'display_order': 10,
+        },
+        {
+          'code': 'separable_verb',
+          'name_vi': 'Từ ly hợp (睡觉, 唱歌, 跳舞, 帮忙...)',
+          'name_zh': '离合词',
+          'description_vi': 'Quy tắc chèn bổ ngữ, lượng từ vào giữa từ ly hợp',
+          'display_order': 11,
+        },
+        {
+          'code': 'word_part',
+          'name_vi': 'Ngữ tố cấu từ (Tiền tố 小-/第-, Hậu tố -们/-子/-化)',
+          'name_zh': '语素',
+          'description_vi': 'Các thành phần tiền tố, hậu tố tạo từ trong tiếng Hán',
+          'display_order': 12,
+        },
+        {
+          'code': 'pronoun',
+          'name_vi': 'Đại từ (Nhân xưng, chỉ thị, nghi vấn)',
+          'name_zh': '代词',
+          'description_vi': 'Cách dùng đại từ và cách dùng phiếm chỉ/nhậm chỉ',
+          'display_order': 13,
+        },
+        {
+          'code': 'measure_word',
+          'name_vi': 'Lượng từ (Danh lượng từ, động lượng từ, trùng điệp)',
+          'name_zh': '量词',
+          'description_vi': 'Hệ thống lượng từ phong phú và quy tắc lặp lại',
+          'display_order': 14,
+        },
+        {
+          'code': 'special_sentence',
+          'name_vi': 'Cấu trúc câu đặc biệt (存现句, 连动句, 兼语句, 是...的)',
+          'name_zh': '特殊句型',
+          'description_vi': 'Câu tồn hiện, câu liên động, câu kiêm ngữ và nhấn mạnh',
+          'display_order': 15,
+        },
+        {
+          'code': 'other',
+          'name_vi': 'Cấu trúc & Cụm từ khác',
+          'name_zh': '其他结构',
+          'description_vi': 'Các định dạng biểu đạt thành ngữ, thời gian và tiền tệ',
+          'display_order': 16,
+        },
       ];
-      for (final topic in defaultTopics) {
+
+      for (final topic in standardTopics) {
         await _db.insert(
           DatabaseConstants.tableGrammarTopics,
           topic,
-          conflictAlgorithm: ConflictAlgorithm.ignore,
+          conflictAlgorithm: ConflictAlgorithm.replace,
         );
       }
     } catch (_) {}
