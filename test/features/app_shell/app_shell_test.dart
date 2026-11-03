@@ -297,7 +297,11 @@ class _MockAppStartupNotifier extends AppStartupNotifier {
   }
 
   @override
-  Future<void> initialize({AssetBundle? bundle, Database? databaseOverride}) async {
+  Future<void> initialize({
+    AssetBundle? bundle,
+    Database? databaseOverride,
+    dynamic credentialStorageOverride,
+  }) async {
     onRetry?.call();
   }
 }

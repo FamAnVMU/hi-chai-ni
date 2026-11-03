@@ -15,7 +15,11 @@ class _TestAppStartupNotifier extends AppStartupNotifier {
   }
 
   @override
-  Future<void> initialize({AssetBundle? bundle, Database? databaseOverride}) async {}
+  Future<void> initialize({
+    AssetBundle? bundle,
+    Database? databaseOverride,
+    dynamic credentialStorageOverride,
+  }) async {}
 }
 
 void main() {

@@ -20,6 +20,16 @@ class AppSettingsDao {
   }
 
   Future<void> setSetting(String key, String value) async {
+    final lowerKey = key.toLowerCase();
+    if (lowerKey.contains('api_key') ||
+        lowerKey.contains('secret_key') ||
+        lowerKey.contains('auth_token')) {
+      throw ArgumentError(
+        'Bảo mật nghiêm ngặt: Không được phép lưu khóa nhạy cảm ("$key") dưới dạng plaintext trong SQLite app_settings. '
+        'Hãy sử dụng AiCredentialStorage (FlutterSecureStorage).',
+      );
+    }
+
     final now = DateTime.now().toUtc().toIso8601String();
     await _db.insert(
       DatabaseConstants.tableAppSettings,
@@ -29,6 +39,14 @@ class AppSettingsDao {
         'updated_at': now,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<int> deleteSetting(String key) async {
+    return _db.delete(
+      DatabaseConstants.tableAppSettings,
+      where: 'key = ?',
+      whereArgs: [key],
     );
   }
 

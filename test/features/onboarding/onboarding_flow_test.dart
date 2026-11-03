@@ -15,7 +15,10 @@ void main() {
           child: MaterialApp(
             home: OnboardingApiKeyScreen(
               onSkip: () => skipped = true,
-              onSaveApiKey: (key) => saved = true,
+              onSaveApiKey: (key) async {
+                saved = true;
+                return true;
+              },
             ),
           ),
         ),

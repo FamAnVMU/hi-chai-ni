@@ -6,6 +6,7 @@ import '../../features/content_packs/data/content_pack_manager.dart';
 import '../database/app_database.dart';
 import '../database/database_constants.dart';
 import '../database/seed/seed_loader.dart';
+import '../network/ai/security/ai_credential_storage.dart';
 import 'app_startup_state.dart';
 
 export 'app_startup_state.dart';
@@ -72,6 +73,7 @@ class AppStartupNotifier extends Notifier<AppStartupState> {
   Future<void> initialize({
     AssetBundle? bundle,
     Database? databaseOverride,
+    AiCredentialStorage? credentialStorageOverride,
   }) async {
     state = state.copyWith(
       isInitializing: true,
@@ -171,7 +173,10 @@ class AppStartupNotifier extends Notifier<AppStartupState> {
         statusMessage: '9/10: Khởi tạo các dịch vụ học tập...',
       );
       debugPrint('[AppStartup] 9/10: Khởi tạo dịch vụ học tập phụ thuộc...');
-      await _initializeDependentServices(db);
+      await _initializeDependentServices(
+        db,
+        credentialStorage: credentialStorageOverride,
+      );
 
       // Bước 10: Chuyển ứng dụng sang trạng thái sẵn sàng
       state = state.copyWith(
@@ -272,8 +277,25 @@ class AppStartupNotifier extends Notifier<AppStartupState> {
     }
   }
 
-  Future<void> _initializeDependentServices(Database db) async {
-    // Ensure default user profile exists for learning analytics and progress recording
+  Future<void> _initializeDependentServices(
+    Database db, {
+    AiCredentialStorage? credentialStorage,
+  }) async {
+    // 1. Run idempotent legacy credential migration from SQLite app_settings to FlutterSecureStorage
+    try {
+      final storage = credentialStorage ?? AiCredentialStorage();
+      final migrationResult = await storage.migrateLegacyCredentials(db);
+      if (migrationResult.migratedKeys.isNotEmpty) {
+        debugPrint(
+          '[AppStartup] Đã chuyển đổi thành công ${migrationResult.migratedKeys.length} '
+          'khóa nhạy cảm sang bộ nhớ bảo mật an toàn.',
+        );
+      }
+    } catch (e) {
+      debugPrint('[AppStartup] Cảnh báo: Di chuyển bảo mật credential thất bại: $e');
+    }
+
+    // 2. Ensure default user profile exists for learning analytics and progress recording
     final profiles = await db.query(DatabaseConstants.tableUserProfiles, limit: 1);
     if (profiles.isEmpty) {
       final nowUtc = DateTime.now().toUtc().toIso8601String();
