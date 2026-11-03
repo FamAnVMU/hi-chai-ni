@@ -4,7 +4,38 @@ enum TutorPersonaId {
   xiaoming,
 }
 
-/// Represents an AI Tutor persona with specific pedagogical demeanor and language nuance.
+enum PersonaVoiceSourceType {
+  assetAudio,
+  ttsSynthesis,
+  unsupported,
+}
+
+class PersonaVoiceConfig {
+  final PersonaVoiceSourceType sourceType;
+  final String? assetPath;
+  final String? ttsLocale;
+  final double ttsPitch;
+  final double ttsRate;
+  final String? ttsVoiceName;
+  final String previewSampleTextZh;
+  final String previewSampleTextPinyin;
+  final String previewSampleTextVi;
+
+  const PersonaVoiceConfig({
+    required this.sourceType,
+    this.assetPath,
+    this.ttsLocale = 'zh-CN',
+    this.ttsPitch = 1.0,
+    this.ttsRate = 0.5,
+    this.ttsVoiceName,
+    required this.previewSampleTextZh,
+    required this.previewSampleTextPinyin,
+    required this.previewSampleTextVi,
+  });
+
+  bool get isPreviewSupported => sourceType != PersonaVoiceSourceType.unsupported;
+}
+
 class TutorPersona {
   final TutorPersonaId id;
   final String nameZh;
@@ -15,6 +46,7 @@ class TutorPersona {
   final int hskTargetMax;
   final String toneDescription;
   final String systemPromptInstruction;
+  final PersonaVoiceConfig voiceConfig;
 
   const TutorPersona({
     required this.id,
@@ -26,11 +58,18 @@ class TutorPersona {
     required this.hskTargetMax,
     required this.toneDescription,
     required this.systemPromptInstruction,
+    required this.voiceConfig,
   });
 
   String get avatarLabel => avatarEmoji;
   String get roleDescriptionVi => toneDescription;
-  String get voicePreviewSampleUri => 'assets/audio/personas/${id.name}_preview.mp3';
+
+  String? get voicePreviewSampleUri =>
+      voiceConfig.sourceType == PersonaVoiceSourceType.assetAudio
+          ? voiceConfig.assetPath
+          : null;
+
+  bool get canPreview => voiceConfig.isPreviewSupported;
 
   Map<String, dynamic> toMap() {
     return {
@@ -42,11 +81,11 @@ class TutorPersona {
       'hsk_min': hskTargetMin,
       'hsk_max': hskTargetMax,
       'tone': toneDescription,
+      'voice_source_type': voiceConfig.sourceType.name,
     };
   }
 }
 
-/// Catalog of default AI Tutor personas.
 class TutorPersonas {
   TutorPersonas._();
 
@@ -67,6 +106,15 @@ PHONG CÁCH:
 - Luôn khen ngợi sự tiến bộ dù là nhỏ nhất của học viên để tạo động lực.
 - Khi học viên sai, nhẹ nhàng phân tích lý do bằng tiếng Việt dễ hiểu kèm Pinyin.
 ''',
+    voiceConfig: PersonaVoiceConfig(
+      sourceType: PersonaVoiceSourceType.ttsSynthesis,
+      ttsLocale: 'zh-CN',
+      ttsPitch: 1.15,
+      ttsRate: 0.45,
+      previewSampleTextZh: '你好！我是乔乔老师，很高兴和你一起学习汉语。',
+      previewSampleTextPinyin: 'Nǐ hǎo! Wǒ shì Qiáoqiáo lǎoshī, hěn gāoxìng hé nǐ yìqǐ xuéxí hànyǔ.',
+      previewSampleTextVi: 'Chào bạn! Tôi là cô giáo Kiều Kiều, rất vui được cùng bạn học tiếng Trung.',
+    ),
   );
 
   static const TutorPersona laowang = TutorPersona(
@@ -86,6 +134,15 @@ PHONG CÁCH:
 - Sửa lỗi chính xác đến từng trợ từ kết cấu (的/地/得) và trật tự định ngữ - trung tâm ngữ.
 - Rèn luyện cho học viên lối diễn đạt gãy gọn, tự nhiên như người đi làm tại Trung Quốc.
 ''',
+    voiceConfig: PersonaVoiceConfig(
+      sourceType: PersonaVoiceSourceType.ttsSynthesis,
+      ttsLocale: 'zh-CN',
+      ttsPitch: 0.85,
+      ttsRate: 0.5,
+      previewSampleTextZh: '你好，我是老王。学习中文贵在严谨和坚持，我们开始吧。',
+      previewSampleTextPinyin: 'Nǐ hǎo, wǒ shì Lǎowáng. Xuéxí zhōngwén guì zài yánjǐn hé jiānchí, wǒmen kāishǐ ba.',
+      previewSampleTextVi: 'Chào anh/chị, tôi là Lão Vương. Học tiếng Trung quý ở sự cẩn trọng và kiên trì, chúng ta bắt đầu nhé.',
+    ),
   );
 
   static const TutorPersona xiaoming = TutorPersona(
@@ -105,6 +162,15 @@ PHONG CÁCH:
 - Chia sẻ về các tình huống sinh hoạt, ẩm thực, văn hóa mạng, kết bạn, mua sắm.
 - Sửa lỗi tự nhiên bằng cách chỉ ra cách nói mà người trẻ Bắc Kinh/Thượng Hải thực tế đang dùng.
 ''',
+    voiceConfig: PersonaVoiceConfig(
+      sourceType: PersonaVoiceSourceType.ttsSynthesis,
+      ttsLocale: 'zh-CN',
+      ttsPitch: 1.0,
+      ttsRate: 0.55,
+      previewSampleTextZh: '嗨！我是小明。平时有什么想聊的尽管说，咱们边聊边学！',
+      previewSampleTextPinyin: 'Hāi! Wǒ shì Xiǎomíng. Píngshí yǒu shénme xiǎng liáo de jǐnguǎn shuō, zánmen biān liáo biān xué!',
+      previewSampleTextVi: 'Chào cậu! Mình là Tiểu Minh. Bình thường có chuyện gì muốn tám cứ thoải mái nói nhé, tụi mình vừa tán gẫu vừa học!',
+    ),
   );
 
   static const List<TutorPersona> all = [

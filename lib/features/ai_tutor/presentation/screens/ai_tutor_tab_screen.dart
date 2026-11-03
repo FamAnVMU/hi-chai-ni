@@ -26,54 +26,133 @@ class _AiTutorTabScreenState extends ConsumerState<AiTutorTabScreen>
 
   void _showPersonaSelector() {
     final activePersona = ref.read(activePersonaProvider);
+    final voiceService = ref.read(voiceConversationServiceProvider);
     final theme = Theme.of(context);
 
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       builder: (ctx) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Chọn Gia sư AI (Persona)',
-                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        return StatefulBuilder(
+          builder: (bottomSheetCtx, setSheetState) {
+            final previewStatus = voiceService.previewStatus;
+
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          'Chọn Gia sư AI (Persona)',
+                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const Spacer(),
+                        if (previewStatus.isPlaying)
+                          TextButton.icon(
+                            icon: const Icon(Icons.stop_circle_outlined, size: 18),
+                            label: const Text('Dừng thử giọng', style: TextStyle(fontSize: 12)),
+                            onPressed: () async {
+                              await voiceService.stopPersonaVoicePreview();
+                              setSheetState(() {});
+                            },
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    ...TutorPersonas.all.map((p) {
+                      final isSelected = p.id == activePersona.id;
+                      final isPreviewing = previewStatus.isPlaying && previewStatus.personaId == p.id.name;
+                      final isLoading = previewStatus.isLoading && previewStatus.personaId == p.id.name;
+
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: isSelected ? AppColors.primaryBlueLight : AppColors.inputBackground,
+                          foregroundColor: isSelected ? AppColors.primaryBlueDark : AppColors.secondaryText,
+                          child: Text(p.avatarLabel),
+                        ),
+                        title: Text(
+                          '${p.nameZh} (${p.nameVi})',
+                          style: TextStyle(fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, color: AppColors.primaryText),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              p.roleDescriptionVi,
+                              style: const TextStyle(fontSize: 11, color: AppColors.secondaryText),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (p.canPreview)
+                              const Padding(
+                                padding: EdgeInsets.only(top: 2),
+                                child: Text(
+                                  '• Hỗ trợ nghe thử mẫu giọng (TTS)',
+                                  style: TextStyle(fontSize: 10, color: AppColors.primaryBlueDark),
+                                ),
+                              ),
+                          ],
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (p.canPreview)
+                              IconButton(
+                                icon: isLoading
+                                    ? const SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                      )
+                                    : Icon(
+                                        isPreviewing ? Icons.stop_rounded : Icons.volume_up_outlined,
+                                        color: isPreviewing ? AppColors.primaryBlueDark : AppColors.secondaryText,
+                                      ),
+                                tooltip: isPreviewing ? 'Dừng phát' : 'Nghe thử giọng mẫu',
+                                onPressed: () async {
+                                  if (isPreviewing) {
+                                    await voiceService.stopPersonaVoicePreview();
+                                  } else {
+                                    await voiceService.previewPersonaVoice(p);
+                                    if (bottomSheetCtx.mounted && voiceService.previewStatus.isUnsupported) {
+                                      ScaffoldMessenger.of(bottomSheetCtx).showSnackBar(
+                                        SnackBar(
+                                          content: Text(voiceService.previewStatus.message ?? 'Không thể nghe thử.'),
+                                          duration: const Duration(seconds: 2),
+                                        ),
+                                      );
+                                    }
+                                  }
+                                  setSheetState(() {});
+                                },
+                              ),
+                            if (isSelected)
+                              const Icon(Icons.check_circle_rounded, color: AppColors.primaryBlueDark),
+                          ],
+                        ),
+                        onTap: () async {
+                          await voiceService.stopPersonaVoicePreview();
+                          ref.read(activePersonaProvider.notifier).selectPersona(p);
+                          if (ctx.mounted) {
+                            Navigator.of(ctx).pop();
+                          }
+                        },
+                      );
+                    }),
+                  ],
                 ),
-                const SizedBox(height: AppSpacing.sm),
-                ...TutorPersonas.all.map((p) {
-                  final isSelected = p.id == activePersona.id;
-                  return ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: isSelected ? AppColors.primaryBlueLight : AppColors.inputBackground,
-                      foregroundColor: isSelected ? AppColors.primaryBlueDark : AppColors.secondaryText,
-                      child: Text(p.avatarLabel),
-                    ),
-                    title: Text(
-                      '${p.nameZh} (${p.nameVi})',
-                      style: TextStyle(fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, color: AppColors.primaryText),
-                    ),
-                    subtitle: Text(
-                      p.roleDescriptionVi,
-                      style: const TextStyle(fontSize: 11, color: AppColors.secondaryText),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    trailing: isSelected ? const Icon(Icons.check_circle_rounded, color: AppColors.primaryBlueDark) : null,
-                    onTap: () {
-                      ref.read(activePersonaProvider.notifier).selectPersona(p);
-                      Navigator.of(ctx).pop();
-                    },
-                  );
-                }),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
-    );
+    ).whenComplete(() {
+      voiceService.stopPersonaVoicePreview();
+    });
   }
 
   void _showScenarioSelector() {

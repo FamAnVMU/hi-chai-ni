@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/audio/audio_player_service.dart';
 import '../../../../core/audio/audio_recorder_service.dart';
+import '../../../../core/audio/tts_service.dart';
 import '../../../../core/database/app_database.dart';
 import '../../../../core/database/dao/chat_dao.dart';
 import '../../../../core/network/ai/ai_service.dart';
@@ -39,6 +40,12 @@ final aiTutorRepositoryProvider = Provider<AiTutorRepository>((ref) {
   );
 });
 
+final aiTutorTtsServiceProvider = Provider<TtsService>((ref) {
+  final tts = DefaultTtsService();
+  ref.onDispose(() => tts.dispose());
+  return tts;
+});
+
 /// Dedicated AudioRecorderService instance for AI Tutor.
 final aiTutorAudioRecorderProvider = Provider<AudioRecorderService>((ref) {
   final recorder = DefaultAudioRecorderService();
@@ -57,16 +64,23 @@ final aiTutorAudioPlayerProvider = Provider<AudioPlayerService>((ref) {
 final voiceConversationServiceProvider = Provider<VoiceConversationService>((ref) {
   final recorder = ref.watch(aiTutorAudioRecorderProvider);
   final player = ref.watch(aiTutorAudioPlayerProvider);
+  final tts = ref.watch(aiTutorTtsServiceProvider);
   final repository = ref.watch(aiTutorRepositoryProvider);
 
   final service = DefaultVoiceConversationService(
     recorder: recorder,
     player: player,
+    tts: tts,
     repository: repository,
   );
 
   ref.onDispose(() => service.dispose());
   return service;
+});
+
+final personaPreviewStatusProvider = StreamProvider<PersonaVoicePreviewStatus>((ref) {
+  final service = ref.watch(voiceConversationServiceProvider);
+  return service.previewStatusStream;
 });
 
 /// Reactive stream provider for the voice conversation status.

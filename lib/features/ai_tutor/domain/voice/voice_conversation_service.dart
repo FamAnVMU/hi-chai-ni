@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../../core/audio/audio_models.dart';
 import '../../../../core/audio/audio_player_service.dart';
 import '../../../../core/audio/audio_recorder_service.dart';
+import '../../../../core/audio/tts_service.dart';
 import '../../../../core/utils/app_lifecycle_manager.dart';
 import '../../data/repositories/ai_tutor_repository.dart';
 import '../models/tutor_persona.dart';
 import '../models/tutor_scenario.dart';
 import 'voice_conversation_models.dart';
 
-/// Contract for AI Tutor Voice Conversation operations.
 abstract class VoiceConversationService {
   VoiceConversationStatus get status;
   Stream<VoiceConversationStatus> get statusStream;
@@ -19,10 +20,15 @@ abstract class VoiceConversationService {
   bool get isMuted;
   VoiceEngineMode get engineMode;
 
+  PersonaVoicePreviewStatus get previewStatus;
+  Stream<PersonaVoicePreviewStatus> get previewStatusStream;
+
   Future<bool> checkPermission();
   Future<void> startMicTest();
   Future<void> stopMicTest();
+
   Future<void> previewPersonaVoice(TutorPersona persona);
+  Future<void> stopPersonaVoicePreview();
 
   Future<void> startSession({
     required String sessionId,
@@ -35,19 +41,17 @@ abstract class VoiceConversationService {
   Future<void> interrupt();
   Future<void> toggleMute();
 
-  /// Simulates or passes recognized speech input from STT / Live audio feed.
   Future<void> submitSpeechInput(String userText);
 
-  /// Called on OS lifecycle transitions to guarantee Android policy compliance.
   void handleLifecycleTransition(AppLifecycleState state);
 
   void dispose();
 }
 
-/// Concrete production-ready implementation of [VoiceConversationService].
 class DefaultVoiceConversationService implements VoiceConversationService {
   final AudioRecorderService recorder;
   final AudioPlayerService player;
+  final TtsService? tts;
   final AiTutorRepository repository;
   final VoiceEngineMode mode;
 
@@ -57,6 +61,10 @@ class DefaultVoiceConversationService implements VoiceConversationService {
   TutorPersona _activePersona = TutorPersonas.qiaoqiao;
   TutorScenario _activeScenario = TutorScenarios.freeChat;
   int _learnerHskLevel = 1;
+
+  PersonaVoicePreviewStatus _previewStatus = PersonaVoicePreviewStatus.initial;
+  final StreamController<PersonaVoicePreviewStatus> _previewStatusController =
+      StreamController<PersonaVoicePreviewStatus>.broadcast();
 
   final List<VoiceTranscriptSegment> _transcripts = [];
 
@@ -73,11 +81,12 @@ class DefaultVoiceConversationService implements VoiceConversationService {
   DefaultVoiceConversationService({
     required this.recorder,
     required this.player,
+    this.tts,
     required this.repository,
     this.mode = VoiceEngineMode.turnBasedAudio,
   }) {
-    // Pipe recorder amplitude into our amplitude stream for UI waveform visualizer
     _recorderAmpSub = recorder.amplitudeStream.listen((amp) {
+      if (_amplitudeController.isClosed) return;
       if (!_isMuted &&
           (_status == VoiceConversationStatus.listening ||
               _status == VoiceConversationStatus.idle)) {
@@ -87,8 +96,20 @@ class DefaultVoiceConversationService implements VoiceConversationService {
       }
     });
 
-    // Listen to player status to auto-transition back to listening when AI finishes speaking
     _playerStatusSub = player.statusStream.listen((playStatus) {
+      if (_previewStatus.isPlaying &&
+          (playStatus == AudioPlaybackStatus.completed ||
+              playStatus == AudioPlaybackStatus.stopped ||
+              playStatus == AudioPlaybackStatus.error)) {
+        _setPreviewStatus(PersonaVoicePreviewStatus(
+          personaId: _previewStatus.personaId,
+          state: playStatus == AudioPlaybackStatus.error
+              ? PersonaPreviewPlaybackState.error
+              : PersonaPreviewPlaybackState.stopped,
+          message: playStatus == AudioPlaybackStatus.error ? 'Lỗi phát file âm thanh mẫu' : null,
+        ));
+      }
+
       if (_status == VoiceConversationStatus.speaking &&
           (playStatus == AudioPlaybackStatus.completed ||
               playStatus == AudioPlaybackStatus.stopped)) {
@@ -96,7 +117,6 @@ class DefaultVoiceConversationService implements VoiceConversationService {
       }
     });
 
-    // Register with AppLifecycleManager for background microphone safety
     AppLifecycleManager.instance.registerAudioSession(_onLifecycleAbort);
   }
 
@@ -122,15 +142,33 @@ class DefaultVoiceConversationService implements VoiceConversationService {
   @override
   VoiceEngineMode get engineMode => mode;
 
+  @override
+  PersonaVoicePreviewStatus get previewStatus => _previewStatus;
+
+  @override
+  Stream<PersonaVoicePreviewStatus> get previewStatusStream =>
+      _previewStatusController.stream;
+
   void _setStatus(VoiceConversationStatus newStatus) {
     if (_status == newStatus) return;
     _status = newStatus;
-    _statusController.add(_status);
+    if (!_statusController.isClosed) {
+      _statusController.add(_status);
+    }
+  }
+
+  void _setPreviewStatus(PersonaVoicePreviewStatus newStatus) {
+    _previewStatus = newStatus;
+    if (!_previewStatusController.isClosed) {
+      _previewStatusController.add(_previewStatus);
+    }
   }
 
   void _addTranscript(VoiceTranscriptSegment segment) {
     _transcripts.add(segment);
-    _transcriptController.add(List.unmodifiable(_transcripts));
+    if (!_transcriptController.isClosed) {
+      _transcriptController.add(List.unmodifiable(_transcripts));
+    }
   }
 
   void _updateLastInterimTranscript(String text, {bool isFinal = false}) {
@@ -146,7 +184,9 @@ class DefaultVoiceConversationService implements VoiceConversationService {
         timestamp: DateTime.now(),
       ));
     }
-    _transcriptController.add(List.unmodifiable(_transcripts));
+    if (!_transcriptController.isClosed) {
+      _transcriptController.add(List.unmodifiable(_transcripts));
+    }
   }
 
   @override
@@ -163,10 +203,11 @@ class DefaultVoiceConversationService implements VoiceConversationService {
 
   @override
   Future<void> startMicTest() async {
-    final granted = await recorder.checkPermission();
+    final granted = await checkPermission();
     if (!granted) {
-      _setStatus(VoiceConversationStatus.error);
-      return;
+      throw const AudioRecordingPermissionException(
+        'Không được cấp quyền truy cập Microphone.',
+      );
     }
     await recorder.startRecording();
   }
@@ -174,14 +215,119 @@ class DefaultVoiceConversationService implements VoiceConversationService {
   @override
   Future<void> stopMicTest() async {
     await recorder.stopRecording();
-    _amplitudeController.add(0.0);
+    if (!_amplitudeController.isClosed) {
+      _amplitudeController.add(0.0);
+    }
+  }
+
+  @override
+  Future<void> stopPersonaVoicePreview() async {
+    try {
+      await player.stop();
+      if (tts != null) {
+        await tts!.stop();
+      }
+    } catch (_) {}
+    _setPreviewStatus(PersonaVoicePreviewStatus(
+      personaId: _previewStatus.personaId,
+      state: PersonaPreviewPlaybackState.stopped,
+    ));
   }
 
   @override
   Future<void> previewPersonaVoice(TutorPersona persona) async {
-    // Play the persona's greeting sample
-    final audioUri = persona.voicePreviewSampleUri;
-    await player.play(audioUri, speed: 1.0);
+    await stopPersonaVoicePreview();
+
+    final config = persona.voiceConfig;
+    final personaIdStr = persona.id.name;
+
+    if (!persona.canPreview) {
+      _setPreviewStatus(PersonaVoicePreviewStatus(
+        personaId: personaIdStr,
+        state: PersonaPreviewPlaybackState.unsupported,
+        message: 'Giọng mẫu của ${persona.nameZh} hiện chưa khả dụng trên thiết bị.',
+      ));
+      return;
+    }
+
+    _setPreviewStatus(PersonaVoicePreviewStatus(
+      personaId: personaIdStr,
+      state: PersonaPreviewPlaybackState.loading,
+      isTts: config.sourceType == PersonaVoiceSourceType.ttsSynthesis,
+    ));
+
+    try {
+      if (config.sourceType == PersonaVoiceSourceType.assetAudio) {
+        final path = config.assetPath;
+        if (path == null || path.trim().isEmpty) {
+          _setPreviewStatus(PersonaVoicePreviewStatus(
+            personaId: personaIdStr,
+            state: PersonaPreviewPlaybackState.unsupported,
+            message: 'Chưa có file mẫu âm thanh cho ${persona.nameZh}.',
+          ));
+          return;
+        }
+
+        try {
+          await rootBundle.load(path);
+        } catch (_) {
+          _setPreviewStatus(PersonaVoicePreviewStatus(
+            personaId: personaIdStr,
+            state: PersonaPreviewPlaybackState.unsupported,
+            message: 'Tài nguyên âm thanh mẫu cho ${persona.nameZh} chưa được cài đặt.',
+          ));
+          return;
+        }
+
+        _setPreviewStatus(PersonaVoicePreviewStatus(
+          personaId: personaIdStr,
+          state: PersonaPreviewPlaybackState.playing,
+          isTts: false,
+        ));
+        await player.play(path, speed: 1.0);
+      } else if (config.sourceType == PersonaVoiceSourceType.ttsSynthesis) {
+        if (tts == null) {
+          _setPreviewStatus(PersonaVoicePreviewStatus(
+            personaId: personaIdStr,
+            state: PersonaPreviewPlaybackState.unsupported,
+            message: 'Công cụ tổng hợp giọng nói (TTS) chưa sẵn sàng.',
+          ));
+          return;
+        }
+
+        final langSupported = await tts!.isLanguageAvailable(config.ttsLocale ?? 'zh-CN');
+        if (!langSupported) {
+          _setPreviewStatus(PersonaVoicePreviewStatus(
+            personaId: personaIdStr,
+            state: PersonaPreviewPlaybackState.unsupported,
+            message: 'Thiết bị chưa cài đặt gói giọng nói tiếng Trung (${config.ttsLocale}).',
+          ));
+          return;
+        }
+
+        _setPreviewStatus(PersonaVoicePreviewStatus(
+          personaId: personaIdStr,
+          state: PersonaPreviewPlaybackState.playing,
+          isTts: true,
+          message: 'Đang phát giọng đọc mẫu TTS (xem trước).',
+        ));
+
+        await tts!.speak(
+          config.previewSampleTextZh,
+          language: config.ttsLocale ?? 'zh-CN',
+          pitch: config.ttsPitch,
+          rate: config.ttsRate,
+          voiceName: config.ttsVoiceName,
+        );
+      }
+    } catch (e) {
+      debugPrint('[VoiceConversationService] Preview error: $e');
+      _setPreviewStatus(PersonaVoicePreviewStatus(
+        personaId: personaIdStr,
+        state: PersonaPreviewPlaybackState.error,
+        message: 'Không thể phát giọng nghe thử: $e',
+      ));
+    }
   }
 
   @override
@@ -191,6 +337,8 @@ class DefaultVoiceConversationService implements VoiceConversationService {
     required TutorScenario scenario,
     int learnerHskLevel = 1,
   }) async {
+    await stopPersonaVoicePreview();
+
     _activeSessionId = sessionId;
     _activePersona = persona;
     _activeScenario = scenario;
@@ -208,7 +356,6 @@ class DefaultVoiceConversationService implements VoiceConversationService {
     _setStatus(VoiceConversationStatus.connecting);
     await Future.delayed(const Duration(milliseconds: 300));
 
-    // Add initial scenario greeting to transcript
     _addTranscript(VoiceTranscriptSegment(
       id: 'greeting_${DateTime.now().millisecondsSinceEpoch}',
       role: 'assistant',
@@ -219,14 +366,26 @@ class DefaultVoiceConversationService implements VoiceConversationService {
       timestamp: DateTime.now(),
     ));
 
-    // Play greeting audio if persona has voice sample
     _setStatus(VoiceConversationStatus.speaking);
-    await player.play(
-      persona.voicePreviewSampleUri,
-      simulatedDuration: const Duration(seconds: 2),
-    );
+    final greetingAsset = persona.voicePreviewSampleUri;
+    if (greetingAsset != null) {
+      try {
+        await player.play(
+          greetingAsset,
+          simulatedDuration: const Duration(seconds: 2),
+        );
+      } catch (_) {}
+    } else if (tts != null && persona.voiceConfig.sourceType == PersonaVoiceSourceType.ttsSynthesis) {
+      try {
+        await tts!.speak(
+          scenario.initialAiGreetingZh,
+          language: persona.voiceConfig.ttsLocale ?? 'zh-CN',
+          pitch: persona.voiceConfig.ttsPitch,
+          rate: persona.voiceConfig.ttsRate,
+        );
+      } catch (_) {}
+    }
 
-    // Start listening for student speech
     await recorder.startRecording();
     _setStatus(VoiceConversationStatus.listening);
   }
@@ -236,10 +395,8 @@ class DefaultVoiceConversationService implements VoiceConversationService {
     if (_status != VoiceConversationStatus.listening) return;
     if (userText.trim().isEmpty) return;
 
-    // 1. Show final user transcript segment
     _updateLastInterimTranscript(userText.trim(), isFinal: true);
 
-    // 2. Transition to processing
     _setStatus(VoiceConversationStatus.processing);
     await recorder.pauseRecording();
 
@@ -249,18 +406,16 @@ class DefaultVoiceConversationService implements VoiceConversationService {
         throw StateError('Cannot submit speech without active session ID.');
       }
 
-      // 3. Delegate to shared AI Tutor Engine
       final tutorResponse = await repository.sendMessage(
         sessionId: sessionId,
         userText: userText.trim(),
+        learnerHskLevel: _learnerHskLevel,
         persona: _activePersona,
         scenario: _activeScenario,
-        learnerHskLevel: _learnerHskLevel,
       );
 
-      // 4. Add assistant response transcript
       _addTranscript(VoiceTranscriptSegment(
-        id: 'asst_${DateTime.now().millisecondsSinceEpoch}',
+        id: 'resp_${DateTime.now().millisecondsSinceEpoch}',
         role: 'assistant',
         text: tutorResponse.replyZh,
         pinyin: tutorResponse.replyPinyin,
@@ -269,12 +424,26 @@ class DefaultVoiceConversationService implements VoiceConversationService {
         timestamp: DateTime.now(),
       ));
 
-      // 5. Play response audio
       _setStatus(VoiceConversationStatus.speaking);
-      await player.play(
-        _activePersona.voicePreviewSampleUri,
-        simulatedDuration: const Duration(seconds: 3),
-      );
+      final assetUri = _activePersona.voicePreviewSampleUri;
+      if (assetUri != null) {
+        await player.play(
+          assetUri,
+          simulatedDuration: const Duration(seconds: 3),
+        );
+      } else if (tts != null) {
+        await tts!.speak(
+          tutorResponse.replyZh,
+          language: _activePersona.voiceConfig.ttsLocale ?? 'zh-CN',
+          pitch: _activePersona.voiceConfig.ttsPitch,
+          rate: _activePersona.voiceConfig.ttsRate,
+        );
+      } else {
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
+
+      _setStatus(VoiceConversationStatus.listening);
+      await recorder.resumeRecording();
     } catch (e) {
       debugPrint('[VoiceConversationService] Speech turn error: $e');
       _setStatus(VoiceConversationStatus.reconnecting);
@@ -289,12 +458,13 @@ class DefaultVoiceConversationService implements VoiceConversationService {
     if (_status == VoiceConversationStatus.speaking ||
         player.status == AudioPlaybackStatus.playing) {
       await player.stop();
-      _setStatus(VoiceConversationStatus.interrupted);
-      await Future.delayed(const Duration(milliseconds: 300));
-      if (!_isMuted) {
-        await recorder.resumeRecording();
+      if (tts != null) {
+        await tts!.stop();
       }
+      _setStatus(VoiceConversationStatus.interrupted);
+      await Future.delayed(const Duration(milliseconds: 200));
       _setStatus(VoiceConversationStatus.listening);
+      await recorder.resumeRecording();
     }
   }
 
@@ -311,20 +481,32 @@ class DefaultVoiceConversationService implements VoiceConversationService {
 
   @override
   Future<void> endSession() async {
+    await stopPersonaVoicePreview();
     await player.stop();
+    if (tts != null) {
+      await tts!.stop();
+    }
     await recorder.stopRecording();
-    _amplitudeController.add(0.0);
+    if (!_amplitudeController.isClosed) {
+      _amplitudeController.add(0.0);
+    }
     _setStatus(VoiceConversationStatus.ended);
   }
 
   void _onLifecycleAbort(String reason) {
     debugPrint('[VoiceConversationService] Lifecycle abort triggered: $reason');
+    stopPersonaVoicePreview();
     if (_status == VoiceConversationStatus.listening ||
         _status == VoiceConversationStatus.speaking ||
         _status == VoiceConversationStatus.processing) {
       player.stop();
+      if (tts != null) {
+        tts!.stop();
+      }
       recorder.stopRecording();
-      _amplitudeController.add(0.0);
+      if (!_amplitudeController.isClosed) {
+        _amplitudeController.add(0.0);
+      }
       _setStatus(VoiceConversationStatus.interrupted);
     }
   }
@@ -344,9 +526,15 @@ class DefaultVoiceConversationService implements VoiceConversationService {
     _recorderAmpSub?.cancel();
     _playerStatusSub?.cancel();
     player.stop();
+    if (tts != null) {
+      tts!.stop();
+      tts!.dispose();
+    }
     recorder.stopRecording();
-    _statusController.close();
-    _amplitudeController.close();
-    _transcriptController.close();
+    _previewStatus = PersonaVoicePreviewStatus.initial;
+    if (!_statusController.isClosed) _statusController.close();
+    if (!_amplitudeController.isClosed) _amplitudeController.close();
+    if (!_transcriptController.isClosed) _transcriptController.close();
+    if (!_previewStatusController.isClosed) _previewStatusController.close();
   }
 }

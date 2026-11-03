@@ -338,9 +338,27 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
             onPressed: _showMicTestDialog,
           ),
           IconButton(
-            icon: const Icon(Icons.volume_up_outlined),
-            tooltip: 'Nghe thử giọng mẫu',
-            onPressed: () => service.previewPersonaVoice(persona),
+            icon: Icon(
+              service.previewStatus.isPlaying ? Icons.stop_rounded : Icons.volume_up_outlined,
+            ),
+            tooltip: service.previewStatus.isPlaying ? 'Dừng phát giọng mẫu' : 'Nghe thử giọng mẫu',
+            onPressed: () async {
+              final messenger = ScaffoldMessenger.of(context);
+              if (service.previewStatus.isPlaying) {
+                await service.stopPersonaVoicePreview();
+              } else {
+                await service.previewPersonaVoice(persona);
+                if (mounted && service.previewStatus.message != null) {
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text(service.previewStatus.message!),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                }
+              }
+              if (mounted) setState(() {});
+            },
           ),
         ],
       ),
