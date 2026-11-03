@@ -1,36 +1,49 @@
-import '../../../curriculum/presentation/screens/curriculum_syllabus_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
-import '../../../hanzi_writing/hanzi_writing.dart';
-import '../../../placement_test/placement_test.dart';
-import '../../../pronunciation/pronunciation.dart';
-import '../../../shadowing/shadowing.dart';
-import '../../../reading/reading.dart';
-import '../../../dictionary/dictionary.dart';
-import '../../../roadmap/roadmap.dart';
-import '../../../grammar/grammar.dart';
-import '../../../practice/practice.dart';
-import '../../../listening/listening.dart';
 import '../../../content_packs/presentation/screens/content_pack_manager_screen.dart';
+import '../../../curriculum/domain/models/curriculum_models.dart';
+import '../../../curriculum/presentation/providers/curriculum_providers.dart';
+import '../../../curriculum/presentation/screens/curriculum_syllabus_screen.dart';
+import '../../../curriculum/presentation/screens/lesson_study_screen.dart';
+import '../../../dictionary/dictionary.dart';
+import '../../../grammar/grammar.dart';
+import '../../../hanzi_writing/hanzi_writing.dart';
+import '../../../listening/listening.dart';
+import '../../../placement_test/placement_test.dart';
+import '../../../practice/practice.dart';
+import '../../../pronunciation/pronunciation.dart';
+import '../../../reading/reading.dart';
+import '../../../roadmap/roadmap.dart'
+    hide CurriculumUnit, CurriculumLesson, LessonStatus;
+import '../../../shadowing/shadowing.dart';
 
-/// Tab 1: Learning Screen featuring structured lessons and HSK roadmap.
-class LearningScreen extends StatefulWidget {
+class LearningScreen extends ConsumerStatefulWidget {
   const LearningScreen({super.key});
 
   @override
-  State<LearningScreen> createState() => _LearningScreenState();
+  ConsumerState<LearningScreen> createState() => _LearningScreenState();
 }
 
-class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAliveClientMixin {
+class _LearningScreenState extends ConsumerState<LearningScreen>
+    with AutomaticKeepAliveClientMixin {
   String _selectedLevel = 'HSK 1';
 
   @override
   bool get wantKeepAlive => true;
 
+  int get _hskLevel {
+    final match = RegExp(r'\d+').firstMatch(_selectedLevel);
+    return match != null ? int.parse(match.group(0)!) : 1;
+  }
+
+  String get _curriculumId => CurriculumConstants.curriculumIdForLevel(_hskLevel);
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     final theme = Theme.of(context);
+    final unitsAsync = ref.watch(curriculumUnitsWithLessonsProvider(_curriculumId));
 
     return Scaffold(
       appBar: AppBar(
@@ -40,11 +53,15 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
             icon: const Icon(Icons.download_for_offline_outlined),
             tooltip: 'Kho học liệu HSK',
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const ContentPackManagerScreen(),
-                ),
-              );
+              Navigator.of(context)
+                  .push(
+                    MaterialPageRoute(
+                      builder: (_) => const ContentPackManagerScreen(),
+                    ),
+                  )
+                  .then((_) {
+                ref.invalidate(curriculumUnitsWithLessonsProvider(_curriculumId));
+              });
             },
           ),
         ],
@@ -53,65 +70,9 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
         child: ListView(
           padding: AppSpacing.screenPadding,
           children: [
-            // Official HSK 1 Curriculum Banner Card
-            HiCard(
-              backgroundColor: AppColors.primaryBlueLight,
-              borderColor: AppColors.secondaryBlue,
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryBlueDark,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      Icons.menu_book_rounded,
-                      color: Colors.white,
-                      size: 28,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Giáo Trình HSK 1 Chuẩn',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryBlueDark,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '15 bài học liên hoàn • 150 từ vựng • 45 ngữ pháp',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppColors.secondaryText,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  HiButton(
-                    text: 'Học ngay',
-                    size: HiButtonSize.sm,
-                    variant: HiButtonVariant.primary,
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const CurriculumSyllabusScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
+            _buildCurriculumBanner(context, unitsAsync),
             const SizedBox(height: AppSpacing.lg),
 
-            // Level Selector Chips
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -133,7 +94,6 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            // Placement Test Card
             _buildFeatureBanner(
               context: context,
               icon: Icons.auto_awesome_rounded,
@@ -150,7 +110,6 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
             ),
             const SizedBox(height: AppSpacing.sm),
 
-            // Adaptive Roadmap Card
             _buildFeatureBanner(
               context: context,
               icon: Icons.map_rounded,
@@ -167,7 +126,6 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
             ),
             const SizedBox(height: AppSpacing.sm),
 
-            // Hanzi Writing Practice Card
             _buildFeatureBanner(
               context: context,
               icon: Icons.brush_rounded,
@@ -184,7 +142,6 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
             ),
             const SizedBox(height: AppSpacing.sm),
 
-            // Pronunciation Lab & Shadowing Quick Access Row
             Row(
               children: [
                 Expanded(
@@ -224,7 +181,6 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
             ),
             const SizedBox(height: AppSpacing.sm),
 
-            // Reading Comprehension & Smart Dictionary Quick Access Row
             Row(
               children: [
                 Expanded(
@@ -264,7 +220,6 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
             ),
             const SizedBox(height: AppSpacing.sm),
 
-            // Grammar Module Banner Card
             _buildFeatureBanner(
               context: context,
               icon: Icons.auto_stories_rounded,
@@ -281,7 +236,6 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
             ),
             const SizedBox(height: AppSpacing.sm),
 
-            // Practice Engine Banner Card
             _buildFeatureBanner(
               context: context,
               icon: Icons.quiz_rounded,
@@ -298,7 +252,6 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
             ),
             const SizedBox(height: AppSpacing.sm),
 
-            // Listening Comprehension Banner Card
             _buildFeatureBanner(
               context: context,
               icon: Icons.headphones_rounded,
@@ -315,67 +268,224 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
             ),
             const SizedBox(height: AppSpacing.xl),
 
-            // Unit 1
-            Text(
-              'Chương 1: Khởi Đầu & Phát Âm Cơ Bản',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppColors.primaryText,
+            unitsAsync.when(
+              loading: () => const Padding(
+                padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
+                child: Center(
+                  child: Column(
+                    children: [
+                      HiLoadingIndicator(),
+                      SizedBox(height: AppSpacing.sm),
+                      Text('Đang nạp bài học...'),
+                    ],
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            _buildLessonCard(
-              unitNumber: 1,
-              title: 'Thanh điệu và phát âm Pinyin',
-              annotatedSnippet: '汉语[hànyǔ]，拼音[pīnyīn]',
-              vocabCount: 15,
-              status: HiChipStatus.success,
-              statusText: 'Đã hoàn thành',
-              progress: 1.0,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            _buildLessonCard(
-              unitNumber: 2,
-              title: 'Chào hỏi và Lời cảm ơn',
-              annotatedSnippet: '你好[nǐ hǎo]，谢谢[xièxie]！',
-              vocabCount: 12,
-              status: HiChipStatus.warning,
-              statusText: 'Đang học (60%)',
-              progress: 0.6,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            _buildLessonCard(
-              unitNumber: 3,
-              title: 'Gia đình và Con số',
-              annotatedSnippet: '爸爸[bàba]，妈妈[māma]',
-              vocabCount: 20,
-              status: HiChipStatus.neutral,
-              statusText: 'Chưa mở khóa',
-              progress: 0.0,
-            ),
-            const SizedBox(height: AppSpacing.xl),
+              error: (err, _) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                child: HiCard(
+                  backgroundColor: AppColors.error.withAlpha(20),
+                  borderColor: AppColors.error.withAlpha(80),
+                  child: Column(
+                    children: [
+                      const Icon(Icons.error_outline_rounded,
+                          color: AppColors.error, size: 36),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        'Không thể tải danh sách bài học $_selectedLevel',
+                        style: theme.textTheme.titleSmall,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        err.toString(),
+                        style: theme.textTheme.bodySmall,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      HiButton(
+                        text: 'Thử lại',
+                        size: HiButtonSize.sm,
+                        variant: HiButtonVariant.secondary,
+                        onPressed: () {
+                          ref.invalidate(
+                              curriculumUnitsWithLessonsProvider(_curriculumId));
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              data: (units) {
+                if (units.isEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                    child: HiCard(
+                      backgroundColor: AppColors.cardBackground,
+                      borderColor: AppColors.border,
+                      padding: const EdgeInsets.all(AppSpacing.xl),
+                      child: Column(
+                        children: [
+                          const Icon(
+                            Icons.inventory_2_outlined,
+                            size: 48,
+                            color: AppColors.secondaryText,
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          Text(
+                            'Chưa có học liệu cho $_selectedLevel',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            'Giáo trình và bài học của cấp độ này chưa được tải về máy. Hãy mở Kho học liệu để cài đặt gói bài học HSK.',
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppColors.secondaryText,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                          HiButton(
+                            text: 'Mở kho học liệu HSK',
+                            icon: const Icon(Icons.download_for_offline_outlined),
+                            variant: HiButtonVariant.primary,
+                            size: HiButtonSize.sm,
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .push(
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const ContentPackManagerScreen(),
+                                    ),
+                                  )
+                                  .then((_) {
+                                ref.invalidate(
+                                    curriculumUnitsWithLessonsProvider(_curriculumId));
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
 
-            // Unit 2
-            Text(
-              'Chương 2: Đời Sống Hàng Ngày',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppColors.primaryText,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            _buildLessonCard(
-              unitNumber: 4,
-              title: 'Ăn uống và Gọi món tại nhà hàng',
-              annotatedSnippet: '米饭[mǐfàn]，吃[chī]面条[miàntiáo]',
-              vocabCount: 18,
-              status: HiChipStatus.neutral,
-              statusText: 'Chưa mở khóa',
-              progress: 0.0,
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: units.map((unit) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Chương ${unit.orderIndex}: ${unit.titleVi}',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryText,
+                          ),
+                        ),
+                        if (unit.titleZh.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            unit.titleZh,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppColors.secondaryText,
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: AppSpacing.md),
+                        ...unit.lessons.map((lesson) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                            child: _buildLessonCard(context, lesson),
+                          );
+                        }),
+                        const SizedBox(height: AppSpacing.lg),
+                      ],
+                    );
+                  }).toList(),
+                );
+              },
             ),
             const SizedBox(height: AppSpacing.huge),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildCurriculumBanner(
+    BuildContext context,
+    AsyncValue<List<CurriculumUnit>> unitsAsync,
+  ) {
+    final theme = Theme.of(context);
+    final units = unitsAsync.value;
+    final totalLessons = units != null
+        ? units.fold<int>(0, (int sum, u) => sum + u.lessons.length)
+        : 0;
+
+    return HiCard(
+      backgroundColor: AppColors.primaryBlueLight,
+      borderColor: AppColors.secondaryBlue,
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            decoration: BoxDecoration(
+              color: AppColors.primaryBlueDark,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.menu_book_rounded,
+              color: Colors.white,
+              size: 28,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Giáo Trình $_selectedLevel Chuẩn',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryBlueDark,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  totalLessons > 0
+                      ? '$totalLessons bài học liên hoàn • Giáo trình chuẩn'
+                      : 'Giáo trình chuẩn quốc tế HSK',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.secondaryText,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppSpacing.xs),
+          HiButton(
+            text: 'Học ngay',
+            size: HiButtonSize.sm,
+            variant: HiButtonVariant.primary,
+            onPressed: () {
+              Navigator.of(context)
+                  .push(
+                    MaterialPageRoute(
+                      builder: (_) => CurriculumSyllabusScreen(
+                        curriculumId: _curriculumId,
+                        curriculumTitle: 'Giáo trình $_selectedLevel Chuẩn',
+                      ),
+                    ),
+                  )
+                  .then((_) {
+                ref.invalidate(curriculumUnitsWithLessonsProvider(_curriculumId));
+              });
+            },
+          ),
+        ],
       ),
     );
   }
@@ -452,14 +562,13 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
     final theme = Theme.of(context);
 
     return HiCard(
-      padding: const EdgeInsets.all(AppSpacing.md),
       backgroundColor: AppColors.cardBackground,
       borderColor: AppColors.border,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(6),
+            padding: const EdgeInsets.all(AppSpacing.xs),
             decoration: BoxDecoration(
               color: AppColors.primaryBlueLight,
               borderRadius: BorderRadius.circular(8),
@@ -498,22 +607,64 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
     );
   }
 
-  Widget _buildLessonCard({
-    required int unitNumber,
-    required String title,
-    required String annotatedSnippet,
-    required int vocabCount,
-    required HiChipStatus status,
-    required String statusText,
-    required double progress,
-  }) {
+  Widget _buildLessonCard(BuildContext context, CurriculumLesson lesson) {
     final theme = Theme.of(context);
+
+    int vocabCount = 0;
+    for (final seg in lesson.segments) {
+      if (seg.contentPayload != null && seg.contentPayload!['words'] is List) {
+        vocabCount += (seg.contentPayload!['words'] as List).length;
+      }
+    }
+
+    final double progress;
+    final HiChipStatus status;
+    final String statusText;
+
+    if (lesson.isLocked) {
+      progress = 0.0;
+      status = HiChipStatus.neutral;
+      statusText = 'Chưa mở khóa';
+    } else if (lesson.status == LessonStatus.completed ||
+        lesson.status == LessonStatus.mastered) {
+      progress = 1.0;
+      status = HiChipStatus.success;
+      statusText = 'Đã hoàn thành';
+    } else if (lesson.status == LessonStatus.inProgress) {
+      progress = (lesson.masteryScore > 0 ? lesson.masteryScore : 0.5)
+          .clamp(0.01, 0.99);
+      status = HiChipStatus.warning;
+      statusText = 'Đang học (${(progress * 100).toInt()}%)';
+    } else {
+      progress = 0.0;
+      status = HiChipStatus.info;
+      statusText = 'Chưa học';
+    }
 
     return HiCard(
       backgroundColor: AppColors.cardBackground,
       borderColor: AppColors.border,
       onTap: () {
-        HiSnackBar.showInfo(context, 'Mở bài học $unitNumber: $title');
+        if (lesson.isLocked) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Bài học đang bị khóa. Hãy hoàn thành đạt ≥ 80% các bài học tiên quyết.',
+              ),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        } else {
+          Navigator.of(context)
+              .push(
+                MaterialPageRoute(
+                  builder: (_) => LessonStudyScreen(lesson: lesson),
+                ),
+              )
+              .then((_) {
+            ref.invalidate(curriculumUnitsWithLessonsProvider(_curriculumId));
+          });
+        }
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -522,7 +673,7 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Bài $unitNumber',
+                'Bài ${lesson.orderIndex}',
                 style: theme.textTheme.labelMedium?.copyWith(
                   color: AppColors.primaryBlueDark,
                   fontWeight: FontWeight.bold,
@@ -536,17 +687,23 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            title,
+            lesson.titleVi,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.primaryText,
             ),
           ),
-          const SizedBox(height: AppSpacing.sm),
-          RubyText.fromAnnotatedString(
-            annotatedText: annotatedSnippet,
-            showPinyin: true,
-          ),
+          if (lesson.titleZh.isNotEmpty || lesson.pinyin.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              '${lesson.titleZh}${lesson.pinyin.isNotEmpty ? ' • ${lesson.pinyin}' : ''}',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppColors.primaryBlueDark,
+                fontWeight: FontWeight.w600,
+                fontFamilyFallback: const ['Noto Sans SC', 'Heiti SC'],
+              ),
+            ),
+          ],
           const SizedBox(height: AppSpacing.md),
           HiLinearProgress(value: progress),
           const SizedBox(height: AppSpacing.xs),
@@ -554,7 +711,7 @@ class _LearningScreenState extends State<LearningScreen> with AutomaticKeepAlive
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '$vocabCount từ vựng',
+                vocabCount > 0 ? '$vocabCount từ vựng' : '${lesson.estimatedMinutes} phút',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppColors.mutedText,
                 ),

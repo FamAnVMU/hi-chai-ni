@@ -112,6 +112,7 @@ class CurriculumLesson {
   final DateTime? completedAt;
   final String? creditedReason;
   final List<LessonSegment> segments;
+  final double masteryScore;
 
   const CurriculumLesson({
     required this.id,
@@ -128,9 +129,14 @@ class CurriculumLesson {
     this.completedAt,
     this.creditedReason,
     this.segments = const [],
+    this.masteryScore = 0.0,
   });
 
-  factory CurriculumLesson.fromMap(Map<String, dynamic> map, {List<LessonSegment> segments = const []}) {
+  factory CurriculumLesson.fromMap(
+    Map<String, dynamic> map, {
+    List<LessonSegment> segments = const [],
+    double? masteryScore,
+  }) {
     List<String> prereqs = [];
     if (map['prerequisites_json'] is String && (map['prerequisites_json'] as String).isNotEmpty) {
       final raw = map['prerequisites_json'] as String;
@@ -182,6 +188,7 @@ class CurriculumLesson {
       completedAt: compAt,
       creditedReason: map['credited_reason'] as String?,
       segments: segments,
+      masteryScore: masteryScore ?? (map['score'] as num?)?.toDouble() ?? (map['mastery_score'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }

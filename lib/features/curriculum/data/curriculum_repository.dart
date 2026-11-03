@@ -29,6 +29,41 @@ class CurriculumRepository {
     return maps.map((m) => CurriculumUnit.fromMap(m)).toList();
   }
 
+  Future<List<CurriculumUnit>> getUnitsWithLessons(String curriculumId) async {
+    final unitMaps = await _curriculumDao.getUnitsByCurriculumId(curriculumId);
+    if (unitMaps.isEmpty) return [];
+
+    final masteryMap = <String, double>{};
+    try {
+      final masteryRows = await _db.query(
+        DatabaseConstants.tableCurriculumMastery,
+        columns: ['item_id', 'score'],
+      );
+      for (final r in masteryRows) {
+        final itemId = r['item_id'] as String?;
+        if (itemId != null) {
+          masteryMap[itemId] = (r['score'] as num?)?.toDouble() ?? 0.0;
+        }
+      }
+    } catch (_) {}
+
+    final results = <CurriculumUnit>[];
+    for (final uMap in unitMaps) {
+      final unitId = uMap['id'] as String;
+      final lessonMaps = await _curriculumDao.getLessonsByUnitId(unitId);
+      final lessons = <CurriculumLesson>[];
+      for (final lMap in lessonMaps) {
+        final lessonId = lMap['id'] as String;
+        final segmentMaps = await _curriculumDao.getSegmentsByLessonId(lessonId);
+        final segments = segmentMaps.map((s) => LessonSegment.fromMap(s)).toList();
+        final score = masteryMap[lessonId] ?? 0.0;
+        lessons.add(CurriculumLesson.fromMap(lMap, segments: segments, masteryScore: score));
+      }
+      results.add(CurriculumUnit.fromMap(uMap, lessons: lessons));
+    }
+    return results;
+  }
+
   Future<List<CurriculumLesson>> getLessons(String unitId) async {
     final maps = await _curriculumDao.getLessonsByUnitId(unitId);
     final results = <CurriculumLesson>[];

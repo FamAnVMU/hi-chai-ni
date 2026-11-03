@@ -1,5 +1,8 @@
+import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../../../../core/audio/audio_player_service.dart';
+import '../../../../core/audio/tts_service.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../dictionary/presentation/widgets/quick_dictionary_sheet.dart';
 import '../../domain/srs_models.dart';
@@ -13,6 +16,8 @@ class FlashcardCard extends StatefulWidget {
   final VoidCallback onFlip;
   final VoidCallback onTogglePinyin;
   final VoidCallback? onPlayAudio;
+  final AudioPlayerService? audioPlayerOverride;
+  final TtsService? ttsServiceOverride;
 
   const FlashcardCard({
     super.key,
@@ -22,6 +27,8 @@ class FlashcardCard extends StatefulWidget {
     required this.onFlip,
     required this.onTogglePinyin,
     this.onPlayAudio,
+    this.audioPlayerOverride,
+    this.ttsServiceOverride,
   });
 
   @override
@@ -32,6 +39,10 @@ class _FlashcardCardState extends State<FlashcardCard>
     with SingleTickerProviderStateMixin {
   late final AnimationController _flipController;
   late final Animation<double> _flipAnimation;
+  late final AudioPlayerService _audioPlayer;
+  late final TtsService _ttsService;
+  late final bool _ownsAudioPlayer;
+  late final bool _ownsTts;
 
   @override
   void initState() {
@@ -45,11 +56,20 @@ class _FlashcardCardState extends State<FlashcardCard>
       parent: _flipController,
       curve: Curves.easeInOutCubic,
     );
+
+    _ownsAudioPlayer = widget.audioPlayerOverride == null;
+    _ownsTts = widget.ttsServiceOverride == null;
+    _audioPlayer = widget.audioPlayerOverride ?? DefaultAudioPlayerService();
+    _ttsService = widget.ttsServiceOverride ?? DefaultTtsService();
   }
 
   @override
   void didUpdateWidget(covariant FlashcardCard oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.card.id != oldWidget.card.id || widget.isFlipped != oldWidget.isFlipped) {
+      _audioPlayer.stop();
+      _ttsService.stop();
+    }
     if (widget.isFlipped != oldWidget.isFlipped) {
       if (widget.isFlipped) {
         _flipController.forward();
@@ -62,25 +82,56 @@ class _FlashcardCardState extends State<FlashcardCard>
   @override
   void dispose() {
     _flipController.dispose();
+    _audioPlayer.stop();
+    _ttsService.stop();
+    if (_ownsAudioPlayer) {
+      _audioPlayer.dispose();
+    }
+    if (_ownsTts) {
+      _ttsService.dispose();
+    }
     super.dispose();
   }
 
-  void _handleAudioPlayback(BuildContext context) {
+  Future<void> _handleAudioPlayback(BuildContext context) async {
     if (widget.onPlayAudio != null) {
       widget.onPlayAudio!();
       return;
     }
 
-    if (widget.card.audioUri != null && widget.card.audioUri!.isNotEmpty) {
-      HiSnackBar.showSuccess(
-        context,
-        'Đang phát âm thanh: ${widget.card.simplified} (${widget.card.pinyin})',
-      );
-    } else {
-      HiSnackBar.showInfo(
-        context,
-        'Chưa có file phát âm gốc cho từ "${widget.card.simplified}". Đang dùng bộ đọc hệ thống.',
-      );
+    await _audioPlayer.stop();
+    await _ttsService.stop();
+
+    bool playedWithAudio = false;
+    final audioUri = widget.card.audioUri;
+    if (audioUri != null && audioUri.isNotEmpty) {
+      final isLocalFile = !audioUri.startsWith('http') && !audioUri.startsWith('assets/');
+      final fileExists = isLocalFile ? File(audioUri).existsSync() : true;
+      if (fileExists) {
+        try {
+          await _audioPlayer.play(audioUri);
+          playedWithAudio = true;
+        } catch (_) {
+          playedWithAudio = false;
+        }
+      }
+    }
+
+    if (!playedWithAudio) {
+      try {
+        final isZhAvailable = await _ttsService.isLanguageAvailable('zh-CN');
+        if (isZhAvailable) {
+          await _ttsService.speak(widget.card.simplified, language: 'zh-CN');
+          return;
+        }
+      } catch (_) {}
+
+      if (context.mounted) {
+        HiSnackBar.showWarning(
+          context,
+          'Chưa có file âm thanh hoặc giọng đọc tiếng Trung cho từ "${widget.card.simplified}".',
+        );
+      }
     }
   }
 

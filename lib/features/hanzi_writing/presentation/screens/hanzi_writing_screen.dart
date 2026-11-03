@@ -272,6 +272,7 @@ class _HanziWritingScreenState extends ConsumerState<HanziWritingScreen> {
                     strokeData: strokeData,
                     highlightedStrokeOrder: _highlightedStrokeOrder,
                     size: canvasSize,
+                    onStepReplay: hasStrokeData ? _handleStepReplay : null,
                   );
                 },
               ),
