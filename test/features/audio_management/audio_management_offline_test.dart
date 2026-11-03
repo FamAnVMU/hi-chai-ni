@@ -13,10 +13,14 @@ import 'package:hi_chinese/features/audio_management/data/audio_coverage_auditor
 import 'package:hi_chinese/features/audio_management/data/audio_pack_downloader.dart';
 import 'package:hi_chinese/features/audio_management/data/audio_storage_manager.dart';
 import 'package:hi_chinese/features/audio_management/domain/models/audio_asset_manifest.dart';
+import '../../helpers/mock_audio_platform.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   setUpAll(() {
     sqfliteFfiInit();
+    MockAudioPlatformHelper.setupMockPlatformChannels();
   });
 
   group('Offline Audio Asset Management Tests (Tests C–H)', () {

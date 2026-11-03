@@ -3,15 +3,6 @@ import 'dart:io';
 import 'audio_models.dart';
 import 'audio_player_service.dart';
 
-class AudioPlaybackException implements Exception {
-  final String message;
-  final String uri;
-  const AudioPlaybackException(this.message, {this.uri = ''});
-
-  @override
-  String toString() => 'AudioPlaybackException($uri): $message';
-}
-
 /// Unified, lifecycle-safe, and singleton audio playback coordinator for HI Chinese.
 /// Ensures single-audio focus across Pinyin, Vocabulary, Listening, Reading, and Shadowing.
 class UnifiedAudioPlaybackService {
