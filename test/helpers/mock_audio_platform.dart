@@ -205,9 +205,7 @@ class MockAudioPlatformHelper {
           case 'stop':
             final tempDir = Directory.systemTemp;
             final testFile = File('${tempDir.path}/test_rec_output.m4a');
-            if (!testFile.existsSync()) {
-              testFile.writeAsBytesSync([0x00, 0x01, 0x02, 0x03]);
-            }
+            testFile.writeAsBytesSync(List.filled(512, 0x01));
             return testFile.path;
           case 'isRecording':
             return true;

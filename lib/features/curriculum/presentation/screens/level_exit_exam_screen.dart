@@ -1,78 +1,273 @@
+import 'dart:convert';
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/audio/audio_models.dart';
+import '../../../../core/audio/audio_player_service.dart';
 import '../../../../core/theme/theme.dart';
+import '../../data/curriculum_repository.dart';
+import '../providers/curriculum_providers.dart';
 
-class LevelExitExamScreen extends StatefulWidget {
+class LevelExitExamScreen extends ConsumerStatefulWidget {
   final String level;
   final Map<String, dynamic>? examPayload;
   final Map<String, dynamic>? examData;
+  final CurriculumRepository? repository;
+  final AudioPlayerService? audioPlayer;
 
   const LevelExitExamScreen({
     super.key,
     this.level = '1',
     this.examPayload,
     this.examData,
+    this.repository,
+    this.audioPlayer,
   });
 
   @override
-  State<LevelExitExamScreen> createState() => _LevelExitExamScreenState();
+  ConsumerState<LevelExitExamScreen> createState() => _LevelExitExamScreenState();
 }
 
-class _LevelExitExamScreenState extends State<LevelExitExamScreen> {
+class _LevelExitExamScreenState extends ConsumerState<LevelExitExamScreen> {
   final Map<String, String> _userAnswers = {};
+  bool _isLoading = true;
   bool _isSubmitted = false;
   int _score = 0;
   int _listenScore = 0;
   int _readScore = 0;
 
   static const int _totalScore = 200;
-  static const int _passingScore = 120; // 60% standard
+  int _passingScore = 120; // 60% standard
+  int _durationMinutes = 35;
+  String _title = '';
+
+  List<Map<String, dynamic>> _questions = [];
+  String? _playingQuestionId;
+  AudioPlayerService? _audioPlayer;
+  StreamSubscription<AudioPlaybackStatus>? _playerStatusSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _title = 'Đề Thi Tốt Nghiệp HSK ${widget.level}';
+    final directPayload = widget.examData ?? widget.examPayload;
+    if (directPayload != null) {
+      _parseAndSetExam(directPayload);
+      _isLoading = false;
+    }
+    _initAudioPlayer();
+    if (_isLoading) {
+      _loadExamData();
+    }
+  }
+
+  void _initAudioPlayer() {
+    _audioPlayer = widget.audioPlayer ?? DefaultAudioPlayerService();
+    _playerStatusSub = _audioPlayer?.statusStream.listen((status) {
+      if (status == AudioPlaybackStatus.completed ||
+          status == AudioPlaybackStatus.stopped ||
+          status == AudioPlaybackStatus.error) {
+        if (mounted) {
+          setState(() => _playingQuestionId = null);
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _playerStatusSub?.cancel();
+    _audioPlayer?.stop();
+    _audioPlayer?.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadExamData() async {
+    // 1. Direct payload passed in widget
+    final directPayload = widget.examData ?? widget.examPayload;
+    if (directPayload != null) {
+      _parseAndSetExam(directPayload);
+      if (mounted) setState(() => _isLoading = false);
+      return;
+    }
+
+    // 2. Load from SQLite via repository
+    final levelNum = int.tryParse(widget.level) ?? 1;
+    try {
+      CurriculumRepository? repo = widget.repository;
+      if (repo == null) {
+        try {
+          repo = ref.read(curriculumRepositoryProvider);
+        } catch (_) {}
+      }
+
+      if (repo != null) {
+        final dbRow = await repo.getExitExam(levelNum);
+        if (dbRow != null) {
+          _parseAndSetExam(dbRow);
+          if (_questions.isNotEmpty) {
+            if (mounted) setState(() => _isLoading = false);
+            return;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('[LevelExitExamScreen] Info: Repo load failed or not available: $e');
+    }
+
+    // 3. Fallback to asset content pack JSON
+    try {
+      final assetPath = 'assets/data/content_packs/hsk${widget.level}/hsk${widget.level}_pack_v1.json';
+      final jsonString = await rootBundle.loadString(assetPath);
+      final dynamic decoded = jsonDecode(jsonString);
+      if (decoded is Map<String, dynamic> && decoded['exit_exam'] is Map<String, dynamic>) {
+        _parseAndSetExam(decoded['exit_exam'] as Map<String, dynamic>);
+        if (_questions.isNotEmpty) {
+          if (mounted) setState(() => _isLoading = false);
+          return;
+        }
+      }
+    } catch (e) {
+      debugPrint('[LevelExitExamScreen] Info: Asset content pack load failed: $e');
+    }
+
+    // 4. Honest empty state: no mock fallback questions manufactured
+    if (mounted) {
+      setState(() {
+        _questions = [];
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _parseAndSetExam(Map<String, dynamic> payload) {
+    if (payload['title'] is String) {
+      _title = payload['title'] as String;
+    }
+    if (payload['duration_minutes'] is int) {
+      _durationMinutes = payload['duration_minutes'] as int;
+    }
+    if (payload['passing_score'] is int) {
+      _passingScore = payload['passing_score'] as int;
+    }
+
+    final parsedQuestions = <Map<String, dynamic>>[];
+
+    dynamic examPayload = payload['exam_data_json'] ?? payload;
+    if (examPayload is String) {
+      try {
+        examPayload = jsonDecode(examPayload);
+      } catch (_) {
+        examPayload = null;
+      }
+    }
+
+    if (examPayload is Map<String, dynamic>) {
+      if (examPayload['sections'] is List) {
+        for (final sec in (examPayload['sections'] as List)) {
+          if (sec is Map<String, dynamic>) {
+            final secName = (sec['name'] ?? '').toString().toLowerCase();
+            final defaultSection = secName.contains('listen') ? 'listening' : 'reading';
+            final qList = sec['questions'];
+            if (qList is List) {
+              for (final q in qList) {
+                if (q is Map<String, dynamic>) {
+                  final qMap = Map<String, dynamic>.from(q);
+                  qMap['section'] ??= defaultSection;
+                  parsedQuestions.add(qMap);
+                }
+              }
+            }
+          }
+        }
+      } else if (examPayload['questions'] is List) {
+        for (final q in (examPayload['questions'] as List)) {
+          if (q is Map<String, dynamic>) {
+            parsedQuestions.add(Map<String, dynamic>.from(q));
+          }
+        }
+      }
+    } else if (payload['questions'] is List) {
+      for (final q in (payload['questions'] as List)) {
+        if (q is Map<String, dynamic>) {
+          parsedQuestions.add(Map<String, dynamic>.from(q));
+        }
+      }
+    }
+
+    _questions = parsedQuestions;
+  }
+
+  Future<void> _submitExam() async {
+    final listeningQuestions = _questions.where((q) => q['section'] == 'listening').toList();
+    final readingQuestions = _questions.where((q) => q['section'] == 'reading').toList();
+
+    int listenCorrect = 0;
+    for (final q in listeningQuestions) {
+      if (_userAnswers[q['id']] == q['correct_answer']) listenCorrect++;
+    }
+    int readCorrect = 0;
+    for (final q in readingQuestions) {
+      if (_userAnswers[q['id']] == q['correct_answer']) readCorrect++;
+    }
+
+    final listenPoints = listeningQuestions.isNotEmpty
+        ? (listenCorrect / listeningQuestions.length * 100).round()
+        : 0;
+    final readPoints = readingQuestions.isNotEmpty
+        ? (readCorrect / readingQuestions.length * 100).round()
+        : 0;
+    final totalPoints = listenPoints + readPoints;
+    final isPassed = totalPoints >= _passingScore;
+
+    setState(() {
+      _listenScore = listenPoints;
+      _readScore = readPoints;
+      _score = totalPoints;
+      _isSubmitted = true;
+    });
+
+    // Persist to database atomically
+    try {
+      CurriculumRepository? repo = widget.repository;
+      if (repo == null) {
+        try {
+          repo = ref.read(curriculumRepositoryProvider);
+        } catch (_) {}
+      }
+
+      if (repo != null) {
+        final levelNum = int.tryParse(widget.level) ?? 1;
+        await repo.recordExitExamSubmission(
+          hskLevel: levelNum,
+          score: totalPoints,
+          totalScore: _totalScore,
+          listenScore: listenPoints,
+          readScore: readPoints,
+          isPassed: isPassed,
+          durationSeconds: _durationMinutes * 60,
+          itemsCount: _questions.length,
+        );
+      }
+    } catch (e) {
+      debugPrint('[LevelExitExamScreen] Warning: Failed to record exit exam submission: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final activePayload = widget.examData ?? widget.examPayload;
-    final title = (activePayload?['title'] as String?) ?? 'Đề Thi Tốt Nghiệp HSK ${widget.level}';
-    final duration = (activePayload?['duration_minutes'] as int?) ?? 35;
 
-    final rawQuestions = (activePayload?['questions'] as List<dynamic>?) ?? [];
-    List<Map<String, dynamic>> questions = rawQuestions.map((e) => e as Map<String, dynamic>).toList();
-
-    // Fallback authentic simulated mock exam if payload not loaded yet
-    if (questions.isEmpty) {
-      questions = [
-        {
-          'id': 'exam_l1',
-          'section': 'listening',
-          'prompt': '[Nghe audio] "你好！" - Người nói đang chào hỏi đối phương.',
-          'options': ['Đúng', 'Sai'],
-          'correct_answer': 'Đúng',
-        },
-        {
-          'id': 'exam_l2',
-          'section': 'listening',
-          'prompt': '[Nghe audio] "他在学校学习汉语。" - Người này đang học tiếng Anh.',
-          'options': ['Đúng', 'Sai'],
-          'correct_answer': 'Sai',
-        },
-        {
-          'id': 'exam_r1',
-          'section': 'reading',
-          'prompt': 'Chọn từ thích hợp điền vào chỗ trống: 我 ____ 中国人。',
-          'options': ['是', '有', '在', '很'],
-          'correct_answer': '是',
-        },
-        {
-          'id': 'exam_r2',
-          'section': 'reading',
-          'prompt': 'Từ nào sau đây có nghĩa là "uống nước"?',
-          'options': ['喝水', '吃菜', '看书', '买米'],
-          'correct_answer': '喝水',
-        },
-      ];
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: Text(_title)),
+        body: const Center(child: CircularProgressIndicator()),
+      );
     }
 
-    final listeningQuestions = questions.where((q) => q['section'] == 'listening').toList();
-    final readingQuestions = questions.where((q) => q['section'] == 'reading').toList();
+    final listeningQuestions = _questions.where((q) => q['section'] == 'listening').toList();
+    final readingQuestions = _questions.where((q) => q['section'] == 'reading').toList();
 
     if (_isSubmitted) {
       final isPassed = _score >= _passingScore;
@@ -132,11 +327,24 @@ class _LevelExitExamScreenState extends State<LevelExitExamScreen> {
                     const Divider(color: AppColors.divider),
                     _buildScoreRow('Phần 2: Đọc hiểu', '$_readScore / 100 điểm'),
                     const Divider(color: AppColors.divider),
-                    _buildScoreRow('Điểm chuẩn đạt HSK 1', '$_passingScore điểm'),
+                    _buildScoreRow('Điểm chuẩn đạt HSK ${widget.level}', '$_passingScore điểm'),
                   ],
                 ),
               ),
-              const SizedBox(height: AppSpacing.xxl),
+              const SizedBox(height: AppSpacing.xl),
+
+              // Detailed question review
+              Text(
+                'Chi Tiết Từng Câu Hỏi (${_questions.length} câu)',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryText,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              ..._questions.map((q) => _buildReviewCard(q)),
+
+              const SizedBox(height: AppSpacing.xl),
               HiButton(
                 text: 'Trở về trang giáo trình',
                 isFullWidth: true,
@@ -144,6 +352,7 @@ class _LevelExitExamScreenState extends State<LevelExitExamScreen> {
                 size: HiButtonSize.lg,
                 onPressed: () => Navigator.of(context).pop(isPassed),
               ),
+              const SizedBox(height: AppSpacing.xxl),
             ],
           ),
         ),
@@ -152,7 +361,7 @@ class _LevelExitExamScreenState extends State<LevelExitExamScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(_title),
         actions: [
           Container(
             margin: const EdgeInsets.only(right: AppSpacing.md),
@@ -166,7 +375,7 @@ class _LevelExitExamScreenState extends State<LevelExitExamScreen> {
                 const Icon(Icons.timer_outlined, size: 16, color: AppColors.primaryBlueDark),
                 const SizedBox(width: 4),
                 Text(
-                  '$duration:00',
+                  '$_durationMinutes:00',
                   style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryBlueDark),
                 ),
               ],
@@ -174,70 +383,71 @@ class _LevelExitExamScreenState extends State<LevelExitExamScreen> {
           ),
         ],
       ),
-      body: ListView(
-        padding: AppSpacing.screenPadding,
-        children: [
-          // Section 1: Listening
-          if (listeningQuestions.isNotEmpty) ...[
-            Text(
-              'Phần 1: Nghe hiểu',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppColors.primaryText,
+      body: _questions.isEmpty
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.xl),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.assignment_late_outlined, size: 56, color: AppColors.mutedText),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(
+                      'Chưa có dữ liệu đề thi tốt nghiệp cho HSK ${widget.level}',
+                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      'Vui lòng tải hoặc cập nhật Content Pack HSK ${widget.level} trong kho dữ liệu để bắt đầu bài thi chính thức.',
+                      style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.secondaryText),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
+            )
+          : ListView(
+              padding: AppSpacing.screenPadding,
+              children: [
+                // Section 1: Listening
+                if (listeningQuestions.isNotEmpty) ...[
+                  Text(
+                    'Phần 1: Nghe hiểu',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryText,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  ...listeningQuestions.map((q) => _buildQuestionCard(q)),
+                  const SizedBox(height: AppSpacing.lg),
+                ],
+
+                // Section 2: Reading
+                if (readingQuestions.isNotEmpty) ...[
+                  Text(
+                    'Phần 2: Đọc hiểu',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryText,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  ...readingQuestions.map((q) => _buildQuestionCard(q)),
+                  const SizedBox(height: AppSpacing.lg),
+                ],
+
+                const SizedBox(height: AppSpacing.md),
+                HiButton(
+                  text: 'Nộp bài thi',
+                  isFullWidth: true,
+                  size: HiButtonSize.lg,
+                  onPressed: _questions.isEmpty ? null : _submitExam,
+                ),
+                const SizedBox(height: AppSpacing.xxl),
+              ],
             ),
-            const SizedBox(height: AppSpacing.sm),
-            ...listeningQuestions.map((q) => _buildQuestionCard(q)),
-            const SizedBox(height: AppSpacing.lg),
-          ],
-
-          // Section 2: Reading
-          if (readingQuestions.isNotEmpty) ...[
-            Text(
-              'Phần 2: Đọc hiểu',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppColors.primaryText,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            ...readingQuestions.map((q) => _buildQuestionCard(q)),
-            const SizedBox(height: AppSpacing.lg),
-          ],
-
-          const SizedBox(height: AppSpacing.md),
-          HiButton(
-            text: 'Nộp bài thi',
-            isFullWidth: true,
-            size: HiButtonSize.lg,
-            onPressed: () {
-              int listenCorrect = 0;
-              for (final q in listeningQuestions) {
-                if (_userAnswers[q['id']] == q['correct_answer']) listenCorrect++;
-              }
-              int readCorrect = 0;
-              for (final q in readingQuestions) {
-                if (_userAnswers[q['id']] == q['correct_answer']) readCorrect++;
-              }
-
-              final listenPoints = listeningQuestions.isNotEmpty
-                  ? (listenCorrect / listeningQuestions.length * 100).round()
-                  : 50;
-              final readPoints = readingQuestions.isNotEmpty
-                  ? (readCorrect / readingQuestions.length * 100).round()
-                  : 50;
-
-              setState(() {
-                _listenScore = listenPoints;
-                _readScore = readPoints;
-                _score = listenPoints + readPoints;
-                _isSubmitted = true;
-              });
-            },
-          ),
-          const SizedBox(height: AppSpacing.xxl),
-        ],
-      ),
     );
   }
 
@@ -272,10 +482,12 @@ class _LevelExitExamScreenState extends State<LevelExitExamScreen> {
 
   Widget _buildQuestionCard(Map<String, dynamic> q) {
     final theme = Theme.of(context);
-    final qId = q['id'] as String;
+    final qId = (q['id'] ?? '').toString();
     final prompt = (q['prompt'] ?? '') as String;
+    final audioUri = q['audio_uri'] as String?;
     final options = ((q['options'] as List<dynamic>?) ?? []).map((e) => e.toString()).toList();
     final selected = _userAnswers[qId];
+    final isPlaying = _playingQuestionId == qId;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -292,6 +504,42 @@ class _LevelExitExamScreenState extends State<LevelExitExamScreen> {
                 color: AppColors.primaryText,
               ),
             ),
+            if (audioUri != null && audioUri.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.sm),
+              OutlinedButton.icon(
+                icon: Icon(
+                  isPlaying ? Icons.stop_rounded : Icons.volume_up_rounded,
+                  size: 18,
+                  color: AppColors.primaryBlueDark,
+                ),
+                label: Text(
+                  isPlaying ? 'Đang phát âm thanh...' : 'Nghe audio câu hỏi',
+                  style: const TextStyle(fontSize: 13, color: AppColors.primaryBlueDark),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.primaryBlueDark),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                onPressed: () async {
+                  if (isPlaying) {
+                    await _audioPlayer?.stop();
+                    setState(() => _playingQuestionId = null);
+                  } else {
+                    setState(() => _playingQuestionId = qId);
+                    try {
+                      await _audioPlayer?.play(audioUri);
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Lỗi phát âm thanh: $e')),
+                        );
+                        setState(() => _playingQuestionId = null);
+                      }
+                    }
+                  }
+                },
+              ),
+            ],
             const SizedBox(height: AppSpacing.md),
             ...options.map((opt) {
               final isChosen = selected == opt;
@@ -337,6 +585,72 @@ class _LevelExitExamScreenState extends State<LevelExitExamScreen> {
                 ),
               );
             }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReviewCard(Map<String, dynamic> q) {
+    final theme = Theme.of(context);
+    final qId = (q['id'] ?? '').toString();
+    final prompt = (q['prompt'] ?? '') as String;
+    final correctAnswer = (q['correct_answer'] ?? '').toString();
+    final userAnswer = _userAnswers[qId];
+    final isCorrect = userAnswer == correctAnswer;
+    final explanation = (q['explanation'] ?? q['explanationVi'] ?? '') as String;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: HiCard(
+        backgroundColor: isCorrect ? AppColors.cardBackground : AppColors.errorContainerLight.withAlpha(50),
+        borderColor: isCorrect ? AppColors.success.withAlpha(120) : AppColors.error.withAlpha(120),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  isCorrect ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                  color: isCorrect ? AppColors.success : AppColors.error,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    prompt,
+                    style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              'Đáp án của bạn: ${userAnswer ?? "(Chưa chọn)"}',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: isCorrect ? AppColors.success : AppColors.error,
+              ),
+            ),
+            if (!isCorrect) ...[
+              const SizedBox(height: 2),
+              Text(
+                'Đáp án đúng: $correctAnswer',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.success,
+                ),
+              ),
+            ],
+            if (explanation.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              Text(
+                'Giải thích: $explanation',
+                style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+              ),
+            ],
           ],
         ),
       ),

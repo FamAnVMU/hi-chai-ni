@@ -150,13 +150,20 @@ class DefaultAudioPlayerService implements AudioPlayerService {
       _updateStatus(AudioPlaybackStatus.buffering);
 
       ja.AudioSource source;
-      if (uri.startsWith('assets/')) {
-        source = ja.AudioSource.asset(uri);
-      } else if (uri.startsWith('http://') || uri.startsWith('https://')) {
-        source = ja.AudioSource.uri(Uri.parse(uri));
+      String cleanUri = uri;
+      if (cleanUri.startsWith('asset:///')) {
+        cleanUri = cleanUri.replaceFirst('asset:///', '');
+      } else if (cleanUri.startsWith('asset://')) {
+        cleanUri = cleanUri.replaceFirst('asset://', '');
+      }
+
+      if (cleanUri.startsWith('assets/')) {
+        source = ja.AudioSource.asset(cleanUri);
+      } else if (cleanUri.startsWith('http://') || cleanUri.startsWith('https://')) {
+        source = ja.AudioSource.uri(Uri.parse(cleanUri));
       } else {
         // Local file
-        String cleanPath = uri;
+        String cleanPath = cleanUri;
         if (cleanPath.startsWith('file://')) {
           cleanPath = Uri.parse(cleanPath).toFilePath();
         }

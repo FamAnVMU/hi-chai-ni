@@ -17,13 +17,25 @@ class _ListeningScreenState extends ConsumerState<ListeningScreen> {
   void initState() {
     super.initState();
     _notifier = ref.read(listeningPlaybackProvider.notifier);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final lesson = ref.read(activeListeningLessonProvider);
+      if (lesson != null) {
+        _notifier.resetForLesson(lesson.audioUrl, lesson.durationSeconds);
+      }
+    });
   }
 
   @override
   void dispose() {
-    // Safety: Halt audio playback when leaving screen
-    _notifier.setPlaying(false);
+    // Safety: Stop audio playback when leaving screen
+    _notifier.stop();
     super.dispose();
+  }
+
+  String _formatDuration(Duration d) {
+    final minutes = d.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = d.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
   }
 
   @override
@@ -82,67 +94,113 @@ class _ListeningScreenState extends ConsumerState<ListeningScreen> {
             const SizedBox(height: AppSpacing.md),
 
             // Audio Player Controls Card
-            HiCard(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+            Builder(
+              builder: (context) {
+                final posMs = playbackState.position.inMilliseconds.toDouble();
+                final totalDuration = playbackState.totalDuration > Duration.zero
+                    ? playbackState.totalDuration
+                    : Duration(seconds: activeLesson.durationSeconds);
+                final totalMs = totalDuration.inMilliseconds.toDouble();
+                final sliderValue = totalMs > 0 ? (posMs / totalMs).clamp(0.0, 1.0) : 0.0;
+
+                return HiCard(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: Column(
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.replay_5_rounded),
-                        onPressed: () {
-                          // Replay 5 seconds
-                        },
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      CircleAvatar(
-                        radius: 28,
-                        backgroundColor: AppColors.primaryBlueDark,
-                        child: IconButton(
-                          icon: Icon(
-                            playbackState.isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                            color: Colors.white,
-                            size: 32,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.replay_5_rounded),
+                            tooltip: 'Lùi 5 giây',
+                            onPressed: () => notifier.rewind5Seconds(),
                           ),
-                          onPressed: notifier.togglePlay,
+                          const SizedBox(width: AppSpacing.sm),
+                          CircleAvatar(
+                            radius: 28,
+                            backgroundColor: AppColors.primaryBlueDark,
+                            child: playbackState.isBuffering
+                                ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : IconButton(
+                                    icon: Icon(
+                                      playbackState.isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                                      color: Colors.white,
+                                      size: 32,
+                                    ),
+                                    tooltip: playbackState.isPlaying ? 'Tạm dừng' : 'Phát âm thanh',
+                                    onPressed: () => notifier.togglePlay(activeLesson.audioUrl),
+                                  ),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          // Speed chips
+                          Wrap(
+                            spacing: 4,
+                            children: [0.8, 1.0, 1.2].map((spd) {
+                              final isSelected = (playbackState.playbackSpeed - spd).abs() < 0.05;
+                              return ChoiceChip(
+                                label: Text('${spd}x', style: const TextStyle(fontSize: 11)),
+                                selected: isSelected,
+                                onSelected: (selected) {
+                                  if (selected) notifier.setPlaybackSpeed(spd);
+                                },
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Row(
+                        children: [
+                          Text(_formatDuration(playbackState.position), style: const TextStyle(fontSize: 11)),
+                          Expanded(
+                            child: Slider(
+                              value: sliderValue,
+                              onChanged: (val) {
+                                final targetMs = (val * totalMs).round();
+                                notifier.seek(Duration(milliseconds: targetMs));
+                              },
+                            ),
+                          ),
+                          Text(
+                            _formatDuration(totalDuration),
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                        ],
+                      ),
+                      if (playbackState.errorMessage != null) ...[
+                        const SizedBox(height: AppSpacing.xs),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: AppColors.errorContainerLight,
+                            borderRadius: BorderRadius.circular(AppRadius.xs),
+                            border: Border.all(color: AppColors.error.withAlpha(100)),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.error_outline, size: 16, color: AppColors.error),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  playbackState.errorMessage!,
+                                  style: const TextStyle(fontSize: 12, color: AppColors.error),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      // Speed chips
-                      Wrap(
-                        spacing: 4,
-                        children: [0.8, 1.0, 1.2].map((spd) {
-                          final isSelected = (playbackState.playbackSpeed - spd).abs() < 0.05;
-                          return ChoiceChip(
-                            label: Text('${spd}x', style: const TextStyle(fontSize: 11)),
-                            selected: isSelected,
-                            onSelected: (selected) {
-                              if (selected) notifier.setPlaybackSpeed(spd);
-                            },
-                          );
-                        }).toList(),
-                      ),
+                      ],
                     ],
                   ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Row(
-                    children: [
-                      const Text('00:00', style: TextStyle(fontSize: 11)),
-                      Expanded(
-                        child: Slider(
-                          value: 0.0,
-                          onChanged: (_) {},
-                        ),
-                      ),
-                      Text(
-                        '00:${activeLesson.durationSeconds.toString().padLeft(2, '0')}',
-                        style: const TextStyle(fontSize: 11),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                );
+              },
             ),
             const SizedBox(height: AppSpacing.md),
 

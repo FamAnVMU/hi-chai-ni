@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hi_chinese/core/theme/theme.dart';
 import 'package:hi_chinese/core/utils/permission_helper.dart';
 import 'package:hi_chinese/features/pronunciation/pronunciation.dart';
+import '../../helpers/mock_audio_platform.dart';
 
 class FakePronunciationRepository implements PronunciationRepository {
   final List<PronunciationAssessmentResult> recorded = [];
@@ -37,9 +38,15 @@ class FakePronunciationRepository implements PronunciationRepository {
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   late FakePronunciationRepository fakeRepo;
 
+  setUpAll(() {
+    MockAudioPlatformHelper.setupMockPlatformChannels();
+  });
+
   setUp(() {
+    MockAudioPlatformHelper.reset();
     fakeRepo = FakePronunciationRepository();
     PermissionHelper.mockPermissionResult = AudioPermissionResult.granted;
   });

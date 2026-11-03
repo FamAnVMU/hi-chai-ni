@@ -47,6 +47,15 @@ class PronunciationTarget {
   });
 }
 
+/// Status of pronunciation evaluation attempt.
+enum PronunciationEvaluationStatus {
+  success,
+  failed,
+  unsupported,
+  pending,
+  insufficientAudio,
+}
+
 /// Confidence level of ASR / speech analysis.
 enum PronunciationConfidence {
   low,
@@ -61,8 +70,9 @@ class PronunciationAssessmentResult {
   final String targetText;
   final String targetPinyin;
   final String? recognizedTranscript;
-  final double? overallScore; // Nullable if provider does not support scoring
+  final double? overallScore; // Nullable if provider does not support scoring or offline
   final PronunciationConfidence confidence;
+  final PronunciationEvaluationStatus status;
 
   /// Crucial academic honesty flag:
   /// True ONLY if an acoustic pitch / tone model actually analyzed the waveform.
@@ -83,6 +93,7 @@ class PronunciationAssessmentResult {
     this.recognizedTranscript,
     this.overallScore,
     this.confidence = PronunciationConfidence.medium,
+    this.status = PronunciationEvaluationStatus.success,
     required this.isAcousticallyAnalyzed,
     this.toneAccuracy,
     this.initialFinalAccuracy,
@@ -107,6 +118,7 @@ class PronunciationAssessmentResult {
         'recognized_transcript': recognizedTranscript,
         'overall_score': overallScore,
         'confidence': confidence.name,
+        'status': status.name,
         'is_acoustically_analyzed': isAcousticallyAnalyzed,
         'tone_accuracy': toneAccuracy,
         'initial_final_accuracy': initialFinalAccuracy,
