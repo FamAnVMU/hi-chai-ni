@@ -6,6 +6,7 @@ import 'package:hi_chinese/core/constants/app_constants.dart';
 import 'package:hi_chinese/core/startup/app_startup_provider.dart';
 import 'package:hi_chinese/features/home/home.dart';
 import 'package:hi_chinese/core/utils/app_lifecycle_manager.dart';
+import 'package:hi_chinese/features/onboarding/presentation/providers/onboarding_providers.dart';
 import 'package:hi_chinese/main.dart';
 
 class _TestAppStartupNotifier extends AppStartupNotifier {
@@ -22,6 +23,17 @@ class _TestAppStartupNotifier extends AppStartupNotifier {
   }) async {}
 }
 
+class _TestOnboardingNotifier extends OnboardingNotifier {
+  @override
+  OnboardingState build() {
+    return const OnboardingState(
+      isLoading: false,
+      isCompleted: true,
+      currentStep: OnboardingStep.completed,
+    );
+  }
+}
+
 void main() {
   testWidgets('HiChineseApp renders successfully with AppShell and 5 tabs', (WidgetTester tester) async {
     // Build app widget wrapped with ProviderScope for Riverpod ThemeModeNotifier
@@ -29,6 +41,7 @@ void main() {
       ProviderScope(
         overrides: [
           appStartupProvider.overrideWith(_TestAppStartupNotifier.new),
+          onboardingProvider.overrideWith(_TestOnboardingNotifier.new),
         ],
         child: const HiChineseApp(),
       ),
@@ -57,14 +70,13 @@ void main() {
 
     manager.registerAudioSession(onMustStop);
 
-    // Simulate app going to background (e.g. incoming call or switching app)
     manager.didChangeAppLifecycleState(AppLifecycleState.paused);
-
-    expect(stopReason, isNotNull);
     expect(stopReason, contains('App backgrounded'));
 
-    // Cleanup
+    stopReason = null;
+    manager.didChangeAppLifecycleState(AppLifecycleState.detached);
+    expect(stopReason, contains('App detached'));
+
     manager.unregisterAudioSession(onMustStop);
-    manager.dispose();
   });
 }

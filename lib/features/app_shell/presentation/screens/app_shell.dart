@@ -5,16 +5,13 @@ import '../../../../core/theme/theme.dart';
 import '../../../ai_tutor/presentation/screens/ai_tutor_tab_screen.dart';
 import '../../../home/presentation/screens/home_screen.dart';
 import '../../../learning/presentation/screens/learning_screen.dart';
+import '../../../onboarding/presentation/providers/onboarding_providers.dart';
+import '../../../onboarding/presentation/screens/onboarding_flow_screen.dart';
 import '../../../profile/presentation/screens/profile_screen.dart';
 import '../../../review/presentation/screens/review_screen.dart';
 import '../providers/app_shell_providers.dart';
 import '../widgets/hi_bottom_nav_bar.dart';
 
-/// The Root Application Shell for HI Chinese containing:
-/// 1. App Startup & SQLite DB readiness handling.
-/// 2. 5-tab IndexedStack preserving state and scroll position.
-/// 3. Prominent center AI Tutor action tab.
-/// 4. Android back button navigation with PopScope and unsaved changes confirmation.
 class AppShell extends ConsumerWidget {
   const AppShell({super.key});
 
@@ -58,7 +55,17 @@ class AppShell extends ConsumerWidget {
       );
     }
 
-    // 3. Main 5-Tab Shell
+    // 3. Onboarding Gate check
+    final onboardingState = ref.watch(onboardingProvider);
+    if (!onboardingState.isCompleted) {
+      return OnboardingFlowScreen(
+        onOnboardingComplete: () {
+          ref.read(selectedTabProvider.notifier).selectTab(AppTab.home);
+        },
+      );
+    }
+
+    // 4. Main 5-Tab Shell
     final currentTab = ref.watch(selectedTabProvider);
     final hasUnsavedChanges = ref.watch(hasUnsavedChangesProvider);
 

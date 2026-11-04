@@ -1,3 +1,4 @@
+import 'package:hi_chinese/features/onboarding/presentation/providers/onboarding_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -45,6 +46,9 @@ void main() {
         ),
         microphoneStatusProvider.overrideWith(
           (ref) => Future.value(PermissionStatus.granted),
+        ),
+        onboardingProvider.overrideWith(
+          () => _MockOnboardingNotifier(),
         ),
       ],
       child: Consumer(
@@ -157,6 +161,9 @@ void main() {
               () => _MockAppStartupNotifier(
                 const AppStartupState(isInitializing: false, isReady: true),
               ),
+            ),
+            onboardingProvider.overrideWith(
+              () => _MockOnboardingNotifier(),
             ),
           ],
           child: Consumer(
@@ -341,4 +348,15 @@ class _MockSrsDueCountNotifier extends SrsDueCountNotifier {
 class _MockUserProfileNotifier extends UserProfileNotifier {
   @override
   Future<UserProfile> build() async => UserProfile.defaultProfile();
+}
+
+class _MockOnboardingNotifier extends OnboardingNotifier {
+  @override
+  OnboardingState build() {
+    return const OnboardingState(
+      isLoading: false,
+      isCompleted: true,
+      currentStep: OnboardingStep.completed,
+    );
+  }
 }

@@ -9,14 +9,14 @@ void main() {
       final registry = AiModelRegistry();
 
       final chatConfig = registry.getConfigForTask(AiTaskType.chatTutor);
-      expect(chatConfig.modelId, equals(AiModelRegistry.modelGemini35FlashLite));
+      expect(chatConfig.modelId, equals(AiModelRegistry.modelGemini25FlashLite));
       expect(chatConfig.supportsStreaming, isTrue);
 
       final grammarConfig = registry.getConfigForTask(AiTaskType.grammarCorrection);
-      expect(grammarConfig.modelId, equals(AiModelRegistry.modelGemini38Flash));
+      expect(grammarConfig.modelId, equals(AiModelRegistry.modelGemini25Flash));
 
       final dictConfig = registry.getConfigForTask(AiTaskType.dictionaryExplanation);
-      expect(dictConfig.modelId, equals(AiModelRegistry.modelGemini35FlashLite));
+      expect(dictConfig.modelId, equals(AiModelRegistry.modelGemini25FlashLite));
       expect(dictConfig.temperature, equals(0.2)); // Deterministic
     });
 
@@ -66,7 +66,7 @@ void main() {
       expect(response.finishReason, equals('STOP'));
       expect(response.usageMetadata, isNotNull);
       expect(response.usageMetadata!.totalTokenCount, greaterThan(0));
-      expect(response.modelUsed, equals(AiModelRegistry.modelGemini35FlashLite));
+      expect(response.modelUsed, equals(AiModelRegistry.modelGemini25FlashLite));
     });
 
     test('2. Streaming receives sequential chunks incrementally', () async {

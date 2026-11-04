@@ -34,6 +34,8 @@ void main() {
       // Verify Skip button exists and functions
       final skipBtn = find.text('Bỏ qua để học ngoại tuyến');
       expect(skipBtn, findsOneWidget);
+      await tester.ensureVisible(skipBtn);
+      await tester.pumpAndSettle();
       await tester.tap(skipBtn);
       await tester.pumpAndSettle();
 

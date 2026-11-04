@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sqflite/sqflite.dart';
-import '../../../../core/database/app_database.dart';
-import '../../../../core/database/database_constants.dart';
-import '../../../../core/network/ai/ai_service.dart';
+import '../../../../core/network/ai/models/ai_model_config.dart';
 import '../../../../core/network/ai/security/ai_credential_storage.dart';
 import '../../../placement_test/presentation/screens/placement_test_intro_screen.dart';
+import '../providers/onboarding_providers.dart';
 import 'onboarding_api_key_screen.dart';
 import 'onboarding_personalization_screen.dart';
 
-class OnboardingFlowScreen extends ConsumerStatefulWidget {
+class OnboardingFlowScreen extends ConsumerWidget {
   final VoidCallback onOnboardingComplete;
   final AiCredentialStorage? credentialStorageOverride;
 
@@ -20,112 +18,71 @@ class OnboardingFlowScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<OnboardingFlowScreen> createState() => _OnboardingFlowScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final onboardingState = ref.watch(onboardingProvider);
+    final notifier = ref.read(onboardingProvider.notifier);
 
-class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
-  int _currentStepIndex = 0;
-
-  AiCredentialStorage get _storage =>
-      widget.credentialStorageOverride ?? ref.read(aiCredentialStorageProvider);
-
-  Future<bool> _onApiKeySaved(String apiKey) async {
-    final cleanKey = apiKey.trim();
-    if (cleanKey.isEmpty) {
-      setState(() => _currentStepIndex = 1);
-      return true;
-    }
-
-    final validationError = AiCredentialStorage.validateApiKey(cleanKey);
-    if (validationError != null) {
-      debugPrint('[Onboarding] API Key validation failed: $validationError');
-      return false;
-    }
-
-    try {
-      // 1. Save to secure storage and verify read-back
-      await _storage.saveApiKey(cleanKey);
-
-      // 2. Read back credential immediately to confirm persistence
-      final verifiedKey = await _storage.getApiKey();
-      if (verifiedKey == null || verifiedKey != cleanKey) {
-        debugPrint('[Onboarding] Read-back verification failed for API key.');
-        return false;
-      }
-
-      if (mounted) {
-        setState(() => _currentStepIndex = 1);
-      }
-      return true;
-    } catch (e) {
-      debugPrint('[Onboarding] Error securely saving API key: $e');
-      return false;
-    }
-  }
-
-  void _onSkipApiKey() {
-    setState(() => _currentStepIndex = 1);
-  }
-
-  void _onPlacementTestFinished([int? hskLevel]) {
-    setState(() => _currentStepIndex = 2);
-  }
-
-  void _onPersonalizationComplete(int dailyMinutes, String focusSkill) async {
-    final db = AppDatabase.instance.database;
-    final nowIso = DateTime.now().toUtc().toIso8601String();
-
-    // Persist to user profiles & app settings idempotently
-    await db.transaction((txn) async {
-      await txn.insert(
-        DatabaseConstants.tableAppSettings,
-        {
-          'key': 'daily_learning_minutes',
-          'value': dailyMinutes.toString(),
-          'updated_at': nowIso,
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-      await txn.insert(
-        DatabaseConstants.tableAppSettings,
-        {
-          'key': 'priority_focus_skill',
-          'value': focusSkill,
-          'updated_at': nowIso,
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-      await txn.insert(
-        DatabaseConstants.tableAppSettings,
-        {
-          'key': 'onboarding_completed',
-          'value': 'true',
-          'updated_at': nowIso,
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    });
-
-    widget.onOnboardingComplete();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_currentStepIndex == 0) {
-      return OnboardingApiKeyScreen(
-        onSkip: _onSkipApiKey,
-        onSaveApiKey: _onApiKeySaved,
+    if (onboardingState.isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
       );
     }
 
-    if (_currentStepIndex == 1) {
-      return PlacementTestIntroScreen(
-        onTestComplete: _onPlacementTestFinished,
-      );
-    }
+    switch (onboardingState.currentStep) {
+      case OnboardingStep.aiSetup:
+        return OnboardingApiKeyScreen(
+          onSkip: () {
+            notifier.setStep(OnboardingStep.placementTest, skippedAi: true);
+          },
+          onSaveApiKey: (apiKey, [provider = AiProviderType.geminiRest]) async {
+            final cleanKey = apiKey.trim();
+            final validationError = AiCredentialStorage.validateApiKey(cleanKey);
+            if (validationError != null) return false;
 
-    return OnboardingPersonalizationScreen(
-      onComplete: _onPersonalizationComplete,
-    );
+            try {
+              final storage = credentialStorageOverride ?? AiCredentialStorage();
+              await storage.saveApiKey(cleanKey, provider: provider);
+              await storage.saveProviderType(provider);
+              await notifier.setStep(OnboardingStep.placementTest, skippedAi: false);
+              return true;
+            } catch (_) {
+              return false;
+            }
+          },
+          onSuccessNext: () {
+            notifier.setStep(OnboardingStep.placementTest, skippedAi: false);
+          },
+        );
+
+      case OnboardingStep.placementTest:
+        return PlacementTestIntroScreen(
+          onTestComplete: ([hskLevel]) {
+            notifier.completePlacementTest(hskLevel);
+          },
+        );
+
+      case OnboardingStep.personalization:
+        return OnboardingPersonalizationScreen(
+          onComplete: (dailyMinutes, focusSkill) async {
+            await notifier.completePersonalization(
+              dailyMinutes: dailyMinutes,
+              focusSkill: focusSkill,
+            );
+            onOnboardingComplete();
+          },
+        );
+
+      case OnboardingStep.completed:
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          onOnboardingComplete();
+        });
+        return const Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+    }
   }
 }
