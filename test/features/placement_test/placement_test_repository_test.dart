@@ -235,5 +235,35 @@ void main() {
       await repository.abandonSession(session.sessionId);
       expect(await repository.getActiveSession(), isNull);
     });
+
+    test('6. Creates zero-Chinese beginner session with initialTheta = -2.0, starts in Listening, and restores blueprint_version', () async {
+      final session = await repository.startNewSession(
+        customSessionId: 'TEST_SESSION_BEGINNER_06',
+        initialTheta: -2.0,
+      );
+
+      expect(session.sessionId, 'TEST_SESSION_BEGINNER_06');
+      expect(session.status, 'in_progress');
+      expect(session.currentSkill, CatSkill.listening);
+      expect(session.currentTheta, -2.0);
+      expect(session.blueprintVersion, 'v1.0-beginner');
+      expect(session.activeItem, isNotNull);
+      expect(session.activeItem!.difficulty, inInclusiveRange(-3.0, -1.0));
+
+      // Verify row in database has blueprint_version = 'v1.0-beginner'
+      final rows = await db.query(
+        DatabaseConstants.tablePlacementTestSessions,
+        where: 'id = ?',
+        whereArgs: ['TEST_SESSION_BEGINNER_06'],
+      );
+      expect(rows, hasLength(1));
+      expect(rows.first['blueprint_version'], 'v1.0-beginner');
+
+      // Verify getActiveSession restores session with blueprint_version
+      final active = await repository.getActiveSession();
+      expect(active, isNotNull);
+      expect(active!.blueprintVersion, 'v1.0-beginner');
+      expect(active.currentSkill, CatSkill.listening);
+    });
   });
 }

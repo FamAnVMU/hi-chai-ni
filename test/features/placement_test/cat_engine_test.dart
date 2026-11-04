@@ -254,5 +254,48 @@ void main() {
       expect(nextState.responses.last.isCorrect, isTrue);
       expect(nextState.currentTheta, greaterThan(initialTheta));
     });
+
+    test('10. Zero-Chinese beginner CAT session calibrates in [-3.0, -1.0], runs 5-8 questions, and yields Acoustic Sensitivity & Pictographic Intuition', () {
+      final initialItem = engine.selectInitialItem(CatSkill.listening, targetTheta: -2.0);
+      expect(initialItem, isNotNull);
+      expect(initialItem!.difficulty, inInclusiveRange(-3.0, -1.0));
+
+      var state = CatSessionState.initial(
+        'SESSION_ZERO_CHINESE',
+        initialSkill: CatSkill.listening,
+        initialItem: initialItem,
+        initialTheta: -2.0,
+        blueprintVersion: 'v1.0-beginner',
+      );
+
+      expect(state.isBeginnerMode, isTrue);
+
+      int iterations = 0;
+      while (!state.isCompleted && iterations < 15) {
+        iterations++;
+        final currentItem = state.activeItem;
+        expect(currentItem, isNotNull);
+
+        // Simulate learner answering with correct option
+        state = engine.processTurn(
+          currentState: state,
+          userAnswer: currentItem!.correctOptionIndex ?? 0,
+          latencyMs: 1200,
+        );
+      }
+
+      expect(state.isCompleted, isTrue);
+      expect(state.responses.length, inInclusiveRange(5, 8));
+
+      final result = state.result;
+      expect(result, isNotNull);
+      expect(result!.recommendedHskLevel, 1);
+      expect(result.blueprintVersion, 'v1.0-beginner');
+      expect(result.hasBeginnerDiagnostics, isTrue);
+      expect(result.acousticSensitivityScore, isNotNull);
+      expect(result.acousticSensitivityScore!, greaterThanOrEqualTo(0.5));
+      expect(result.pictographicIntuitionScore, isNotNull);
+      expect(result.pictographicIntuitionScore!, greaterThanOrEqualTo(0.5));
+    });
   });
 }

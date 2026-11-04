@@ -4,6 +4,7 @@ import 'package:sqflite/sqflite.dart';
 import '../../../core/database/database_constants.dart';
 import '../../../core/utils/app_clock.dart';
 import '../../curriculum/data/placement_unlock_handler.dart';
+import '../domain/engine/cat_blueprint.dart';
 import '../domain/engine/cat_engine.dart';
 import '../domain/models/cat_assessment_result.dart';
 import '../domain/models/cat_session_state.dart';
@@ -30,14 +31,20 @@ class PlacementTestRepository {
     final sessionId = customSessionId ?? 'CAT_${nowUtc.microsecondsSinceEpoch}';
 
     final effectiveTheta = initialTheta ?? -1.0;
+    final isBeginner = effectiveTheta <= -1.8;
+    final initialSkill = isBeginner ? CatSkill.listening : CatSkill.vocabulary;
+    final blueprintVer = isBeginner ? 'v1.0-beginner' : _engine.blueprint.version;
+
     final initialItem = _engine.selectInitialItem(
-      CatSkill.vocabulary,
+      initialSkill,
       targetTheta: initialTheta,
     );
     final initialState = CatSessionState.initial(
       sessionId,
+      initialSkill: initialSkill,
       initialItem: initialItem,
       initialTheta: effectiveTheta,
+      blueprintVersion: blueprintVer,
     );
 
     await _db.insert(
@@ -54,7 +61,7 @@ class PlacementTestRepository {
         'knowledge_gaps_json': json.encode([]),
         'recommended_level': 1,
         'recommended_roadmap_code': 'HSK_1',
-        'blueprint_version': _engine.blueprint.version,
+        'blueprint_version': blueprintVer,
         'started_at': nowUtc.toIso8601String(),
         'completed_at': null,
         'created_at': nowUtc.toIso8601String(),
@@ -128,18 +135,22 @@ class PlacementTestRepository {
     final currentTheta = (sRow['estimated_theta'] as num).toDouble();
     final currentSe = (sRow['standard_error'] as num).toDouble();
     final startedAt = DateTime.parse(sRow['started_at'] as String);
+    final blueprintVer = sRow['blueprint_version'] as String? ?? _engine.blueprint.version;
+    final effectiveBlueprint = blueprintVer == 'v1.0-beginner'
+        ? const CatBlueprint.beginner()
+        : _engine.blueprint;
 
     // Determine current active skill and select next item
     final usedItemIds = responses.map((r) => r.itemId).toSet();
-    CatSkill currentSkill = CatSkill.vocabulary;
+    CatSkill currentSkill = effectiveBlueprint.skillSequence.first;
 
-    for (final skill in _engine.blueprint.skillSequence) {
+    for (final skill in effectiveBlueprint.skillSequence) {
       final count = skillCounts[skill] ?? 0;
-      if (count < _engine.blueprint.minItemsPerSkill) {
+      if (count < effectiveBlueprint.minItemsPerSkill) {
         currentSkill = skill;
         break;
       }
-      if (count < _engine.blueprint.maxItemsPerSkill) {
+      if (count < effectiveBlueprint.maxItemsPerSkill) {
         currentSkill = skill;
         break;
       }
@@ -149,7 +160,7 @@ class PlacementTestRepository {
       currentSkill: currentSkill,
       currentTheta: currentTheta,
       usedItemIds: usedItemIds,
-    ) ?? _engine.selectInitialItem(currentSkill);
+    ) ?? _engine.selectInitialItem(currentSkill, targetTheta: currentTheta);
 
     return CatSessionState(
       sessionId: sessionId,
@@ -162,6 +173,7 @@ class PlacementTestRepository {
       currentStandardError: currentSe,
       responses: responses,
       startedAt: startedAt,
+      blueprintVersion: blueprintVer,
     );
   }
 

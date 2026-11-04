@@ -118,6 +118,15 @@ void main() {
       expect(find.text('4. Nghe hiểu'), findsOneWidget);
       expect(find.text('5. Kỹ năng Viết'), findsOneWidget);
       expect(find.text('6. Phát âm & Nói'), findsOneWidget);
+
+      // Default selected is zeroChinese: Check encouraging copy, badge, and custom button
+      expect(find.text('Đừng lo lắng! Bài kiểm tra sẽ giúp bạn kiểm tra độ nhạy âm thanh và trực giác nhận diện chữ tượng hình, không yêu cầu đã biết chữ Hán.'), findsOneWidget);
+      expect(find.text('Độ khó thích ứng mức cơ bản'), findsOneWidget);
+      expect(find.text('Bắt đầu bài trắc nghiệm làm quen (2 phút)'), findsOneWidget);
+
+      // When switching to 'Đã biết cơ bản', button updates to standard start text
+      await tester.tap(find.text('Đã biết cơ bản'));
+      await tester.pumpAndSettle();
       expect(find.text('Bắt đầu làm bài kiểm tra'), findsOneWidget);
     });
 
@@ -294,6 +303,66 @@ void main() {
 
       expect(tester.takeException(), isNull); // Zero overflows!
       expect(find.text('HSK 2 (Sơ cấp nâng cao)'), findsOneWidget);
+    });
+
+    testWidgets('8. PlacementTestResultScreen displays beginner diagnostic cards for Acoustic Sensitivity and Pictographic Intuition', (tester) async {
+      final beginnerResult = CatAssessmentResult(
+        sessionId: 'BEGINNER_TEST_01',
+        overallTheta: -2.0,
+        overallStandardError: 0.38,
+        referenceHskBand: 'HSK 0 (Khởi đầu từ số 0)',
+        confidenceScore: 0.75,
+        skillScores: {
+          CatSkill.listening: const SkillScoreEstimate(
+            skill: CatSkill.listening,
+            isAssessed: true,
+            estimatedTheta: -1.9,
+            accuracyRate: 0.80,
+            confidenceLabel: 'Cao',
+            subMetrics: {'acoustic_sensitivity_accuracy': 0.85},
+          ),
+          CatSkill.writing: const SkillScoreEstimate(
+            skill: CatSkill.writing,
+            isAssessed: true,
+            estimatedTheta: -2.0,
+            accuracyRate: 1.0,
+            confidenceLabel: 'Cao',
+            subMetrics: {
+              'pictographic_intuition_accuracy': 1.0,
+              'character_recognition_accuracy': 1.0,
+            },
+          ),
+          CatSkill.vocabulary: SkillScoreEstimate.unassessed(CatSkill.vocabulary),
+          CatSkill.grammar: SkillScoreEstimate.unassessed(CatSkill.grammar),
+          CatSkill.reading: SkillScoreEstimate.unassessed(CatSkill.reading),
+          CatSkill.speaking: SkillScoreEstimate.unassessed(CatSkill.speaking),
+        },
+        knowledgeGaps: const [],
+        recommendedHskLevel: 1,
+        recommendedRoadmapTitle: 'Lộ trình gợi ý: HSK 1',
+        recommendedRoadmapCode: 'HSK_1',
+        completedAt: DateTime.now().toUtc(),
+        blueprintVersion: 'v1.0-beginner',
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            theme: AppTheme.lightTheme,
+            home: PlacementTestResultScreen(result: beginnerResult),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Đánh Giá Khả Năng Ngôn Ngữ Tự Nhiên'), findsOneWidget);
+      expect(find.text('Người mới bắt đầu'), findsOneWidget);
+      expect(find.text('Độ nhạy ngữ âm (Acoustic Sensitivity)'), findsOneWidget);
+      expect(find.text('Trực giác chữ tượng hình (Pictographic Intuition)'), findsOneWidget);
+      expect(find.text('85%'), findsWidgets);
+      expect(find.text('100%'), findsWidgets);
+      expect(find.text('Lộ trình gợi ý: HSK 1'), findsOneWidget);
     });
   });
 }

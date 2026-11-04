@@ -43,4 +43,20 @@ class CatBlueprint {
       CatSkill.speaking,
     ],
   });
+
+  /// Calibrated lightweight blueprint for absolute beginners (zero-Chinese).
+  /// Focuses on tone discrimination, pinyin intuition, and pictograph recognition (5-8 items, ~2 mins).
+  const CatBlueprint.beginner({
+    this.version = 'v1.0-beginner',
+    this.minTotalItems = 5,
+    this.maxTotalItems = 8,
+    this.minItemsPerSkill = 2,
+    this.maxItemsPerSkill = 4,
+    this.targetStandardError = 0.40,
+    this.maxConsecutiveLowestFailures = 3,
+    this.skillSequence = const [
+      CatSkill.listening,
+      CatSkill.writing,
+    ],
+  });
 }

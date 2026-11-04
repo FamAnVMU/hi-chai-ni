@@ -122,6 +122,101 @@ class PlacementTestResultScreen extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpacing.lg),
 
+              // 1B. Beginner Calibration Diagnostics (if available)
+              if (result.hasBeginnerDiagnostics) ...[
+                HiCard(
+                  borderColor: AppColors.primaryBlueDark,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.auto_awesome_rounded,
+                            color: AppColors.primaryBlueDark,
+                            size: AppDimensions.iconMd,
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Expanded(
+                            child: Text(
+                              'Đánh Giá Khả Năng Ngôn Ngữ Tự Nhiên',
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const HiChip(
+                            label: 'Người mới bắt đầu',
+                            status: HiChipStatus.success,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      if (result.acousticSensitivityScore != null) ...[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Độ nhạy ngữ âm (Acoustic Sensitivity)',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              '${((result.acousticSensitivityScore!) * 100).toInt()}%',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryBlueDark,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        HiLinearProgress(value: result.acousticSensitivityScore!),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Khả năng phân biệt cao độ thanh điệu và nhận diện trực giác âm thanh Pinyin.',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                      ],
+                      if (result.pictographicIntuitionScore != null) ...[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Trực giác chữ tượng hình (Pictographic Intuition)',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              '${((result.pictographicIntuitionScore!) * 100).toInt()}%',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryBlueDark,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        HiLinearProgress(value: result.pictographicIntuitionScore!),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Khả năng liên tưởng trực quan hình ảnh đời thực với cấu tạo chữ Hán cổ.',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+              ],
+
               // 2. Six Assessed Skills Breakdown Card
               CatSkillRadarCard(skillScores: result.skillScores),
               const SizedBox(height: AppSpacing.lg),

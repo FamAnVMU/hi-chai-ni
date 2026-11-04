@@ -55,7 +55,7 @@ class _PlacementTestIntroScreenState extends ConsumerState<PlacementTestIntroScr
   double _getInitialTheta() {
     switch (_selectedExperience) {
       case LearnerExperienceLevel.zeroChinese:
-        return -1.0;
+        return -2.0;
       case LearnerExperienceLevel.basicPinyin:
         return -0.5;
       case LearnerExperienceLevel.intermediate:
@@ -189,6 +189,40 @@ class _PlacementTestIntroScreenState extends ConsumerState<PlacementTestIntroScr
                   ),
                 );
               }),
+
+              if (_selectedExperience == LearnerExperienceLevel.zeroChinese) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryBlueDark.withAlpha(20),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.primaryBlueDark.withAlpha(60),
+                    ),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.lightbulb_outline_rounded,
+                        color: AppColors.primaryBlueDark,
+                        size: 22,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Text(
+                          'Đừng lo lắng! Bài kiểm tra sẽ giúp bạn kiểm tra độ nhạy âm thanh và trực giác nhận diện chữ tượng hình, không yêu cầu đã biết chữ Hán.',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurface,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
 
               if (_selectedExperience == LearnerExperienceLevel.hasHsk) ...[
                 const SizedBox(height: AppSpacing.sm),
@@ -428,8 +462,40 @@ class _PlacementTestIntroScreenState extends ConsumerState<PlacementTestIntroScr
                 const SizedBox(height: AppSpacing.lg),
               ],
 
+              if (_selectedExperience == LearnerExperienceLevel.zeroChinese) ...[
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
+                    margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryBlueDark.withAlpha(25),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppColors.primaryBlueDark.withAlpha(60)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.speed_rounded, size: 14, color: AppColors.primaryBlueDark),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Độ khó thích ứng mức cơ bản',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryBlueDark,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+
               HiButton(
-                text: activeSession != null ? 'Bắt đầu bài kiểm tra mới' : 'Bắt đầu làm bài kiểm tra',
+                text: activeSession != null
+                    ? 'Bắt đầu bài kiểm tra mới'
+                    : (_selectedExperience == LearnerExperienceLevel.zeroChinese
+                        ? 'Bắt đầu bài trắc nghiệm làm quen (2 phút)'
+                        : 'Bắt đầu làm bài kiểm tra'),
                 icon: const Icon(Icons.arrow_forward_rounded),
                 variant: HiButtonVariant.primary,
                 size: HiButtonSize.lg,
@@ -456,12 +522,27 @@ class _PlacementTestIntroScreenState extends ConsumerState<PlacementTestIntroScr
               ),
               if (widget.onTestComplete != null) ...[
                 const SizedBox(height: AppSpacing.sm),
-                HiButton(
-                  text: 'Bỏ qua bài kiểm tra (Bắt đầu từ HSK 1)',
-                  variant: HiButtonVariant.ghost,
-                  isFullWidth: true,
-                  onPressed: () => widget.onTestComplete?.call(1),
-                ),
+                if (_selectedExperience == LearnerExperienceLevel.zeroChinese)
+                  Opacity(
+                    opacity: 0.45,
+                    child: TextButton(
+                      onPressed: () => widget.onTestComplete?.call(1),
+                      child: Text(
+                        'Bỏ qua bài kiểm tra (Bắt đầu từ HSK 1)',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  HiButton(
+                    text: 'Bỏ qua bài kiểm tra (Bắt đầu từ HSK 1)',
+                    variant: HiButtonVariant.ghost,
+                    isFullWidth: true,
+                    onPressed: () => widget.onTestComplete?.call(1),
+                  ),
               ],
               const SizedBox(height: AppSpacing.xl),
             ],

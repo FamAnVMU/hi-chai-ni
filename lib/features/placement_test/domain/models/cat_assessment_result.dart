@@ -183,4 +183,28 @@ class CatAssessmentResult {
     if (writing != null && writing.isAssessed && (writing.accuracyRate ?? 0) >= 0.8) return true;
     return false;
   }
+
+  /// Acoustic Sensitivity score (0.0 to 1.0) derived from tone discrimination and pinyin sound-to-symbol calibration.
+  double? get acousticSensitivityScore {
+    final listening = skillScores[CatSkill.listening];
+    if (listening != null && listening.subMetrics.containsKey('acoustic_sensitivity_accuracy')) {
+      final val = listening.subMetrics['acoustic_sensitivity_accuracy'];
+      if (val is num) return val.toDouble();
+    }
+    return null;
+  }
+
+  /// Pictographic Intuition score (0.0 to 1.0) derived from pictograph recognition calibration.
+  double? get pictographicIntuitionScore {
+    final writing = skillScores[CatSkill.writing];
+    if (writing != null && writing.subMetrics.containsKey('pictographic_intuition_accuracy')) {
+      final val = writing.subMetrics['pictographic_intuition_accuracy'];
+      if (val is num) return val.toDouble();
+    }
+    return null;
+  }
+
+  /// Whether this result includes beginner calibration diagnostics.
+  bool get hasBeginnerDiagnostics =>
+      acousticSensitivityScore != null || pictographicIntuitionScore != null;
 }

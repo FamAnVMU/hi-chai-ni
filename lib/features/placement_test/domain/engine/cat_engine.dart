@@ -134,19 +134,23 @@ class CatEngine {
 
     final usedItemIds = updatedResponses.map((r) => r.itemId).toSet();
 
+    // Determine active blueprint based on session configuration
+    final activeBlueprint = _resolveBlueprint(currentState);
+
     // 4. Evaluate stopping rule for current skill
     final shouldStopCurrentSkill = isSkipped || _evaluateSkillStopRule(
       currentSkill: currentSkill,
       skillItemCount: updatedSkillCounts[currentSkill] ?? 0,
       skillSe: newSe,
       responses: updatedResponses,
+      blueprint: activeBlueprint,
     );
 
     if (shouldStopCurrentSkill) {
       // Find next skill in sequence
-      final nextSkill = _findNextSkill(currentSkill);
+      final nextSkill = _findNextSkill(currentSkill, blueprint: activeBlueprint);
 
-      if (nextSkill == null || updatedResponses.length >= blueprint.maxTotalItems) {
+      if (nextSkill == null || updatedResponses.length >= activeBlueprint.maxTotalItems) {
         // Complete test!
         final finalResult = generateAssessmentResult(
           sessionId: currentState.sessionId,
@@ -154,6 +158,7 @@ class CatEngine {
           overallStandardError: newSe,
           responses: updatedResponses,
           completedAt: DateTime.now().toUtc(),
+          blueprintVersion: activeBlueprint.version,
         );
 
         return currentState.copyWith(
@@ -168,7 +173,7 @@ class CatEngine {
         );
       } else {
         // Advance to next skill
-        final nextItem = selectInitialItem(nextSkill);
+        final nextItem = selectInitialItem(nextSkill, targetTheta: newTheta);
         return currentState.copyWith(
           currentSkill: nextSkill,
           activeItem: nextItem,
@@ -189,14 +194,15 @@ class CatEngine {
 
       if (nextItem == null) {
         // Skill items exhausted early -> advance to next skill
-        final nextSkill = _findNextSkill(currentSkill);
-        if (nextSkill == null) {
+        final nextSkill = _findNextSkill(currentSkill, blueprint: activeBlueprint);
+        if (nextSkill == null || updatedResponses.length >= activeBlueprint.minTotalItems) {
           final finalResult = generateAssessmentResult(
             sessionId: currentState.sessionId,
             overallTheta: newTheta,
             overallStandardError: newSe,
             responses: updatedResponses,
             completedAt: DateTime.now().toUtc(),
+            blueprintVersion: activeBlueprint.version,
           );
           return currentState.copyWith(
             status: 'completed',
@@ -211,7 +217,7 @@ class CatEngine {
         }
         return currentState.copyWith(
           currentSkill: nextSkill,
-          activeItem: selectInitialItem(nextSkill),
+          activeItem: selectInitialItem(nextSkill, targetTheta: newTheta),
           stepIndex: currentState.stepIndex + 1,
           currentTheta: newTheta,
           currentStandardError: newSe,
@@ -231,29 +237,38 @@ class CatEngine {
     }
   }
 
+  CatBlueprint _resolveBlueprint(CatSessionState state) {
+    if (state.isBeginnerMode || (state.currentTheta <= -1.8 && state.stepIndex == 0)) {
+      return const CatBlueprint.beginner();
+    }
+    return blueprint;
+  }
+
   /// Evaluates stopping rule for a given skill.
   bool _evaluateSkillStopRule({
     required CatSkill currentSkill,
     required int skillItemCount,
     required double skillSe,
     required List<CatResponseRecord> responses,
+    CatBlueprint? blueprint,
   }) {
-    if (skillItemCount < blueprint.minItemsPerSkill) {
+    final bp = blueprint ?? this.blueprint;
+    if (skillItemCount < bp.minItemsPerSkill) {
       return false;
     }
-    if (skillItemCount >= blueprint.maxItemsPerSkill) {
+    if (skillItemCount >= bp.maxItemsPerSkill) {
       return true;
     }
 
     // Early termination: Target SE achieved
-    if (skillSe <= blueprint.targetStandardError) {
+    if (skillSe <= bp.targetStandardError) {
       return true;
     }
 
     // Early termination: 3 consecutive failures in this skill
     final skillResponses = responses.where((r) => r.skill == currentSkill).toList();
-    if (skillResponses.length >= blueprint.maxConsecutiveLowestFailures) {
-      final lastThree = skillResponses.sublist(skillResponses.length - blueprint.maxConsecutiveLowestFailures);
+    if (skillResponses.length >= bp.maxConsecutiveLowestFailures) {
+      final lastThree = skillResponses.sublist(skillResponses.length - bp.maxConsecutiveLowestFailures);
       final allFailed = lastThree.every((r) => r.isCorrect == false);
       if (allFailed) return true;
     }
@@ -261,8 +276,8 @@ class CatEngine {
     return false;
   }
 
-  CatSkill? _findNextSkill(CatSkill currentSkill) {
-    final seq = blueprint.skillSequence;
+  CatSkill? _findNextSkill(CatSkill currentSkill, {CatBlueprint? blueprint}) {
+    final seq = (blueprint ?? this.blueprint).skillSequence;
     final currentIndex = seq.indexOf(currentSkill);
     if (currentIndex == -1 || currentIndex >= seq.length - 1) {
       return null;
@@ -277,6 +292,7 @@ class CatEngine {
     required double overallStandardError,
     required List<CatResponseRecord> responses,
     required DateTime completedAt,
+    String? blueprintVersion,
   }) {
     final skillScores = <CatSkill, SkillScoreEstimate>{};
     final knowledgeGaps = <KnowledgeGapItem>[];
@@ -303,7 +319,18 @@ class CatEngine {
       double skillTheta = overallTheta;
       final subMetrics = <String, dynamic>{};
 
-      if (skill == CatSkill.writing) {
+      if (skill == CatSkill.listening) {
+        // Acoustic Sensitivity (tone discrimination & pinyin sound-to-symbol)
+        final acousticResponses = attempted.where((r) =>
+          r.itemId.startsWith('TONE_') ||
+          r.itemId.startsWith('PIN_') ||
+          (r.skill == CatSkill.listening && r.itemDifficulty <= -1.5)
+        ).toList();
+        if (acousticResponses.isNotEmpty) {
+          final correctAcoustic = acousticResponses.where((r) => r.isCorrect == true).length;
+          subMetrics['acoustic_sensitivity_accuracy'] = correctAcoustic / acousticResponses.length;
+        }
+      } else if (skill == CatSkill.writing) {
         // Separate sub-metrics for writing: Never mix recognition, pinyin, and stroke scores
         final recResponses = attempted.where((r) => r.writingSubType == WritingSubType.characterRecognition).toList();
         final pinResponses = attempted.where((r) => r.writingSubType == WritingSubType.pinyinTranscription).toList();
@@ -312,6 +339,16 @@ class CatEngine {
         subMetrics['character_recognition_accuracy'] = recResponses.isEmpty ? null : (recResponses.where((r) => r.isCorrect == true).length / recResponses.length);
         subMetrics['pinyin_transcription_accuracy'] = pinResponses.isEmpty ? null : (pinResponses.where((r) => r.isCorrect == true).length / pinResponses.length);
         subMetrics['stroke_order_accuracy'] = strResponses.isEmpty ? null : (strResponses.where((r) => r.isCorrect == true).length / strResponses.length);
+
+        // Pictographic Intuition (basic pictographs)
+        final picResponses = attempted.where((r) =>
+          r.itemId.startsWith('PIC_') ||
+          (r.writingSubType == WritingSubType.characterRecognition && r.itemDifficulty <= -1.5)
+        ).toList();
+        if (picResponses.isNotEmpty) {
+          final correctPic = picResponses.where((r) => r.isCorrect == true).length;
+          subMetrics['pictographic_intuition_accuracy'] = correctPic / picResponses.length;
+        }
       } else if (skill == CatSkill.speaking) {
         subMetrics['speaking_mode'] = SpeakingEvaluationMode.acousticAudioAnalyzed.labelVi;
         subMetrics['note'] = 'Đánh giá qua ngữ điệu và phát âm mẫu';
@@ -356,8 +393,15 @@ class CatEngine {
       }
     }
 
-    final hskBand = CatAssessmentResult.mapThetaToHskBand(overallTheta);
-    final recommendedLevel = CatAssessmentResult.mapThetaToRecommendedLevel(overallTheta);
+    final effectiveBlueprintVersion = blueprintVersion ?? blueprint.version;
+    final isBeginner = effectiveBlueprintVersion == 'v1.0-beginner';
+
+    final hskBand = isBeginner
+        ? (overallTheta < -1.5 ? 'HSK 0 (Khởi đầu từ số 0)' : 'HSK 1 (Sơ cấp cơ bản)')
+        : CatAssessmentResult.mapThetaToHskBand(overallTheta);
+    final recommendedLevel = isBeginner
+        ? 1
+        : CatAssessmentResult.mapThetaToRecommendedLevel(overallTheta);
     final confidenceScore = (1.0 - (overallStandardError / 1.5)).clamp(0.1, 1.0);
 
     return CatAssessmentResult(
@@ -372,7 +416,7 @@ class CatEngine {
       recommendedRoadmapTitle: 'Lộ trình gợi ý: HSK $recommendedLevel',
       recommendedRoadmapCode: 'HSK_$recommendedLevel',
       completedAt: completedAt,
-      blueprintVersion: blueprint.version,
+      blueprintVersion: effectiveBlueprintVersion,
     );
   }
 }

@@ -112,6 +112,24 @@ class CatSkillRadarCard extends StatelessWidget {
             ),
           ],
 
+          // Distinct sub-metrics for Listening (Acoustic Sensitivity)
+          if (skill == CatSkill.listening && isAssessed && estimate?.subMetrics != null && estimate!.subMetrics.containsKey('acoustic_sensitivity_accuracy')) ...[
+            const SizedBox(height: AppSpacing.xs),
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.sm),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest.withAlpha(40),
+                borderRadius: AppRadius.borderSm,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildSubMetricRow('Độ nhạy ngữ âm (Acoustic)', estimate.subMetrics['acoustic_sensitivity_accuracy']),
+                ],
+              ),
+            ),
+          ],
+
           // Distinct sub-metrics for Writing (Never mixed)
           if (skill == CatSkill.writing && isAssessed && estimate?.subMetrics != null) ...[
             const SizedBox(height: AppSpacing.xs),
@@ -124,7 +142,9 @@ class CatSkillRadarCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSubMetricRow('Nhận diện chữ Hán', estimate!.subMetrics['character_recognition_accuracy']),
+                  if (estimate!.subMetrics.containsKey('pictographic_intuition_accuracy'))
+                    _buildSubMetricRow('Trực giác chữ tượng hình', estimate.subMetrics['pictographic_intuition_accuracy']),
+                  _buildSubMetricRow('Nhận diện chữ Hán', estimate.subMetrics['character_recognition_accuracy']),
                   _buildSubMetricRow('Phiên âm Pinyin', estimate.subMetrics['pinyin_transcription_accuracy']),
                   _buildSubMetricRow('Thứ tự nét viết', estimate.subMetrics['stroke_order_accuracy']),
                 ],

@@ -67,6 +67,7 @@ class CatSessionState {
   final bool isCompleted;
   final CatAssessmentResult? result;
   final DateTime startedAt;
+  final String blueprintVersion;
 
   const CatSessionState({
     required this.sessionId,
@@ -81,18 +82,23 @@ class CatSessionState {
     this.isCompleted = false,
     this.result,
     required this.startedAt,
+    this.blueprintVersion = 'v1.0',
   });
+
+  bool get isBeginnerMode => blueprintVersion == 'v1.0-beginner';
 
   factory CatSessionState.initial(
     String sessionId, {
     CatItem? initialItem,
+    CatSkill initialSkill = CatSkill.vocabulary,
     double initialTheta = -1.0,
     double initialStandardError = 1.2,
+    String blueprintVersion = 'v1.0',
   }) =>
       CatSessionState(
         sessionId: sessionId,
         status: 'in_progress',
-        currentSkill: CatSkill.vocabulary,
+        currentSkill: initialSkill,
         activeItem: initialItem,
         stepIndex: 0,
         skillItemCounts: {for (final s in CatSkill.values) s: 0},
@@ -101,6 +107,7 @@ class CatSessionState {
         responses: const [],
         isCompleted: false,
         startedAt: DateTime.now().toUtc(),
+        blueprintVersion: blueprintVersion,
       );
 
   CatSessionState copyWith({
@@ -115,6 +122,7 @@ class CatSessionState {
     List<CatResponseRecord>? responses,
     bool? isCompleted,
     CatAssessmentResult? result,
+    String? blueprintVersion,
   }) {
     return CatSessionState(
       sessionId: sessionId,
@@ -129,6 +137,7 @@ class CatSessionState {
       isCompleted: isCompleted ?? this.isCompleted,
       result: result ?? this.result,
       startedAt: startedAt,
+      blueprintVersion: blueprintVersion ?? this.blueprintVersion,
     );
   }
 }
