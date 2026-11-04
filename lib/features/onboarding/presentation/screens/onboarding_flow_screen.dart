@@ -65,10 +65,18 @@ class OnboardingFlowScreen extends ConsumerWidget {
 
       case OnboardingStep.personalization:
         return OnboardingPersonalizationScreen(
-          onComplete: (dailyMinutes, focusSkill) async {
+          onComplete: (dailyMinutes, focusSkill, [PersonalizationData? data]) async {
             await notifier.completePersonalization(
               dailyMinutes: dailyMinutes,
               focusSkill: focusSkill,
+              learningPurpose: data?.purpose ?? 'dailyCommunication',
+              showPinyin: data?.showPinyin ?? true,
+              pinyinPosition: data?.pinyinPosition ?? 'above_hanzi',
+              scriptType: data?.scriptType ?? 'simplified',
+              learningMethod: data?.learningMethod ?? 'contextual_lessons',
+              speechRate: data?.speechRate ?? 1.0,
+              reminderEnabled: data?.reminderEnabled ?? true,
+              reminderTime: data?.reminderTime ?? '20:00',
             );
             onOnboardingComplete();
           },

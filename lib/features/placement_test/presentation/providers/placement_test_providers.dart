@@ -18,12 +18,11 @@ class ActiveCatSessionNotifier extends AsyncNotifier<CatSessionState?> {
     return await repo.getActiveSession();
   }
 
-  /// Starts a fresh adaptive placement test session.
-  Future<void> startNewTest() async {
+  Future<void> startNewTest({double? initialTheta}) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final repo = ref.read(placementTestRepositoryProvider);
-      return await repo.startNewSession();
+      return await repo.startNewSession(initialTheta: initialTheta);
     });
   }
 

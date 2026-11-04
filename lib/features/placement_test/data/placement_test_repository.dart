@@ -22,13 +22,23 @@ class PlacementTestRepository {
 
   CatEngine get engine => _engine;
 
-  /// Creates and persists a new in-progress CAT session.
-  Future<CatSessionState> startNewSession({String? customSessionId}) async {
+  Future<CatSessionState> startNewSession({
+    String? customSessionId,
+    double? initialTheta,
+  }) async {
     final nowUtc = DateTime.now().toUtc();
     final sessionId = customSessionId ?? 'CAT_${nowUtc.microsecondsSinceEpoch}';
 
-    final initialItem = _engine.selectInitialItem(CatSkill.vocabulary);
-    final initialState = CatSessionState.initial(sessionId, initialItem: initialItem);
+    final effectiveTheta = initialTheta ?? -1.0;
+    final initialItem = _engine.selectInitialItem(
+      CatSkill.vocabulary,
+      targetTheta: initialTheta,
+    );
+    final initialState = CatSessionState.initial(
+      sessionId,
+      initialItem: initialItem,
+      initialTheta: effectiveTheta,
+    );
 
     await _db.insert(
       DatabaseConstants.tablePlacementTestSessions,

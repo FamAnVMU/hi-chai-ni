@@ -7,13 +7,14 @@ import '../widgets/cat_knowledge_gaps_card.dart';
 import '../widgets/cat_skill_radar_card.dart';
 
 /// Screen presenting the complete pedagogical diagnostic report,
-/// skill breakdown, knowledge gaps, and recommended learning roadmap.
 class PlacementTestResultScreen extends ConsumerWidget {
   final CatAssessmentResult result;
+  final void Function(int level)? onContinue;
 
   const PlacementTestResultScreen({
     super.key,
     required this.result,
+    this.onContinue,
   });
 
   @override
@@ -170,7 +171,11 @@ class PlacementTestResultScreen extends ConsumerWidget {
                       size: HiButtonSize.lg,
                       isFullWidth: true,
                       onPressed: () {
-                        // Switch to Learning tab (Tab 1) and pop to root
+                        if (onContinue != null) {
+                          onContinue!(result.recommendedHskLevel);
+                          Navigator.of(context).pop();
+                          return;
+                        }
                         ref
                             .read(selectedTabProvider.notifier)
                             .selectTab(AppTab.learning);

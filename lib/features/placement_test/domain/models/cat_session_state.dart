@@ -83,8 +83,12 @@ class CatSessionState {
     required this.startedAt,
   });
 
-  /// Initial fresh session state starting with Vocabulary skill.
-  factory CatSessionState.initial(String sessionId, {CatItem? initialItem}) =>
+  factory CatSessionState.initial(
+    String sessionId, {
+    CatItem? initialItem,
+    double initialTheta = -1.0,
+    double initialStandardError = 1.2,
+  }) =>
       CatSessionState(
         sessionId: sessionId,
         status: 'in_progress',
@@ -92,8 +96,8 @@ class CatSessionState {
         activeItem: initialItem,
         stepIndex: 0,
         skillItemCounts: {for (final s in CatSkill.values) s: 0},
-        currentTheta: -1.0, // Initial baseline prior: Elementary level
-        currentStandardError: 1.2, // Initial high uncertainty
+        currentTheta: initialTheta,
+        currentStandardError: initialStandardError,
         responses: const [],
         isCompleted: false,
         startedAt: DateTime.now().toUtc(),

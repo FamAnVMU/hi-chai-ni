@@ -8,7 +8,8 @@ import 'placement_test_result_screen.dart';
 
 /// Screen managing the active interactive adaptive testing flow.
 class PlacementTestFlowScreen extends ConsumerStatefulWidget {
-  const PlacementTestFlowScreen({super.key});
+  final void Function(int level)? onTestComplete;
+  const PlacementTestFlowScreen({super.key, this.onTestComplete});
 
   @override
   ConsumerState<PlacementTestFlowScreen> createState() =>
@@ -92,8 +93,10 @@ class _PlacementTestFlowScreenState
                   if (mounted) {
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
-                        builder: (_) =>
-                            PlacementTestResultScreen(result: session.result!),
+                        builder: (_) => PlacementTestResultScreen(
+                          result: session.result!,
+                          onContinue: widget.onTestComplete,
+                        ),
                       ),
                     );
                   }

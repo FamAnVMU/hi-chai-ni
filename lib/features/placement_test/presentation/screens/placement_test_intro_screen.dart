@@ -5,9 +5,35 @@ import '../providers/placement_test_providers.dart';
 import 'placement_test_flow_screen.dart';
 import 'placement_test_result_screen.dart';
 
-/// Screen introducing the Computerized Adaptive Placement Test (CAT),
-/// showing past results if available, and allowing resume of in-progress test.
-class PlacementTestIntroScreen extends ConsumerWidget {
+enum LearnerExperienceLevel {
+  zeroChinese(
+    'Người mới bắt đầu',
+    'Chưa từng học tiếng Trung. Học từ Pinyin và nét chữ cơ bản.',
+    Icons.school_outlined,
+  ),
+  basicPinyin(
+    'Đã biết cơ bản',
+    'Biết phát âm Pinyin hoặc một số chữ Hán đơn giản (50 - 150 từ).',
+    Icons.translate_rounded,
+  ),
+  intermediate(
+    'Đã học một thời gian',
+    'Có vốn từ và ngữ pháp, muốn kiểm tra chuẩn xác năng lực thực tế.',
+    Icons.auto_stories_rounded,
+  ),
+  hasHsk(
+    'Đã có chứng chỉ HSK',
+    'Đã từng học hoặc thi đạt các cấp độ HSK 1 đến HSK 6.',
+    Icons.workspace_premium_rounded,
+  );
+
+  final String title;
+  final String description;
+  final IconData icon;
+  const LearnerExperienceLevel(this.title, this.description, this.icon);
+}
+
+class PlacementTestIntroScreen extends ConsumerStatefulWidget {
   final void Function([int? hskLevel])? onTestComplete;
 
   const PlacementTestIntroScreen({
@@ -16,7 +42,43 @@ class PlacementTestIntroScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PlacementTestIntroScreen> createState() => _PlacementTestIntroScreenState();
+}
+
+class _PlacementTestIntroScreenState extends ConsumerState<PlacementTestIntroScreen> {
+  LearnerExperienceLevel _selectedExperience = LearnerExperienceLevel.zeroChinese;
+  int _selectedHskLevel = 1;
+
+  double _getInitialTheta() {
+    switch (_selectedExperience) {
+      case LearnerExperienceLevel.zeroChinese:
+        return -1.0;
+      case LearnerExperienceLevel.basicPinyin:
+        return -0.5;
+      case LearnerExperienceLevel.intermediate:
+        return 0.5;
+      case LearnerExperienceLevel.hasHsk:
+        switch (_selectedHskLevel) {
+          case 1:
+            return -1.0;
+          case 2:
+            return -0.5;
+          case 3:
+            return 0.2;
+          case 4:
+            return 0.8;
+          case 5:
+            return 1.5;
+          case 6:
+            return 2.2;
+          default:
+            return -1.0;
+        }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final activeSessionAsync = ref.watch(activeCatSessionProvider);
     final latestResultAsync = ref.watch(latestAssessmentResultProvider);
@@ -34,7 +96,130 @@ class PlacementTestIntroScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 1. Overview Banner
+              Text(
+                'Kinh nghiệm học tiếng Trung của bạn:',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                'Chọn mức độ hiện tại để hệ thống tối ưu bài kiểm tra thích ứng hoặc chọn lộ trình xuất phát phù hợp nhất.',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+
+              ...LearnerExperienceLevel.values.map((exp) {
+                final isSelected = _selectedExperience == exp;
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                  child: Material(
+                    color: isSelected
+                        ? AppColors.primaryBlueDark.withAlpha(25)
+                        : AppColors.cardBackground,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(
+                        color: isSelected ? AppColors.primaryBlueDark : AppColors.border,
+                        width: isSelected ? 1.5 : 1,
+                      ),
+                    ),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        setState(() => _selectedExperience = exp);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              exp.icon,
+                              color: isSelected ? AppColors.primaryBlueDark : AppColors.mutedText,
+                              size: 24,
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    exp.title,
+                                    style: theme.textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: isSelected ? AppColors.primaryBlueDark : null,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    exp.description,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: AppColors.secondaryText,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              isSelected
+                                  ? Icons.check_circle_rounded
+                                  : Icons.radio_button_unchecked,
+                              color: isSelected
+                                  ? AppColors.primaryBlueDark
+                                  : AppColors.mutedText,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+
+              if (_selectedExperience == LearnerExperienceLevel.hasHsk) ...[
+                const SizedBox(height: AppSpacing.sm),
+                HiCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Chọn cấp độ HSK bạn đã đạt được:',
+                        style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Wrap(
+                        spacing: 8,
+                        children: List.generate(6, (index) {
+                          final level = index + 1;
+                          final isCurrent = _selectedHskLevel == level;
+                          return ChoiceChip(
+                            label: Text('HSK $level'),
+                            selected: isCurrent,
+                            onSelected: (val) {
+                              if (val) setState(() => _selectedHskLevel = level);
+                            },
+                          );
+                        }),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      if (widget.onTestComplete != null)
+                        HiButton(
+                          text: 'Xác nhận bắt đầu từ HSK $_selectedHskLevel',
+                          icon: const Icon(Icons.check_circle_outline_rounded),
+                          variant: HiButtonVariant.secondary,
+                          isFullWidth: true,
+                          onPressed: () => widget.onTestComplete?.call(_selectedHskLevel),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: AppSpacing.lg),
+
               HiCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,7 +269,6 @@ class PlacementTestIntroScreen extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpacing.lg),
 
-              // 2. Six Assessed Skills Grid
               Text(
                 '6 Kỹ Năng Được Khảo Sát',
                 style: theme.textTheme.titleSmall?.copyWith(
@@ -130,7 +314,6 @@ class PlacementTestIntroScreen extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpacing.lg),
 
-              // 3. Resume in-progress session if exists
               if (activeSession != null && !activeSession.isCompleted) ...[
                 HiCard(
                   borderColor: theme.colorScheme.primary,
@@ -165,7 +348,9 @@ class PlacementTestIntroScreen extends ConsumerWidget {
                               onPressed: () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (_) => const PlacementTestFlowScreen(),
+                                    builder: (_) => PlacementTestFlowScreen(
+                                      onTestComplete: widget.onTestComplete,
+                                    ),
                                   ),
                                 );
                               },
@@ -187,7 +372,6 @@ class PlacementTestIntroScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.lg),
               ],
 
-              // 4. View Latest Completed Result if exists
               if (latestResult != null) ...[
                 HiCard(
                   child: Column(
@@ -219,7 +403,10 @@ class PlacementTestIntroScreen extends ConsumerWidget {
                         onPressed: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (_) => PlacementTestResultScreen(result: latestResult),
+                              builder: (_) => PlacementTestResultScreen(
+                                result: latestResult,
+                                onContinue: widget.onTestComplete,
+                              ),
                             ),
                           );
                         },
@@ -230,7 +417,6 @@ class PlacementTestIntroScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.lg),
               ],
 
-              // 5. Start Fresh Button
               HiButton(
                 text: activeSession != null ? 'Bắt đầu bài kiểm tra mới' : 'Bắt đầu làm bài kiểm tra',
                 icon: const Icon(Icons.arrow_forward_rounded),
@@ -241,25 +427,29 @@ class PlacementTestIntroScreen extends ConsumerWidget {
                   if (activeSession != null) {
                     await ref.read(activeCatSessionProvider.notifier).abandonSession();
                   }
-                  await ref.read(activeCatSessionProvider.notifier).startNewTest();
+                  await ref.read(activeCatSessionProvider.notifier).startNewTest(
+                    initialTheta: _getInitialTheta(),
+                  );
                   if (context.mounted) {
                     await Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => const PlacementTestFlowScreen(),
+                        builder: (_) => PlacementTestFlowScreen(
+                          onTestComplete: widget.onTestComplete,
+                        ),
                       ),
                     );
                     final updatedResult = ref.read(latestAssessmentResultProvider).asData?.value;
-                    onTestComplete?.call(updatedResult?.recommendedHskLevel);
+                    widget.onTestComplete?.call(updatedResult?.recommendedHskLevel);
                   }
                 },
               ),
-              if (onTestComplete != null) ...[
+              if (widget.onTestComplete != null) ...[
                 const SizedBox(height: AppSpacing.sm),
                 HiButton(
                   text: 'Bỏ qua bài kiểm tra (Bắt đầu từ HSK 1)',
                   variant: HiButtonVariant.ghost,
                   isFullWidth: true,
-                  onPressed: () => onTestComplete?.call(1),
+                  onPressed: () => widget.onTestComplete?.call(1),
                 ),
               ],
               const SizedBox(height: AppSpacing.xl),

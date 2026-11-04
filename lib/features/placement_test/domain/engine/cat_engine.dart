@@ -32,12 +32,19 @@ class CatEngine {
     return discrimination * discrimination * p * (1.0 - p);
   }
 
-  /// Initial item selection for a new test session.
-  CatItem? selectInitialItem(CatSkill skill) {
+  CatItem? selectInitialItem(CatSkill skill, {double? targetTheta}) {
     final available = itemBank.where((i) => i.skill == skill).toList();
     if (available.isEmpty) return null;
 
-    // Prefer calibration item with medium-low difficulty for gentle onboarding
+    if (targetTheta != null) {
+      available.sort((a, b) {
+        final diffA = (a.difficulty - targetTheta).abs();
+        final diffB = (b.difficulty - targetTheta).abs();
+        return diffA.compareTo(diffB);
+      });
+      return available.first;
+    }
+
     for (final item in available) {
       if (item.isCalibration && item.difficulty <= -1.0) {
         return item;
