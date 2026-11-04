@@ -319,6 +319,19 @@ class AiCredentialStorage {
     if (simulateFailure) {
       throw StateError('Simulated secure storage I/O failure');
     }
+
+    if (url != null && url.trim().isNotEmpty) {
+      final cleanUrl = url.trim();
+      final uri = Uri.tryParse(cleanUrl);
+      if (uri == null || !uri.hasScheme || uri.scheme.toLowerCase() != 'https') {
+        throw ArgumentError('Custom Proxy URL bắt buộc phải sử dụng giao thức HTTPS bảo mật.');
+      }
+      final host = uri.host.toLowerCase();
+      if (host == 'localhost' || host == '127.0.0.1' || host.startsWith('192.168.') || host.startsWith('10.')) {
+        throw ArgumentError('Không được sử dụng địa chỉ loopback hoặc IP nội bộ cho AI Proxy.');
+      }
+    }
+
     final memory = inMemoryStore;
     if (url == null || url.trim().isEmpty) {
       if (memory != null) {

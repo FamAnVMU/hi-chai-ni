@@ -120,7 +120,7 @@ void main() {
       );
 
       expect(result.status, equals(PronunciationEvaluationStatus.failed));
-      expect(result.overallScore, isNull);
+      expect(result.overallScore, equals(0.0));
       expect(result.recognizedTranscript, isNull);
       expect(result.feedbackList.first, contains('không tồn tại'));
     });

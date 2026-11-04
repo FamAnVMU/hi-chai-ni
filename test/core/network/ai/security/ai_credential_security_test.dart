@@ -137,6 +137,43 @@ void main() {
       expect(sanitized.contains(secret), isFalse);
       expect(sanitized.contains('[REDACTED_API_KEY]'), isTrue);
     });
+
+    test('7b. saveCustomProxyUrl enforces HTTPS and blocks SSRF / loopback hosts', () async {
+      final inMemory = <String, String>{};
+      final storage = AiCredentialStorage(inMemoryStore: inMemory);
+
+      // Rejects plain HTTP
+      expect(
+        () => storage.saveCustomProxyUrl('http://insecure-proxy.com/api'),
+        throwsA(isA<ArgumentError>().having((e) => e.message, 'message', contains('HTTPS'))),
+      );
+
+      // Rejects localhost / 127.0.0.1 / private IPs
+      expect(
+        () => storage.saveCustomProxyUrl('https://localhost:8080'),
+        throwsA(isA<ArgumentError>().having((e) => e.message, 'message', contains('loopback'))),
+      );
+      expect(
+        () => storage.saveCustomProxyUrl('https://127.0.0.1/proxy'),
+        throwsA(isA<ArgumentError>().having((e) => e.message, 'message', contains('loopback'))),
+      );
+      expect(
+        () => storage.saveCustomProxyUrl('https://192.168.1.100/ai'),
+        throwsA(isA<ArgumentError>().having((e) => e.message, 'message', contains('loopback'))),
+      );
+      expect(
+        () => storage.saveCustomProxyUrl('https://10.0.0.1/ai'),
+        throwsA(isA<ArgumentError>().having((e) => e.message, 'message', contains('loopback'))),
+      );
+
+      // Accepts valid HTTPS proxy URL
+      await storage.saveCustomProxyUrl('https://secure-ai-proxy.company.com/v1');
+      expect(await storage.getCustomProxyUrl(), equals('https://secure-ai-proxy.company.com/v1'));
+
+      // Allows clearing proxy URL with null or empty
+      await storage.saveCustomProxyUrl(null);
+      expect(await storage.getCustomProxyUrl(), isNull);
+    });
   });
 
   group('Legacy Credential Migration from SQLite to FlutterSecureStorage', () {
