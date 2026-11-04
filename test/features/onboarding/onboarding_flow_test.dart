@@ -68,11 +68,14 @@ void main() {
       expect(find.text('30 phút'), findsOneWidget);
       expect(find.text('60 phút'), findsOneWidget);
 
-      await tester.tap(find.text('15 phút'));
+      final chip15 = find.text('15 phút');
+      await tester.ensureVisible(chip15);
+      await tester.tap(chip15);
       await tester.pumpAndSettle();
 
       final listeningChip = find.text('Nghe hiểu');
       expect(listeningChip, findsOneWidget);
+      await tester.ensureVisible(listeningChip);
       await tester.tap(listeningChip);
       await tester.pumpAndSettle();
 
@@ -183,26 +186,45 @@ void main() {
 
       await tester.pumpAndSettle();
 
+      // Step 1: Goals & Purpose
       expect(find.text('Mục tiêu học tiếng Trung chính của bạn:'), findsOneWidget);
-      expect(find.text('Hiển thị Pinyin & Phiên âm:'), findsOneWidget);
-      expect(find.text('Bộ chữ Hán ưa thích:'), findsOneWidget);
-      expect(find.text('Phương pháp học ưa thích:'), findsOneWidget);
-      expect(find.text('Tốc độ phát âm audio mặc định:'), findsOneWidget);
-      expect(find.text('Nhắc nhở học tập hàng ngày:'), findsOneWidget);
-
       final hskExamPurpose = find.text('Luyện thi chứng chỉ HSK');
       await tester.ensureVisible(hskExamPurpose);
       await tester.tap(hskExamPurpose);
       await tester.pumpAndSettle();
+
+      // Navigate to Step 2
+      final toStep2Btn = find.text('Tiếp tục sang Chặng 2');
+      expect(toStep2Btn, findsOneWidget);
+      await tester.ensureVisible(toStep2Btn);
+      await tester.tap(toStep2Btn);
+      await tester.pumpAndSettle();
+
+      // Step 2: Method & Reminder
+      expect(find.text('Phương pháp học ưa thích:'), findsOneWidget);
+      expect(find.text('Nhắc nhở học tập hàng ngày:'), findsOneWidget);
+
+      // Navigate to Step 3
+      final toStep3Btn = find.text('Tiếp tục Chặng 3');
+      expect(toStep3Btn, findsOneWidget);
+      await tester.ensureVisible(toStep3Btn);
+      await tester.tap(toStep3Btn);
+      await tester.pumpAndSettle();
+
+      // Step 3: Display & Audio Preferences
+      expect(find.text('Hiển thị Pinyin & Phiên âm:'), findsOneWidget);
+      expect(find.text('Bộ chữ Hán ưa thích:'), findsOneWidget);
+      expect(find.text('Tốc độ phát âm audio mặc định:'), findsOneWidget);
 
       final traditionalScript = find.text('Phồn thể (繁體)');
       await tester.ensureVisible(traditionalScript);
       await tester.tap(traditionalScript);
       await tester.pumpAndSettle();
 
-      final startBtn = find.text('Bắt đầu lộ trình ngay');
-      await tester.ensureVisible(startBtn);
-      await tester.tap(startBtn);
+      final finishBtn = find.text('Hoàn tất thiết lập & Vào học');
+      expect(finishBtn, findsOneWidget);
+      await tester.ensureVisible(finishBtn);
+      await tester.tap(finishBtn);
       await tester.pumpAndSettle();
 
       expect(submittedMinutes, equals(30));
