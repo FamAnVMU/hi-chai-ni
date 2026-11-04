@@ -34,6 +34,7 @@
 | **Placement Test UI (`PlacementTestScreen`)** | **IMPLEMENTED** | CAT assessment flow with step progress indicators, multiple-choice, and listening audio controls. |
 | **Grammar Practice & Topics UI (`GrammarTopicsScreen`, `GrammarDetailScreen`)** | **IMPLEMENTED** | AllSet Wiki & HSK 3.0 rule presentations with contrastive examples and quiz views. |
 | **Sentence Audio & Shadowing UI (`SentencePracticeScreen`, `ShadowingScreen`)** | **IMPLEMENTED** | Waveform / audio playback bar, 7-level shadowing step-by-step recording UI. |
+| **Onboarding Multi-Step Wizard Flow** | **IMPLEMENTED** | Tái cấu trúc thành 3 chặng (Goals -> Habits -> Preferences) với PageView & Sub-step indicator. 17/17 tests pass. |
 | **Accessibility & Semantics Support** | **PARTIALLY IMPLEMENTED** | Essential semantics, contrast and touch targets present; screen reader announcements and alternative canvas controls scheduled for further enhancement. |
 | **Tablet / Foldable Dual-pane Adaptation** | **PARTIALLY IMPLEMENTED** | Responsive layout handles narrow to standard screens (320dp - 600dp); large tablet dual-pane layouts planned. |
 
