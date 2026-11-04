@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../onboarding/presentation/widgets/onboarding_progress_header.dart';
 import '../providers/placement_test_providers.dart';
 import 'placement_test_flow_screen.dart';
 import 'placement_test_result_screen.dart';
@@ -35,10 +36,12 @@ enum LearnerExperienceLevel {
 
 class PlacementTestIntroScreen extends ConsumerStatefulWidget {
   final void Function([int? hskLevel])? onTestComplete;
+  final VoidCallback? onBack;
 
   const PlacementTestIntroScreen({
     super.key,
     this.onTestComplete,
+    this.onBack,
   });
 
   @override
@@ -89,6 +92,13 @@ class _PlacementTestIntroScreenState extends ConsumerState<PlacementTestIntroScr
     return Scaffold(
       appBar: AppBar(
         title: const Text('Khảo Sát Năng Lực Đầu Vào'),
+        leading: widget.onBack != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                tooltip: 'Quay lại',
+                onPressed: widget.onBack,
+              )
+            : null,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -96,6 +106,7 @@ class _PlacementTestIntroScreenState extends ConsumerState<PlacementTestIntroScr
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const OnboardingProgressHeader(currentStep: 2),
               Text(
                 'Kinh nghiệm học tiếng Trung của bạn:',
                 style: theme.textTheme.titleSmall?.copyWith(

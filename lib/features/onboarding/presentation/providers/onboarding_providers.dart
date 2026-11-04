@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../../../core/database/app_database.dart';
 import '../../../../core/database/database_constants.dart';
+import '../../../curriculum/data/placement_unlock_handler.dart';
 
 enum OnboardingStep {
   aiSetup(0),
@@ -325,9 +326,85 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
               'updated_at': nowUtc,
             },
           );
+
+          final targetHsk = (currentHsk < 6) ? currentHsk + 1 : 6;
+
+          String purposeEnumName = 'dailyCommunication';
+          if (learningPurpose == 'hskExam') {
+            purposeEnumName = 'hskExam';
+          } else if (learningPurpose == 'businessWork') {
+            purposeEnumName = 'businessWork';
+          } else if (learningPurpose == 'travelCulture') {
+            purposeEnumName = 'travelCulture';
+          }
+
+          String timeframeEnumName = 'standard';
+          if (dailyMinutes >= 45) {
+            timeframeEnumName = 'express';
+          } else if (dailyMinutes <= 15) {
+            timeframeEnumName = 'relaxed';
+          }
+
+          final activeGoals = await txn.query(
+            DatabaseConstants.tableLearnerGoals,
+            where: 'is_active = 1',
+            limit: 1,
+          );
+
+          if (activeGoals.isNotEmpty) {
+            final existingId = activeGoals.first['id'] as String;
+            await txn.update(
+              DatabaseConstants.tableLearnerGoals,
+              {
+                'target_hsk_level': targetHsk,
+                'purpose': purposeEnumName,
+                'timeframe': timeframeEnumName,
+                'daily_minutes': dailyMinutes,
+                'updated_at': nowUtc,
+              },
+              where: 'id = ?',
+              whereArgs: [existingId],
+            );
+          } else {
+            await txn.insert(
+              DatabaseConstants.tableLearnerGoals,
+              {
+                'id': 'goal_${DateTime.now().toUtc().microsecondsSinceEpoch}',
+                'target_hsk_level': targetHsk,
+                'purpose': purposeEnumName,
+                'timeframe': timeframeEnumName,
+                'daily_minutes': dailyMinutes,
+                'is_active': 1,
+                'created_at': nowUtc,
+                'updated_at': nowUtc,
+              },
+              conflictAlgorithm: ConflictAlgorithm.replace,
+            );
+          }
+
+          final unlockHandler = PlacementUnlockHandler(txn);
+          await unlockHandler.unlockForRecommendedLevel(currentHsk);
+
+          await txn.insert(
+            DatabaseConstants.tableAppSettings,
+            {
+              'key': 'roadmap_initialized',
+              'value': 'true',
+              'updated_at': nowUtc,
+            },
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
         });
       }
     } catch (_) {}
+  }
+
+  Future<void> previousStep() async {
+    if (state.currentStep == OnboardingStep.personalization) {
+      await setStep(OnboardingStep.placementTest);
+    } else if (state.currentStep == OnboardingStep.placementTest) {
+      await setStep(OnboardingStep.aiSetup);
+    }
   }
 
   Future<void> resetOnboarding() async {

@@ -30,9 +30,12 @@ class PlacementUnlockHandler {
       final lessonId = lesson['id'] as String;
       final orderIndex = (lesson['order_index'] as num).toInt();
       final unitId = lesson['unit_id'] as String;
+      final existingStatus = lesson['status'] as String?;
 
       if (orderIndex < targetLessonOrder) {
-        // Auto-credit previous lesson
+        if (existingStatus == 'completed') {
+          continue;
+        }
         await _curriculumDao.updateLessonStatus(
           lessonId,
           status: 'completed',

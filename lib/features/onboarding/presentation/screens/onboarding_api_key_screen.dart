@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import '../../../../core/network/ai/models/ai_model_config.dart';
 import '../../../../core/network/ai/security/ai_credential_storage.dart';
 import '../../../../core/theme/theme.dart';
+import '../widgets/onboarding_progress_header.dart';
 
 class OnboardingApiKeyScreen extends StatefulWidget {
   final VoidCallback onSkip;
   final dynamic onSaveApiKey;
   final VoidCallback? onSuccessNext;
+  final VoidCallback? onBack;
 
   const OnboardingApiKeyScreen({
     super.key,
     required this.onSkip,
     this.onSaveApiKey,
     this.onSuccessNext,
+    this.onBack,
   });
 
   @override
@@ -257,6 +260,13 @@ class _OnboardingApiKeyScreenState extends State<OnboardingApiKeyScreen> {
       appBar: AppBar(
         title: const Text('Bước 1 / 3'),
         centerTitle: true,
+        leading: widget.onBack != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                tooltip: 'Quay lại',
+                onPressed: widget.onBack,
+              )
+            : null,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -264,6 +274,7 @@ class _OnboardingApiKeyScreenState extends State<OnboardingApiKeyScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const OnboardingProgressHeader(currentStep: 1),
               const SizedBox(height: AppSpacing.xs),
               const Icon(
                 Icons.auto_awesome_rounded,

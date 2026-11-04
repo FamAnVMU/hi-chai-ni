@@ -149,6 +149,7 @@ void main() {
       expect(find.text('Chọn cấp độ HSK bạn đã đạt được:'), findsOneWidget);
       final hsk3Chip = find.text('HSK 3');
       expect(hsk3Chip, findsOneWidget);
+      await tester.ensureVisible(hsk3Chip);
       await tester.tap(hsk3Chip);
       await tester.pumpAndSettle();
 

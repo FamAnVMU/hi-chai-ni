@@ -280,6 +280,7 @@ void main() {
       // 1. Enter invalid short key (<20 chars)
       await tester.enterText(textFieldFinder, 'short_key');
       final saveBtnFinder = find.byType(HiButton);
+      await tester.ensureVisible(saveBtnFinder);
       await tester.tap(saveBtnFinder);
       await tester.pumpAndSettle();
 
@@ -290,6 +291,7 @@ void main() {
       // 2. Enter valid key
       const validKey = 'AIzaSyValidOnboardingKey1234567890';
       await tester.enterText(textFieldFinder, validKey);
+      await tester.ensureVisible(saveBtnFinder);
       await tester.tap(saveBtnFinder);
       await tester.pumpAndSettle();
 
@@ -322,7 +324,9 @@ void main() {
       await tester.enterText(find.byType(TextField), testKey);
 
       // Tap Save
-      await tester.tap(find.byType(HiButton));
+      final saveBtnFinder = find.byType(HiButton);
+      await tester.ensureVisible(saveBtnFinder);
+      await tester.tap(saveBtnFinder);
       await tester.pumpAndSettle();
 
       // Verify saved to secure storage

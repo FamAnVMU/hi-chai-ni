@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/theme.dart';
 import '../providers/onboarding_providers.dart';
+import '../widgets/onboarding_progress_header.dart';
 
 class OnboardingPersonalizationScreen extends StatefulWidget {
   final dynamic onComplete;
+  final VoidCallback? onBack;
 
   const OnboardingPersonalizationScreen({
     super.key,
     required this.onComplete,
+    this.onBack,
   });
 
   @override
@@ -114,6 +117,13 @@ class _OnboardingPersonalizationScreenState extends State<OnboardingPersonalizat
       appBar: AppBar(
         title: const Text('Cá Nhân Hóa Trải Nghiệm'),
         centerTitle: true,
+        leading: widget.onBack != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                tooltip: 'Quay lại',
+                onPressed: widget.onBack,
+              )
+            : null,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -121,6 +131,7 @@ class _OnboardingPersonalizationScreenState extends State<OnboardingPersonalizat
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const OnboardingProgressHeader(currentStep: 3),
               Text(
                 'Thiết Lập Mục Tiêu Học Tập',
                 style: theme.textTheme.headlineSmall?.copyWith(
