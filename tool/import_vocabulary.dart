@@ -119,8 +119,6 @@ void main(List<String> args) async {
   ''');
 
   final importAll = args.contains('--all') || args.isEmpty;
-  final importDict = args.contains('--dict');
-  final checkStats = args.contains('--stats');
 
   if (importAll) {
     final vocabFile = File('data_pipeline/processed/hsk_all_vocab.json');
