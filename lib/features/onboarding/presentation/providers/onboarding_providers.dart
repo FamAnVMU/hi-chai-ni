@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../../../core/database/app_database.dart';
 import '../../../../core/database/database_constants.dart';
+import '../../../../core/startup/app_startup_provider.dart';
 import '../../../curriculum/data/placement_unlock_handler.dart';
 
 enum OnboardingStep {
@@ -132,13 +133,23 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
 
   @override
   OnboardingState build() {
-    Future.microtask(() => _loadState());
+    final startup = ref.watch(appStartupProvider);
+    if (startup.isReady) {
+      Future.microtask(() => _loadState());
+    } else {
+      Future.microtask(() => _loadState());
+    }
     return const OnboardingState(isLoading: false);
+  }
+
+  Future<void> reloadState() async {
+    await _loadState();
   }
 
   Future<void> _loadState() async {
     try {
       if (!AppDatabase.instance.isOpen) {
+        if (!ref.mounted) return;
         state = state.copyWith(
           isLoading: false,
           isCompleted: false,
@@ -158,20 +169,35 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
         }
       }
 
-      final isCompleted = map[keyOnboardingCompleted] == 'true';
-      final stepIndex = int.tryParse(map[keyOnboardingStep] ?? '0') ?? 0;
-      final dailyMinutes = int.tryParse(map[keyDailyMinutes] ?? '30') ?? 30;
-      final focusSkill = map[keyPrioritySkill] ?? 'reading';
-      final purpose = map[keyLearningPurpose] ?? 'dailyCommunication';
-      final showPinyin = (map[keyShowPinyin] ?? 'true') == 'true';
-      final pinyinPos = map[keyPinyinPosition] ?? 'above_hanzi';
-      final script = map[keyScriptType] ?? 'simplified';
-      final method = map[keyLearningMethod] ?? 'contextual_lessons';
-      final speech = double.tryParse(map[keySpeechRate] ?? '1.0') ?? 1.0;
-      final reminder = (map[keyReminderEnabled] ?? 'true') == 'true';
-      final reminderTime = map[keyReminderTime] ?? '20:00';
-      final startingHsk = int.tryParse(map[keyStartingHsk] ?? '1');
+      final isCompleted = map.containsKey(keyOnboardingCompleted)
+          ? map[keyOnboardingCompleted] == 'true'
+          : state.isCompleted;
+      final stepIndex = map.containsKey(keyOnboardingStep)
+          ? (int.tryParse(map[keyOnboardingStep]!) ?? state.currentStep.stepIndex)
+          : state.currentStep.stepIndex;
+      final dailyMinutes = map.containsKey(keyDailyMinutes)
+          ? (int.tryParse(map[keyDailyMinutes]!) ?? state.dailyMinutes)
+          : state.dailyMinutes;
+      final focusSkill = map[keyPrioritySkill] ?? state.focusSkill;
+      final purpose = map[keyLearningPurpose] ?? state.learningPurpose;
+      final showPinyin = map.containsKey(keyShowPinyin)
+          ? map[keyShowPinyin] == 'true'
+          : state.showPinyin;
+      final pinyinPos = map[keyPinyinPosition] ?? state.pinyinPosition;
+      final script = map[keyScriptType] ?? state.scriptType;
+      final method = map[keyLearningMethod] ?? state.learningMethod;
+      final speech = map.containsKey(keySpeechRate)
+          ? (double.tryParse(map[keySpeechRate]!) ?? state.speechRate)
+          : state.speechRate;
+      final reminder = map.containsKey(keyReminderEnabled)
+          ? map[keyReminderEnabled] == 'true'
+          : state.reminderEnabled;
+      final reminderTime = map[keyReminderTime] ?? state.reminderTime;
+      final startingHsk = map.containsKey(keyStartingHsk)
+          ? int.tryParse(map[keyStartingHsk]!)
+          : state.assessedHskLevel;
 
+      if (!ref.mounted) return;
       state = state.copyWith(
         isLoading: false,
         isCompleted: isCompleted,
@@ -189,6 +215,7 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
         assessedHskLevel: startingHsk,
       );
     } catch (_) {
+      if (!ref.mounted) return;
       state = state.copyWith(
         isLoading: false,
         isCompleted: false,
@@ -198,6 +225,7 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
   }
 
   Future<void> setStep(OnboardingStep step, {bool? skippedAi}) async {
+    if (!ref.mounted) return;
     state = state.copyWith(
       currentStep: step,
       hasSkippedAiSetup: skippedAi ?? state.hasSkippedAiSetup,
@@ -221,6 +249,7 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
   }
 
   Future<void> completePlacementTest([int? hskLevel]) async {
+    if (!ref.mounted) return;
     state = state.copyWith(
       assessedHskLevel: hskLevel,
       currentStep: OnboardingStep.personalization,
@@ -266,6 +295,7 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
     bool reminderEnabled = true,
     String reminderTime = '20:00',
   }) async {
+    if (!ref.mounted) return;
     state = state.copyWith(
       isLoading: false,
       isCompleted: true,
@@ -317,7 +347,7 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
           }
 
           final currentHsk = state.assessedHskLevel ?? 1;
-          await txn.update(
+          final updatedRows = await txn.update(
             DatabaseConstants.tableUserProfiles,
             {
               'current_hsk_level': currentHsk,
@@ -326,6 +356,23 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
               'updated_at': nowUtc,
             },
           );
+          if (updatedRows == 0) {
+            await txn.insert(
+              DatabaseConstants.tableUserProfiles,
+              {
+                'id': 'profile_default',
+                'display_name': 'Học viên',
+                'current_hsk_level': currentHsk,
+                'target_hsk_level': (currentHsk < 6) ? currentHsk + 1 : 6,
+                'daily_minutes': dailyMinutes,
+                'purpose': learningPurpose,
+                'start_date': nowUtc,
+                'created_at': nowUtc,
+                'updated_at': nowUtc,
+              },
+              conflictAlgorithm: ConflictAlgorithm.replace,
+            );
+          }
 
           final targetHsk = (currentHsk < 6) ? currentHsk + 1 : 6;
 

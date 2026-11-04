@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/constants/app_constants.dart';
+import 'core/router/app_router.dart';
 import 'core/theme/theme.dart';
 import 'core/utils/app_lifecycle_manager.dart';
 import 'core/utils/permission_helper.dart';
@@ -66,6 +67,7 @@ class HiChineseApp extends ConsumerWidget {
           child: child ?? const SizedBox.shrink(),
         );
       },
+      onGenerateRoute: (settings) => AppRouter.onGenerateRoute(settings, ref),
       home: const AppShell(),
     );
   }
