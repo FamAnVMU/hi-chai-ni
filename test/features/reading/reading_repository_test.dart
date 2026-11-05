@@ -2,12 +2,15 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hi_chinese/core/database/database_constants.dart';
 import 'package:hi_chinese/core/database/migrations/migration_engine.dart';
+import 'package:hi_chinese/core/network/ai/ai.dart';
 import 'package:hi_chinese/features/reading/reading.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
   late Database db;
   late Directory tempDir;
+  late MockAiProvider mockAiProvider;
+  late AiService aiService;
   late ReadingRepository repository;
 
   setUpAll(() {
@@ -23,7 +26,13 @@ void main() {
     final engine = MigrationEngine();
     await engine.executeMigrations(db, 0, DatabaseConstants.currentDatabaseVersion);
 
-    repository = DefaultReadingRepository(db);
+    mockAiProvider = MockAiProvider();
+    aiService = AiService(
+      provider: mockAiProvider,
+      credentialStorage: AiCredentialStorage.inMemory(initialApiKey: 'test_key'),
+      modelRegistry: AiModelRegistry(),
+    );
+    repository = DefaultReadingRepository(db, aiService: aiService);
 
     // Insert test passage into SQLite
     final now = DateTime.utc(2026, 11, 1).toIso8601String();
@@ -118,12 +127,48 @@ void main() {
       expect(activities.first['duration_seconds'], equals(90));
     });
 
-    test('4. askAiAboutPassage returns academic commentary', () async {
+    test('4. askAiAboutPassage returns real AI pedagogical response via AiService (Task 3.2)', () async {
+      mockAiProvider.customTextResponse =
+          'Giải thích AI: Trong đoạn văn "他叫李明。他是中国人。", câu hỏi của bạn về quốc tịch được giải đáp rõ: Lý Minh là người Trung Quốc (中国人).';
       final response = await repository.askAiAboutPassage(
         passageText: '他是中国人。',
         userQuestion: 'Là người nước nào?',
       );
       expect(response, contains('Giải thích AI'));
+      expect(response, contains('中国人'));
+    });
+
+    test('5. askAiAboutPassage throws AiAuthenticationException when no API key configured (Task 3.2)', () async {
+      final unauthedAiService = AiService(
+        provider: GeminiRestAiProvider(
+          credentialStorage: AiCredentialStorage.inMemory(initialApiKey: null),
+        ),
+        credentialStorage: AiCredentialStorage.inMemory(initialApiKey: null),
+        modelRegistry: AiModelRegistry(),
+      );
+      final unauthedRepo = DefaultReadingRepository(db, aiService: unauthedAiService);
+
+      expect(
+        () => unauthedRepo.askAiAboutPassage(
+          passageText: '他是中国人。',
+          userQuestion: 'Là người nước nào?',
+        ),
+        throwsA(isA<AiAuthenticationException>()),
+      );
+    });
+
+    test('6. askAiAboutPassage supports CancelToken and cancels gracefully (Task 3.2)', () async {
+      final cancelToken = CancelToken();
+      cancelToken.cancel();
+
+      expect(
+        () => repository.askAiAboutPassage(
+          passageText: '他是中国人。',
+          userQuestion: 'Là người nước nào?',
+          cancelToken: cancelToken,
+        ),
+        throwsA(isA<AiCancelledException>()),
+      );
     });
   });
 }

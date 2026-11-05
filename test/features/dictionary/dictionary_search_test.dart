@@ -2,12 +2,15 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hi_chinese/core/database/database_constants.dart';
 import 'package:hi_chinese/core/database/migrations/migration_engine.dart';
+import 'package:hi_chinese/core/network/ai/ai.dart';
 import 'package:hi_chinese/features/dictionary/dictionary.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
   late Database db;
   late Directory tempDir;
+  late MockAiProvider mockAiProvider;
+  late AiService aiService;
   late DictionaryRepository repository;
 
   setUpAll(() {
@@ -23,7 +26,14 @@ void main() {
     final engine = MigrationEngine();
     await engine.executeMigrations(db, 0, DatabaseConstants.currentDatabaseVersion);
 
-    repository = DefaultDictionaryRepository(db);
+    mockAiProvider = MockAiProvider();
+    aiService = AiService(
+      provider: mockAiProvider,
+      credentialStorage: AiCredentialStorage.inMemory(initialApiKey: 'test_key'),
+      modelRegistry: AiModelRegistry(),
+    );
+
+    repository = DefaultDictionaryRepository(db, aiService: aiService);
 
     // Seed test vocabulary with multiple senses and traditional characters
     final now = DateTime.utc(2026, 11, 1).toIso8601String();
@@ -231,6 +241,58 @@ void main() {
       await repository.clearSearchHistory();
       final clearedHistory = await repository.getRecentSearches();
       expect(clearedHistory, isEmpty);
+    });
+
+    test('8. explainWordWithAi returns real contextual pedagogical analysis via AiService (Task 3.1)', () async {
+      mockAiProvider.customTextResponse = '''
+1. **Nghĩa & Từ loại**: "你好" là thán từ chào hỏi phổ biến nhất trong tiếng Hán.
+2. **Cấu tạo chữ Hán & Chiết tự**: Chữ 你 gồm bộ Nhân đứng (亻) và chữ 尔; chữ 好 gồm bộ Nữ (女) và bộ Tử (子).
+3. **Phân tích ngữ cảnh**: Dùng trong giao tiếp hàng ngày khi gặp gỡ lần đầu hoặc chào hỏi xã giao.
+4. **2 Câu ví dụ chuẩn HSK**:
+   - 你好！很高兴认识你。(Nǐ hǎo! Hěn gāoxìng rènshi nǐ.) — Xin chào! Rất vui được quen biết bạn.
+   - 老师，你好！(Lǎoshī, nǐ hǎo!) — Chào thầy/cô giáo!
+5. **Lỗi người Việt hay mắc**: Người Việt hay dịch từng chữ "bạn tốt", nhưng đây là một cụm từ chào hỏi hoàn chỉnh.
+''';
+
+      final result = await repository.explainWordWithAi('你好');
+      expect(result, contains('Nghĩa & Từ loại'));
+      expect(result, contains('Cấu tạo chữ Hán & Chiết tự'));
+      expect(result, contains('Câu ví dụ chuẩn HSK'));
+      expect(result, contains('Lỗi người Việt hay mắc'));
+    });
+
+    test('9. explainWordWithAi with contextSentence passes contextual prompt (Task 3.1)', () async {
+      mockAiProvider.customTextResponse = 'Trong câu "今天天气很好", từ "好" đóng vai trò vị ngữ tính từ mang nghĩa tốt, đẹp.';
+
+      final result = await repository.explainWordWithAi(
+        '好',
+        contextSentence: '今天天气很好。',
+      );
+      expect(result, contains('今天天气很好'));
+      expect(result, contains('tính từ'));
+    });
+
+    test('10. explainWordWithAi throws AiAuthenticationException when no API key configured (Task 3.1)', () async {
+      final unauthedAiService = AiService(
+        provider: GeminiRestAiProvider(
+          credentialStorage: AiCredentialStorage.inMemory(initialApiKey: null),
+        ),
+        credentialStorage: AiCredentialStorage.inMemory(initialApiKey: null),
+        modelRegistry: AiModelRegistry(),
+      );
+      final unauthedRepo = DefaultDictionaryRepository(db, aiService: unauthedAiService);
+
+      expect(
+        () => unauthedRepo.explainWordWithAi('你好'),
+        throwsA(isA<AiAuthenticationException>()),
+      );
+    });
+
+    test('11. explainWordWithAi throws AiValidationException for empty word (Task 3.1)', () async {
+      expect(
+        () => repository.explainWordWithAi('   '),
+        throwsA(isA<AiValidationException>()),
+      );
     });
   });
 }

@@ -61,6 +61,9 @@ class LearnerContextService {
     int hskLevel = 1,
     String learnerName = 'Học viên',
     String? customGoal,
+    String? learningPathType,
+    String? focusSkill,
+    bool? hasCompletedLessons,
     int maxVocab = 20,
     int maxErrors = 5,
     int maxEvidence = 10,
@@ -83,6 +86,12 @@ class LearnerContextService {
       _loadMasterySnapshots(db),
       _loadRecentEvidence(db, maxEvidence),
       _loadRecentChatSummary(db, sessionId),
+      learningPathType == null || (learningPathType == 'focused' && focusSkill == null)
+          ? _loadLearningPathSettings(db)
+          : Future.value((learningPathType: learningPathType, focusSkill: focusSkill)),
+      hasCompletedLessons == null
+          ? _loadHasCompletedLessons(db)
+          : Future.value(hasCompletedLessons),
     ]);
 
     final rawVocab = results[0] as List<ConfirmedVocabulary>;
@@ -90,6 +99,12 @@ class LearnerContextService {
     final masteryBySkill = results[2] as Map<String, double>;
     final recentEvidence = results[3] as List<RecentEvidenceEntry>;
     final recentChatSummary = results[4] as String?;
+    final pathSettings = results[5] as ({String learningPathType, String? focusSkill});
+    final completedLessons = results[6] as bool;
+
+    final resolvedLearningPathType = learningPathType ?? pathSettings.learningPathType;
+    final resolvedFocusSkill = focusSkill ?? pathSettings.focusSkill;
+    final resolvedHasCompletedLessons = hasCompletedLessons ?? completedLessons;
 
     // Detect conflicting evidence: word appears in both confirmed and error lists
     final errorExamples = {
@@ -154,6 +169,9 @@ class LearnerContextService {
         hskLevel: hskLevel,
         learnerName: learnerName,
         customGoal: customGoal,
+        learningPathType: resolvedLearningPathType,
+        focusSkill: resolvedFocusSkill,
+        hasCompletedLessons: resolvedHasCompletedLessons,
       ),
       confirmedVocabulary: fittedVocab,
       recurringErrors: fittedErrors,
@@ -407,6 +425,68 @@ class LearnerContextService {
     } catch (e) {
       debugPrint('[LearnerContextService] _loadRecentChatSummary error: $e');
       return null;
+    }
+  }
+
+  /// Loads learning path type and focus skill from [DatabaseConstants.tableAppSettings].
+  Future<({String learningPathType, String? focusSkill})> _loadLearningPathSettings(
+    DatabaseExecutor db,
+  ) async {
+    try {
+      final rows = await db.query(
+        DatabaseConstants.tableAppSettings,
+        where: 'key IN (?, ?)',
+        whereArgs: ['priority_focus_skill', 'learning_path_type'],
+      );
+      String? rawType;
+      String? rawSkill;
+      for (final r in rows) {
+        final k = r['key'] as String?;
+        final v = r['value'] as String?;
+        if (k == 'learning_path_type') rawType = v;
+        if (k == 'priority_focus_skill') rawSkill = v;
+      }
+
+      if (rawType != null && rawType.isNotEmpty) {
+        if (rawType.toLowerCase() == 'focused') {
+          return (learningPathType: 'focused', focusSkill: rawSkill ?? 'reading');
+        } else {
+          return (learningPathType: 'comprehensive', focusSkill: null);
+        }
+      }
+
+      if (rawSkill != null && rawSkill.isNotEmpty) {
+        final lower = rawSkill.toLowerCase();
+        if (lower == 'comprehensive' || lower == 'all' || lower == 'toandien') {
+          return (learningPathType: 'comprehensive', focusSkill: null);
+        } else {
+          return (learningPathType: 'focused', focusSkill: rawSkill);
+        }
+      }
+
+      return (learningPathType: 'comprehensive', focusSkill: null);
+    } catch (e) {
+      debugPrint('[LearnerContextService] _loadLearningPathSettings error: $e');
+      return (learningPathType: 'comprehensive', focusSkill: null);
+    }
+  }
+
+  /// Checks whether the user has completed at least one lesson in [DatabaseConstants.tableLessonProgress].
+  Future<bool> _loadHasCompletedLessons(DatabaseExecutor db) async {
+    try {
+      final rows = await db.rawQuery('''
+        SELECT COUNT(id) AS completed_count
+        FROM ${DatabaseConstants.tableLessonProgress}
+        WHERE status = 'completed' OR completed_at IS NOT NULL
+      ''');
+      if (rows.isNotEmpty) {
+        final count = (rows.first['completed_count'] as int?) ?? 0;
+        return count > 0;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('[LearnerContextService] _loadHasCompletedLessons error: $e');
+      return false;
     }
   }
 

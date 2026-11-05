@@ -1,11 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/database/app_database.dart';
+import '../../../../core/network/ai/ai_service.dart';
 import '../../data/reading_repository.dart';
 import '../../domain/models/reading_models.dart';
 
 final readingRepositoryProvider = Provider<ReadingRepository>((ref) {
   final db = AppDatabase.instance.database;
-  return DefaultReadingRepository(db);
+  final aiService = ref.watch(aiServiceProvider);
+  return DefaultReadingRepository(db, aiService: aiService);
 });
 
 class SelectedHskFilterNotifier extends Notifier<int?> {

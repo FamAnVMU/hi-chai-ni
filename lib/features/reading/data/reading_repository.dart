@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import '../../../../core/database/dao/activity_dao.dart';
 import '../../../../core/database/dao/learner_evidence_dao.dart';
 import '../../../../core/database/dao/reading_dao.dart';
+import '../../../../core/network/ai/ai.dart';
 import '../../../../core/utils/app_clock.dart';
 import '../domain/models/reading_models.dart';
 
@@ -21,16 +22,28 @@ abstract class ReadingRepository {
   Future<String> askAiAboutPassage({
     required String passageText,
     required String userQuestion,
+    CancelToken? cancelToken,
   });
 }
 
 class DefaultReadingRepository implements ReadingRepository {
   final Database _db;
+  final AiService _aiService;
   late final ReadingDao _readingDao;
   late final LearnerEvidenceDao _evidenceDao;
   late final ActivityDao _activityDao;
 
-  DefaultReadingRepository(this._db) {
+  DefaultReadingRepository(
+    this._db, {
+    AiService? aiService,
+  })  : _aiService = aiService ??
+            AiService(
+              provider: GeminiRestAiProvider(
+                credentialStorage: AiCredentialStorage(),
+              ),
+              credentialStorage: AiCredentialStorage(),
+              modelRegistry: AiModelRegistry(),
+            ) {
     _readingDao = ReadingDao(_db);
     _evidenceDao = LearnerEvidenceDao(_db);
     _activityDao = ActivityDao(_db);
@@ -149,10 +162,46 @@ class DefaultReadingRepository implements ReadingRepository {
   Future<String> askAiAboutPassage({
     required String passageText,
     required String userQuestion,
+    CancelToken? cancelToken,
   }) async {
-    // Academic & Architectural Honesty:
-    // AI assists in explaining contextual grammar, cultural nuances and sentence breakdowns.
-    return 'Giải thích AI: Về câu hỏi "$userQuestion", trong bài đọc: "$passageText", điểm mấu chốt nằm ở kết cấu ngữ pháp và ngữ cảnh giao tiếp tự nhiên của người bản xứ.';
+    final trimmedQuestion = userQuestion.trim();
+    if (trimmedQuestion.isEmpty) {
+      throw const AiValidationException('Câu hỏi không được để trống.');
+    }
+
+    final systemPrompt = '''
+Bạn là Gia Sư Tiếng Trung AI Kiên Nhẫn & Tận Tâm trong ứng dụng "HI Chinese", hỗ trợ người học đọc hiểu văn bản tiếng Trung Quốc.
+
+# ĐOẠN VĂN GỐC CẦN PHÂN TÍCH:
+"""
+$passageText
+"""
+
+# NGUYÊN TẮC SƯ PHẠM KHI TRẢ LỜI CÂU HỎI:
+1. **Dựa trên bài đọc**: Câu trả lời PHẢI dựa trực tiếp trên nội dung đoạn văn trên. Trích dẫn câu văn gốc trong bài (kèm Pinyin và nghĩa tiếng Việt) làm bằng chứng luận điểm.
+2. **Giải thích ngữ pháp & từ vựng**: Chỉ ra các cấu trúc ngữ pháp, từ nối hoặc thành ngữ xuất hiện trong đoạn văn liên quan đến câu hỏi của người học.
+3. **Phương pháp sư phạm gợi mở (Scaffolding)**: Không chỉ đưa ra đáp án cụt lủn, hãy giải thích logic suy luận từng bước để người học hiểu lý do vì sao lại như vậy và phát triển tư duy đọc hiểu.
+4. **Không gợi ý bài kiểm tra năng lực**: Tuyệt đối KHÔNG gợi ý người học làm bài kiểm tra năng lực đầu vào (placement test).
+
+# ĐỊNH DẠNG TRẢ LỜI:
+- Trình bày bằng tiếng Việt rõ ràng, sư phạm, thân thiện.
+- Sử dụng Markdown có phân mục, in đậm các từ khóa tiếng Trung và có Pinyin hỗ trợ người học.
+''';
+
+    final request = AiPromptRequest.singlePrompt(
+      trimmedQuestion,
+      systemInstruction: systemPrompt,
+      temperature: 0.5,
+      taskId: 'reading_passage_qa',
+    );
+
+    final response = await _aiService.generateText(
+      request,
+      taskType: AiTaskType.readingComprehension,
+      cancelToken: cancelToken,
+    );
+
+    return response.text.trim();
   }
 
   static final List<ReadingPassage> _fallbackPassages = [
@@ -161,8 +210,9 @@ class DefaultReadingRepository implements ReadingRepository {
       hskLevel: 1,
       titleCn: '我的中国朋友',
       contentCn: '我有一个好朋友，他叫李明。他是中国人，今年二十岁。李明很喜欢学习英语，我也喜欢学习汉语。我们常常一起去图书馆看书，一起喝茶。',
-      pinyin: 'Wǒ yǒu yí gè hǎo péngyou, tā jiào Lǐ Míng. Tā shì Zhōngguó rén, jīnnián èrshí suì. Lǐ Míng hěn xǐhuan xuéxí Yīngyǔ, wǒ yě xǐhuan xuéxí Hànyǔ. Wǒmen chángcháng yìqǐ qù túshūguǎn kàn shū, yìqǐ hē chá.',
+      pinyin: 'wǒ yǒu yí gè hǎo péng yǒu tā jiào lǐ míng tā shì zhōng guó rén jīn nián èr shí suì lǐ míng hěn xǐ huān xué xí yīng yǔ wǒ yě xǐ huān xué xí hàn yǔ wǒ men cháng cháng yì qǐ qù tú shū guǎn kàn shū yì qǐ hē chá',
       translationVi: 'Tôi có một người bạn tốt, anh ấy tên là Lý Minh. Anh ấy là người Trung Quốc, năm nay hai mươi tuổi. Lý Minh rất thích học tiếng Anh, tôi cũng thích học tiếng Trung. Chúng tôi thường cùng nhau đến thư viện đọc sách, cùng nhau uống trà.',
+      audioUri: 'assets/audio/reading/rdg_hsk1_friend.mp3',
       topic: 'Đời sống',
       estimatedMinutes: 2,
       questions: [
@@ -191,8 +241,9 @@ class DefaultReadingRepository implements ReadingRepository {
       hskLevel: 2,
       titleCn: '在饭馆点菜',
       contentCn: '今天晚上我和家人一起去中国饭馆吃饭。服务员很热情，给我们介绍了几个特色菜。我们点了宫保鸡丁、西红柿炒鸡蛋和两碗米饭。菜的味道非常好，我们吃得很高兴。',
-      pinyin: 'Jīntiān wǎnshang wǒ hé jiārén yìqǐ qù Zhōngguó fànguǎn chīfàn. Fúwùyuán hěn rèqíng, gěi wǒmen jièshào le jǐ gè tèsè cài. Wǒmen diǎn le gōngbǎo jīdīng, xīhóngshì chǎo jīdàn hé liǎng wǎn mǐfàn. Cài de wèidao fēicháng hǎo, wǒmen chī de hěn gāoxìng.',
+      pinyin: 'jīn tiān wǎn shàng wǒ hé jiā rén yì qǐ qù zhōng guó fàn guǎn chī fàn fú wù yuán hěn rè qíng gěi wǒ men jiè shào le jǐ gè tè sè cài wǒ men diǎn le gōng bǎo jī dīng xī hóng shì chǎo jī dàn hé liǎng wǎn mǐ fàn cài de wèi dào fēi cháng hǎo wǒ men chī de hěn gāo xìng',
       translationVi: 'Tối nay tôi cùng gia đình đến một nhà hàng Trung Quốc dùng bữa. Nhân viên phục vụ rất nhiệt tình, giới thiệu cho chúng tôi vài món đặc sắc. Chúng tôi gọi gà Cung Bảo, trứng xào cà chua và hai bát cơm trắng. Hương vị món ăn rất ngon, chúng tôi ăn uống rất vui vẻ.',
+      audioUri: 'assets/audio/reading/rdg_hsk2_restaurant.mp3',
       topic: 'Ẩm thực',
       estimatedMinutes: 3,
       questions: [

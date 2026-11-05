@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../../../core/audio/audio_player_service.dart';
+import '../../../../core/network/ai/ai.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../hanzi/hanzi.dart';
 import '../../../sentences/sentences.dart';
+import '../../../settings/presentation/screens/ai_settings_screen.dart';
 import '../../data/dictionary_repository.dart';
 import '../../domain/models/dictionary_models.dart';
 
@@ -47,6 +49,8 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
   late DictionaryEntry _entry;
   bool _isAudioPlaying = false;
   String? _aiExplanation;
+  String? _aiError;
+  bool _isAiAuthError = false;
   bool _isLoadingAi = false;
   final AudioPlayerService _audioPlayer = DefaultAudioPlayerService();
 
@@ -138,7 +142,10 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
   }
 
   Future<void> _handleAskAi() async {
-    setState(() => _isLoadingAi = true);
+    setState(() {
+      _isLoadingAi = true;
+      _aiError = null;
+    });
     try {
       final explanation = await widget.repository.explainWordWithAi(
         _entry.simplified,
@@ -150,9 +157,19 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
           _isLoadingAi = false;
         });
       }
-    } catch (_) {
+    } catch (e) {
       if (mounted) {
-        setState(() => _isLoadingAi = false);
+        final isAuth = e is AiAuthenticationException || e.toString().toLowerCase().contains('api key');
+        final errorMsg = isAuth
+            ? 'Chưa cấu hình API Key. Vui lòng thiết lập khóa Gemini API trong phần Cài đặt để sử dụng tính năng này.'
+            : (e is AiNetworkException
+                ? 'Không thể kết nối đến máy chủ AI. Vui lòng kiểm tra lại kết nối mạng.'
+                : 'Lỗi khi hỏi AI: $e');
+        setState(() {
+          _aiError = errorMsg;
+          _isAiAuthError = isAuth;
+          _isLoadingAi = false;
+        });
       }
     }
   }
@@ -590,10 +607,68 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                             ],
                           ),
                           const SizedBox(height: 6),
-                          Text(
+                          SelectableText(
                             _aiExplanation!,
-                            style: theme.textTheme.bodySmall,
+                            style: theme.textTheme.bodySmall?.copyWith(height: 1.5),
                           ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                  ],
+
+                  // AI Error Section (Friendly Banner with Action)
+                  if (_aiError != null) ...[
+                    Container(
+                      padding: const EdgeInsets.all(AppSpacing.sm),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.errorContainer.withAlpha(80),
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
+                        border: Border.all(
+                          color: theme.colorScheme.error.withAlpha(120),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.error_outline_rounded,
+                                size: 18,
+                                color: theme.colorScheme.error,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  _aiError!,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onErrorContainer,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (_isAiAuthError) ...[
+                            const SizedBox(height: 8),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton.icon(
+                                icon: const Icon(Icons.settings, size: 16),
+                                label: const Text('Mở Cài Đặt AI'),
+                                style: TextButton.styleFrom(
+                                  visualDensity: VisualDensity.compact,
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const AiSettingsScreen()),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),

@@ -256,6 +256,7 @@ class SeedReadingPassageItem {
   final String contentZh;
   final String pinyin;
   final String translationVi;
+  final String? audioUri;
   final List<Map<String, dynamic>> questions;
 
   const SeedReadingPassageItem({
@@ -265,6 +266,7 @@ class SeedReadingPassageItem {
     required this.contentZh,
     required this.pinyin,
     required this.translationVi,
+    this.audioUri,
     this.questions = const [],
   });
 
@@ -277,6 +279,7 @@ class SeedReadingPassageItem {
       contentZh: json['contentZh'] as String? ?? '',
       pinyin: json['pinyin'] as String? ?? '',
       translationVi: json['translationVi'] as String? ?? '',
+      audioUri: json['audioUri'] as String? ?? json['audio_uri'] as String?,
       questions: rawQuestions.map((q) => q as Map<String, dynamic>).toList(),
     );
   }
@@ -288,6 +291,7 @@ class SeedReadingPassageItem {
         'contentZh': contentZh,
         'pinyin': pinyin,
         'translationVi': translationVi,
+        if (audioUri != null) 'audioUri': audioUri,
         'questions': questions,
       };
 }
