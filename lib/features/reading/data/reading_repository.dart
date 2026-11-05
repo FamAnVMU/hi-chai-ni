@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import '../../../../core/database/dao/activity_dao.dart';
 import '../../../../core/database/dao/learner_evidence_dao.dart';
 import '../../../../core/database/dao/reading_dao.dart';
+import '../../../../core/network/ai/ai.dart';
 import '../../../../core/utils/app_clock.dart';
 import '../domain/models/reading_models.dart';
 
@@ -21,16 +22,28 @@ abstract class ReadingRepository {
   Future<String> askAiAboutPassage({
     required String passageText,
     required String userQuestion,
+    CancelToken? cancelToken,
   });
 }
 
 class DefaultReadingRepository implements ReadingRepository {
   final Database _db;
+  final AiService _aiService;
   late final ReadingDao _readingDao;
   late final LearnerEvidenceDao _evidenceDao;
   late final ActivityDao _activityDao;
 
-  DefaultReadingRepository(this._db) {
+  DefaultReadingRepository(
+    this._db, {
+    AiService? aiService,
+  })  : _aiService = aiService ??
+            AiService(
+              provider: GeminiRestAiProvider(
+                credentialStorage: AiCredentialStorage(),
+              ),
+              credentialStorage: AiCredentialStorage(),
+              modelRegistry: AiModelRegistry(),
+            ) {
     _readingDao = ReadingDao(_db);
     _evidenceDao = LearnerEvidenceDao(_db);
     _activityDao = ActivityDao(_db);
@@ -149,10 +162,46 @@ class DefaultReadingRepository implements ReadingRepository {
   Future<String> askAiAboutPassage({
     required String passageText,
     required String userQuestion,
+    CancelToken? cancelToken,
   }) async {
-    // Academic & Architectural Honesty:
-    // AI assists in explaining contextual grammar, cultural nuances and sentence breakdowns.
-    return 'Giải thích AI: Về câu hỏi "$userQuestion", trong bài đọc: "$passageText", điểm mấu chốt nằm ở kết cấu ngữ pháp và ngữ cảnh giao tiếp tự nhiên của người bản xứ.';
+    final trimmedQuestion = userQuestion.trim();
+    if (trimmedQuestion.isEmpty) {
+      throw const AiValidationException('Câu hỏi không được để trống.');
+    }
+
+    final systemPrompt = '''
+Bạn là Gia Sư Tiếng Trung AI Kiên Nhẫn & Tận Tâm trong ứng dụng "HI Chinese", hỗ trợ người học đọc hiểu văn bản tiếng Trung Quốc.
+
+# ĐOẠN VĂN GỐC CẦN PHÂN TÍCH:
+"""
+$passageText
+"""
+
+# NGUYÊN TẮC SƯ PHẠM KHI TRẢ LỜI CÂU HỎI:
+1. **Dựa trên bài đọc**: Câu trả lời PHẢI dựa trực tiếp trên nội dung đoạn văn trên. Trích dẫn câu văn gốc trong bài (kèm Pinyin và nghĩa tiếng Việt) làm bằng chứng luận điểm.
+2. **Giải thích ngữ pháp & từ vựng**: Chỉ ra các cấu trúc ngữ pháp, từ nối hoặc thành ngữ xuất hiện trong đoạn văn liên quan đến câu hỏi của người học.
+3. **Phương pháp sư phạm gợi mở (Scaffolding)**: Không chỉ đưa ra đáp án cụt lủn, hãy giải thích logic suy luận từng bước để người học hiểu lý do vì sao lại như vậy và phát triển tư duy đọc hiểu.
+4. **Không gợi ý bài kiểm tra năng lực**: Tuyệt đối KHÔNG gợi ý người học làm bài kiểm tra năng lực đầu vào (placement test).
+
+# ĐỊNH DẠNG TRẢ LỜI:
+- Trình bày bằng tiếng Việt rõ ràng, sư phạm, thân thiện.
+- Sử dụng Markdown có phân mục, in đậm các từ khóa tiếng Trung và có Pinyin hỗ trợ người học.
+''';
+
+    final request = AiPromptRequest.singlePrompt(
+      trimmedQuestion,
+      systemInstruction: systemPrompt,
+      temperature: 0.5,
+      taskId: 'reading_passage_qa',
+    );
+
+    final response = await _aiService.generateText(
+      request,
+      taskType: AiTaskType.readingComprehension,
+      cancelToken: cancelToken,
+    );
+
+    return response.text.trim();
   }
 
   static final List<ReadingPassage> _fallbackPassages = [

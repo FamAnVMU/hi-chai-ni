@@ -2,6 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import '../../../../core/database/dao/dictionary_history_dao.dart';
 import '../../../../core/database/dao/user_saved_words_dao.dart';
 import '../../../../core/database/dao/vocabulary_dao.dart';
+import '../../../../core/network/ai/ai.dart';
 import '../domain/models/dictionary_models.dart';
 import '../domain/utils/pinyin_helper.dart';
 
@@ -20,6 +21,7 @@ abstract class DictionaryRepository {
 
 class DefaultDictionaryRepository implements DictionaryRepository {
   final Database _db;
+  final AiService _aiService;
   late final VocabularyDao _vocabDao;
   late final UserSavedWordsDao _savedWordsDao;
   late final DictionaryHistoryDao _historyDao;
@@ -27,7 +29,17 @@ class DefaultDictionaryRepository implements DictionaryRepository {
   @override
   Database? get database => _db;
 
-  DefaultDictionaryRepository(this._db) {
+  DefaultDictionaryRepository(
+    this._db, {
+    AiService? aiService,
+  })  : _aiService = aiService ??
+            AiService(
+              provider: GeminiRestAiProvider(
+                credentialStorage: AiCredentialStorage(),
+              ),
+              credentialStorage: AiCredentialStorage(),
+              modelRegistry: AiModelRegistry(),
+            ) {
     _vocabDao = VocabularyDao(_db);
     _savedWordsDao = UserSavedWordsDao(_db);
     _historyDao = DictionaryHistoryDao(_db);
@@ -187,6 +199,48 @@ class DefaultDictionaryRepository implements DictionaryRepository {
 
   @override
   Future<String> explainWordWithAi(String word, {String? contextSentence}) async {
-    return 'Phân tích từ "$word" bằng trợ lý AI.';
+    final trimmedWord = word.trim();
+    if (trimmedWord.isEmpty) {
+      throw const AiValidationException('Từ vựng cần phân tích không được để trống.');
+    }
+
+    final contextClause = contextSentence != null && contextSentence.trim().isNotEmpty
+        ? 'Phân tích cụ thể sắc thái và vai trò ngữ pháp của từ trong ngữ cảnh câu: "$contextSentence".'
+        : 'Giải thích sắc thái biểu cảm và ngữ cảnh sử dụng tự nhiên của từ.';
+
+    final systemPrompt = '''
+Bạn là Trợ Giảng Tiếng Trung AI Sư Phạm chuyên nghiệp trong ứng dụng "HI Chinese", chuyên phân tích từ vựng chuyên sâu cho người Việt Nam học tiếng Hán.
+
+# MỤC TIÊU SƯ PHẠM
+Hãy phân tích từ vựng được yêu cầu theo đúng cấu trúc chuẩn sau:
+1. **Nghĩa & Từ loại**: Giải thích nghĩa gốc, từ loại chính, và nghĩa mở rộng phổ biến nhất.
+2. **Cấu tạo chữ Hán & Chiết tự**: Phân tích bộ thủ, cấu trúc chữ (hội ý, hình thanh, tượng hình...), ý nghĩa các thành phần tạo nên chữ để người học dễ nhớ mặt chữ.
+3. **Phân tích ngữ cảnh**: $contextClause
+4. **2 Câu ví dụ chuẩn HSK**: Cung cấp đúng 2 câu ví dụ thực tế, tự nhiên. Mỗi câu BẮT BUỘC có đủ: Chữ Hán giản thể, Pinyin có dấu thanh, và bản dịch tiếng Việt chuẩn xác.
+5. **Lỗi người Việt hay mắc (Cảnh báo sư phạm)**: Chỉ rõ lỗi sai phổ biến của người Việt (ví dụ: dùng sai ngữ cảnh, dịch từng chữ theo Hán-Việt thô ráp, nhầm với từ gần nghĩa hoặc lỗi trật tự từ).
+
+# NGUYÊN TẮC BẮT BUỘC
+- Ngôn ngữ giải thích: Tiếng Việt sư phạm, khúc chiết, chuẩn mực.
+- Tuyệt đối KHÔNG gợi ý người học làm bài kiểm tra năng lực đầu vào (placement test).
+- Trình bày dạng Markdown có gạch đầu dòng rõ ràng, dễ đọc trên thiết bị di động.
+''';
+
+    final userPrompt = contextSentence != null && contextSentence.trim().isNotEmpty
+        ? 'Hãy phân tích từ "$trimmedWord" xuất hiện trong câu ngữ cảnh: "$contextSentence".'
+        : 'Hãy phân tích chi tiết từ vựng "$trimmedWord".';
+
+    final request = AiPromptRequest.singlePrompt(
+      userPrompt,
+      systemInstruction: systemPrompt,
+      temperature: 0.3,
+      taskId: 'dictionary_word_explanation',
+    );
+
+    final response = await _aiService.generateText(
+      request,
+      taskType: AiTaskType.dictionaryExplanation,
+    );
+
+    return response.text.trim();
   }
 }

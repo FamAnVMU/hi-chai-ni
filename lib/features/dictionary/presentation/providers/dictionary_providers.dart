@@ -1,11 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/database/app_database.dart';
+import '../../../../core/network/ai/ai_service.dart';
 import '../../data/dictionary_repository.dart';
 import '../../domain/models/dictionary_models.dart';
 
 final dictionaryRepositoryProvider = Provider<DictionaryRepository>((ref) {
   final db = AppDatabase.instance.database;
-  return DefaultDictionaryRepository(db);
+  final aiService = ref.watch(aiServiceProvider);
+  return DefaultDictionaryRepository(db, aiService: aiService);
 });
 
 class DictionarySearchQueryNotifier extends Notifier<String> {

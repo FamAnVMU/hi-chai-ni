@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../core/database/app_database.dart';
+import '../../../../core/network/ai/ai.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../dictionary/data/dictionary_repository.dart';
 import '../../../dictionary/presentation/widgets/dictionary_detail_sheet.dart';
+import '../../../settings/presentation/screens/ai_settings_screen.dart';
 import '../../data/reading_repository.dart';
 import '../../domain/models/reading_models.dart';
 import '../widgets/reading_mode_selector.dart';
@@ -38,6 +40,7 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
   int _readingTimeSeconds = 0;
   ReadingProgress? _existingProgress;
   bool _isLoading = true;
+  CancelToken? _aiCancelToken;
 
   final ScrollController _scrollController = ScrollController();
 
@@ -78,6 +81,7 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
 
   @override
   void dispose() {
+    _aiCancelToken?.cancel();
     _readingTimer?.cancel();
     _saveProgress(isCompleted: _existingProgress?.isCompleted ?? false);
     _scrollController.dispose();
@@ -197,41 +201,111 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
     );
 
     if (question != null && question.isNotEmpty && mounted) {
+      _aiCancelToken?.cancel();
+      _aiCancelToken = CancelToken();
+
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (_) => const Center(child: CircularProgressIndicator()),
-      );
-
-      final explanation = await _repo.askAiAboutPassage(
-        passageText: widget.passage.contentCn,
-        userQuestion: question,
-      );
-
-      if (!mounted) return;
-      Navigator.of(context).pop(); // dismiss loading
-
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Row(
+        builder: (dialogCtx) => AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.auto_awesome_rounded, color: AppColors.primaryBlueDark),
-              SizedBox(width: 8),
-              Text('Phản Hồi Từ AI Tutor'),
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              const Text('AI Tutor đang phân tích đoạn văn...'),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () {
+                  _aiCancelToken?.cancel();
+                  Navigator.of(dialogCtx).pop();
+                },
+                child: const Text('Hủy bỏ'),
+              ),
             ],
           ),
-          content: SingleChildScrollView(
-            child: Text(explanation),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Đã hiểu'),
-            ),
-          ],
         ),
       );
+
+      try {
+        final explanation = await _repo.askAiAboutPassage(
+          passageText: widget.passage.contentCn,
+          userQuestion: question,
+          cancelToken: _aiCancelToken,
+        );
+
+        if (!mounted) return;
+        Navigator.of(context).pop(); // dismiss loading dialog
+
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Row(
+              children: [
+                Icon(Icons.auto_awesome_rounded, color: AppColors.primaryBlueDark),
+                SizedBox(width: 8),
+                Text('Phản Hồi Từ AI Tutor'),
+              ],
+            ),
+            content: SingleChildScrollView(
+              child: SelectableText(explanation),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('Đã hiểu'),
+              ),
+            ],
+          ),
+        );
+      } catch (e) {
+        if (!mounted) return;
+        Navigator.of(context).pop(); // dismiss loading dialog
+
+        if (e is AiCancelledException) {
+          return;
+        }
+
+        final isAuthError =
+            e is AiAuthenticationException || e.toString().toLowerCase().contains('api key');
+        final errorMsg = isAuthError
+            ? 'Chưa cấu hình API Key. Vui lòng thiết lập khóa Gemini API trong phần Cài đặt để sử dụng tính năng này.'
+            : (e is AiNetworkException
+                ? 'Không thể kết nối đến máy chủ AI. Vui lòng kiểm tra lại kết nối mạng.'
+                : 'Lỗi kết nối AI: $e');
+
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Row(
+              children: [
+                Icon(Icons.error_outline_rounded, color: Colors.orange),
+                SizedBox(width: 8),
+                Text('Không Thể Kết Nối AI'),
+              ],
+            ),
+            content: Text(errorMsg),
+            actions: [
+              if (isAuthError)
+                FilledButton.icon(
+                  icon: const Icon(Icons.settings, size: 16),
+                  label: const Text('Cài đặt AI'),
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const AiSettingsScreen()),
+                    );
+                  },
+                ),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('Đóng'),
+              ),
+            ],
+          ),
+        );
+      }
     }
   }
 
