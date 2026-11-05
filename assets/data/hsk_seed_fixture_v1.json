@@ -2453,7 +2453,7 @@
       "hskLevel": 1,
       "title": "我的中国朋友",
       "contentZh": "我有一个好朋友，他叫李明。他是中国人，今年二十岁。李明很喜欢学习英语，我也喜欢学习汉语。我们常常一起去图书馆看书，一起喝茶。",
-      "pinyin": "Wǒ yǒu yí gè hǎo péngyou, tā jiào Lǐ Míng. Tā shì Zhōngguó rén, jīnnián èrshí suì. Lǐ Míng hěn xǐhuan xuéxí Yīngyǔ, wǒ yě xǐhuan xuéxí Hànyǔ. Wǒmen chángcháng yìqǐ qù túshūguǎn kàn shū, yìqǐ hē chá.",
+      "pinyin": "wǒ yǒu yí gè hǎo péng yǒu tā jiào lǐ míng tā shì zhōng guó rén jīn nián èr shí suì lǐ míng hěn xǐ huān xué xí yīng yǔ wǒ yě xǐ huān xué xí hàn yǔ wǒ men cháng cháng yì qǐ qù tú shū guǎn kàn shū yì qǐ hē chá",
       "translationVi": "Tôi có một người bạn tốt, anh ấy tên là Lý Minh. Anh ấy là người Trung Quốc, năm nay hai mươi tuổi. Lý Minh rất thích học tiếng Anh, tôi cũng thích học tiếng Trung. Chúng tôi thường cùng nhau đến thư viện đọc sách, cùng nhau uống trà.",
       "questions": [
         {
@@ -2490,14 +2490,15 @@
           "explanationVi": "Bài đọc viết: \"我们常常一起去图书馆看书，一起喝茶。\"",
           "citationText": "我们常常一起去图书馆看书，一起喝茶。"
         }
-      ]
+      ],
+      "audioUri": "assets/audio/reading/rdg_hsk1_friend.mp3"
     },
     {
       "id": "RDG_2_reading_hsk2_restaurant",
       "hskLevel": 2,
       "title": "在饭馆点菜",
       "contentZh": "服务员：两位好，请问你们想吃点儿什么？\n王明：请给我们一份菜单。你们这里有什么特色菜？\n服务员：北京烤鸭和宫保鸡丁非常有名，很多客人都喜欢。\n李华：那我们要一只烤鸭，一份宫保鸡丁，再来两碗米饭。\n服务员：好的，请问喝什么饮料？\n王明：请给我们一壶热茉莉花茶，谢谢！",
-      "pinyin": "Fúwùyuán: Liǎng wèi hǎo, qǐngwèn nǐmen xiǎng chī diǎnr shénme?\nWáng Míng: Qǐng gěi wǒmen yí fèn càidān. Nǐmen zhèlǐ yǒu shénme tèsè cài?\nFúwùyuán: Běijīng kǎoyā hé Gōngbǎo jīdīng fēicháng yǒumíng, hěn duō kèrén dōu xǐhuan.\nLǐ Huá: Nà wǒmen yào yì zhī kǎoyā, yí fèn Gōngbǎo jīdīng, zài lái liǎng wǎn mǐfàn.\nFúwùyuán: Hǎo de, qǐngwèn hē shénme yǐnliào?\nWáng Míng: Qǐng gěi wǒmen yì hú rè mòlìhuā chá, xièxie!",
+      "pinyin": "fú wù yuán liǎng wèi hǎo qǐng wèn nǐ men xiǎng chī diǎn ér shén me wáng míng qǐng gěi wǒ men yī fèn cài dān nǐ men zhè lǐ yǒu shén me tè sè cài fú wù yuán běi jīng kǎo yā hé gōng bǎo jī dīng fēi cháng yǒu míng hěn duō kè rén dōu xǐ huān lǐ huá nà wǒ men yào yī zhī kǎo yā yī fèn gōng bǎo jī dīng zài lái liǎng wǎn mǐ fàn fú wù yuán hǎo de qǐng wèn hē shén me yǐn liào wáng míng qǐng gěi wǒ men yī hú rè mò lì huā chá xiè xiè",
       "translationVi": "Phục vụ: Xin chào hai vị, xin hỏi hai vị muốn dùng món gì ạ?\nVương Minh: Xin cho chúng tôi một cuốn thực đơn. Ở đây có món đặc sản gì thế?\nPhục vụ: Vịt quay Bắc Kinh và Gà xào Cung Bảo rất nổi tiếng, nhiều khách đều thích.\nLý Hoa: Vậy cho chúng tôi một con vịt quay, một phần gà Cung Bảo, thêm hai bát cơm trắng nữa nhé.\nPhục vụ: Vâng ạ, xin hỏi hai vị uống đồ uống gì?\nVương Minh: Xin cho chúng tôi một ấm trà lài nóng, cảm ơn!",
       "questions": [
         {
@@ -2536,14 +2537,15 @@
           "explanationVi": "Bài đọc viết: \"请给我们一壶热茉莉花茶\".",
           "citationText": "请给我们一壶热茉莉花茶，谢谢！"
         }
-      ]
+      ],
+      "audioUri": "assets/audio/reading/rdg_hsk2_restaurant.mp3"
     },
     {
       "id": "RDG_3_reading_hsk3_travel_beijing",
       "hskLevel": 3,
       "title": "我的北京旅行日记",
       "contentZh": "上个周末，我和同学坐高铁去北京旅行。北京的天气非常晴朗，空气也很新鲜。第一天，我们去了故宫。故宫以前是皇帝住的地方，红色的墙和黄色的瓦非常壮观。我们在里面走了整整四个小时，拍了很多漂亮的照片。虽然脚有点儿累，但是我们心里非常高兴。晚上，我们在王府井大街品尝了正宗的老北京炸酱面，味道特别棒！",
-      "pinyin": "Shàng gè zhōumò, wǒ hé tóngxué zuò gāotiě qù Běijīng lǚxíng. Běijīng de tiānqì fēicháng qínglǎng, kōngqì yě hěn xīnxian. Dì-yī tiān, wǒmen qù le Gùgōng. Gùgōng yǐqián shì huángdì zhù de dìfang, hóngsè de qiáng hé huángsè de wǎ fēicháng zhuàngguān. Wǒmen zài lǐmiàn zǒu le zhěngzhěng sì gè xiǎoshí, pāi le hěn duō piàoliang de zhàopiàn. Suīrán jiǎo yǒudiǎnr lèi, dànshì wǒmen xīnlǐ fēicháng gāoxìng. Wǎnshang, wǒmen zài Wángfǔjǐng Dàjiē pǐncháng le zhèngzōng de lǎo Běijīng zhájiàngmiàn, wèidao tèbié bàng!",
+      "pinyin": "shàng gè zhōu mò wǒ hé tóng xué zuò gāo tiě qù běi jīng lǚ xíng běi jīng de tiān qì fēi cháng qíng lǎng kōng qì yě hěn xīn xiān dì yī tiān wǒ men qù le gù gōng gù gōng yǐ qián shì huáng dì zhù de dì fang hóng sè de qiáng hé huáng sè de wǎ fēi cháng zhuàng guān wǒ men zài lǐ miàn zǒu le zhěng zhěng sì gè xiǎo shí pāi le hěn duō piào liàng de zhào piān suī rán jiǎo yǒu diǎn ér lèi dàn shì wǒ men xīn lǐ fēi cháng gāo xìng wǎn shàng wǒ men zài wáng fǔ jǐng dà jiē pǐn cháng le zhèng zōng de lǎo běi jīng zhá jiàng miàn wèi dào tè bié bàng",
       "translationVi": "Cuối tuần trước, tôi và bạn học đi tàu cao tốc đến Bắc Kinh du lịch. Thời tiết Bắc Kinh rất trong xanh, không khí cũng rất trong lành. Ngày đầu tiên, chúng tôi đến Cố Cung. Cố Cung trước đây là nơi hoàng đế sinh sống, tường màu đỏ và ngói màu vàng vô cùng hùng vĩ. Chúng tôi đi dạo bên trong suốt bốn tiếng đồng hồ, chụp rất nhiều ảnh đẹp. Mặc dù chân có chút mỏi mệt, nhưng trong lòng chúng tôi vô cùng vui sướng. Buổi tối, chúng tôi thưởng thức món mì tương đen Bắc Kinh chính hiệu tại phố Vương Phủ Tỉnh, hương vị tuyệt vời khó quên!",
       "questions": [
         {
@@ -2586,14 +2588,15 @@
           "explanationVi": "Bài đọc ghi rõ Cố Cung là nơi hoàng đế ở: \"故宫以前是皇帝住的地方\".",
           "citationText": "故宫以前是皇帝住的地方"
         }
-      ]
+      ],
+      "audioUri": "assets/audio/reading/rdg_hsk3_travel_beijing.mp3"
     },
     {
       "id": "RDG_4_reading_hsk4_mid_autumn",
       "hskLevel": 4,
       "title": "中秋节与月饼的文化意义",
       "contentZh": "农历八月十五是中国传统的节日——中秋节。因为这一天的月亮最圆、最明亮，所以中国人把圆月看作是团圆的象征。无论人们在多远的地方工作或学习，到了中秋节，大家都会尽量赶回家里与亲人团聚。吃月饼是中秋节最重要的习俗之一。月饼通常是圆形的，里面有豆沙、莲蓉或者蛋黄等各种馅料。亲朋好友之间互相赠送月饼，表达美好的祝福。正如中国古诗所写：“但愿人长久，千里共婵娟”，中秋节承载着人们对美好生活和远方亲人的深切思念。",
-      "pinyin": "Nónglì bā yuè shíwǔ shì Zhōngguó chuántǒng de jiérì —— Zhōngqiūjié. Yīnwèi zhè yì tiān de yuèliang zuì yuán, zuì míngliàng, suǒyǐ Zhōngguó rén bǎ yuányuè kànzuò shì tuányuán de xiàngzhēng. Wúlùn rénmen zài duō yuǎn de dìfang gōngzuò huò xuéxí, dào le Zhōngqiūjié, dàjiā dōu huì jǐnliàng gǎnhuí jiā lǐ yǔ qīnrén tuánjù. Chī yuèbǐng shì Zhōngqiūjié zuì zhòngyào de xísú zhī yī. Yuèbǐng tōngcháng shì yuánxíng de, lǐmiàn yǒu dòushā, liánróng huòzhě dànhuáng děng gèzhǒng xiànliào. Qīnpéng hǎoyǒu zhījiān hùxiāng zèngsòng yuèbǐng, biǎodá měihǎo de zhùfú. Zhèngrú Zhōngguó gǔshī suǒ xiě: “Dànyuàn rén chángjiǔ, qiānlǐ gòng chánjuān”, Zhōngqiūjié chéngzàizhe rénmen duì měihǎo shēnghuó hé yuǎnfāng qīnrén de shēnqiè sīniàn.",
+      "pinyin": "nóng lì bā yuè shí wǔ shì zhōng guó chuán tǒng de jié rì zhōng qiū jié yīn wèi zhè yī tiān de yuè liàng zuì yuán zuì míng liàng suǒ yǐ zhōng guó rén bǎ yuán yuè kàn zuò shì tuán yuán de xiàng zhēng wú lùn rén men zài duō yuǎn de dì fang gōng zuò huò xué xí dào le zhōng qiū jié dà jiā dōu huì jǐn liàng gǎn huí jiā lǐ yǔ qīn rén tuán jù chī yuè bǐng shì zhōng qiū jié zuì zhòng yào de xí sú zhī yī yuè bǐng tōng cháng shì yuán xíng de lǐ miàn yǒu dòu shā lián róng huò zhě dàn huáng děng gè zhǒng xiàn liào qīn péng hǎo yǒu zhī jiān hù xiāng zèng sòng yuè bǐng biǎo dá měi hǎo de zhù fú zhèng rú zhōng guó gǔ shī suǒ xiě dàn yuàn rén cháng jiǔ qiān lǐ gòng chán juān zhōng qiū jié chéng zài zhe rén men duì měi hǎo shēng huó hé yuǎn fāng qīn rén de shēn qiè sī niàn",
       "translationVi": "Ngày 15 tháng 8 âm lịch là một ngày lễ truyền thống của Trung Quốc - Tết Trung Thu. Bởi vì trăng vào ngày này tròn nhất và sáng nhất, nên người Trung Quốc coi vầng trăng tròn là biểu tượng của sự đoàn viên sum họp. Bất kể mọi người làm việc hay học tập ở nơi xa xôi đến đâu, đến Tết Trung Thu, ai nấy đều cố gắng trở về nhà để sum vầy bên người thân. Ăn bánh Trung Thu là một trong những phong tục quan trọng nhất của ngày Tết này. Bánh Trung Thu thường có hình tròn, bên trong chứa nhiều loại nhân như đậu đỏ, hạt sen hay lòng đỏ trứng muối. Bạn bè và người thân tặng bánh Trung Thu cho nhau để gửi gắm những lời chúc tốt đẹp nhất. Đúng như câu thơ cổ: \"Nguyện người trường cửu, nghìn dặm cùng ngắm ánh trăng\", Tết Trung Thu mang chở nỗi nhớ nhung sâu sắc của con người hướng về cuộc sống êm ấm và người thân nơi phương xa.",
       "questions": [
         {
@@ -2632,14 +2635,15 @@
           "explanationVi": "Đoạn văn trích dẫn thơ Tô Thức: “但愿人长久，千里共婵娟”。",
           "citationText": "但愿人长久，千里共婵娟"
         }
-      ]
+      ],
+      "audioUri": "assets/audio/reading/rdg_hsk4_mid_autumn.mp3"
     },
     {
       "id": "RDG_5_reading_hsk5_idiom_rabbit",
       "hskLevel": 5,
       "title": "成语故事：守株待兔",
       "contentZh": "战国时期，宋国有一个农夫。有一天，他正在田里辛勤地耕地，忽然看见一只飞奔的野兔惊慌失措地跑过来。野兔一不小心，重重地撞在田边的一棵大树桩上，当场折断了脖子死去了。农夫急忙跑过去，毫不费力地捡起这只又肥又大的野兔。他高兴极了，心想：“种庄稼多辛苦啊，要是每天都能白白捡到一只兔子，那该多舒服啊！”从此以后，这个农夫放下了手里的农具，不再耕作。他整天坐在树桩旁边痴痴地守着，满心希望还能有兔子撞死在这里。结果，田地荒芜了，杂草丛生，他再也没有等到第二只兔子，反而成了全天下人的笑柄。这个成语告诫人们：切不可心存侥幸，企图不劳而获；更不能把偶然事件当成必然规律。",
-      "pinyin": "Zhànguó shíqī, Sòng guó yǒu yí gè nóngfū. Yǒu yì tiān, tā zhèngzài tián lǐ xīnqín de gēngdì, hūrán kànjiàn yì zhī fēibēn de yětù jīnghuāngshīcuò de pǎoguòlái. Yětù yí bù xiǎoxīn, zhòngzhòng de zhuàng zài tiánbiān de yì kē dà shùzhuāng shàng, dāngchǎng zhéduàn le bózǐ sǐqù le. Nóngfū jímáng pǎoguòqù, háobù fèilì de jiǎnqǐ zhè zhī yòu féi yòu dà de yětù. Tā gāoxìng jíle, xīnxǐang: “Zhòng zhuāngjia duō xīnkǔ a, yàoshi měitiān dōu néng báibái jiǎndào yì zhī tùzi, nà gāi duō shūfu a!” Cóngcǐ yǐhòu, zhè gè nóngfū fàngxià le shǒu lǐ de nóngjù, búzài gēngzuò. Tā zhěngtiān zuò zài shùzhuāng pángbiān chīchī de shǒuzhe, mǎnxīn xīwàng hái néng yǒu tùzi zhuàngsǐ zài zhèlǐ. Jiéguǒ, tiándì huāngwú le, zácǎo cóngshēng, tā zài yě méiyǒu děngdào dì-èr zhī tùzi, fǎn'ér chéng le quántiānxià rén de xiàobǐng. Zhè gè chéngyǔ gàojiè rénmen: qiè bù kě xīncún jiǎoxìng, qǐtú bùláo'érhuò; gèng bù néng bǎ ǒurán shìjiàn dàngchéng bìrán guīlǜ.",
+      "pinyin": "zhàn guó shí qī sòng guó yǒu yí gè nóng fū yǒu yī tiān tā zhèng zài tián lǐ xīn qín de gēng dì hū rán kàn jiàn yī zhī fēi bēn de yě tù jīng huāng shī cuò de pǎo guò lái yě tù yí bù xiǎo xīn chóng chóng de zhuàng zài tián biān de yī kē dà shù zhuāng shàng dāng chǎng zhé duàn le bó zi sǐ qù le nóng fū jí máng pǎo guò qù háo bù fèi lì de jiǎn qǐ zhè zhǐ yòu féi yòu dà de yě tù tā gāo xìng jí le xīn xiǎng zhǒng zhuāng jià duō xīn kǔ a yào shì měi tiān dōu néng bái bái jiǎn dào yī zhī tù zi nà gāi duō shū fú a cóng cǐ yǐ hòu zhè ge nóng fū fàng xià le shǒu lǐ de nóng jù bù zài gēng zuò tā zhěng tiān zuò zài shù zhuāng páng biān chī chī de shǒu zhe mǎn xīn xī wàng hái néng yǒu tù zi zhuàng sǐ zài zhè lǐ jié guǒ tián dì huāng wú le zá cǎo cóng shēng tā zài yě méi yǒu děng dào dì èr zhǐ tù zi fǎn ér chéng le quán tiān xià rén de xiào bǐng zhè ge chéng yǔ gào jiè rén men qiè bù kě xīn cún jiǎo xìng qǐ tú bù láo ér huò gèng bù néng bǎ ǒu rán shì jiàn dàng chéng bì rán guī lǜ",
       "translationVi": "Thời Chiến Quốc, nước Tống có một người nông dân. Một ngày nọ, khi anh ta đang cần mẫn cày bừa trên đồng ruộng, bỗng thấy một con thỏ rừng hớt hải lao tới. Thỏ rừng không cẩn thận đâm sầm vào gốc cây to bên bờ ruộng, gãy cổ chết ngay tại chỗ. Người nông dân vội vàng chạy lại, chẳng tốn chút sức lực nào nhặt được con thỏ vừa béo vừa to. Anh ta mừng rỡ vô cùng, thầm nghĩ: \"Trồng trọt vất vả thế này, nếu ngày nào cũng nhặt không được một con thỏ thì sướng biết bao!\". Từ đó về sau, người nông dân bỏ rơi nông cụ, không chịu cày cấy nữa. Anh ta suốt ngày ngồi ngẩn ngơ bên gốc cây trông ngóng, hy vọng sẽ có con thỏ khác đâm đầu vào chết ở đó. Kết quả là đồng ruộng hoang tàn, cỏ dại mọc đầy, anh ta chẳng bao giờ đợi được con thỏ thứ hai, trái lại còn biến thành trò cười cho thiên hạ. Thành ngữ này răn dạy con người: Tuyệt đối không được ôm tâm lý may rủi, mưu cầu không làm mà hưởng; càng không thể coi một sự việc ngẫu nhiên là quy luật tất nhiên.",
       "questions": [
         {
@@ -2670,7 +2674,8 @@
           "explanationVi": "Bài học nêu rõ: \"切不可心存侥幸，企图不劳而获；更不能把偶然事件当成必然规律。\"",
           "citationText": "这个成语告诫人们：切不可心存侥幸，企图不劳而获；更不能把偶然事件当成必然规律。"
         }
-      ]
+      ],
+      "audioUri": "assets/audio/reading/rdg_hsk5_idiom_rabbit.mp3"
     }
   ]
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../../../core/audio/audio.dart';
 import '../../../../core/database/app_database.dart';
 import '../../../../core/network/ai/ai.dart';
 import '../../../../core/theme/theme.dart';
@@ -42,6 +43,10 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
   bool _isLoading = true;
   CancelToken? _aiCancelToken;
 
+  AudioPlayerService? _audioPlayer;
+  AudioPlaybackStatus _audioStatus = AudioPlaybackStatus.idle;
+  StreamSubscription<AudioPlaybackStatus>? _audioSub;
+
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -50,6 +55,16 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
     final db = AppDatabase.instance.database;
     _repo = widget.repository ?? DefaultReadingRepository(db);
     _dictRepo = widget.dictionaryRepository ?? DefaultDictionaryRepository(db);
+
+    final audioUri = widget.passage.audioUri;
+    if (audioUri != null && audioUri.isNotEmpty) {
+      _audioPlayer = DefaultAudioPlayerService();
+      _audioSub = _audioPlayer?.statusStream.listen((status) {
+        if (mounted) {
+          setState(() => _audioStatus = status);
+        }
+      });
+    }
 
     _segments = widget.passage.buildRubySegments();
     _startTimer();
@@ -81,6 +96,9 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
 
   @override
   void dispose() {
+    _audioSub?.cancel();
+    _audioPlayer?.stop();
+    _audioPlayer?.dispose();
     _aiCancelToken?.cancel();
     _readingTimer?.cancel();
     _saveProgress(isCompleted: _existingProgress?.isCompleted ?? false);
@@ -326,6 +344,31 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
       appBar: AppBar(
         title: Text(widget.passage.titleCn),
         actions: [
+          // Audio Narration Player Action
+          if (widget.passage.audioUri != null && widget.passage.audioUri!.isNotEmpty)
+            IconButton(
+              icon: Icon(
+                _audioStatus == AudioPlaybackStatus.playing
+                    ? Icons.pause_circle_filled_rounded
+                    : (_audioStatus == AudioPlaybackStatus.buffering
+                        ? Icons.hourglass_top_rounded
+                        : Icons.play_circle_fill_rounded),
+                color: theme.colorScheme.primary,
+              ),
+              tooltip: _audioStatus == AudioPlaybackStatus.playing
+                  ? 'Tạm dừng đọc'
+                  : 'Nghe bài đọc chuẩn Mandarin',
+              onPressed: () async {
+                if (_audioPlayer == null) return;
+                if (_audioStatus == AudioPlaybackStatus.playing) {
+                  await _audioPlayer!.pause();
+                } else if (_audioStatus == AudioPlaybackStatus.paused) {
+                  await _audioPlayer!.resume();
+                } else {
+                  await _audioPlayer!.play(widget.passage.audioUri!);
+                }
+              },
+            ),
           // Timer Chip
           Center(
             child: Container(

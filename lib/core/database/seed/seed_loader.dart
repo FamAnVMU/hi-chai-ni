@@ -372,14 +372,15 @@ class SeedLoader {
             batch.rawInsert('''
               INSERT INTO ${DatabaseConstants.tableReadingPassages} (
                 id, hsk_level, title_cn, content_cn, pinyin,
-                translation_vi, questions_json, created_at, updated_at
-              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                translation_vi, audio_uri, questions_json, created_at, updated_at
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
               ON CONFLICT(id) DO UPDATE SET
                 hsk_level = excluded.hsk_level,
                 title_cn = excluded.title_cn,
                 content_cn = excluded.content_cn,
                 pinyin = excluded.pinyin,
                 translation_vi = excluded.translation_vi,
+                audio_uri = excluded.audio_uri,
                 questions_json = excluded.questions_json,
                 updated_at = excluded.updated_at;
             ''', [
@@ -389,6 +390,7 @@ class SeedLoader {
               r.contentZh,
               r.pinyin,
               r.translationVi,
+              r.audioUri,
               questionsJson,
               now,
               now,
