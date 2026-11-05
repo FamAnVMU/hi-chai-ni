@@ -74,6 +74,9 @@ class _PronunciationLabScreenState extends ConsumerState<PronunciationLabScreen>
     _ampSub?.cancel();
     _durSub?.cancel();
     _playStatusSub?.cancel();
+    if (_recordedFilePath != null) {
+      AudioTempCleaner.deleteAudioFile(_recordedFilePath);
+    }
     _recorder.cancelRecording();
     _recorder.dispose();
     _player.stop();
@@ -112,6 +115,9 @@ class _PronunciationLabScreenState extends ConsumerState<PronunciationLabScreen>
 
       if (perm == AudioPermissionResult.granted) {
         await _player.stop();
+        if (_recordedFilePath != null) {
+          AudioTempCleaner.deleteAudioFile(_recordedFilePath);
+        }
         setState(() {
           _isRecording = true;
           _recordedFilePath = null;

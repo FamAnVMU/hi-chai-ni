@@ -5,6 +5,7 @@ import '../../../../core/audio/audio_models.dart';
 import '../../../../core/audio/audio_player_service.dart';
 import '../../../../core/audio/audio_recorder_service.dart';
 import '../../../../core/audio/tts_service.dart';
+import '../../../../core/network/ai/models/cancel_token.dart';
 import '../../../../core/utils/app_lifecycle_manager.dart';
 import '../../data/repositories/ai_tutor_repository.dart';
 import '../models/tutor_persona.dart';
@@ -39,6 +40,8 @@ abstract class VoiceConversationService {
 
   Future<void> endSession();
   Future<void> interrupt();
+  Future<void> cancelCurrentTurn();
+  Future<void> stopListening();
   Future<void> toggleMute();
 
   Future<void> submitSpeechInput(String userText);
@@ -61,6 +64,7 @@ class DefaultVoiceConversationService implements VoiceConversationService {
   TutorPersona _activePersona = TutorPersonas.qiaoqiao;
   TutorScenario _activeScenario = TutorScenarios.freeChat;
   int _learnerHskLevel = 1;
+  CancelToken? _currentTurnCancelToken;
 
   PersonaVoicePreviewStatus _previewStatus = PersonaVoicePreviewStatus.initial;
   final StreamController<PersonaVoicePreviewStatus> _previewStatusController =
@@ -406,12 +410,16 @@ class DefaultVoiceConversationService implements VoiceConversationService {
         throw StateError('Cannot submit speech without active session ID.');
       }
 
+      _currentTurnCancelToken?.cancel();
+      _currentTurnCancelToken = CancelToken();
+
       final tutorResponse = await repository.sendMessage(
         sessionId: sessionId,
         userText: userText.trim(),
         learnerHskLevel: _learnerHskLevel,
         persona: _activePersona,
         scenario: _activeScenario,
+        cancelToken: _currentTurnCancelToken,
       );
 
       _addTranscript(VoiceTranscriptSegment(
@@ -455,6 +463,7 @@ class DefaultVoiceConversationService implements VoiceConversationService {
 
   @override
   Future<void> interrupt() async {
+    cancelCurrentTurn();
     if (_status == VoiceConversationStatus.speaking ||
         player.status == AudioPlaybackStatus.playing) {
       await player.stop();
@@ -465,6 +474,24 @@ class DefaultVoiceConversationService implements VoiceConversationService {
       await Future.delayed(const Duration(milliseconds: 200));
       _setStatus(VoiceConversationStatus.listening);
       await recorder.resumeRecording();
+    }
+  }
+
+  @override
+  Future<void> cancelCurrentTurn() async {
+    _currentTurnCancelToken?.cancel();
+    _currentTurnCancelToken = null;
+    await player.stop();
+    if (tts != null) {
+      await tts!.stop();
+    }
+  }
+
+  @override
+  Future<void> stopListening() async {
+    await recorder.stopRecording();
+    if (!_amplitudeController.isClosed) {
+      _amplitudeController.add(0.0);
     }
   }
 
@@ -495,6 +522,8 @@ class DefaultVoiceConversationService implements VoiceConversationService {
 
   void _onLifecycleAbort(String reason) {
     debugPrint('[VoiceConversationService] Lifecycle abort triggered: $reason');
+    _currentTurnCancelToken?.cancel();
+    _currentTurnCancelToken = null;
     stopPersonaVoicePreview();
     if (_status == VoiceConversationStatus.listening ||
         _status == VoiceConversationStatus.speaking ||
@@ -523,6 +552,8 @@ class DefaultVoiceConversationService implements VoiceConversationService {
   @override
   void dispose() {
     AppLifecycleManager.instance.unregisterAudioSession(_onLifecycleAbort);
+    _currentTurnCancelToken?.cancel();
+    _currentTurnCancelToken = null;
     _recorderAmpSub?.cancel();
     _playerStatusSub?.cancel();
     player.stop();

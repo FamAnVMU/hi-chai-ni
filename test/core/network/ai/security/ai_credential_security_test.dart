@@ -4,7 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:hi_chinese/core/database/dao/app_settings_dao.dart';
 import 'package:hi_chinese/core/database/database_constants.dart';
+import 'package:hi_chinese/core/network/ai/models/ai_errors.dart';
 import 'package:hi_chinese/core/network/ai/models/ai_model_config.dart';
+import 'package:hi_chinese/core/network/ai/providers/gemini_rest_ai_provider.dart';
 import 'package:hi_chinese/core/network/ai/security/ai_credential_storage.dart';
 import 'package:hi_chinese/core/theme/theme.dart';
 import 'package:hi_chinese/features/onboarding/presentation/screens/onboarding_api_key_screen.dart';
@@ -173,6 +175,27 @@ void main() {
       // Allows clearing proxy URL with null or empty
       await storage.saveCustomProxyUrl(null);
       expect(await storage.getCustomProxyUrl(), isNull);
+    });
+
+    test('7c. GeminiRestAiProvider.testConnection throws SecurityException before sending API key if proxy is unsafe', () async {
+      final inMemory = <String, String>{};
+      final storage = AiCredentialStorage(inMemoryStore: inMemory);
+      await storage.saveApiKey('AIzaSyValidGeminiKeyForTest1234567');
+      // Inject unsafe proxy directly into store (simulating legacy or tainted store)
+      inMemory['hi_chinese_custom_proxy_url'] = 'http://insecure-backend.local';
+
+      final provider = GeminiRestAiProvider(credentialStorage: storage);
+      expect(
+        () => provider.testConnection(),
+        throwsA(isA<SecurityException>()),
+      );
+
+      // Also test loopback IP
+      inMemory['hi_chinese_custom_proxy_url'] = 'https://127.0.0.1:8080';
+      expect(
+        () => provider.testConnection(),
+        throwsA(isA<SecurityException>()),
+      );
     });
   });
 

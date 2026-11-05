@@ -45,6 +45,7 @@ class GeminiRestAiProvider implements AiProvider {
     try {
       final customProxy = await credentialStorage.getCustomProxyUrl();
       final base = customProxy?.isNotEmpty == true ? customProxy! : _baseUrl;
+      _validateEndpointSecurity(base);
       final uri = Uri.parse('$base/models?pageSize=1');
 
       final response = await _client.get(
@@ -77,9 +78,12 @@ class GeminiRestAiProvider implements AiProvider {
       );
     }
 
+    final customProxy = await credentialStorage.getCustomProxyUrl();
+    final base = customProxy?.isNotEmpty == true ? customProxy! : _baseUrl;
+    // Pre-flight security check: prevent SSRF and cleartext key leakage over insecure proxy
+    _validateEndpointSecurity(base);
+
     try {
-      final customProxy = await credentialStorage.getCustomProxyUrl();
-      final base = customProxy?.isNotEmpty == true ? customProxy! : _baseUrl;
       final uri = Uri.parse('$base/models/$effectiveModel:generateContent');
 
       final requestBody = json.encode({
@@ -438,17 +442,39 @@ class GeminiRestAiProvider implements AiProvider {
     yield* controller.stream;
   }
 
+  void _validateEndpointSecurity(String url) {
+    final uri = Uri.tryParse(url);
+    if (uri == null || !uri.hasScheme || uri.scheme.toLowerCase() != 'https') {
+      throw const SecurityException('Endpoint URL không an toàn: Bắt buộc sử dụng giao thức HTTPS.');
+    }
+    final host = uri.host.toLowerCase();
+    if (host == 'localhost' ||
+        host == '127.0.0.1' ||
+        host == '0.0.0.0' ||
+        host == '::1' ||
+        host.startsWith('192.168.') ||
+        host.startsWith('10.') ||
+        host.startsWith('172.16.') ||
+        host.startsWith('172.17.') ||
+        host.startsWith('172.18.') ||
+        host.startsWith('172.19.') ||
+        host.startsWith('172.2') ||
+        host.startsWith('172.30.') ||
+        host.startsWith('172.31.')) {
+      throw const SecurityException('Endpoint URL không an toàn: Không được trỏ về địa chỉ loopback hoặc IP nội bộ.');
+    }
+  }
+
   Future<String> _resolveSecureBaseUrl() async {
     final providerType = await credentialStorage.getProviderType();
     if (providerType == AiProviderType.customProxy) {
       final customProxy = await credentialStorage.getCustomProxyUrl();
       if (customProxy != null && customProxy.trim().isNotEmpty) {
-        final parsed = Uri.tryParse(customProxy.trim());
-        if (parsed != null && parsed.scheme == 'https' && parsed.host.isNotEmpty) {
-          return customProxy.trim().replaceAll(RegExp(r'/+$'), '');
-        }
+        _validateEndpointSecurity(customProxy.trim());
+        return customProxy.trim().replaceAll(RegExp(r'/+$'), '');
       }
     }
+    _validateEndpointSecurity(_baseUrl);
     return _baseUrl;
   }
 

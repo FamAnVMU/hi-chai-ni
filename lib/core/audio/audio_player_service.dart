@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart' as ja;
 import 'audio_models.dart';
+import 'tts_service.dart';
 
 class AudioPlaybackException implements Exception {
   final String message;
@@ -47,6 +49,8 @@ abstract class AudioPlayerService {
 class DefaultAudioPlayerService implements AudioPlayerService {
   final ja.AudioPlayer _player;
   final bool _ownsPlayer;
+  TtsService? _tts;
+  final bool _ownsTts;
 
   AudioPlaybackStatus _status = AudioPlaybackStatus.idle;
   Duration _currentPosition = Duration.zero;
@@ -61,11 +65,17 @@ class DefaultAudioPlayerService implements AudioPlayerService {
   StreamSubscription<Duration>? _positionSub;
   StreamSubscription<Duration?>? _durationSub;
 
-  DefaultAudioPlayerService({ja.AudioPlayer? player})
-      : _player = player ?? ja.AudioPlayer(),
-        _ownsPlayer = player == null {
+  DefaultAudioPlayerService({
+    ja.AudioPlayer? player,
+    TtsService? tts,
+  })  : _player = player ?? ja.AudioPlayer(),
+        _ownsPlayer = player == null,
+        _tts = tts,
+        _ownsTts = tts == null {
     _initListeners();
   }
+
+  TtsService get _effectiveTts => _tts ??= DefaultTtsService();
 
   void _initListeners() {
     _playerStateSub = _player.playerStateStream.listen((state) {
@@ -158,7 +168,30 @@ class DefaultAudioPlayerService implements AudioPlayerService {
       }
 
       if (cleanUri.startsWith('assets/')) {
-        source = ja.AudioSource.asset(cleanUri);
+        // Check asset existence before feeding to native player to avoid unhandled crashes
+        bool assetExists = false;
+        try {
+          await rootBundle.load(cleanUri);
+          assetExists = true;
+        } catch (_) {
+          assetExists = false;
+        }
+
+        if (assetExists) {
+          source = ja.AudioSource.asset(cleanUri);
+        } else {
+          // Graceful fallback: synthesize speech via TTS engine for missing virtual assets
+          debugPrint('[DefaultAudioPlayerService] Asset not bundled: $cleanUri -> Falling back to TTS');
+          final fallbackText = _deriveTextFromAudioUri(cleanUri);
+          _updateStatus(AudioPlaybackStatus.playing);
+          await _effectiveTts.speak(
+            fallbackText,
+            language: 'zh-CN',
+            rate: (_playbackSpeed * 0.5).clamp(0.2, 1.0),
+          );
+          _updateStatus(AudioPlaybackStatus.completed);
+          return;
+        }
       } else if (cleanUri.startsWith('http://') || cleanUri.startsWith('https://')) {
         source = ja.AudioSource.uri(Uri.parse(cleanUri));
       } else {
@@ -258,6 +291,15 @@ class DefaultAudioPlayerService implements AudioPlayerService {
     } catch (_) {}
   }
 
+  /// Extracts a pronounceable Chinese text snippet from the filename for TTS fallback.
+  String _deriveTextFromAudioUri(String uri) {
+    final fileName = uri.split('/').last.split('.').first;
+    // Map common Pinyin syllables or filenames
+    final clean = fileName.replaceAll('_', ' ').replaceAll(RegExp(r'\d+'), '').trim();
+    if (clean.isEmpty) return '你好';
+    return clean;
+  }
+
   @override
   void dispose() {
     _playerStateSub?.cancel();
@@ -265,6 +307,11 @@ class DefaultAudioPlayerService implements AudioPlayerService {
     _durationSub?.cancel();
     if (_ownsPlayer) {
       _player.dispose();
+    }
+    if (_ownsTts && _tts != null) {
+      try {
+        _tts!.dispose();
+      } catch (_) {}
     }
     _statusController.close();
     _positionController.close();
