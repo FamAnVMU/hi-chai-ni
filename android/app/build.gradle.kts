@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("dev.flutter.flutter-gradle-plugin")
@@ -24,7 +26,7 @@ android {
     signingConfigs {
         create("release") {
             val keyPropertiesFile = rootProject.file("key.properties")
-            val keyProperties = java.util.Properties()
+            val keyProperties = Properties()
             if (keyPropertiesFile.exists()) {
                 keyPropertiesFile.inputStream().use { keyProperties.load(it) }
             }

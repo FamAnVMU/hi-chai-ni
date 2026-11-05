@@ -112,7 +112,7 @@ class SrsRepository {
     final lastReview = _lastReviewTimes[lockKey];
     if (lastReview != null) {
       final elapsed = nowUtc.difference(lastReview).inMilliseconds;
-      if (elapsed < debounceCooldownMs) {
+      if (elapsed >= 0 && elapsed < debounceCooldownMs) {
         throw DuplicateReviewException(
           'Duplicate review rejected: $elapsed ms < $debounceCooldownMs ms debounce threshold.',
         );
@@ -188,7 +188,7 @@ class SrsRepository {
       });
 
       // Update cooldown timestamp & invalidate due count cache
-      _lastReviewTimes[lockKey] = DateTime.now().toUtc();
+      _lastReviewTimes[lockKey] = nowUtc;
       _dueCountCache.clear();
 
       return reviewResult;
