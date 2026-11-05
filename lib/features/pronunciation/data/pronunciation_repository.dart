@@ -26,21 +26,26 @@ class PronunciationRepository {
 
     await _db.transaction((txn) async {
       // 1. Immutable audit record in learner_evidence
-      await txn.insert(
-        DatabaseConstants.tableLearnerEvidence,
-        {
-          'id': evidenceId,
-          'srs_item_id': null,
-          'content_id': assessment.targetId,
-          'content_type': 'pronunciation',
-          'source': 'pronunciation_lab',
-          'score': assessment.overallScore ?? 0.0,
-          'duration_ms': assessment.recordedDurationMs,
-          'metadata_json': json.encode(assessment.toMap()),
-          'created_at': nowUtc.toIso8601String(),
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+      // Only insert into learner_evidence if the attempt was actually evaluated/scored,
+      // avoiding recording 0.0 scores when ASR is unsupported/offline (T6-F07).
+      if (assessment.overallScore != null &&
+          assessment.status != PronunciationEvaluationStatus.unsupported) {
+        await txn.insert(
+          DatabaseConstants.tableLearnerEvidence,
+          {
+            'id': evidenceId,
+            'srs_item_id': null,
+            'content_id': assessment.targetId,
+            'content_type': 'pronunciation',
+            'source': 'pronunciation_lab',
+            'score': assessment.overallScore!,
+            'duration_ms': assessment.recordedDurationMs,
+            'metadata_json': json.encode(assessment.toMap()),
+            'created_at': nowUtc.toIso8601String(),
+          },
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
 
       // 2. Aggregate activity log to feed daily streak
       final durationSec = (assessment.recordedDurationMs / 1000).ceil();

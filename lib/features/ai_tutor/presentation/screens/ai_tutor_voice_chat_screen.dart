@@ -228,7 +228,12 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
           );
         },
       ),
-    );
+    ).whenComplete(() async {
+      if (_isMicTesting) {
+        await service.stopMicTest();
+        _isMicTesting = false;
+      }
+    });
   }
 
   void _showLiveApiDiagnosticDialog() {
@@ -701,6 +706,8 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
         _currentStatus == VoiceConversationStatus.speaking ||
         _currentStatus == VoiceConversationStatus.processing ||
         _currentStatus == VoiceConversationStatus.connecting ||
+        _currentStatus == VoiceConversationStatus.requestingPermission ||
+        _currentStatus == VoiceConversationStatus.reconnecting ||
         _currentStatus == VoiceConversationStatus.interrupted;
 
     final canInterrupt = _currentStatus == VoiceConversationStatus.speaking;

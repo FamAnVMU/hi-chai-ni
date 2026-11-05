@@ -264,7 +264,11 @@ class _AiTutorTabScreenState extends ConsumerState<AiTutorTabScreen>
           ],
           selected: {mode},
           onSelectionChanged: (Set<AiTutorMode> newSelection) {
-            ref.read(aiTutorModeProvider.notifier).setMode(newSelection.first);
+            final nextMode = newSelection.first;
+            if (nextMode == AiTutorMode.text) {
+              _abortActiveVoiceAndAudio();
+            }
+            ref.read(aiTutorModeProvider.notifier).setMode(nextMode);
           },
           style: SegmentedButton.styleFrom(
             visualDensity: VisualDensity.compact,

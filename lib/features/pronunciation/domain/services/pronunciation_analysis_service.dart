@@ -164,7 +164,7 @@ class DefaultPronunciationAnalysisService implements PronunciationAnalysisServic
         targetText: target.text,
         targetPinyin: target.pinyin,
         recognizedTranscript: null,
-        overallScore: null,
+        overallScore: 0.0,
         confidence: PronunciationConfidence.low,
         status: PronunciationEvaluationStatus.failed,
         isAcousticallyAnalyzed: false,
