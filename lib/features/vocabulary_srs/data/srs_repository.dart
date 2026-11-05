@@ -398,6 +398,7 @@ class SrsRepository {
     int count = 0;
 
     if (hskLevel != null && contentType == 'vocabulary') {
+      final effectiveLevel = (hskLevel <= 0) ? 1 : (hskLevel > 6 ? 6 : hskLevel);
       final result = await _db.rawQuery(
         '''
         SELECT COUNT(DISTINCT s.id) as count 
@@ -405,17 +406,18 @@ class SrsRepository {
         INNER JOIN ${DatabaseConstants.tableVocabularies} v ON (s.content_id = v.id OR s.content_id = v.simplified)
         WHERE s.content_type = ? 
           AND s.due_at <= ? 
+          AND s.state != 'new'
           AND s.deleted_at IS NULL 
           AND v.deleted_at IS NULL 
           AND v.hsk_level = ?
         ''',
-        [contentType, asOfUtc, hskLevel],
+        [contentType, asOfUtc, effectiveLevel],
       );
       count = (result.first['count'] as num?)?.toInt() ?? 0;
     } else {
       final result = await _db.rawQuery(
         'SELECT COUNT(id) as count FROM ${DatabaseConstants.tableSrsItems} '
-        'WHERE content_type = ? AND due_at <= ? AND deleted_at IS NULL',
+        'WHERE content_type = ? AND due_at <= ? AND state != \'new\' AND deleted_at IS NULL',
         [contentType, asOfUtc],
       );
       count = (result.first['count'] as num?)?.toInt() ?? 0;

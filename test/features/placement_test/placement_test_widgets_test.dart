@@ -364,6 +364,37 @@ void main() {
       expect(find.text('100%'), findsWidgets);
       expect(find.text('Lộ trình gợi ý: HSK 1'), findsOneWidget);
     });
+
+    testWidgets('9. PlacementTestIntroScreen provides dedicated beginner button that triggers onTestComplete(0)', (tester) async {
+      int? completedLevel;
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            activeCatSessionProvider.overrideWith(() => _TestActiveSessionNotifier(null)),
+            latestAssessmentResultProvider.overrideWith((ref) => Future.value(null)),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.lightTheme,
+            home: PlacementTestIntroScreen(
+              onTestComplete: ([level]) => completedLevel = level,
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final beginnerBtn = find.text('Tôi là người mới bắt đầu – Chưa biết tiếng Trung');
+      expect(beginnerBtn, findsOneWidget);
+
+      await tester.ensureVisible(beginnerBtn);
+      await tester.pumpAndSettle();
+      await tester.tap(beginnerBtn);
+      await tester.pumpAndSettle();
+
+      expect(completedLevel, equals(0));
+    });
   });
 }
 

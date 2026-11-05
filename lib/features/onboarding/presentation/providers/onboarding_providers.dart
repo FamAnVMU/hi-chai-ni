@@ -326,6 +326,10 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
         final db = AppDatabase.instance.database;
         final nowUtc = DateTime.now().toUtc().toIso8601String();
 
+        final assessedHsk = state.assessedHskLevel;
+        // For beginners (0, null, or <= 0), the active curriculum level starts at HSK 1
+        final currentHsk = (assessedHsk == null || assessedHsk <= 0) ? 1 : (assessedHsk > 6 ? 6 : assessedHsk);
+
         await db.transaction((txn) async {
           final settingsMap = {
             keyDailyMinutes: dailyMinutes.toString(),
@@ -338,7 +342,8 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
             keySpeechRate: speechRate.toString(),
             keyReminderEnabled: reminderEnabled.toString(),
             keyReminderTime: reminderTime,
-            keyStartingHsk: (state.assessedHskLevel ?? 1).toString(),
+            keyStartingHsk: currentHsk.toString(),
+            'key_assessed_hsk_level': (assessedHsk ?? 0).toString(),
             keyOnboardingStep: OnboardingStep.completed.stepIndex.toString(),
             keyOnboardingCompleted: 'true',
           };
@@ -355,7 +360,6 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
             );
           }
 
-          final currentHsk = state.assessedHskLevel ?? 1;
           final updatedRows = await txn.update(
             DatabaseConstants.tableUserProfiles,
             {

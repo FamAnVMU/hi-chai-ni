@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../app_shell/presentation/providers/app_shell_providers.dart';
 import '../../../onboarding/presentation/widgets/onboarding_progress_header.dart';
 import '../providers/placement_test_providers.dart';
 import 'placement_test_flow_screen.dart';
@@ -490,59 +491,89 @@ class _PlacementTestIntroScreenState extends ConsumerState<PlacementTestIntroScr
                 ),
               ],
 
-              HiButton(
-                text: activeSession != null
-                    ? 'Bắt đầu bài kiểm tra mới'
-                    : (_selectedExperience == LearnerExperienceLevel.zeroChinese
-                        ? 'Bắt đầu bài trắc nghiệm làm quen (2 phút)'
-                        : 'Bắt đầu làm bài kiểm tra'),
-                icon: const Icon(Icons.arrow_forward_rounded),
-                variant: HiButtonVariant.primary,
-                size: HiButtonSize.lg,
-                isFullWidth: true,
-                onPressed: () async {
-                  if (activeSession != null) {
-                    await ref.read(activeCatSessionProvider.notifier).abandonSession();
-                  }
-                  await ref.read(activeCatSessionProvider.notifier).startNewTest(
-                    initialTheta: _getInitialTheta(),
-                  );
-                  if (context.mounted) {
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => PlacementTestFlowScreen(
-                          onTestComplete: widget.onTestComplete,
-                        ),
-                      ),
-                    );
-                    final updatedResult = ref.read(latestAssessmentResultProvider).asData?.value;
-                    widget.onTestComplete?.call(updatedResult?.recommendedHskLevel);
-                  }
-                },
-              ),
-              if (widget.onTestComplete != null) ...[
+              if (_selectedExperience == LearnerExperienceLevel.zeroChinese) ...[
+                HiButton(
+                  text: 'Tôi là người mới bắt đầu – Chưa biết tiếng Trung',
+                  icon: const Icon(Icons.school_rounded),
+                  variant: HiButtonVariant.primary,
+                  size: HiButtonSize.lg,
+                  isFullWidth: true,
+                  onPressed: () {
+                    if (widget.onTestComplete != null) {
+                      widget.onTestComplete!(0);
+                    } else {
+                      ref.read(selectedTabProvider.notifier).selectTab(AppTab.learning);
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                    }
+                  },
+                ),
                 const SizedBox(height: AppSpacing.sm),
-                if (_selectedExperience == LearnerExperienceLevel.zeroChinese)
-                  Opacity(
-                    opacity: 0.45,
-                    child: TextButton(
-                      onPressed: () => widget.onTestComplete?.call(1),
-                      child: Text(
-                        'Bỏ qua bài kiểm tra (Bắt đầu từ HSK 1)',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                          decoration: TextDecoration.underline,
+                HiButton(
+                  text: activeSession != null
+                      ? 'Tiếp tục / Bắt đầu bài trắc nghiệm làm quen (2 phút)'
+                      : 'Bắt đầu bài trắc nghiệm làm quen (2 phút)',
+                  icon: const Icon(Icons.auto_awesome_rounded),
+                  variant: HiButtonVariant.secondary,
+                  size: HiButtonSize.md,
+                  isFullWidth: true,
+                  onPressed: () async {
+                    if (activeSession != null) {
+                      await ref.read(activeCatSessionProvider.notifier).abandonSession();
+                    }
+                    await ref.read(activeCatSessionProvider.notifier).startNewTest(
+                      initialTheta: _getInitialTheta(),
+                    );
+                    if (context.mounted) {
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => PlacementTestFlowScreen(
+                            onTestComplete: widget.onTestComplete,
+                          ),
                         ),
-                      ),
-                    ),
-                  )
-                else
+                      );
+                      final updatedResult = ref.read(latestAssessmentResultProvider).asData?.value;
+                      widget.onTestComplete?.call(updatedResult?.recommendedHskLevel ?? 1);
+                    }
+                  },
+                ),
+              ] else ...[
+                HiButton(
+                  text: activeSession != null
+                      ? 'Bắt đầu bài kiểm tra mới'
+                      : 'Bắt đầu làm bài kiểm tra',
+                  icon: const Icon(Icons.arrow_forward_rounded),
+                  variant: HiButtonVariant.primary,
+                  size: HiButtonSize.lg,
+                  isFullWidth: true,
+                  onPressed: () async {
+                    if (activeSession != null) {
+                      await ref.read(activeCatSessionProvider.notifier).abandonSession();
+                    }
+                    await ref.read(activeCatSessionProvider.notifier).startNewTest(
+                      initialTheta: _getInitialTheta(),
+                    );
+                    if (context.mounted) {
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => PlacementTestFlowScreen(
+                            onTestComplete: widget.onTestComplete,
+                          ),
+                        ),
+                      );
+                      final updatedResult = ref.read(latestAssessmentResultProvider).asData?.value;
+                      widget.onTestComplete?.call(updatedResult?.recommendedHskLevel);
+                    }
+                  },
+                ),
+                if (widget.onTestComplete != null) ...[
+                  const SizedBox(height: AppSpacing.sm),
                   HiButton(
                     text: 'Bỏ qua bài kiểm tra (Bắt đầu từ HSK 1)',
                     variant: HiButtonVariant.ghost,
                     isFullWidth: true,
                     onPressed: () => widget.onTestComplete?.call(1),
                   ),
+                ],
               ],
               const SizedBox(height: AppSpacing.xl),
             ],

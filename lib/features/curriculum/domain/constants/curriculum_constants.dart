@@ -18,9 +18,13 @@ class CurriculumConstants {
   static const String codeHsk2 = 'HSK_2012_L2';
 
   /// Returns canonical curriculum ID for a given HSK level (1..6)
+  /// Safely maps beginner/introductory levels (<= 1) to `curr_hsk1` and caps at `curr_hsk6`.
   static String curriculumIdForLevel(int level) {
-    if (level < 1 || level > 6) {
-      throw ArgumentError.value(level, 'level', 'HSK level must be between 1 and 6');
+    if (level <= 1) {
+      return currHsk1;
+    }
+    if (level > 6) {
+      return currHsk6;
     }
     return 'curr_hsk$level';
   }

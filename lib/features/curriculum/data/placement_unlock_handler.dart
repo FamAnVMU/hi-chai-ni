@@ -18,7 +18,8 @@ class PlacementUnlockHandler {
     required int hskLevel,
     required int targetLessonOrder,
   }) async {
-    final curr = await _curriculumDao.getCurriculumByLevel(hskLevel);
+    final effectiveLevel = (hskLevel <= 0) ? 1 : (hskLevel > 6 ? 6 : hskLevel);
+    final curr = await _curriculumDao.getCurriculumByLevel(effectiveLevel);
     if (curr == null) return 0;
 
     final currId = curr['id'] as String;
@@ -89,19 +90,20 @@ class PlacementUnlockHandler {
     int recommendedLevel, {
     int startingLessonOrder = 1,
   }) async {
+    final effectiveLevel = (recommendedLevel <= 0) ? 1 : (recommendedLevel > 6 ? 6 : recommendedLevel);
     int totalCredited = 0;
 
-    // 1. Auto-credit all curriculum levels prior to recommendedLevel
-    for (int lvl = 1; lvl < recommendedLevel; lvl++) {
+    // 1. Auto-credit all curriculum levels prior to effectiveLevel
+    for (int lvl = 1; lvl < effectiveLevel; lvl++) {
       totalCredited += await creditLessonsUpToLevel(
         hskLevel: lvl,
         targetLessonOrder: 999999, // Exceeds any lesson count, crediting all lessons in level
       );
     }
 
-    // 2. In recommendedLevel, unlock starting lesson (and credit lessons before it if startingLessonOrder > 1)
+    // 2. In effectiveLevel, unlock starting lesson (and credit lessons before it if startingLessonOrder > 1)
     totalCredited += await creditLessonsUpToLevel(
-      hskLevel: recommendedLevel,
+      hskLevel: effectiveLevel,
       targetLessonOrder: startingLessonOrder,
     );
 

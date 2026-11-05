@@ -12,6 +12,7 @@ import '../../../hanzi_writing/hanzi_writing.dart';
 import '../../../listening/listening.dart';
 import '../../../placement_test/placement_test.dart';
 import '../../../practice/practice.dart';
+import '../../../profile/presentation/providers/profile_providers.dart';
 import '../../../pronunciation/pronunciation.dart';
 import '../../../reading/reading.dart';
 import '../../../roadmap/roadmap.dart'
@@ -28,6 +29,7 @@ class LearningScreen extends ConsumerStatefulWidget {
 class _LearningScreenState extends ConsumerState<LearningScreen>
     with AutomaticKeepAliveClientMixin {
   String _selectedLevel = 'HSK 1';
+  bool _hasSyncedLevelWithProfile = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -43,6 +45,15 @@ class _LearningScreenState extends ConsumerState<LearningScreen>
   Widget build(BuildContext context) {
     super.build(context);
     final theme = Theme.of(context);
+
+    final profileAsync = ref.watch(userProfileProvider);
+    if (!_hasSyncedLevelWithProfile && profileAsync.hasValue && profileAsync.value != null) {
+      final userHsk = profileAsync.value!.currentHskLevel;
+      final safeHsk = (userHsk <= 0) ? 1 : (userHsk > 5 ? 5 : userHsk);
+      _selectedLevel = 'HSK $safeHsk';
+      _hasSyncedLevelWithProfile = true;
+    }
+
     final unitsAsync = ref.watch(curriculumUnitsWithLessonsProvider(_curriculumId));
 
     return Scaffold(

@@ -375,8 +375,9 @@ class HomeRepository {
         ? learnerName.trim()
         : await getLearnerDisplayName();
 
-    // 2. Resolve active HSK level
-    final activeHskLevel = targetHskLevel ?? await getCurrentHskLevel();
+    // 2. Resolve active HSK level (normalize beginners 0 or negative to 1)
+    final rawLevel = targetHskLevel ?? await getCurrentHskLevel();
+    final activeHskLevel = (rawLevel <= 0) ? 1 : (rawLevel > 6 ? 6 : rawLevel);
 
     // 3. Contextual greeting
     final greeting = _getGreeting(nowLocal.hour);
@@ -464,11 +465,12 @@ class HomeRepository {
 
   /// Calculates roadmap progress for the specified HSK level from actual SQLite data.
   Future<RoadmapProgress> getRoadmapProgress({int hskLevel = 1}) async {
+    final effectiveLevel = (hskLevel <= 0) ? 1 : (hskLevel > 6 ? 6 : hskLevel);
     // 1. Total vocab in this level from seed/database
     final totalVocabRes = await _db.rawQuery(
       'SELECT COUNT(id) as count FROM ${DatabaseConstants.tableVocabularies} '
       'WHERE hsk_level = ? AND deleted_at IS NULL',
-      [hskLevel],
+      [effectiveLevel],
     );
     final totalVocab = (totalVocabRes.first['count'] as num?)?.toInt() ?? 0;
 
@@ -515,8 +517,8 @@ class HomeRepository {
     }
 
     return RoadmapProgress(
-      currentHskLevel: hskLevel,
-      levelTitle: 'Lộ trình: HSK $hskLevel Cơ Bản',
+      currentHskLevel: effectiveLevel,
+      levelTitle: 'Lộ trình: HSK $effectiveLevel Cơ Bản',
       totalVocabCount: totalVocab > 0 ? totalVocab : 150,
       learnedVocabCount: learnedVocab,
       masteredVocabCount: masteredVocab,
