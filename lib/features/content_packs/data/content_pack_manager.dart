@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:isolate';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
@@ -15,9 +14,13 @@ class ContentPackManagerException implements Exception {
   String toString() => 'ContentPackManagerException($packId): $message';
 }
 
+Map<String, dynamic> _parseContentPackJson(String jsonString) {
+  return json.decode(jsonString) as Map<String, dynamic>;
+}
+
 class ContentPackManager {
   final DatabaseExecutor _db;
-  static const String currentAppVersion = '1.0.9';
+  static const String currentAppVersion = '1.0.11';
   static const int currentSupportedSchemaVersion = 2;
 
   const ContentPackManager(this._db);
@@ -162,9 +165,12 @@ class ContentPackManager {
     bool isBundled = false,
   }) async {
     try {
-      final decoded = await Isolate.run(() {
-        return json.decode(rawJson) as Map<String, dynamic>;
-      });
+      final Map<String, dynamic> decoded;
+      if (rawJson.length > 20 * 1024 * 1024) {
+        decoded = await compute(_parseContentPackJson, rawJson);
+      } else {
+        decoded = json.decode(rawJson) as Map<String, dynamic>;
+      }
       final manifestMap = decoded['manifest'] as Map<String, dynamic>? ?? {};
       final manifest = ContentPackManifest.fromJson(manifestMap);
 
@@ -458,7 +464,9 @@ class ContentPackManager {
             parsedContent = item['content_json'] is Map<String, dynamic>
                 ? item['content_json'] as Map<String, dynamic>
                 : json.decode(rawContentJson) as Map<String, dynamic>;
-          } catch (_) {}
+          } catch (e, stack) {
+            debugPrint('[ContentPackManager] Lỗi phân tích content_json cho item $contentId: $e\n$stack');
+          }
 
           if (knowledgeType == 'vocabulary' && parsedContent['words'] is List) {
             final words = parsedContent['words'] as List<dynamic>;
@@ -846,7 +854,9 @@ class ContentPackManager {
           if (deps.contains(packId)) {
             dependentPacks.add(p['title'] as String? ?? p['id'] as String);
           }
-        } catch (_) {}
+        } catch (e, stack) {
+          debugPrint('[ContentPackManager] Lỗi phân tích dependencies_json cho pack ${p['id']}: $e\n$stack');
+        }
       }
 
       if (dependentPacks.isNotEmpty) {

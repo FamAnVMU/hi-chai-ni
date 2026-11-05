@@ -75,21 +75,77 @@ class DefaultRoadmapRepository implements RoadmapRepository {
   Future<Map<String, LessonProgress>> getLessonProgressMap() async {
     final rows = await _db.query(DatabaseConstants.tableLessonProgress);
     final map = <String, LessonProgress>{};
+
+    final aliasToCanonical = <String, String>{};
+    final canonicalToAliases = <String, List<String>>{};
+
+    for (final entry in KnowledgeIdentityRegistry.wellKnownLessonAliases.entries) {
+      aliasToCanonical[entry.key] = entry.value;
+      canonicalToAliases.putIfAbsent(entry.value, () => []).add(entry.key);
+    }
+
+    try {
+      final mappingRows = await _db.query(
+        DatabaseConstants.tableContentIdMappings,
+        columns: ['old_id', 'new_id'],
+      );
+      for (final row in mappingRows) {
+        final oldId = row['old_id'] as String?;
+        final newId = row['new_id'] as String?;
+        if (oldId != null && newId != null) {
+          aliasToCanonical[oldId] = newId;
+          canonicalToAliases.putIfAbsent(newId, () => []).add(oldId);
+        }
+      }
+    } catch (_) {}
+
+    try {
+      final registryRows = await _db.query(
+        DatabaseConstants.tableKnowledgeRegistry,
+        columns: ['id', 'canonical_id'],
+        where: "entity_type = 'lesson'",
+      );
+      for (final row in registryRows) {
+        final id = row['id'] as String?;
+        final canonicalId = row['canonical_id'] as String?;
+        if (id != null && canonicalId != null) {
+          aliasToCanonical[id] = canonicalId;
+          canonicalToAliases.putIfAbsent(canonicalId, () => []).add(id);
+        }
+      }
+    } catch (_) {}
+
+    String resolveCanonical(String id) {
+      final trimmed = id.trim();
+      if (aliasToCanonical.containsKey(trimmed)) {
+        return aliasToCanonical[trimmed]!;
+      }
+      final regex = RegExp(r'^lesson_hsk(\d+)_u\d+_l(\d+)$', caseSensitive: false);
+      final match = regex.firstMatch(trimmed);
+      if (match != null) {
+        return 'lesson_${match.group(1)}_${match.group(2)}';
+      }
+      final regexC = RegExp(r'^c_hsk(\d+)_l(\d+)$', caseSensitive: false);
+      final matchC = regexC.firstMatch(trimmed);
+      if (matchC != null) {
+        return 'lesson_${matchC.group(1)}_${matchC.group(2)}';
+      }
+      return trimmed;
+    }
+
     for (final r in rows) {
       final progress = LessonProgress.fromMap(r);
       map[progress.lessonId] = progress;
 
-      // Index by canonical ID and all aliases for seamless roadmap/curriculum sync
-      final canonical = await _identityRegistry.toCanonicalLessonId(progress.lessonId);
+      final canonical = resolveCanonical(progress.lessonId);
       map[canonical] = progress;
 
-      final aliases = await _identityRegistry.getAliasesFor(canonical);
+      final aliases = canonicalToAliases[canonical] ?? [progress.lessonId];
       for (final alias in aliases) {
         map[alias] = progress;
       }
     }
 
-    // Enrich from curriculum_mastery to ensure complete synchronization
     try {
       final masteryRows = await _db.query(
         DatabaseConstants.tableCurriculumMastery,
@@ -111,8 +167,12 @@ class DefaultRoadmapRepository implements RoadmapRepository {
             updatedAt: DateTime.tryParse(m['updated_at'] as String? ?? '') ?? DateTime.now(),
           );
           map[lId] = p;
-          final canonical = await _identityRegistry.toCanonicalLessonId(lId);
+          final canonical = resolveCanonical(lId);
           map[canonical] = p;
+          final aliases = canonicalToAliases[canonical] ?? [lId];
+          for (final alias in aliases) {
+            map[alias] = p;
+          }
         }
       }
     } catch (_) {}

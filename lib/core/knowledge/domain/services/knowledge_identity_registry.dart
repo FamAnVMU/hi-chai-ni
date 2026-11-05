@@ -74,6 +74,8 @@ class KnowledgeIdentityRegistry {
     'c_hsk1': 'curr_hsk1',
   };
 
+  static Map<String, String> get wellKnownLessonAliases => Map.unmodifiable(_wellKnownLessonAliases);
+
   KnowledgeIdentityRegistry(this._db);
 
   /// Generates a standardized canonical knowledge ID.
