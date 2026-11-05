@@ -2,7 +2,7 @@ class DatabaseConstants {
   DatabaseConstants._();
 
   static const String databaseName = 'hi_chinese.db';
-  static const int currentDatabaseVersion = 19;
+  static const int currentDatabaseVersion = 20;
 
   // Table names
   static const String tableVocabularies = 'vocabularies';

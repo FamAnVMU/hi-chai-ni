@@ -451,4 +451,201 @@ class SeedLoader {
       );
     }
   }
+
+  Future<SeedResult> seedGradedReadingPassages({
+    String assetPath = 'assets/data/graded_reading_passages.json',
+    AssetBundle? bundle,
+    String? rawJson,
+    bool forceReload = false,
+    int chunkSize = 100,
+    void Function(SeedProgress progress)? onProgress,
+  }) async {
+    final sw = Stopwatch()..start();
+    const bundleName = 'graded_reading_passages';
+    const version = 1;
+
+    try {
+      if (!forceReload) {
+        final existing = await _historyDao.getEntry(bundleName);
+        if (existing != null && existing.status == 'completed') {
+          final countRes = await _db.rawQuery(
+            'SELECT COUNT(*) as cnt FROM ${DatabaseConstants.tableReadingPassages} WHERE deleted_at IS NULL',
+          );
+          final currentCount = Sqflite.firstIntValue(countRes) ?? 0;
+          if (currentCount >= 60) {
+            sw.stop();
+            return SeedResult.skipped(
+              reason: 'Graded reading passages already seeded ($currentCount items).',
+              duration: sw.elapsed,
+            );
+          }
+        }
+      }
+
+      final jsonString = rawJson ?? await (bundle ?? rootBundle).loadString(assetPath);
+      final checksum = computeChecksum(jsonString);
+
+      if (!forceReload) {
+        final existing = await _historyDao.getEntry(bundleName);
+        if (existing != null &&
+            existing.status == 'completed' &&
+            existing.checksum == checksum &&
+            existing.version == version) {
+          sw.stop();
+          return SeedResult.skipped(
+            reason: 'Graded reading passages checksum matches completed seed.',
+            duration: sw.elapsed,
+          );
+        }
+      }
+
+      onProgress?.call(const SeedProgress(
+        stage: SeedStage.validating,
+        processedItems: 0,
+        totalItems: 0,
+        message: 'Parsing graded reading passages in background isolate...',
+      ));
+
+      final (parsedPassages, parseError) = await Isolate.run(() {
+        try {
+          final decoded = json.decode(jsonString);
+          final List<dynamic> rawList;
+          if (decoded is List) {
+            rawList = decoded;
+          } else if (decoded is Map<String, dynamic> && decoded['readingPassages'] is List) {
+            rawList = decoded['readingPassages'] as List<dynamic>;
+          } else {
+            return (<Map<String, dynamic>>[], 'Unrecognized JSON structure for reading passages');
+          }
+
+          final list = <Map<String, dynamic>>[];
+          for (final item in rawList) {
+            if (item is! Map<String, dynamic>) continue;
+            final id = item['id'] as String? ?? '';
+            if (id.isEmpty) continue;
+
+            final questionsRaw = item['questions_json'] ?? item['questions'];
+            final questionsJson = questionsRaw is String
+                ? questionsRaw
+                : json.encode(questionsRaw ?? []);
+
+            list.add({
+              'id': id,
+              'hsk_level': item['hsk_level'] as int? ?? item['hskLevel'] as int? ?? 1,
+              'title_cn': item['title_cn'] as String? ?? item['title'] as String? ?? '',
+              'content_cn': item['content_cn'] as String? ?? item['contentZh'] as String? ?? '',
+              'pinyin': item['pinyin'] as String? ?? '',
+              'translation_vi': item['translation_vi'] as String? ?? item['translationVi'] as String? ?? '',
+              'audio_uri': item['audio_uri'] as String? ?? item['audioUri'] as String?,
+              'questions_json': questionsJson,
+            });
+          }
+          return (list, null);
+        } catch (e) {
+          return (<Map<String, dynamic>>[], e.toString());
+        }
+      });
+
+      if (parseError != null || parsedPassages.isEmpty) {
+        sw.stop();
+        final errorMsg = 'Failed to parse graded reading passages: $parseError';
+        debugPrint('[SeedLoader] $errorMsg');
+        return SeedResult.failed(error: errorMsg, duration: sw.elapsed);
+      }
+
+      await _historyDao.recordInProgress(
+        bundleName: bundleName,
+        totalItems: parsedPassages.length,
+        checksum: checksum,
+        version: version,
+      );
+
+      final totalItems = parsedPassages.length;
+      int processedCount = 0;
+      final now = DateTime.now().toUtc().toIso8601String();
+
+      for (int i = 0; i < parsedPassages.length; i += chunkSize) {
+        final end = (i + chunkSize < parsedPassages.length) ? i + chunkSize : parsedPassages.length;
+        final chunk = parsedPassages.sublist(i, end);
+
+        await _db.transaction((txn) async {
+          final batch = txn.batch();
+          for (final p in chunk) {
+            batch.rawInsert('''
+              INSERT INTO ${DatabaseConstants.tableReadingPassages} (
+                id, hsk_level, title_cn, content_cn, pinyin,
+                translation_vi, audio_uri, questions_json, created_at, updated_at
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              ON CONFLICT(id) DO UPDATE SET
+                hsk_level = excluded.hsk_level,
+                title_cn = excluded.title_cn,
+                content_cn = excluded.content_cn,
+                pinyin = excluded.pinyin,
+                translation_vi = excluded.translation_vi,
+                audio_uri = COALESCE(excluded.audio_uri, ${DatabaseConstants.tableReadingPassages}.audio_uri),
+                questions_json = excluded.questions_json,
+                updated_at = excluded.updated_at;
+            ''', [
+              p['id'],
+              p['hsk_level'],
+              p['title_cn'],
+              p['content_cn'],
+              p['pinyin'],
+              p['translation_vi'],
+              p['audio_uri'],
+              p['questions_json'],
+              now,
+              now,
+            ]);
+          }
+          await batch.commit(noResult: true);
+        });
+
+        processedCount += chunk.length;
+        onProgress?.call(SeedProgress(
+          stage: SeedStage.seedingReading,
+          processedItems: processedCount,
+          totalItems: totalItems,
+          message: 'Seeded $processedCount/$totalItems graded reading passages...',
+        ));
+
+        await Future<void>.delayed(Duration.zero);
+      }
+
+      await _historyDao.recordCompleted(
+        bundleName: bundleName,
+        appliedItems: processedCount,
+      );
+
+      sw.stop();
+      debugPrint('[SeedLoader] Graded reading passages seeded: $processedCount items in ${sw.elapsedMilliseconds}ms.');
+
+      onProgress?.call(SeedProgress(
+        stage: SeedStage.completed,
+        processedItems: processedCount,
+        totalItems: totalItems,
+        message: 'Graded reading passages seeding completed in ${sw.elapsedMilliseconds}ms.',
+      ));
+
+      return SeedResult.completed(
+        totalItems: processedCount,
+        duration: sw.elapsed,
+      );
+    } catch (e, stackTrace) {
+      sw.stop();
+      final errorMsg = 'Error during graded reading passages seeding: $e';
+      debugPrint('[SeedLoader] $errorMsg\n$stackTrace');
+
+      await _historyDao.recordFailed(
+        bundleName: bundleName,
+        errorMessage: errorMsg,
+        appliedItems: 0,
+      );
+
+      return SeedResult.failed(
+        error: errorMsg,
+        duration: sw.elapsed,
+      );
+    }
+  }
 }

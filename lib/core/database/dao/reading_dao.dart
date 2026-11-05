@@ -66,6 +66,13 @@ class ReadingDao {
     );
   }
 
+  Future<int> countPassages() async {
+    final res = await _db.rawQuery(
+      'SELECT COUNT(*) as cnt FROM ${DatabaseConstants.tableReadingPassages} WHERE deleted_at IS NULL',
+    );
+    return Sqflite.firstIntValue(res) ?? 0;
+  }
+
   // Reading Progress methods
   Future<void> saveProgress(Map<String, dynamic> row, {Transaction? txn}) async {
     final executor = txn ?? _db;

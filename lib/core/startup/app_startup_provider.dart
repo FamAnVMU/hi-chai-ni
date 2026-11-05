@@ -143,6 +143,8 @@ class AppStartupNotifier extends Notifier<AppStartupState> {
         debugPrint('[AppStartup] 5/10: Dữ liệu từ điển đã sẵn sàng. Bỏ qua nạp lại.');
       }
 
+      await SeedLoader(db).seedGradedReadingPassages(bundle: assetBundle);
+
       // Bước 6 & 7: Kiểm tra và nạp các Content Pack bắt buộc
       final packManager = ContentPackManager(db);
 
