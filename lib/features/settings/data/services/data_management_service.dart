@@ -119,14 +119,36 @@ class DataManagementService {
       throw StateError('File sao lưu không tồn tại: ${backupFile.path}');
     }
 
-    // 1. Pre-destruction safety backup of current database
+    Database? tempCheckDb;
+    try {
+      tempCheckDb = await databaseFactory.openDatabase(
+        backupFile.path,
+        options: OpenDatabaseOptions(
+          readOnly: true,
+          onConfigure: (db) async {
+            await db.execute('PRAGMA query_only = ON;');
+          },
+        ),
+      );
+      final preCheckIssues = await DatabaseBackupHelper.checkIntegrity(tempCheckDb);
+      if (preCheckIssues.isNotEmpty) {
+        throw StateError('Tệp sao lưu không hợp lệ hoặc bị lỗi toàn vẹn: ${preCheckIssues.join(', ')}');
+      }
+    } catch (e) {
+      if (e is StateError) rethrow;
+      throw StateError('Không thể đọc tệp sao lưu: $e');
+    } finally {
+      if (tempCheckDb != null && tempCheckDb.isOpen) {
+        await tempCheckDb.close();
+      }
+    }
+
     try {
       await createBackup(customName: 'pre_restore_safety_snapshot_${DateTime.now().millisecondsSinceEpoch}.hibak');
     } catch (e) {
       debugPrint('[DataManagement] Warning: Could not create pre-restore snapshot: $e');
     }
 
-    // 2. Perform safe WAL checkpoint on active DB and close all connection handles safely
     try {
       if (_db.isOpen) {
         await _db.execute('PRAGMA optimize;');
@@ -142,46 +164,79 @@ class DataManagementService {
 
     await AppDatabase.instance.close();
 
-    // 3. Cleanly remove target file on platforms (e.g. Windows) that fail on copy collision, then copy backup
     final targetDbFile = File(_dbPath);
-    if (await targetDbFile.exists()) {
-      await targetDbFile.delete();
-    }
-    await backupFile.copy(_dbPath);
-
-    // 4. Remove lingering -wal and -shm files to avoid inconsistencies
+    final stagedDbFile = File('$_dbPath.old');
     final walFile = File('$_dbPath-wal');
-    if (await walFile.exists()) {
-      try {
-        await walFile.delete();
-      } catch (_) {}
-    }
+    final stagedWalFile = File('$_dbPath-wal.old');
     final shmFile = File('$_dbPath-shm');
+    final stagedShmFile = File('$_dbPath-shm.old');
+
+    if (await stagedDbFile.exists()) {
+      await stagedDbFile.delete();
+    }
+    if (await stagedWalFile.exists()) {
+      await stagedWalFile.delete();
+    }
+    if (await stagedShmFile.exists()) {
+      await stagedShmFile.delete();
+    }
+
+    if (await targetDbFile.exists()) {
+      await targetDbFile.rename(stagedDbFile.path);
+    }
+    if (await walFile.exists()) {
+      await walFile.rename(stagedWalFile.path);
+    }
     if (await shmFile.exists()) {
-      try {
-        await shmFile.delete();
-      } catch (_) {}
+      await shmFile.rename(stagedShmFile.path);
     }
 
-    // 5. Safely re-open database connection
     try {
+      await backupFile.copy(_dbPath);
       _db = await AppDatabase.instance.open(customPath: _dbPath);
-    } catch (_) {
-      _db = await databaseFactory.openDatabase(
-        _dbPath,
-        options: OpenDatabaseOptions(
-          onConfigure: (db) async {
-            await db.execute('PRAGMA foreign_keys = ON;');
-            await db.rawQuery('PRAGMA journal_mode = WAL;');
-          },
-        ),
-      );
-    }
+      final issues = await DatabaseBackupHelper.checkIntegrity(_db);
+      if (issues.isNotEmpty) {
+        throw StateError('Phát hiện lỗi toàn vẹn sau khi nạp: ${issues.join(', ')}');
+      }
+      if (await stagedDbFile.exists()) {
+        await stagedDbFile.delete();
+      }
+      if (await stagedWalFile.exists()) {
+        await stagedWalFile.delete();
+      }
+      if (await stagedShmFile.exists()) {
+        await stagedShmFile.delete();
+      }
+    } catch (e) {
+      try {
+        if (_db.isOpen) {
+          await _db.close();
+        }
+      } catch (_) {}
+      await AppDatabase.instance.close();
 
-    // 6. Verify integrity of restored database
-    final issues = await DatabaseBackupHelper.checkIntegrity(_db);
-    if (issues.isNotEmpty) {
-      debugPrint('[DataManagement] Warning: Integrity check issues after restore: $issues');
+      if (await targetDbFile.exists()) {
+        await targetDbFile.delete();
+      }
+      if (await walFile.exists()) {
+        await walFile.delete();
+      }
+      if (await shmFile.exists()) {
+        await shmFile.delete();
+      }
+
+      if (await stagedDbFile.exists()) {
+        await stagedDbFile.rename(_dbPath);
+      }
+      if (await stagedWalFile.exists()) {
+        await stagedWalFile.rename(walFile.path);
+      }
+      if (await stagedShmFile.exists()) {
+        await stagedShmFile.rename(shmFile.path);
+      }
+
+      _db = await AppDatabase.instance.open(customPath: _dbPath);
+      throw StateError('Khôi phục thất bại: tệp sao lưu không vượt qua kiểm tra toàn vẹn ($e). Đã phục hồi dữ liệu gốc.');
     }
 
     debugPrint('[DataManagement] Restore completed from ${backupFile.path}');
@@ -383,12 +438,39 @@ class DataManagementService {
       await txn.delete(DatabaseConstants.tableGoalHistory);
       await txn.delete(DatabaseConstants.tableUserProfiles);
 
-      // Re-seed clean fresh default profile
       final cleanProfile = UserProfile.defaultProfile();
       await txn.insert(
         DatabaseConstants.tableUserProfiles,
         cleanProfile.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+
+      await txn.update(
+        DatabaseConstants.tableCurriculumLessons,
+        {
+          'status': 'not_started',
+          'completed_at': null,
+          'credited_reason': null,
+          'is_locked': 1,
+        },
+      );
+      await txn.rawUpdate('''
+        UPDATE ${DatabaseConstants.tableCurriculumLessons}
+        SET is_locked = 0
+        WHERE id IN (
+          SELECT cl.id FROM ${DatabaseConstants.tableCurriculumLessons} cl
+          JOIN ${DatabaseConstants.tableCurriculumUnits} cu ON cl.unit_id = cu.id
+          WHERE cu.order_index = 1 AND cl.order_index = 1
+        )
+      ''');
+      await txn.update(
+        DatabaseConstants.tableCurriculumUnits,
+        {'is_locked': 1},
+      );
+      await txn.update(
+        DatabaseConstants.tableCurriculumUnits,
+        {'is_locked': 0},
+        where: 'order_index = 1',
       );
     });
 

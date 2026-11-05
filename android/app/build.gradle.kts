@@ -1,6 +1,5 @@
 plugins {
     id("com.android.application")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -16,17 +15,48 @@ android {
 
     defaultConfig {
         applicationId = "com.hichinese.hi_chinese"
-        // Min SDK 24 (Android 7.0+) required for Android KeyStore GCM, SQLite WAL and modern TLS
         minSdk = 24
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        create("release") {
+            val keyPropertiesFile = rootProject.file("key.properties")
+            val keyProperties = java.util.Properties()
+            if (keyPropertiesFile.exists()) {
+                keyPropertiesFile.inputStream().use { keyProperties.load(it) }
+            }
+            val env = System.getenv()
+            val ksPath = env["KEYSTORE_PATH"] ?: keyProperties.getProperty("storeFile")
+            val ksPass = env["KEYSTORE_PASSWORD"] ?: keyProperties.getProperty("storePassword")
+            val kAlias = env["KEY_ALIAS"] ?: keyProperties.getProperty("keyAlias")
+            val kPass = env["KEY_PASSWORD"] ?: keyProperties.getProperty("keyPassword")
+
+            val isReleaseTask = gradle.startParameter.taskNames.any {
+                it.contains("Release", ignoreCase = true) || it.contains("assembleRelease") || it.contains("bundleRelease")
+            }
+
+            if (!ksPath.isNullOrEmpty() && !ksPass.isNullOrEmpty() && !kAlias.isNullOrEmpty() && !kPass.isNullOrEmpty()) {
+                val resolvedFile = file(ksPath)
+                if (resolvedFile.exists()) {
+                    storeFile = resolvedFile
+                    storePassword = ksPass
+                    keyAlias = kAlias
+                    keyPassword = kPass
+                } else if (isReleaseTask) {
+                    throw GradleException("Release keystore file not found at: ${resolvedFile.absolutePath}")
+                }
+            } else if (isReleaseTask) {
+                throw GradleException("Release build requires a valid release keystore configured via environment variables (KEYSTORE_PATH, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD) or key.properties.")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // Configure signing config: fall back to debug signing only when release keystore is not yet set up
-            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

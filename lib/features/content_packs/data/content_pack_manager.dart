@@ -50,7 +50,24 @@ class ContentPackManager {
     await executor.insert(table, values, conflictAlgorithm: ConflictAlgorithm.ignore);
   }
 
+  static Map<String, dynamic> _decodeJson(String rawJson) {
+    return json.decode(rawJson) as Map<String, dynamic>;
+  }
+
   static String computeChecksum(String rawJson) {
+    try {
+      final decoded = json.decode(rawJson);
+      if (decoded is Map<String, dynamic>) {
+        final manifest = decoded['manifest'];
+        if (manifest is Map<String, dynamic> && manifest.containsKey('sha256') && (manifest['sha256'] as String).isNotEmpty) {
+          final normalizedManifest = Map<String, dynamic>.from(manifest);
+          normalizedManifest['sha256'] = '';
+          final copy = Map<String, dynamic>.from(decoded);
+          copy['manifest'] = normalizedManifest;
+          return sha256.convert(utf8.encode(json.encode(copy))).toString();
+        }
+      }
+    } catch (_) {}
     return sha256.convert(utf8.encode(rawJson)).toString();
   }
 
@@ -106,13 +123,9 @@ class ContentPackManager {
       );
     }
 
-    // 3. Checksum check if specified
     if (rawJson != null && manifest.sha256.isNotEmpty) {
       final actualSha = computeChecksum(rawJson);
-      final isKnownValid = manifest.packId == 'hsk3_pack_v1' &&
-          manifest.sha256.toLowerCase() ==
-              '434442694a2fb1868bd11c54dd698af117f2ce755cee52ccce9918549b17a2c2';
-      if (actualSha.toLowerCase() != manifest.sha256.toLowerCase() && !isKnownValid) {
+      if (actualSha.toLowerCase() != manifest.sha256.toLowerCase()) {
         throw ContentPackManagerException(
           'Mã băm SHA-256 không hợp lệ (kỳ vọng: ${manifest.sha256}, thực tế: $actualSha). Dữ liệu có thể bị hư hỏng.',
           packId: manifest.packId,
@@ -169,8 +182,34 @@ class ContentPackManager {
       final idMappingsList = decoded['id_mappings'] as List<dynamic>? ?? [];
 
       Future<void> executeInTransaction(DatabaseExecutor txn) async {
-        // Pre-installation manifest validation
         await validateManifest(manifest, rawJson: rawJson, executor: txn);
+
+        final contentItemIds = contentItemsList
+            .map((item) => (item as Map<String, dynamic>)['content_id'] as String?)
+            .whereType<String>()
+            .toSet();
+
+        if (curriculumMap != null) {
+          final units = curriculumMap['units'] as List<dynamic>? ?? [];
+          for (final u in units) {
+            final uMap = u as Map<String, dynamic>;
+            final lessons = uMap['lessons'] as List<dynamic>? ?? [];
+            for (final l in lessons) {
+              final lMap = l as Map<String, dynamic>;
+              final segments = lMap['segments'] as List<dynamic>? ?? [];
+              for (final s in segments) {
+                final sMap = s as Map<String, dynamic>;
+                final refId = sMap['content_ref_id'] as String?;
+                if (refId != null && refId.isNotEmpty && !contentItemIds.contains(refId)) {
+                  throw ContentPackManagerException(
+                    'Lỗi toàn vẹn tham chiếu gói học liệu: Segment "${sMap['id']}" tham chiếu content_ref_id "$refId" không tồn tại trong content_items.',
+                    packId: manifest.packId,
+                  );
+                }
+              }
+            }
+          }
+        }
 
         final nowUtc = DateTime.now().toUtc().toIso8601String();
 

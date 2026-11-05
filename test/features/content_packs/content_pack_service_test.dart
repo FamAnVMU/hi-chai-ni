@@ -95,7 +95,7 @@ void main() {
         title: 'Giáo trình chuẩn HSK 3 (Trực tuyến)',
         description: 'Test pack',
         version: '1.0.0',
-        sizeBytes: 6341,
+        sizeBytes: 7598,
         downloadUrl: 'https://raw.githubusercontent.com/FamAnVMU/hi-chai-ni/main/content_packs_cdn/hsk3_pack_v1.json',
         sha256Checksum: '',
         isBundled: false,
@@ -113,6 +113,25 @@ void main() {
 
       final isNowInstalled = await remoteService.isPackInstalled(targetPack.packId);
       expect(isNowInstalled, isTrue);
+    });
+
+    test('4. Referential integrity enforcement throws exception and aborts when segment points to missing content item', () async {
+      final hsk2File = File('assets/data/content_packs/hsk2/hsk2_pack_v1.json');
+      final raw = await hsk2File.readAsString();
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      
+      final contentItems = (decoded['content_items'] as List<dynamic>)
+          .where((item) => (item as Map<String, dynamic>)['content_id'] != 'MASTERY_L2_1')
+          .toList();
+      decoded['content_items'] = contentItems;
+      final corruptedJson = jsonEncode(decoded);
+
+      final loader = ContentPackLoader(db);
+      final result = await loader.loadPackFromJson(corruptedJson);
+
+      expect(result.isSuccess, isFalse);
+      expect(result.errorMessage, contains('Lỗi toàn vẹn tham chiếu gói học liệu'));
+      expect(result.errorMessage, contains('MASTERY_L2_1'));
     });
   });
 }

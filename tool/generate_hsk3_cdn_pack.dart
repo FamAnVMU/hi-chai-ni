@@ -134,7 +134,7 @@ void main() {
             'type': 'multiple_choice',
             'skill_type': 'reading',
             'prompt': 'Từ "打算" (dǎsuàn) có nghĩa là gì?',
-            'options': ['dự định, tính toán', 'thường xuyên', 'tin tưởng'],
+            'options': ['thường xuyên', 'dự định, tính toán', 'tin tưởng'],
             'correct_answer': 'dự định, tính toán',
             'explanation': '"打算" có nghĩa là dự định, tính toán.'
           }
@@ -142,6 +142,46 @@ void main() {
       }),
       'objectives': ['Đánh giá kiến thức bài học'],
       'source_reference': 'HSK 3.0 Practice Workbook Lesson 1'
+    },
+    {
+      'content_id': 'MASTERY_L3_1',
+      'curriculum_id': 'curr_hsk3',
+      'hsk_level': 3,
+      'knowledge_type': 'exercise',
+      'title': 'Đánh giá hoàn thành HSK 3 Bài 1',
+      'content_json': json.encode({
+        'exercises': [
+          {
+            'id': 'm_ex_3_1_1',
+            'type': 'multiple_choice',
+            'skill_type': 'reading',
+            'prompt': 'Từ "打算" (dǎsuàn) có nghĩa là gì?',
+            'options': ['thường xuyên', 'tin tưởng', 'dự định, tính toán'],
+            'correct_answer': 'dự định, tính toán',
+            'explanation': '"打算" có nghĩa là dự định, tính toán.'
+          },
+          {
+            'id': 'm_ex_3_1_2',
+            'type': 'multiple_choice',
+            'skill_type': 'reading',
+            'prompt': 'Từ "作业" (zuòyè) có nghĩa là gì?',
+            'options': ['bài tập về nhà', 'kỳ nghỉ', 'trò chơi'],
+            'correct_answer': 'bài tập về nhà',
+            'explanation': '"作业" phát âm là zuòyè, nghĩa là bài tập về nhà.'
+          },
+          {
+            'id': 'm_ex_3_1_3',
+            'type': 'multiple_choice',
+            'skill_type': 'grammar',
+            'prompt': 'Chọn câu dịch đúng: "周末你有什么打算？"',
+            'options': ['Bạn đã làm bài tập chưa?', 'Cuối tuần bạn có dự định gì?', 'Bạn đi đâu vào ngày mai?'],
+            'correct_answer': 'Cuối tuần bạn có dự định gì?',
+            'explanation': '"周末" là cuối tuần, "打算" là dự định.'
+          }
+        ]
+      }),
+      'objectives': ['Đánh giá toàn diện kiến thức Bài 1 HSK 3'],
+      'source_reference': 'HSK 3.0 Standard Course Lesson 1'
     }
   ];
 
@@ -166,10 +206,13 @@ void main() {
     'content_items': contentItems,
   };
 
+  (fullPack['manifest'] as Map<String, dynamic>)['sha256'] = '';
+  final tempJson = json.encode(fullPack);
+  (fullPack['manifest'] as Map<String, dynamic>)['size_bytes'] = utf8.encode(tempJson).length;
+
   final rawJson = json.encode(fullPack);
   final sha = sha256.convert(utf8.encode(rawJson)).toString();
   (fullPack['manifest'] as Map<String, dynamic>)['sha256'] = sha;
-  (fullPack['manifest'] as Map<String, dynamic>)['size_bytes'] = utf8.encode(rawJson).length;
 
   final finalJson = json.encode(fullPack);
   final targetFile = File('content_packs_cdn/hsk3_pack_v1.json');

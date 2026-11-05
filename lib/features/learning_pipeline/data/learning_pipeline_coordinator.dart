@@ -562,9 +562,23 @@ class LearningPipelineCoordinator {
         conflictAlgorithm: ConflictAlgorithm.abort,
       );
 
-      // 5. Update Mastery & SRS
+      final existingMasteryRows = await txn.query(
+        DatabaseConstants.tableCurriculumMastery,
+        where: 'id = ?',
+        whereArgs: ['mastery_$targetId'],
+        limit: 1,
+      );
+      final prevAttempts = existingMasteryRows.isNotEmpty
+          ? ((existingMasteryRows.first['attempts_count'] as num?)?.toInt() ?? 0)
+          : 0;
+      final existingCreatedAt = existingMasteryRows.isNotEmpty
+          ? (existingMasteryRows.first['created_at'] as String? ?? nowIso)
+          : nowIso;
+      final existingDueReviewAt = existingMasteryRows.isNotEmpty
+          ? (existingMasteryRows.first['due_review_at'] as String?)
+          : null;
+
       if (!attempt.isCorrect) {
-        // Tag as unstable
         await txn.insert(
           DatabaseConstants.tableCurriculumMastery,
           {
@@ -573,10 +587,10 @@ class LearningPipelineCoordinator {
             'item_type': 'vocabulary',
             'mastery_state': MasteryState.unstable.value,
             'score': attempt.score,
-            'attempts_count': 1,
+            'attempts_count': prevAttempts + 1,
             'last_attempt_at': nowIso,
             'due_review_at': nowIso,
-            'created_at': nowIso,
+            'created_at': existingCreatedAt,
             'updated_at': nowIso,
           },
           conflictAlgorithm: ConflictAlgorithm.replace,
@@ -628,7 +642,6 @@ class LearningPipelineCoordinator {
           );
         }
       } else {
-        // Successful attempt: fetch history and evaluate promotion
         final historyRows = await txn.query(
           DatabaseConstants.tableLearnerEvidence,
           where: 'content_id = ?',
@@ -645,9 +658,10 @@ class LearningPipelineCoordinator {
             'item_type': 'vocabulary',
             'mastery_state': calculatedState.value,
             'score': attempt.score,
-            'attempts_count': 1,
+            'attempts_count': prevAttempts + 1,
             'last_attempt_at': nowIso,
-            'created_at': nowIso,
+            'due_review_at': existingDueReviewAt,
+            'created_at': existingCreatedAt,
             'updated_at': nowIso,
           },
           conflictAlgorithm: ConflictAlgorithm.replace,

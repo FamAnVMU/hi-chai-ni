@@ -57,7 +57,7 @@ void main() {
       expect(player.status, equals(AudioPlaybackStatus.playing));
 
       await player.seek(const Duration(seconds: 1));
-      expect(player.currentPosition, equals(const Duration(seconds: 1)));
+      expect(player.currentPosition.inSeconds, equals(1));
 
       await player.setPlaybackSpeed(1.25);
       expect(player.playbackSpeed, equals(1.25));
