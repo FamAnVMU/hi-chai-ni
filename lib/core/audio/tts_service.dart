@@ -109,7 +109,7 @@ class DefaultTtsService implements TtsService {
   @override
   void dispose() {
     try {
-      _flutterTts.stop();
+      _flutterTts.stop().catchError((_) => 0);
     } catch (_) {}
   }
 }

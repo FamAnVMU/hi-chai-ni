@@ -219,6 +219,15 @@ class MockAudioPlatformHelper {
       },
     );
 
+    // 4. Flutter TTS Mock Channel
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+      const MethodChannel('flutter_tts'),
+      (MethodCall methodCall) async {
+        return 1;
+      },
+    );
+
     // Sync PermissionHelper
     PermissionHelper.mockPermissionStatus = PermissionStatus.granted;
     PermissionHelper.mockPermissionResult = AudioPermissionResult.granted;

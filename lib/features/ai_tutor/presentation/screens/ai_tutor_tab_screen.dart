@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/tokens/app_colors.dart';
 import '../../../../core/theme/tokens/app_spacing.dart';
 import '../../../settings/presentation/screens/ai_settings_screen.dart';
+import '../../../app_shell/presentation/providers/app_shell_providers.dart';
 import '../../domain/models/tutor_persona.dart';
 import '../../domain/models/tutor_scenario.dart';
 import '../providers/ai_tutor_providers.dart';
@@ -23,6 +24,26 @@ class _AiTutorTabScreenState extends ConsumerState<AiTutorTabScreen>
     with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void deactivate() {
+    _abortActiveVoiceAndAudio();
+    super.deactivate();
+  }
+
+  @override
+  void dispose() {
+    _abortActiveVoiceAndAudio();
+    super.dispose();
+  }
+
+  void _abortActiveVoiceAndAudio() {
+    try {
+      final voiceService = ref.read(voiceConversationServiceProvider);
+      voiceService.stopListening();
+      voiceService.cancelCurrentTurn();
+    } catch (_) {}
+  }
 
   void _showPersonaSelector() {
     final activePersona = ref.read(activePersonaProvider);
@@ -218,6 +239,13 @@ class _AiTutorTabScreenState extends ConsumerState<AiTutorTabScreen>
     super.build(context);
     final theme = Theme.of(context);
     final mode = ref.watch(aiTutorModeProvider);
+
+    // Stop microphone, TTS, and cancel streaming if user switches away to another tab
+    ref.listen<AppTab>(selectedTabProvider, (prev, next) {
+      if (prev == AppTab.aiTutor && next != AppTab.aiTutor) {
+        _abortActiveVoiceAndAudio();
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(

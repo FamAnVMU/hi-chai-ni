@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../features/content_packs/data/content_pack_manager.dart';
+import '../audio/audio_temp_cleaner.dart';
 import '../database/app_database.dart';
 import '../database/database_constants.dart';
 import '../database/seed/seed_loader.dart';
@@ -85,8 +86,13 @@ class AppStartupNotifier extends Notifier<AppStartupState> {
     try {
       final assetBundle = bundle ?? rootBundle;
 
-      // Bước 1: Khởi tạo môi trường ứng dụng
+      // Bước 1: Khởi tạo môi trường ứng dụng & dọn dẹp âm thanh tạm thời cũ (F-30)
       debugPrint('[AppStartup] 1/10: Khởi tạo môi trường ứng dụng...');
+      try {
+        await AudioTempCleaner.cleanupTempAudioFiles();
+      } catch (e) {
+        debugPrint('[AppStartup] AudioTempCleaner non-fatal warning: $e');
+      }
 
       // Bước 2: Mở database
       state = state.copyWith(

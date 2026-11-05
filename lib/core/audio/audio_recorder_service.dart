@@ -299,6 +299,7 @@ class DefaultAudioRecorderService implements AudioRecorderService {
 
   @override
   void dispose() {
+    AppLifecycleManager.instance.unregisterAudioSession(_onLifecycleStop);
     _durationTimer?.cancel();
     _amplitudeSub?.cancel();
     if (_ownsRecorder) {

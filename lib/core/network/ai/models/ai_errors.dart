@@ -43,3 +43,11 @@ class AiCancelledException extends AiException {
 class AiValidationException extends AiException {
   const AiValidationException(super.message);
 }
+
+class SecurityException implements Exception {
+  final String message;
+  const SecurityException(this.message);
+
+  @override
+  String toString() => 'SecurityException: $message';
+}
