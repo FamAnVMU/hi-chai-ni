@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/constants/app_info_provider.dart';
 import '../../../../core/database/database_constants.dart';
 import '../../../../core/theme/theme.dart';
 
-class AboutAndPrivacyDialog extends StatelessWidget {
+class AboutAndPrivacyDialog extends ConsumerWidget {
   const AboutAndPrivacyDialog({super.key});
 
   static void show(BuildContext context) {
@@ -14,8 +16,13 @@ class AboutAndPrivacyDialog extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final appInfoAsync = ref.watch(appInfoProvider);
+    final versionStr = appInfoAsync.maybeWhen(
+      data: (info) => info.fullVersionString,
+      orElse: () => 'v${AppConstants.appVersionWithBuild}',
+    );
 
     return AlertDialog(
       title: Row(
@@ -40,7 +47,7 @@ class AboutAndPrivacyDialog extends StatelessWidget {
                     style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    'Phiên bản 1.0.0+1 • CSDL Schema v${DatabaseConstants.currentDatabaseVersion}',
+                    'Phiên bản $versionStr • CSDL Schema v${DatabaseConstants.currentDatabaseVersion}',
                     style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                   ),
                 ],

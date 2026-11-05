@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Exclude SQLite databases -->
+    <exclude domain="database" path="." />
+    <!-- Exclude any backup archives in files directory -->
+    <exclude domain="file" path="*.hibak" />
+</full-backup-content>

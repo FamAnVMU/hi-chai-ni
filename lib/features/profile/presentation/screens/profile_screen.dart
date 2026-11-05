@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../../../../core/constants/app_constants.dart';
+import '../../../../core/constants/app_info_provider.dart';
 import '../../../../core/database/database_constants.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/permission_helper.dart';
@@ -505,14 +507,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with AutomaticKee
             const SizedBox(height: AppSpacing.xl),
 
             // App Footer
-            Center(
-              child: Text(
-                'HI Chinese • Native Android • Offline-first v1.0.0+1\nCơ sở dữ liệu SQLite Schema v${DatabaseConstants.currentDatabaseVersion}',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: isDark ? Colors.white38 : theme.colorScheme.onSurfaceVariant.withAlpha(120),
-                ),
-                textAlign: TextAlign.center,
-              ),
+            Builder(
+              builder: (context) {
+                final appInfoAsync = ref.watch(appInfoProvider);
+                final versionStr = appInfoAsync.maybeWhen(
+                  data: (info) => info.fullVersionString,
+                  orElse: () => 'v${AppConstants.appVersionWithBuild}',
+                );
+                return Center(
+                  child: Text(
+                    '${AppConstants.appName} • Native Android • Offline-first $versionStr\nCơ sở dữ liệu SQLite Schema v${DatabaseConstants.currentDatabaseVersion}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: isDark ? Colors.white38 : theme.colorScheme.onSurfaceVariant.withAlpha(120),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                );
+              },
             ),
             const SizedBox(height: AppSpacing.huge),
           ],

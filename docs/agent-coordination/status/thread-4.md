@@ -34,6 +34,9 @@
 | **Placement Test UI (`PlacementTestScreen`)** | **IMPLEMENTED** | CAT assessment flow with step progress indicators, multiple-choice, and listening audio controls. |
 | **Grammar Practice & Topics UI (`GrammarTopicsScreen`, `GrammarDetailScreen`)** | **IMPLEMENTED** | AllSet Wiki & HSK 3.0 rule presentations with contrastive examples and quiz views. |
 | **Sentence Audio & Shadowing UI (`SentencePracticeScreen`, `ShadowingScreen`)** | **IMPLEMENTED** | Waveform / audio playback bar, 7-level shadowing step-by-step recording UI. |
+| **Theme & Settings Startup Synchronization (F-05)** | **IMPLEMENTED** | Nạp & đồng bộ cài đặt người dùng (Theme, Pinyin, Font) ngay tại bước 9 của AppStartupSequence, không giật màn hình. |
+| **Android Backup & Extraction Security (F-21)** | **IMPLEMENTED** | Đã cấu hình `data_extraction_rules.xml` & `backup_rules.xml` chặn rò rỉ database và tệp `.hibak`. |
+| **Dynamic App Versioning & Dead Code Clean (F-31, F-32)** | **IMPLEMENTED** | Tích hợp `package_info_plus` lấy version động runtime v1.0.9+10; đã xóa bỏ `HiChineseSkeletonScreen` trong main.dart. |
 | **Onboarding Multi-Step Wizard Flow** | **IMPLEMENTED** | Tái cấu trúc thành 3 chặng (Goals -> Habits -> Preferences) với PageView & Sub-step indicator. 17/17 tests pass. |
 | **Accessibility & Semantics Support** | **PARTIALLY IMPLEMENTED** | Essential semantics, contrast and touch targets present; screen reader announcements and alternative canvas controls scheduled for further enhancement. |
 | **Tablet / Foldable Dual-pane Adaptation** | **PARTIALLY IMPLEMENTED** | Responsive layout handles narrow to standard screens (320dp - 600dp); large tablet dual-pane layouts planned. |

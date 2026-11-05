@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/database/app_database.dart';
 import '../../../../core/database/database_backup_helper.dart';
 import '../../../../core/database/database_constants.dart';
@@ -210,7 +211,7 @@ class DataManagementService {
       'metadata': {
         'app_name': 'HI Chinese',
         'export_version': '1.0',
-        'app_version': '1.0.0+1',
+        'app_version': AppConstants.appVersionWithBuild,
         'schema_version': DatabaseConstants.currentDatabaseVersion,
         'exported_at': DateTime.now().toUtc().toIso8601String(),
         'platform': 'local_standalone',

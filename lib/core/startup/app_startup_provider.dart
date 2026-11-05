@@ -1,12 +1,15 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../features/content_packs/data/content_pack_manager.dart';
+import '../../features/settings/presentation/providers/settings_providers.dart';
 import '../database/app_database.dart';
+import '../database/dao/app_settings_dao.dart';
 import '../database/database_constants.dart';
 import '../database/seed/seed_loader.dart';
 import '../network/ai/security/ai_credential_storage.dart';
+import '../theme/theme.dart';
 import 'app_startup_state.dart';
 
 export 'app_startup_state.dart';
@@ -170,7 +173,7 @@ class AppStartupNotifier extends Notifier<AppStartupState> {
 
       // Bước 9: Khởi tạo các service phụ thuộc vào dữ liệu học tập
       state = state.copyWith(
-        statusMessage: '9/10: Khởi tạo các dịch vụ học tập...',
+        statusMessage: '9/10: Khởi tạo các dịch vụ học tập & cài đặt người dùng...',
       );
       debugPrint('[AppStartup] 9/10: Khởi tạo dịch vụ học tập phụ thuộc...');
       await _initializeDependentServices(
@@ -317,6 +320,27 @@ class AppStartupNotifier extends Notifier<AppStartupState> {
         },
         conflictAlgorithm: ConflictAlgorithm.ignore,
       );
+    }
+
+    // 3. Preload and synchronize user preferences (Theme, Font Scale, Pinyin) into memory
+    try {
+      final settingsDao = AppSettingsDao(db);
+      final map = await settingsDao.getAllSettings();
+      if (map.isNotEmpty) {
+        ThemeMode themeMode = ThemeMode.light;
+        if (map['theme_mode'] == 'dark') themeMode = ThemeMode.dark;
+        if (map['theme_mode'] == 'system') themeMode = ThemeMode.system;
+        if (map['theme_mode'] == 'light') themeMode = ThemeMode.light;
+
+        // Synchronize themeModeProvider to avoid visual flashing
+        ref.read(themeModeProvider.notifier).setThemeMode(themeMode);
+
+        // Synchronize AppSettings state
+        await ref.read(appSettingsProvider.notifier).reloadSettings();
+        debugPrint('[AppStartup] Đã đồng bộ cài đặt người dùng: ThemeMode=$themeMode');
+      }
+    } catch (e) {
+      debugPrint('[AppStartup] Cảnh báo: Tải cài đặt người dùng ban đầu thất bại: $e');
     }
   }
 }
