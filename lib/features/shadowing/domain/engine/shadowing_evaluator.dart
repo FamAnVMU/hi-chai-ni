@@ -16,6 +16,22 @@ class ShadowingEvaluator {
     // Base target duration adjusted by playback speed rate
     final effectiveTargetMs = (segment.durationMs / speed.rate).round();
 
+    if (segment.durationMs <= 0 || effectiveTargetMs <= 0) {
+      return ShadowingAssessmentResult(
+        segmentId: segment.id,
+        targetDurationMs: 0,
+        userDurationMs: userMs,
+        pacingRatio: 0.0,
+        pacingVerdict: 'Thời lượng mẫu không hợp lệ.',
+        timelineMatchPercent: 0.0,
+        fluencyIndex: 0.0,
+        userAudioPath: audioPath,
+        mode: mode,
+        speed: speed,
+        timestamp: DateTime.now(),
+      );
+    }
+
     if (userMs < 400) {
       return ShadowingAssessmentResult(
         segmentId: segment.id,

@@ -314,23 +314,55 @@ class AiCredentialStorage {
 
   // ==================== PROXY URL ====================
 
+  /// Checks whether a hostname or IP address is loopback, internal, link-local, or otherwise unsafe for proxying.
+  static bool isUnsafeHost(String rawHost) {
+    final host = rawHost.trim().toLowerCase().replaceAll(RegExp(r'^\[|\]$'), '');
+    if (host.isEmpty) return true;
+    if (host == 'localhost' || host.endsWith('.local') || host.endsWith('.internal')) {
+      return true;
+    }
+    // Loopback IPv4 / IPv6 / Unspecified
+    if (host == '::1' || host == '::' || host == '0.0.0.0') return true;
+    if (host.startsWith('127.')) return true;
+    if (host.startsWith('0.')) return true;
+    // Private IPv4 ranges
+    // 10.0.0.0/8
+    if (host.startsWith('10.')) return true;
+    // 192.168.0.0/16
+    if (host.startsWith('192.168.')) return true;
+    // 169.254.0.0/16 (Link-local & cloud metadata)
+    if (host.startsWith('169.254.')) return true;
+    // 172.16.0.0/12 (172.16.x.x - 172.31.x.x)
+    if (RegExp(r'^172\.(1[6-9]|2[0-9]|3[0-1])\.').hasMatch(host)) return true;
+    // 100.64.0.0/10 (Carrier-Grade NAT)
+    if (RegExp(r'^100\.(6[4-9]|[7-9][0-9]|1[0-1][0-9]|12[0-7])\.').hasMatch(host)) return true;
+    // IPv6 Link-local / Unique Local Address (ULA)
+    if (host.startsWith('fe80:') || host.startsWith('fc') || host.startsWith('fd')) {
+      return true;
+    }
+    return false;
+  }
+
+  /// Validates custom proxy URL to prevent SSRF and cleartext token exposure.
+  static void validateProxyUrl(String? url) {
+    if (url == null || url.trim().isEmpty) return;
+    final cleanUrl = url.trim();
+    final uri = Uri.tryParse(cleanUrl);
+    if (uri == null || !uri.hasScheme || uri.scheme.toLowerCase() != 'https') {
+      throw ArgumentError('Custom Proxy URL bắt buộc phải sử dụng giao thức HTTPS bảo mật.');
+    }
+    if (isUnsafeHost(uri.host)) {
+      throw ArgumentError('Không được sử dụng địa chỉ loopback hoặc IP nội bộ cho AI Proxy.');
+    }
+  }
+
   /// Saves an optional custom backend proxy URL.
   Future<void> saveCustomProxyUrl(String? url) async {
     if (simulateFailure) {
       throw StateError('Simulated secure storage I/O failure');
     }
 
-    if (url != null && url.trim().isNotEmpty) {
-      final cleanUrl = url.trim();
-      final uri = Uri.tryParse(cleanUrl);
-      if (uri == null || !uri.hasScheme || uri.scheme.toLowerCase() != 'https') {
-        throw ArgumentError('Custom Proxy URL bắt buộc phải sử dụng giao thức HTTPS bảo mật.');
-      }
-      final host = uri.host.toLowerCase();
-      if (host == 'localhost' || host == '127.0.0.1' || host.startsWith('192.168.') || host.startsWith('10.')) {
-        throw ArgumentError('Không được sử dụng địa chỉ loopback hoặc IP nội bộ cho AI Proxy.');
-      }
-    }
+    validateProxyUrl(url);
 
     final memory = inMemoryStore;
     if (url == null || url.trim().isEmpty) {

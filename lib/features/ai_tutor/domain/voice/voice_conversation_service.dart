@@ -19,6 +19,7 @@ abstract class VoiceConversationService {
   Stream<List<VoiceTranscriptSegment>> get transcriptStream;
   List<VoiceTranscriptSegment> get transcripts;
   bool get isMuted;
+  bool get voiceInputSupported;
   VoiceEngineMode get engineMode;
 
   PersonaVoicePreviewStatus get previewStatus;
@@ -57,6 +58,8 @@ class DefaultVoiceConversationService implements VoiceConversationService {
   final TtsService? tts;
   final AiTutorRepository repository;
   final VoiceEngineMode mode;
+  @override
+  final bool voiceInputSupported;
 
   VoiceConversationStatus _status = VoiceConversationStatus.idle;
   bool _isMuted = false;
@@ -88,6 +91,7 @@ class DefaultVoiceConversationService implements VoiceConversationService {
     this.tts,
     required this.repository,
     this.mode = VoiceEngineMode.turnBasedAudio,
+    this.voiceInputSupported = false,
   }) {
     _recorderAmpSub = recorder.amplitudeStream.listen((amp) {
       if (_amplitudeController.isClosed) return;
@@ -196,9 +200,15 @@ class DefaultVoiceConversationService implements VoiceConversationService {
   @override
   Future<bool> checkPermission() async {
     _setStatus(VoiceConversationStatus.requestingPermission);
-    final granted = await recorder.checkPermission();
+    bool granted = false;
+    try {
+      granted = await recorder.checkPermission();
+    } catch (e) {
+      debugPrint('[VoiceConversationService] checkPermission error: $e');
+      granted = false;
+    }
     if (!granted) {
-      _setStatus(VoiceConversationStatus.error);
+      _setStatus(voiceInputSupported ? VoiceConversationStatus.error : VoiceConversationStatus.idle);
       return false;
     }
     _setStatus(VoiceConversationStatus.idle);
@@ -351,14 +361,26 @@ class DefaultVoiceConversationService implements VoiceConversationService {
     _transcripts.clear();
 
     _setStatus(VoiceConversationStatus.requestingPermission);
-    final hasPerm = await recorder.checkPermission();
-    if (!hasPerm) {
+    bool hasPerm = false;
+    try {
+      hasPerm = await recorder.checkPermission();
+    } catch (_) {
+      hasPerm = false;
+    }
+
+    if (!hasPerm && voiceInputSupported) {
       _setStatus(VoiceConversationStatus.error);
       return;
     }
 
     _setStatus(VoiceConversationStatus.connecting);
     await Future.delayed(const Duration(milliseconds: 300));
+
+    if (_status == VoiceConversationStatus.ended ||
+        _status == VoiceConversationStatus.idle ||
+        _activeSessionId != sessionId) {
+      return;
+    }
 
     _addTranscript(VoiceTranscriptSegment(
       id: 'greeting_${DateTime.now().millisecondsSinceEpoch}',
@@ -390,7 +412,19 @@ class DefaultVoiceConversationService implements VoiceConversationService {
       } catch (_) {}
     }
 
-    await recorder.startRecording();
+    if (_status == VoiceConversationStatus.ended ||
+        _status == VoiceConversationStatus.idle ||
+        _activeSessionId != sessionId) {
+      return;
+    }
+
+    if (voiceInputSupported && hasPerm) {
+      try {
+        await recorder.startRecording();
+      } catch (e) {
+        debugPrint('[VoiceConversationService] startRecording error: $e');
+      }
+    }
     _setStatus(VoiceConversationStatus.listening);
   }
 
@@ -402,7 +436,11 @@ class DefaultVoiceConversationService implements VoiceConversationService {
     _updateLastInterimTranscript(userText.trim(), isFinal: true);
 
     _setStatus(VoiceConversationStatus.processing);
-    await recorder.pauseRecording();
+    if (voiceInputSupported) {
+      try {
+        await recorder.pauseRecording();
+      } catch (_) {}
+    }
 
     try {
       final sessionId = _activeSessionId;
@@ -421,6 +459,14 @@ class DefaultVoiceConversationService implements VoiceConversationService {
         scenario: _activeScenario,
         cancelToken: _currentTurnCancelToken,
       );
+
+      // Abort immediately if turn was cancelled, or session ended/idle while waiting for LLM
+      if (_currentTurnCancelToken?.isCancelled == true ||
+          _status == VoiceConversationStatus.ended ||
+          _status == VoiceConversationStatus.idle ||
+          _activeSessionId != sessionId) {
+        return;
+      }
 
       _addTranscript(VoiceTranscriptSegment(
         id: 'resp_${DateTime.now().millisecondsSinceEpoch}',
@@ -451,13 +497,27 @@ class DefaultVoiceConversationService implements VoiceConversationService {
       }
 
       _setStatus(VoiceConversationStatus.listening);
-      await recorder.resumeRecording();
+      if (voiceInputSupported) {
+        try {
+          await recorder.resumeRecording();
+        } catch (_) {}
+      }
     } catch (e) {
+      if (_currentTurnCancelToken?.isCancelled == true ||
+          _status == VoiceConversationStatus.ended ||
+          _status == VoiceConversationStatus.idle) {
+        return;
+      }
       debugPrint('[VoiceConversationService] Speech turn error: $e');
       _setStatus(VoiceConversationStatus.reconnecting);
       await Future.delayed(const Duration(milliseconds: 800));
+      if (_status == VoiceConversationStatus.ended || _status == VoiceConversationStatus.idle) return;
       _setStatus(VoiceConversationStatus.listening);
-      await recorder.resumeRecording();
+      if (voiceInputSupported) {
+        try {
+          await recorder.resumeRecording();
+        } catch (_) {}
+      }
     }
   }
 
@@ -473,7 +533,11 @@ class DefaultVoiceConversationService implements VoiceConversationService {
       _setStatus(VoiceConversationStatus.interrupted);
       await Future.delayed(const Duration(milliseconds: 200));
       _setStatus(VoiceConversationStatus.listening);
-      await recorder.resumeRecording();
+      if (voiceInputSupported) {
+        try {
+          await recorder.resumeRecording();
+        } catch (_) {}
+      }
     }
   }
 
@@ -527,7 +591,9 @@ class DefaultVoiceConversationService implements VoiceConversationService {
     stopPersonaVoicePreview();
     if (_status == VoiceConversationStatus.listening ||
         _status == VoiceConversationStatus.speaking ||
-        _status == VoiceConversationStatus.processing) {
+        _status == VoiceConversationStatus.processing ||
+        _status == VoiceConversationStatus.connecting ||
+        _status == VoiceConversationStatus.requestingPermission) {
       player.stop();
       if (tts != null) {
         tts!.stop();
