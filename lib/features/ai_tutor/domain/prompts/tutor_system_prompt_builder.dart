@@ -16,6 +16,15 @@ class TutorPromptOptions {
   /// sections to the system prompt.
   final LearnerContext? learnerContext;
 
+  /// The active learning path type: 'comprehensive' or 'focused'.
+  final String learningPathType;
+
+  /// The specific focus skill when [learningPathType] is 'focused' (e.g. 'reading', 'speaking').
+  final String? focusSkill;
+
+  /// Whether the user has completed at least one official lesson in the curriculum.
+  final bool? hasCompletedLessons;
+
   const TutorPromptOptions({
     this.persona = TutorPersonas.qiaoqiao,
     this.scenario = TutorScenarios.freeChat,
@@ -24,6 +33,9 @@ class TutorPromptOptions {
     this.weakSrsWords = const [],
     this.customLearningGoal,
     this.learnerContext,
+    this.learningPathType = 'comprehensive',
+    this.focusSkill,
+    this.hasCompletedLessons,
   });
 }
 
@@ -57,6 +69,15 @@ class TutorSystemPromptBuilder {
     );
     buffer.writeln();
 
+    // 1c. Placement Test Guardrail (T3-1)
+    buffer.writeln('# QUAN TRỌNG – VỀ BÀI KIỂM TRA NĂNG LỰC:');
+    buffer.writeln(
+      '- Không gợi ý người dùng "làm bài kiểm tra năng lực đầu vào" hay "placement test" trong quá trình hội thoại thông thường.\n'
+      '- Bài kiểm tra năng lực chỉ được thực hiện một lần duy nhất khi lần đầu khởi động ứng dụng.\n'
+      '- Nếu người dùng hỏi về trình độ của mình, hãy dựa vào thông tin HSK level hiện tại được cung cấp trong context.',
+    );
+    buffer.writeln();
+
     // 2. Persona Injection
     buffer.writeln('# TÍNH CÁCH & HÌNH TƯỢNG GIA SƯ');
     buffer.writeln(options.persona.systemPromptInstruction.trim());
@@ -75,12 +96,27 @@ class TutorSystemPromptBuilder {
         options.learnerContext?.profile.learnerName ?? options.learnerName;
     final effectiveGoal =
         options.learnerContext?.profile.customGoal ?? options.customLearningGoal;
+    final effectiveLearningPathType =
+        options.learnerContext?.profile.learningPathType ?? options.learningPathType;
+    final effectiveFocusSkill =
+        options.learnerContext?.profile.focusSkill ?? options.focusSkill;
+    final effectiveHasCompletedLessons =
+        options.learnerContext?.profile.hasCompletedLessons ??
+        options.hasCompletedLessons ??
+        (options.weakSrsWords.isNotEmpty ? true : false);
 
     buffer.writeln('# THÔNG TIN HỌC VIÊN');
     buffer.writeln('- Tên người học: $effectiveName');
     buffer.writeln('- Trình độ HSK hiện tại: HSK $effectiveHsk');
     if (effectiveGoal != null && effectiveGoal.isNotEmpty) {
       buffer.writeln('- Mục tiêu học tập: $effectiveGoal');
+    }
+    if (effectiveLearningPathType == 'focused' &&
+        effectiveFocusSkill != null &&
+        effectiveFocusSkill.isNotEmpty) {
+      buffer.writeln('- Lộ trình học: Người dùng đang tập trung vào kỹ năng: $effectiveFocusSkill.');
+    } else {
+      buffer.writeln('- Lộ trình học: Người dùng đang theo lộ trình Toàn Diện – học đều tất cả 6 kỹ năng.');
     }
     buffer.writeln(
       'QUY TẮC PHÙ HỢP TRÌNH ĐỘ HSK $effectiveHsk: '
@@ -135,8 +171,17 @@ class TutorSystemPromptBuilder {
       buffer.writeln();
     }
 
-    // 8. SRS Weak Words Injection (Active Recall)
-    if (options.weakSrsWords.isNotEmpty) {
+    // 8. SRS Weak Words Injection or Brand-New Learner Guard (T3-1)
+    if (!effectiveHasCompletedLessons) {
+      buffer.writeln('# HƯỚNG DẪN DÀNH CHO NGƯỜI HỌC MỚI BẮT ĐẦU');
+      buffer.writeln(
+        '- Người học chưa hoàn thành bài học nào trong giáo trình.\n'
+        '- AI vẫn trò chuyện, phản hồi và giải đáp câu hỏi của người học bình thường.\n'
+        '- Tuyệt đối KHÔNG đề xuất ôn tập từ vựng hay nhắc lại bài cũ/SRS (vì chưa có dữ liệu ôn tập).\n'
+        '- Hãy động viên và gợi ý: "Bắt đầu bài học đầu tiên của bạn – Bài 1 HSK 1 đang chờ bạn!"',
+      );
+      buffer.writeln();
+    } else if (options.weakSrsWords.isNotEmpty) {
       buffer.writeln('# NHIỆM VỤ CỦNG CỐ TRÍ NHỚ (SRS VOCABULARY INJECTION)');
       buffer.writeln(
         'Học viên đang cần ôn tập và củng cố các từ vựng sau: '

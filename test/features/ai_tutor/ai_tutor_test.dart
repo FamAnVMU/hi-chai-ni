@@ -86,6 +86,76 @@ void main() {
       expect(p2, contains('thành ngữ thường dùng (成语)'));
       expect(p3, contains('khẩu ngữ đời sống thực tế (口语)'));
     });
+
+    test('6. Forbids placement test suggestions in normal conversation (T3-1)', () {
+      final prompt = TutorSystemPromptBuilder.build(
+        const TutorPromptOptions(),
+      );
+
+      expect(prompt, contains('# QUAN TRỌNG – VỀ BÀI KIỂM TRA NĂNG LỰC:'));
+      expect(
+        prompt,
+        contains(
+          '- Không gợi ý người dùng "làm bài kiểm tra năng lực đầu vào" hay "placement test" trong quá trình hội thoại thông thường.',
+        ),
+      );
+      expect(
+        prompt,
+        contains(
+          '- Bài kiểm tra năng lực chỉ được thực hiện một lần duy nhất khi lần đầu khởi động ứng dụng.',
+        ),
+      );
+      expect(
+        prompt,
+        contains(
+          '- Nếu người dùng hỏi về trình độ của mình, hãy dựa vào thông tin HSK level hiện tại được cung cấp trong context.',
+        ),
+      );
+    });
+
+    test('7. Injects learning path context (comprehensive vs focused) (T3-1)', () {
+      final promptComp = TutorSystemPromptBuilder.build(
+        const TutorPromptOptions(
+          learningPathType: 'comprehensive',
+        ),
+      );
+      expect(
+        promptComp,
+        contains(
+          'Người dùng đang theo lộ trình Toàn Diện – học đều tất cả 6 kỹ năng.',
+        ),
+      );
+
+      final promptFocused = TutorSystemPromptBuilder.build(
+        const TutorPromptOptions(
+          learningPathType: 'focused',
+          focusSkill: 'reading',
+        ),
+      );
+      expect(
+        promptFocused,
+        contains(
+          'Người dùng đang tập trung vào kỹ năng: reading.',
+        ),
+      );
+    });
+
+    test('8. Guards brand new learners from SRS and prompts first lesson (T3-1)', () {
+      final prompt = TutorSystemPromptBuilder.build(
+        const TutorPromptOptions(
+          hasCompletedLessons: false,
+          weakSrsWords: ['苹果', '多少钱'],
+        ),
+      );
+
+      expect(prompt, contains('# HƯỚNG DẪN DÀNH CHO NGƯỜI HỌC MỚI BẮT ĐẦU'));
+      expect(
+        prompt,
+        contains('Bắt đầu bài học đầu tiên của bạn – Bài 1 HSK 1 đang chờ bạn!'),
+      );
+      expect(prompt, contains('Tuyệt đối KHÔNG đề xuất ôn tập từ vựng'));
+      expect(prompt, isNot(contains('SRS VOCABULARY INJECTION')));
+    });
   });
 
   group('TutorContextBuilder Tests', () {

@@ -16,12 +16,18 @@ class LearnerProfile {
   final String learnerName;
   final String? customGoal;
   final DateTime? registeredAt;
+  final String learningPathType; // 'comprehensive' | 'focused'
+  final String? focusSkill; // e.g. 'reading', 'speaking', 'listening', 'writing'
+  final bool hasCompletedLessons;
 
   const LearnerProfile({
     this.hskLevel = 1,
     this.learnerName = 'Học viên',
     this.customGoal,
     this.registeredAt,
+    this.learningPathType = 'comprehensive',
+    this.focusSkill,
+    this.hasCompletedLessons = false,
   });
 }
 
@@ -141,9 +147,18 @@ class LearnerContext {
   factory LearnerContext.empty({
     int hskLevel = 1,
     String learnerName = 'Học viên',
+    String learningPathType = 'comprehensive',
+    String? focusSkill,
+    bool hasCompletedLessons = false,
   }) {
     return LearnerContext(
-      profile: LearnerProfile(hskLevel: hskLevel, learnerName: learnerName),
+      profile: LearnerProfile(
+        hskLevel: hskLevel,
+        learnerName: learnerName,
+        learningPathType: learningPathType,
+        focusSkill: focusSkill,
+        hasCompletedLessons: hasCompletedLessons,
+      ),
     );
   }
 

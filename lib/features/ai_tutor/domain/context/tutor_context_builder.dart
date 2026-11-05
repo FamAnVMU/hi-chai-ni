@@ -32,6 +32,9 @@ class TutorContextBuilder {
     /// When provided, overrides [learnerHskLevel] and [learnerName] from profile
     /// and enriches the system prompt with pedagogical history.
     LearnerContext? learnerContext,
+    String learningPathType = 'comprehensive',
+    String? focusSkill,
+    bool? hasCompletedLessons,
   }) {
     // 1. Build the pedagogical system prompt with anti-hypercorrection and anti-injection guardrails
     final systemPrompt = TutorSystemPromptBuilder.build(
@@ -43,6 +46,9 @@ class TutorContextBuilder {
         weakSrsWords: weakSrsWords,
         customLearningGoal: customLearningGoal,
         learnerContext: learnerContext,
+        learningPathType: learningPathType,
+        focusSkill: focusSkill,
+        hasCompletedLessons: hasCompletedLessons,
       ),
     );
 

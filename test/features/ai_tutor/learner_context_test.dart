@@ -263,6 +263,112 @@ void main() {
       expect(prompt, contains('Ghi chú về `evidence_proposals`'));
       expect(prompt, contains('KHÔNG dùng "mastered"'));
     });
+
+    test('6. Injects placement test prohibition guardrail into prompt (T3-1)', () {
+      final prompt = TutorSystemPromptBuilder.build(
+        const TutorPromptOptions(),
+      );
+
+      expect(prompt, contains('# QUAN TRỌNG – VỀ BÀI KIỂM TRA NĂNG LỰC:'));
+      expect(
+        prompt,
+        contains(
+          'Không gợi ý người dùng "làm bài kiểm tra năng lực đầu vào" hay "placement test" trong quá trình hội thoại thông thường.',
+        ),
+      );
+      expect(
+        prompt,
+        contains(
+          'Bài kiểm tra năng lực chỉ được thực hiện một lần duy nhất khi lần đầu khởi động ứng dụng.',
+        ),
+      );
+      expect(
+        prompt,
+        contains(
+          'Nếu người dùng hỏi về trình độ của mình, hãy dựa vào thông tin HSK level hiện tại được cung cấp trong context.',
+        ),
+      );
+    });
+
+    test('7. Injects comprehensive vs focused learning path correctly (T3-1)', () {
+      // 7a. Comprehensive path
+      final comprehensivePrompt = TutorSystemPromptBuilder.build(
+        const TutorPromptOptions(
+          learningPathType: 'comprehensive',
+        ),
+      );
+      expect(
+        comprehensivePrompt,
+        contains(
+          'Người dùng đang theo lộ trình Toàn Diện – học đều tất cả 6 kỹ năng.',
+        ),
+      );
+
+      // 7b. Focused path with focus skill
+      final focusedPrompt = TutorSystemPromptBuilder.build(
+        const TutorPromptOptions(
+          learningPathType: 'focused',
+          focusSkill: 'speaking',
+        ),
+      );
+      expect(
+        focusedPrompt,
+        contains(
+          'Người dùng đang tập trung vào kỹ năng: speaking.',
+        ),
+      );
+
+      // 7c. From LearnerContext profile
+      final contextPrompt = TutorSystemPromptBuilder.build(
+        TutorPromptOptions(
+          learnerContext: LearnerContext(
+            profile: const LearnerProfile(
+              learningPathType: 'focused',
+              focusSkill: 'writing',
+            ),
+          ),
+        ),
+      );
+      expect(
+        contextPrompt,
+        contains(
+          'Người dùng đang tập trung vào kỹ năng: writing.',
+        ),
+      );
+    });
+
+    test('8. Brand-new learners guard suppresses SRS and prompts first lesson (T3-1)', () {
+      final prompt = TutorSystemPromptBuilder.build(
+        const TutorPromptOptions(
+          hasCompletedLessons: false,
+          weakSrsWords: ['苹果', '香蕉'],
+        ),
+      );
+
+      expect(prompt, contains('# HƯỚNG DẪN DÀNH CHO NGƯỜI HỌC MỚI BẮT ĐẦU'));
+      expect(
+        prompt,
+        contains('Bắt đầu bài học đầu tiên của bạn – Bài 1 HSK 1 đang chờ bạn!'),
+      );
+      expect(
+        prompt,
+        contains('Tuyệt đối KHÔNG đề xuất ôn tập từ vựng'),
+      );
+      expect(prompt, isNot(contains('SRS VOCABULARY INJECTION')));
+    });
+
+    test('9. Experienced learners receive SRS active recall when weak words exist (T3-1)', () {
+      final prompt = TutorSystemPromptBuilder.build(
+        const TutorPromptOptions(
+          hasCompletedLessons: true,
+          weakSrsWords: ['苹果', '香蕉'],
+        ),
+      );
+
+      expect(prompt, isNot(contains('# HƯỚNG DẪN DÀNH CHO NGƯỜI HỌC MỚI BẮT ĐẦU')));
+      expect(prompt, contains('# NHIỆM VỤ CỦNG CỐ TRÍ NHỚ (SRS VOCABULARY INJECTION)'));
+      expect(prompt, contains('苹果, 香蕉'));
+    });
   });
 
   group('LearnerContextService SQLite Integration Tests', () {
@@ -546,6 +652,99 @@ void main() {
       // Should prune and only include a fraction of the 10 items
       expect(context.confirmedVocabulary.length, lessThan(10));
       expect(context.contextBudgetUsed, lessThanOrEqualTo(20));
+    });
+
+    test('7. Resolves learningPathType and focusSkill from app_settings (T3-1)', () async {
+      final db = appDatabase.database;
+      final nowUtc = DateTime.now().toUtc().toIso8601String();
+
+      // Case 7a: Default empty settings -> comprehensive
+      final ctxDefault = await service.buildContext(
+        db,
+        sessionId: 'session_default_path',
+        bypassCache: true,
+      );
+      expect(ctxDefault.profile.learningPathType, 'comprehensive');
+      expect(ctxDefault.profile.focusSkill, isNull);
+
+      // Case 7b: Setting priority_focus_skill = 'speaking'
+      await db.insert(DatabaseConstants.tableAppSettings, {
+        'key': 'priority_focus_skill',
+        'value': 'speaking',
+        'updated_at': nowUtc,
+      });
+
+      final ctxFocused = await service.buildContext(
+        db,
+        sessionId: 'session_focused_path',
+        bypassCache: true,
+      );
+      expect(ctxFocused.profile.learningPathType, 'focused');
+      expect(ctxFocused.profile.focusSkill, 'speaking');
+
+      // Case 7c: Explicit learning_path_type = 'comprehensive' overrides priority_focus_skill
+      await db.insert(DatabaseConstants.tableAppSettings, {
+        'key': 'learning_path_type',
+        'value': 'comprehensive',
+        'updated_at': nowUtc,
+      });
+
+      final ctxOverridden = await service.buildContext(
+        db,
+        sessionId: 'session_comprehensive_path',
+        bypassCache: true,
+      );
+      expect(ctxOverridden.profile.learningPathType, 'comprehensive');
+    });
+
+    test('8. Resolves hasCompletedLessons from lesson_progress table (T3-1)', () async {
+      final db = appDatabase.database;
+      final nowUtc = DateTime.now().toUtc().toIso8601String();
+
+      // Case 8a: No lessons completed -> hasCompletedLessons = false
+      final ctxNew = await service.buildContext(
+        db,
+        sessionId: 'session_new_learner',
+        bypassCache: true,
+      );
+      expect(ctxNew.profile.hasCompletedLessons, isFalse);
+
+      // Case 8b: Insert incomplete/locked lesson
+      await db.insert(DatabaseConstants.tableLessonProgress, {
+        'id': 'prog_01',
+        'lesson_id': 'lesson_hsk1_01',
+        'unit_id': 'unit_01',
+        'hsk_level': 1,
+        'status': 'in_progress',
+        'created_at': nowUtc,
+        'updated_at': nowUtc,
+      });
+
+      final ctxInProgress = await service.buildContext(
+        db,
+        sessionId: 'session_in_progress',
+        bypassCache: true,
+      );
+      expect(ctxInProgress.profile.hasCompletedLessons, isFalse);
+
+      // Case 8c: Insert completed lesson
+      await db.insert(DatabaseConstants.tableLessonProgress, {
+        'id': 'prog_02',
+        'lesson_id': 'lesson_hsk1_02',
+        'unit_id': 'unit_01',
+        'hsk_level': 1,
+        'status': 'completed',
+        'completed_at': nowUtc,
+        'created_at': nowUtc,
+        'updated_at': nowUtc,
+      });
+
+      final ctxCompleted = await service.buildContext(
+        db,
+        sessionId: 'session_completed',
+        bypassCache: true,
+      );
+      expect(ctxCompleted.profile.hasCompletedLessons, isTrue);
     });
   });
 
