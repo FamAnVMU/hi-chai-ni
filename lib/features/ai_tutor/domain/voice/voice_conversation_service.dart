@@ -19,6 +19,7 @@ abstract class VoiceConversationService {
   Stream<List<VoiceTranscriptSegment>> get transcriptStream;
   List<VoiceTranscriptSegment> get transcripts;
   bool get isMuted;
+  bool get voiceInputSupported;
   VoiceEngineMode get engineMode;
 
   PersonaVoicePreviewStatus get previewStatus;
@@ -57,6 +58,7 @@ class DefaultVoiceConversationService implements VoiceConversationService {
   final TtsService? tts;
   final AiTutorRepository repository;
   final VoiceEngineMode mode;
+  final bool _voiceInputSupported;
 
   VoiceConversationStatus _status = VoiceConversationStatus.idle;
   bool _isMuted = false;
@@ -88,7 +90,8 @@ class DefaultVoiceConversationService implements VoiceConversationService {
     this.tts,
     required this.repository,
     this.mode = VoiceEngineMode.turnBasedAudio,
-  }) {
+    bool voiceInputSupported = false,
+  }) : _voiceInputSupported = voiceInputSupported {
     _recorderAmpSub = recorder.amplitudeStream.listen((amp) {
       if (_amplitudeController.isClosed) return;
       if (!_isMuted &&
@@ -144,6 +147,9 @@ class DefaultVoiceConversationService implements VoiceConversationService {
   bool get isMuted => _isMuted;
 
   @override
+  bool get voiceInputSupported => _voiceInputSupported;
+
+  @override
   VoiceEngineMode get engineMode => mode;
 
   @override
@@ -196,9 +202,15 @@ class DefaultVoiceConversationService implements VoiceConversationService {
   @override
   Future<bool> checkPermission() async {
     _setStatus(VoiceConversationStatus.requestingPermission);
-    final granted = await recorder.checkPermission();
+    bool granted = false;
+    try {
+      granted = await recorder.checkPermission();
+    } catch (e) {
+      debugPrint('[VoiceConversationService] checkPermission error: $e');
+      granted = false;
+    }
     if (!granted) {
-      _setStatus(VoiceConversationStatus.error);
+      _setStatus(_voiceInputSupported ? VoiceConversationStatus.error : VoiceConversationStatus.idle);
       return false;
     }
     _setStatus(VoiceConversationStatus.idle);
@@ -351,8 +363,14 @@ class DefaultVoiceConversationService implements VoiceConversationService {
     _transcripts.clear();
 
     _setStatus(VoiceConversationStatus.requestingPermission);
-    final hasPerm = await recorder.checkPermission();
-    if (!hasPerm) {
+    bool hasPerm = false;
+    try {
+      hasPerm = await recorder.checkPermission();
+    } catch (_) {
+      hasPerm = false;
+    }
+
+    if (!hasPerm && _voiceInputSupported) {
       _setStatus(VoiceConversationStatus.error);
       return;
     }
@@ -390,7 +408,13 @@ class DefaultVoiceConversationService implements VoiceConversationService {
       } catch (_) {}
     }
 
-    await recorder.startRecording();
+    if (_voiceInputSupported && hasPerm) {
+      try {
+        await recorder.startRecording();
+      } catch (e) {
+        debugPrint('[VoiceConversationService] startRecording error: $e');
+      }
+    }
     _setStatus(VoiceConversationStatus.listening);
   }
 
@@ -402,7 +426,11 @@ class DefaultVoiceConversationService implements VoiceConversationService {
     _updateLastInterimTranscript(userText.trim(), isFinal: true);
 
     _setStatus(VoiceConversationStatus.processing);
-    await recorder.pauseRecording();
+    if (_voiceInputSupported) {
+      try {
+        await recorder.pauseRecording();
+      } catch (_) {}
+    }
 
     try {
       final sessionId = _activeSessionId;
@@ -451,13 +479,21 @@ class DefaultVoiceConversationService implements VoiceConversationService {
       }
 
       _setStatus(VoiceConversationStatus.listening);
-      await recorder.resumeRecording();
+      if (_voiceInputSupported) {
+        try {
+          await recorder.resumeRecording();
+        } catch (_) {}
+      }
     } catch (e) {
       debugPrint('[VoiceConversationService] Speech turn error: $e');
       _setStatus(VoiceConversationStatus.reconnecting);
       await Future.delayed(const Duration(milliseconds: 800));
       _setStatus(VoiceConversationStatus.listening);
-      await recorder.resumeRecording();
+      if (_voiceInputSupported) {
+        try {
+          await recorder.resumeRecording();
+        } catch (_) {}
+      }
     }
   }
 
@@ -473,7 +509,11 @@ class DefaultVoiceConversationService implements VoiceConversationService {
       _setStatus(VoiceConversationStatus.interrupted);
       await Future.delayed(const Duration(milliseconds: 200));
       _setStatus(VoiceConversationStatus.listening);
-      await recorder.resumeRecording();
+      if (_voiceInputSupported) {
+        try {
+          await recorder.resumeRecording();
+        } catch (_) {}
+      }
     }
   }
 

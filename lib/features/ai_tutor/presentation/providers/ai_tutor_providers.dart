@@ -101,6 +101,13 @@ final voiceTranscriptsProvider = StreamProvider<List<VoiceTranscriptSegment>>((r
   return service.transcriptStream;
 });
 
+/// Reactive provider indicating whether native ASR (Speech-to-Text) voice input is supported.
+/// Currently false pending on-device STT or cloud WebSocket Live API integration (BUG-NEW-003).
+final voiceInputSupportedProvider = Provider<bool>((ref) {
+  final service = ref.watch(voiceConversationServiceProvider);
+  return service.voiceInputSupported;
+});
+
 /// Notifier managing the currently selected AI Tutor persona.
 class ActivePersonaNotifier extends Notifier<TutorPersona> {
   @override

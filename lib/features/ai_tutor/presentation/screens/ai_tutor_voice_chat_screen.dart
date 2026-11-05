@@ -189,8 +189,15 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
                   size: HiButtonSize.sm,
                   variant: HiButtonVariant.primary,
                   onPressed: () async {
-                    setDialogState(() => _isMicTesting = true);
-                    await service.startMicTest();
+                    try {
+                      setDialogState(() => _isMicTesting = true);
+                      await service.startMicTest();
+                    } catch (e) {
+                      setDialogState(() => _isMicTesting = false);
+                      if (ctx.mounted) {
+                        HiSnackBar.showError(ctx, 'Không thể truy cập microphone: $e');
+                      }
+                    }
                   },
                 )
               else
@@ -365,13 +372,37 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
       body: SafeArea(
         child: Column(
           children: [
+            // Informational notification banner when voice input is not supported
+            if (!service.voiceInputSupported)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 8.0),
+                color: theme.colorScheme.primary.withAlpha(20),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline_rounded, size: 16, color: theme.colorScheme.primary),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Chế độ hội thoại văn bản có hỗ trợ phát âm AI (Tính năng nhận diện giọng nói đang phát triển)',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
             // Status & Live API Preview Banner
             Container(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 6.0),
               color: isDark ? AppColors.cardBackground : theme.colorScheme.surfaceContainerHighest.withAlpha(70),
               child: Row(
                 children: [
-                  _buildStatusChip(_currentStatus),
+                  _buildStatusChip(_currentStatus, service.voiceInputSupported),
                   const Spacer(),
                   InkWell(
                     onTap: _showLiveApiDiagnosticDialog,
@@ -409,7 +440,7 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
                 final isListening = _currentStatus == VoiceConversationStatus.listening;
                 return WaveformVisualizer(
                   amplitude: amp,
-                  isRecording: isListening && !service.isMuted,
+                  isRecording: service.voiceInputSupported && isListening && !service.isMuted,
                   duration: Duration.zero,
                 );
               },
@@ -431,7 +462,9 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
                           Text(
                             _currentStatus == VoiceConversationStatus.idle
                                 ? 'Nhấn nút gọi để bắt đầu hội thoại với ${persona.nameZh}'
-                                : 'Đang lắng nghe giọng nói của bạn...',
+                                : (service.voiceInputSupported
+                                    ? 'Đang lắng nghe giọng nói của bạn...'
+                                    : 'Chế độ hội thoại văn bản có hỗ trợ phát âm AI\n(Tính năng nhận diện giọng nói đang phát triển)'),
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
@@ -500,7 +533,7 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
     );
   }
 
-  Widget _buildStatusChip(VoiceConversationStatus status) {
+  Widget _buildStatusChip(VoiceConversationStatus status, [bool voiceInputSupported = false]) {
     Color color;
     String label;
     IconData icon;
@@ -523,8 +556,8 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
         break;
       case VoiceConversationStatus.listening:
         color = AppColors.primaryBlueDark;
-        label = 'Đang lắng nghe...';
-        icon = Icons.hearing;
+        label = voiceInputSupported ? 'Đang lắng nghe...' : 'Sẵn sàng nhập văn bản';
+        icon = voiceInputSupported ? Icons.hearing : Icons.keyboard_alt_outlined;
         break;
       case VoiceConversationStatus.processing:
         color = Colors.purple;
