@@ -43,7 +43,35 @@ class ChatDao {
     );
   }
 
-  Future<List<Map<String, dynamic>>> getMessagesBySessionId(String sessionId) async {
+  /// Retrieves up to [limit] most recent messages for a session, ordered chronologically (ASC).
+  ///
+  /// Uses a sliding window query (ORDER BY created_at DESC LIMIT [limit]) and reverses
+  /// the resulting list to ensure chronological order for AI context building (F-08).
+  Future<List<Map<String, dynamic>>> getSessionMessages(
+    String sessionId, {
+    int limit = 20,
+  }) async {
+    if (limit <= 0) return [];
+    final rows = await _db.query(
+      DatabaseConstants.tableChatMessages,
+      where: 'session_id = ?',
+      whereArgs: [sessionId],
+      orderBy: 'created_at DESC',
+      limit: limit,
+    );
+
+    return rows.reversed.toList();
+  }
+
+  /// Backward-compatible alias for retrieving messages for a session.
+  /// If [limit] is provided, applies sliding window; otherwise retrieves all messages ordered ASC for full session inspection.
+  Future<List<Map<String, dynamic>>> getMessagesBySessionId(
+    String sessionId, {
+    int? limit,
+  }) async {
+    if (limit != null) {
+      return getSessionMessages(sessionId, limit: limit);
+    }
     return await _db.query(
       DatabaseConstants.tableChatMessages,
       where: 'session_id = ?',

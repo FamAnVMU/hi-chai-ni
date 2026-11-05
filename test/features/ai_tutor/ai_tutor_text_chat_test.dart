@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hi_chinese/core/database/app_database.dart';
+import 'package:hi_chinese/core/database/dao/chat_dao.dart';
 import 'package:hi_chinese/core/network/ai/ai_service.dart';
 import 'package:hi_chinese/core/network/ai/models/ai_model_config.dart';
 import 'package:hi_chinese/core/network/ai/models/cancel_token.dart';
@@ -195,6 +196,53 @@ void main() {
       turns = await repository.getSessionTurns(sessionId);
       expect(turns.last.role, 'user');
       expect(turns.last.content, 'Thử lại nhé');
+    });
+
+    test('4. Sliding window context limit (F-08): Session with 30 messages sends bounded context and preserves full history', () async {
+      final sessionId = await repository.createSession(
+        title: 'Long Session F-08',
+        scenarioCode: 'free_chat',
+      );
+
+      final db = await appDatabase.open();
+      final chatDao = ChatDao(db);
+      final baseTime = DateTime.parse('2026-01-01T10:00:00.000Z');
+
+      // Seed 25 prior messages into this session
+      for (int i = 1; i <= 25; i++) {
+        await chatDao.insertMessage({
+          'id': 'msg_historical_$i',
+          'session_id': sessionId,
+          'role': (i % 2 == 1) ? 'user' : 'assistant',
+          'content': 'Lịch sử số $i',
+          'pinyin': null,
+          'translation_vi': null,
+          'audio_uri': null,
+          'tokens_used': 5,
+          'created_at': baseTime.add(Duration(minutes: i)).toIso8601String(),
+        });
+      }
+
+      mockAiProvider.customTextResponse =
+          '{"reply_zh": "收到，这是最新的回答", "reply_pinyin": "...", "reply_vi": "..."}';
+
+      // Send 26th message
+      final response = await repository.sendMessage(
+        sessionId: sessionId,
+        userText: 'Tin nhắn thứ 26',
+      );
+
+      expect(response.replyZh, '收到，这是最新的回答');
+
+      // Verify that full history is preserved in SQLite (1 greeting + 25 seeded + 1 user + 1 assistant = 28 turns)
+      final allTurns = await repository.getSessionTurns(sessionId);
+      expect(allTurns.length, 28);
+      expect(allTurns.last.content, '收到，这是最新的回答');
+
+      // Verify that getSessionMessages with default limit=20 returns exactly 20 messages in ASC order
+      final boundedMessages = await chatDao.getSessionMessages(sessionId);
+      expect(boundedMessages.length, 20);
+      expect(boundedMessages.last['content'], '收到，这是最新的回答');
     });
   });
 
