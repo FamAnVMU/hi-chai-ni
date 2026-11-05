@@ -4,7 +4,7 @@ import '../../domain/catalog/curriculum_catalog.dart';
 import '../../domain/models/roadmap_models.dart';
 
 /// Modal bottom sheet displaying deep pedagogical details for a curriculum lesson.
-class LessonDetailSheet extends StatelessWidget {
+class LessonDetailSheet extends StatefulWidget {
   final CurriculumLesson lesson;
   final LessonProgress? progress;
   final Map<String, LessonProgress> allProgressMap;
@@ -47,8 +47,18 @@ class LessonDetailSheet extends StatelessWidget {
   }
 
   @override
+  State<LessonDetailSheet> createState() => _LessonDetailSheetState();
+}
+
+class _LessonDetailSheetState extends State<LessonDetailSheet> {
+  bool _isActionInFlight = false;
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final lesson = widget.lesson;
+    final progress = widget.progress;
+    final allProgressMap = widget.allProgressMap;
     final status = progress?.status ?? LessonStatus.locked;
 
     Color statusColor;
@@ -237,7 +247,7 @@ class LessonDetailSheet extends StatelessWidget {
             ],
 
             // Progress Evidence details if in-progress or completed
-            if (progress != null && progress!.evidenceCount > 0) ...[
+            if (progress != null && progress.evidenceCount > 0) ...[
               Container(
                 padding: const EdgeInsets.all(AppSpacing.sm),
                 decoration: BoxDecoration(
@@ -253,13 +263,13 @@ class LessonDetailSheet extends StatelessWidget {
                     ),
                     const SizedBox(width: AppSpacing.xs),
                     Text(
-                      'Số bằng chứng ghi nhận: ${progress!.evidenceCount}',
+                      'Số bằng chứng ghi nhận: ${progress.evidenceCount}',
                       style: theme.textTheme.labelSmall,
                     ),
-                    if (progress!.completionScore != null) ...[
+                    if (progress.completionScore != null) ...[
                       const Spacer(),
                       Text(
-                        'Điểm đạt: ${(progress!.completionScore! * 100).toInt()}%',
+                        'Điểm đạt: ${(progress.completionScore! * 100).toInt()}%',
                         style: theme.textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.primaryBlueDark,
@@ -282,8 +292,10 @@ class LessonDetailSheet extends StatelessWidget {
                       variant: HiButtonVariant.primary,
                       icon: const Icon(Icons.play_arrow_rounded, size: 18),
                       onPressed: () {
+                        if (_isActionInFlight) return;
+                        setState(() => _isActionInFlight = true);
                         Navigator.of(context).pop();
-                        onStart();
+                        widget.onStart();
                       },
                     ),
                   ),
@@ -292,8 +304,10 @@ class LessonDetailSheet extends StatelessWidget {
                     text: 'Bỏ qua',
                     variant: HiButtonVariant.secondary,
                     onPressed: () {
+                      if (_isActionInFlight) return;
+                      setState(() => _isActionInFlight = true);
                       Navigator.of(context).pop();
-                      onSkip();
+                      widget.onSkip();
                     },
                   ),
                 ] else ...[
@@ -301,12 +315,33 @@ class LessonDetailSheet extends StatelessWidget {
                     child: HiButton(
                       text: 'Bài học đang khóa',
                       variant: HiButtonVariant.secondary,
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () {
+                        if (_isActionInFlight) return;
+                        setState(() => _isActionInFlight = true);
+                        Navigator.of(context).pop();
+                      },
                     ),
                   ),
                 ],
               ],
             ),
+            if (status == LessonStatus.inProgress) ...[
+              const SizedBox(height: AppSpacing.sm),
+              SizedBox(
+                width: double.infinity,
+                child: HiButton(
+                  text: 'Xác nhận hoàn thành bài học',
+                  variant: HiButtonVariant.secondary,
+                  icon: const Icon(Icons.check_circle_outline_rounded, size: 18),
+                  onPressed: () {
+                    if (_isActionInFlight) return;
+                    setState(() => _isActionInFlight = true);
+                    Navigator.of(context).pop();
+                    widget.onComplete(progress?.score ?? 0.8);
+                  },
+                ),
+              ),
+            ],
           ],
         ),
       ),

@@ -263,6 +263,7 @@ class LessonProgress {
   bool get isCompleted => status == LessonStatus.completed;
   bool get isAvailable => status == LessonStatus.available;
   bool get isLocked => status == LessonStatus.locked;
+  double? get score => completionScore;
 
   factory LessonProgress.fromMap(Map<String, dynamic> map) {
     return LessonProgress(

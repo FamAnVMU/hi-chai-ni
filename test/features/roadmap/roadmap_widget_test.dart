@@ -180,5 +180,40 @@ void main() {
       expect(find.text('Bắt đầu học'), findsOneWidget);
       expect(find.text('Bỏ qua'), findsWidgets);
     });
+
+    testWidgets('4. End-to-end F-04: In-progress lesson shows confirm completion button, calls completeLesson, and updates roadmap state to completed', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(500, 1400));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      // Put lesson in inProgress status
+      fakeRepo.progressMap['LES_HSK1_01_TONES'] = fakeRepo.progressMap['LES_HSK1_01_TONES']!.copyWith(
+        status: LessonStatus.inProgress,
+        completionScore: 0.85,
+      );
+
+      await tester.pumpWidget(buildTestableWidget());
+      await tester.pumpAndSettle();
+
+      // Open detail sheet
+      final learnNowBtn = find.text('Học ngay');
+      expect(learnNowBtn, findsWidgets);
+      await tester.tap(learnNowBtn.first);
+      await tester.pumpAndSettle();
+
+      // Detail sheet opens with "Đang học dở" and "Xác nhận hoàn thành bài học"
+      expect(find.text('Đang học dở'), findsOneWidget);
+      final confirmBtn = find.text('Xác nhận hoàn thành bài học');
+      expect(confirmBtn, findsOneWidget);
+
+      // Tap confirm completion
+      await tester.tap(confirmBtn);
+      await tester.pumpAndSettle();
+
+      // Verify repository updated to completed
+      final updated = fakeRepo.progressMap['LES_HSK1_01_TONES']!;
+      expect(updated.status, equals(LessonStatus.completed));
+      expect(updated.completionScore, equals(0.85));
+      expect(updated.isCompleted, isTrue);
+    });
   });
 }
