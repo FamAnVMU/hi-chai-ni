@@ -70,6 +70,43 @@ extension SkillDimensionExtension on SkillDimension {
   }
 }
 
+enum LearningPathType {
+  focused,
+  comprehensive,
+}
+
+extension LearningPathTypeExtension on LearningPathType {
+  String get displayName {
+    switch (this) {
+      case LearningPathType.focused:
+        return 'Trọng tâm 1 kỹ năng';
+      case LearningPathType.comprehensive:
+        return 'Toàn diện – Học đều 6 kỹ năng';
+    }
+  }
+
+  String get description {
+    switch (this) {
+      case LearningPathType.focused:
+        return 'Tập trung 40% thời gian vào kỹ năng ưu tiên, 60% còn lại phân bổ đều.';
+      case LearningPathType.comprehensive:
+        return 'Phân bổ đều 6 kỹ năng: Từ vựng, Ngữ pháp, Đọc, Nghe, Nói, Viết – không ưu tiên riêng lẻ.';
+    }
+  }
+
+  String get dbValue => name;
+
+  static LearningPathType fromDb(String? value) {
+    if (value == 'balanced' || value == 'comprehensive') {
+      return LearningPathType.comprehensive;
+    }
+    return LearningPathType.values.firstWhere(
+      (e) => e.name == value,
+      orElse: () => LearningPathType.focused,
+    );
+  }
+}
+
 /// Progression status of a curriculum lesson
 enum LessonStatus {
   locked,
@@ -241,6 +278,7 @@ class LessonProgress {
   final LessonStatus status;
   final double? completionScore;
   final int evidenceCount;
+  final String? source;
   final DateTime? startedAt;
   final DateTime? completedAt;
   final DateTime? lastStudiedAt;
@@ -254,6 +292,7 @@ class LessonProgress {
     this.status = LessonStatus.locked,
     this.completionScore,
     this.evidenceCount = 0,
+    this.source,
     this.startedAt,
     this.completedAt,
     this.lastStudiedAt,
@@ -277,6 +316,7 @@ class LessonProgress {
       ),
       completionScore: (map['completion_score'] as num?)?.toDouble(),
       evidenceCount: map['evidence_count'] as int? ?? 0,
+      source: map['source'] as String?,
       startedAt: map['started_at'] != null ? DateTime.tryParse(map['started_at'] as String) : null,
       completedAt: map['completed_at'] != null ? DateTime.tryParse(map['completed_at'] as String) : null,
       lastStudiedAt: map['last_studied_at'] != null ? DateTime.tryParse(map['last_studied_at'] as String) : null,
@@ -292,6 +332,7 @@ class LessonProgress {
         'status': status.name,
         if (completionScore != null) 'completion_score': completionScore,
         'evidence_count': evidenceCount,
+        if (source != null) 'source': source,
         if (startedAt != null) 'started_at': startedAt!.toUtc().toIso8601String(),
         if (completedAt != null) 'completed_at': completedAt!.toUtc().toIso8601String(),
         if (lastStudiedAt != null) 'last_studied_at': lastStudiedAt!.toUtc().toIso8601String(),
@@ -306,6 +347,7 @@ class LessonProgress {
     LessonStatus? status,
     double? completionScore,
     int? evidenceCount,
+    String? source,
     DateTime? startedAt,
     DateTime? completedAt,
     DateTime? lastStudiedAt,
@@ -319,6 +361,7 @@ class LessonProgress {
       status: status ?? this.status,
       completionScore: completionScore ?? this.completionScore,
       evidenceCount: evidenceCount ?? this.evidenceCount,
+      source: source ?? this.source,
       startedAt: startedAt ?? this.startedAt,
       completedAt: completedAt ?? this.completedAt,
       lastStudiedAt: lastStudiedAt ?? this.lastStudiedAt,

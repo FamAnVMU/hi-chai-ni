@@ -45,6 +45,7 @@ class _OnboardingPersonalizationScreenState extends State<OnboardingPersonalizat
   final List<int> _commitmentOptions = [10, 15, 30, 45, 60];
 
   final List<Map<String, String>> _skillOptions = [
+    {'id': 'balanced', 'label': 'Toàn diện – Học đều 6 kỹ năng', 'desc': 'Phân bổ đều 6 kỹ năng, không ưu tiên riêng lẻ'},
     {'id': 'listening', 'label': 'Nghe hiểu', 'desc': 'Luyện nghe phản xạ và nhận diện thanh điệu'},
     {'id': 'speaking', 'label': 'Nói / Phát âm', 'desc': 'Luyện phát âm chuẩn Pinyin & kỹ thuật Shadowing'},
     {'id': 'reading', 'label': 'Đọc hiểu', 'desc': 'Nhận diện mặt chữ Hán và ngữ cảnh văn bản'},

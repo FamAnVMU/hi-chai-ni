@@ -1,8 +1,25 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/database/app_database.dart';
+import '../../../../core/database/database_constants.dart';
 import '../../../profile/presentation/providers/profile_providers.dart';
 import '../../data/srs_repository.dart';
 import '../../domain/srs_models.dart';
+
+final hasCompletedLessonsProvider = FutureProvider<bool>((ref) async {
+  if (!AppDatabase.instance.isOpen) return false;
+  final db = AppDatabase.instance.database;
+  try {
+    final result = await db.rawQuery('''
+      SELECT COUNT(*) as cnt FROM ${DatabaseConstants.tableLessonProgress}
+      WHERE status = 'completed'
+      AND (source IS NULL OR source != 'placement_test')
+    ''');
+    final count = result.first['cnt'] as int? ?? 0;
+    return count > 0;
+  } catch (_) {
+    return false;
+  }
+});
 
 /// Provider exposing the SrsRepository instance tied to the active database.
 final srsRepositoryProvider = Provider<SrsRepository>((ref) {

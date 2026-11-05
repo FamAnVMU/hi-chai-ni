@@ -4,6 +4,7 @@ import '../../../../core/database/app_database.dart';
 import '../../../../core/database/database_constants.dart';
 import '../../../../core/startup/app_startup_provider.dart';
 import '../../../curriculum/data/placement_unlock_handler.dart';
+import '../../../roadmap/domain/models/roadmap_models.dart';
 
 enum OnboardingStep {
   aiSetup(0),
@@ -54,6 +55,7 @@ class OnboardingState {
   final int? assessedHskLevel;
   final int dailyMinutes;
   final String focusSkill;
+  final LearningPathType learningPathType;
   final String learningPurpose;
   final bool showPinyin;
   final String pinyinPosition;
@@ -73,6 +75,7 @@ class OnboardingState {
     this.assessedHskLevel,
     this.dailyMinutes = 30,
     this.focusSkill = 'reading',
+    this.learningPathType = LearningPathType.focused,
     this.learningPurpose = 'dailyCommunication',
     this.showPinyin = true,
     this.pinyinPosition = 'above_hanzi',
@@ -94,6 +97,7 @@ class OnboardingState {
     int? assessedHskLevel,
     int? dailyMinutes,
     String? focusSkill,
+    LearningPathType? learningPathType,
     String? learningPurpose,
     bool? showPinyin,
     String? pinyinPosition,
@@ -113,6 +117,7 @@ class OnboardingState {
       assessedHskLevel: assessedHskLevel ?? this.assessedHskLevel,
       dailyMinutes: dailyMinutes ?? this.dailyMinutes,
       focusSkill: focusSkill ?? this.focusSkill,
+      learningPathType: learningPathType ?? this.learningPathType,
       learningPurpose: learningPurpose ?? this.learningPurpose,
       showPinyin: showPinyin ?? this.showPinyin,
       pinyinPosition: pinyinPosition ?? this.pinyinPosition,
@@ -130,6 +135,7 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
   static const String keyOnboardingStep = 'onboarding_current_step';
   static const String keyDailyMinutes = 'daily_learning_minutes';
   static const String keyPrioritySkill = 'priority_focus_skill';
+  static const String keyLearningPathType = 'learning_path_type';
   static const String keyLearningPurpose = 'learning_purpose';
   static const String keyShowPinyin = 'show_pinyin';
   static const String keyPinyinPosition = 'pinyin_position';
@@ -188,6 +194,10 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
           ? (int.tryParse(map[keyDailyMinutes]!) ?? state.dailyMinutes)
           : state.dailyMinutes;
       final focusSkill = map[keyPrioritySkill] ?? state.focusSkill;
+      final rawPathType = map[keyLearningPathType];
+      final learningPathType = (rawPathType == 'balanced' || rawPathType == 'comprehensive' || focusSkill == 'balanced')
+          ? LearningPathType.comprehensive
+          : LearningPathTypeExtension.fromDb(rawPathType);
       final purpose = map[keyLearningPurpose] ?? state.learningPurpose;
       final showPinyin = map.containsKey(keyShowPinyin)
           ? map[keyShowPinyin] == 'true'
@@ -213,6 +223,7 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
         currentStep: isCompleted ? OnboardingStep.completed : OnboardingStep.fromIndex(stepIndex),
         dailyMinutes: dailyMinutes,
         focusSkill: focusSkill,
+        learningPathType: learningPathType,
         learningPurpose: purpose,
         showPinyin: showPinyin,
         pinyinPosition: pinyinPos,
@@ -295,6 +306,7 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
   Future<bool> completePersonalization({
     required int dailyMinutes,
     required String focusSkill,
+    LearningPathType learningPathType = LearningPathType.focused,
     String learningPurpose = 'dailyCommunication',
     bool showPinyin = true,
     String pinyinPosition = 'above_hanzi',
@@ -304,13 +316,21 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
     bool reminderEnabled = true,
     String reminderTime = '20:00',
   }) async {
+    final effectivePathType = (focusSkill == 'balanced' || learningPathType == LearningPathType.comprehensive)
+        ? LearningPathType.comprehensive
+        : learningPathType;
+    final effectiveFocusSkill = (effectivePathType == LearningPathType.comprehensive)
+        ? 'balanced'
+        : focusSkill;
+
     if (!ref.mounted) return false;
     state = state.copyWith(
       isLoading: true,
       isSubmitting: true,
       clearErrorMessage: true,
       dailyMinutes: dailyMinutes,
-      focusSkill: focusSkill,
+      focusSkill: effectiveFocusSkill,
+      learningPathType: effectivePathType,
       learningPurpose: learningPurpose,
       showPinyin: showPinyin,
       pinyinPosition: pinyinPosition,
@@ -329,7 +349,8 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
         await db.transaction((txn) async {
           final settingsMap = {
             keyDailyMinutes: dailyMinutes.toString(),
-            keyPrioritySkill: focusSkill,
+            keyPrioritySkill: effectiveFocusSkill,
+            keyLearningPathType: (effectivePathType == LearningPathType.comprehensive) ? 'balanced' : 'focused',
             keyLearningPurpose: learningPurpose,
             keyShowPinyin: showPinyin.toString(),
             keyPinyinPosition: pinyinPosition,

@@ -137,6 +137,9 @@ class LearningPipelineCoordinator {
           'hsk_level': hskLevel,
           'status': isPassed ? 'completed' : 'inProgress',
           'completion_score': scorePercent,
+          'source': existingLessonProg.isNotEmpty
+              ? (existingLessonProg.first['source'] ?? 'curriculum_lesson')
+              : 'curriculum_lesson',
           'evidence_count': (existingLessonProg.isNotEmpty
                   ? ((existingLessonProg.first['evidence_count'] as num?)?.toInt() ?? 0)
                   : 0) +
