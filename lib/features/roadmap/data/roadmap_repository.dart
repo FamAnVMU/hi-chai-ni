@@ -106,7 +106,7 @@ class DefaultRoadmapRepository implements RoadmapRepository {
             unitId: catalogLesson?.unitId ?? 'unit_1',
             hskLevel: catalogLesson?.level ?? 1,
             status: LessonStatus.completed,
-            completionScore: (m['score'] as num?)?.toDouble() ?? 1.0,
+            completionScore: (m['score'] as num?)?.toDouble() ?? 0.8,
             completedAt: DateTime.tryParse(m['updated_at'] as String? ?? ''),
             updatedAt: DateTime.tryParse(m['updated_at'] as String? ?? '') ?? DateTime.now(),
           );

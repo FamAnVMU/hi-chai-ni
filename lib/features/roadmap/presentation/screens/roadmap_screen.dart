@@ -548,6 +548,18 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
               lessonId: lesson.id,
               score: score,
             );
+        if (!context.mounted) return;
+        if (score >= 0.8) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Đã hoàn thành bài "${lesson.title}"!')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Chưa có điểm đánh giá đạt chuẩn (≥ 80%). Vui lòng làm bài tập để ghi nhận điểm.'),
+            ),
+          );
+        }
       },
       onSkip: () async {
         await _onSkipLesson(lesson);
