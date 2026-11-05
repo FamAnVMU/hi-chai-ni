@@ -10,7 +10,6 @@ import '../../../dictionary/dictionary.dart';
 import '../../../grammar/grammar.dart';
 import '../../../hanzi_writing/hanzi_writing.dart';
 import '../../../listening/listening.dart';
-import '../../../placement_test/placement_test.dart';
 import '../../../practice/practice.dart';
 import '../../../profile/presentation/providers/profile_providers.dart';
 import '../../../pronunciation/pronunciation.dart';
@@ -105,21 +104,6 @@ class _LearningScreenState extends ConsumerState<LearningScreen>
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            _buildFeatureBanner(
-              context: context,
-              icon: Icons.auto_awesome_rounded,
-              title: 'Khảo sát năng lực đầu vào',
-              subtitle: 'Kiểm tra thích ứng 6 kỹ năng để chọn lớp HSK',
-              buttonText: 'Làm bài',
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const PlacementTestIntroScreen(),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: AppSpacing.sm),
 
             _buildFeatureBanner(
               context: context,

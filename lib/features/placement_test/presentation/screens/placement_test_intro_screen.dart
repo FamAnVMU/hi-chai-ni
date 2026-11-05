@@ -565,15 +565,15 @@ class _PlacementTestIntroScreenState extends ConsumerState<PlacementTestIntroScr
                     }
                   },
                 ),
-                if (widget.onTestComplete != null) ...[
-                  const SizedBox(height: AppSpacing.sm),
-                  HiButton(
-                    text: 'Bỏ qua bài kiểm tra (Bắt đầu từ HSK 1)',
-                    variant: HiButtonVariant.ghost,
-                    isFullWidth: true,
-                    onPressed: () => widget.onTestComplete?.call(1),
-                  ),
-                ],
+              ],
+              if (widget.onTestComplete != null) ...[
+                const SizedBox(height: AppSpacing.sm),
+                HiButton(
+                  text: 'Bỏ qua bài kiểm tra (Bắt đầu từ HSK 1)',
+                  variant: HiButtonVariant.ghost,
+                  isFullWidth: true,
+                  onPressed: () => widget.onTestComplete?.call(1),
+                ),
               ],
               const SizedBox(height: AppSpacing.xl),
             ],

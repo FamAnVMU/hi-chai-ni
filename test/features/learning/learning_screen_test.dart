@@ -249,5 +249,25 @@ void main() {
       expect(find.textContaining('Lỗi kết nối cơ sở dữ liệu học tập'), findsOneWidget);
       expect(find.text('Thử lại'), findsOneWidget);
     });
+
+    testWidgets('6. Does not display Placement Test banner (accessible only via onboarding)',
+        (tester) async {
+      tester.view.physicalSize = const Size(1080, 4000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(
+        buildTestWidget(
+          unitsAsyncValue: AsyncValue.data([sampleUnit1]),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Khảo sát năng lực đầu vào'), findsNothing);
+      expect(find.text('Kiểm tra thích ứng 6 kỹ năng để chọn lớp HSK'), findsNothing);
+    });
   });
 }

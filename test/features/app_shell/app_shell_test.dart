@@ -1,4 +1,5 @@
 import 'package:hi_chinese/features/onboarding/presentation/providers/onboarding_providers.dart';
+import 'package:hi_chinese/features/curriculum/presentation/providers/curriculum_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -50,6 +51,9 @@ void main() {
         onboardingProvider.overrideWith(
           () => _MockOnboardingNotifier(),
         ),
+        hasCompletedLessonsProvider.overrideWith(
+          (ref) => Future.value(true),
+        ),
       ],
       child: Consumer(
         builder: (context, ref, child) {
@@ -89,7 +93,8 @@ void main() {
 
       // Verifies LearningScreen is displayed
       expect(find.text('Lộ Trình Học Tập'), findsOneWidget);
-      expect(find.text('Khảo sát năng lực đầu vào'), findsOneWidget);
+      expect(find.text('Lộ trình thích ứng cá nhân'), findsOneWidget);
+      expect(find.text('Khảo sát năng lực đầu vào'), findsNothing);
     });
 
     testWidgets('Tapping center prominent AI Tutor button switches to AiTutorTabScreen', (tester) async {
