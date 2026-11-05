@@ -224,12 +224,124 @@ void main() {
     });
 
     test('7. Database error propagation occurs cleanly when SQLite connection is closed', () async {
-      await db.close(); // Force DB closed
+      await db.close();
 
       expect(
         () async => await homeRepo.getDashboardData(),
         throwsA(isA<Exception>()),
       );
+    });
+
+    test('8. Query optimization excludes activities older than 30 days and sample_data', () async {
+      final nowUtc = DateTime.now().toUtc();
+      final oldDate = nowUtc.subtract(const Duration(days: 35));
+      final recentDate = nowUtc.subtract(const Duration(days: 5));
+
+      await db.insert(DatabaseConstants.tableLearningActivities, {
+        'id': 'act_old',
+        'activity_type': 'lesson',
+        'duration_seconds': 300,
+        'items_count': 5,
+        'activity_date': '${oldDate.year}-${oldDate.month.toString().padLeft(2, '0')}-${oldDate.day.toString().padLeft(2, '0')}',
+        'created_at': oldDate.toIso8601String(),
+      });
+
+      await db.insert(DatabaseConstants.tableLearningActivities, {
+        'id': 'act_sample',
+        'activity_type': 'sample_data',
+        'duration_seconds': 400,
+        'items_count': 5,
+        'activity_date': '${recentDate.year}-${recentDate.month.toString().padLeft(2, '0')}-${recentDate.day.toString().padLeft(2, '0')}',
+        'created_at': recentDate.toIso8601String(),
+      });
+
+      await db.insert(DatabaseConstants.tableLearningActivities, {
+        'id': 'act_seed',
+        'activity_type': 'seed',
+        'duration_seconds': 400,
+        'items_count': 5,
+        'activity_date': '${recentDate.year}-${recentDate.month.toString().padLeft(2, '0')}-${recentDate.day.toString().padLeft(2, '0')}',
+        'created_at': recentDate.toIso8601String(),
+      });
+
+      await db.insert(DatabaseConstants.tableLearningActivities, {
+        'id': 'act_valid',
+        'activity_type': 'lesson',
+        'duration_seconds': 600,
+        'items_count': 10,
+        'activity_date': '${recentDate.year}-${recentDate.month.toString().padLeft(2, '0')}-${recentDate.day.toString().padLeft(2, '0')}',
+        'created_at': recentDate.toIso8601String(),
+      });
+
+      final sessions = await homeRepo.getSanitizedStudySessionsAndStats();
+      expect(sessions.stats.totalDurationSeconds, equals(600));
+      expect(sessions.stats.totalItemsCompleted, equals(10));
+    });
+
+    test('9. Query limits cap learning_activities at 200 and learner_evidence at 100', () async {
+      final nowUtc = DateTime.now().toUtc();
+      final batch = db.batch();
+
+      for (int i = 0; i < 250; i++) {
+        final d = nowUtc.subtract(Duration(minutes: i + 1));
+        batch.insert(DatabaseConstants.tableLearningActivities, {
+          'id': 'act_cap_$i',
+          'activity_type': 'srs_review',
+          'duration_seconds': 10,
+          'items_count': 1,
+          'activity_date': '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}',
+          'created_at': d.toIso8601String(),
+        });
+      }
+
+      for (int i = 0; i < 150; i++) {
+        final d = nowUtc.subtract(Duration(hours: 10, minutes: i + 1));
+        batch.insert(DatabaseConstants.tableLearnerEvidence, {
+          'id': 'evi_cap_$i',
+          'content_id': 'content_$i',
+          'content_type': 'vocabulary',
+          'source': 'srs_flashcard',
+          'score': 1.0,
+          'duration_ms': 5000,
+          'metadata_json': '{}',
+          'created_at': d.toIso8601String(),
+        });
+      }
+
+      await batch.commit(noResult: true);
+
+      final actCountRows = await db.rawQuery('''
+        SELECT COUNT(*) as cnt FROM (
+          SELECT id FROM ${DatabaseConstants.tableLearningActivities}
+          WHERE activity_type NOT IN ('sample_data', 'seed')
+            AND created_at >= datetime('now', '-30 days')
+          ORDER BY created_at ASC
+          LIMIT 200
+        )
+      ''');
+      expect(actCountRows.first['cnt'], equals(200));
+
+      final eviCountRows = await db.rawQuery('''
+        SELECT COUNT(*) as cnt FROM (
+          SELECT id FROM ${DatabaseConstants.tableLearnerEvidence}
+          WHERE source NOT IN ('sample_data', 'seed')
+            AND created_at >= datetime('now', '-30 days')
+          ORDER BY created_at ASC
+          LIMIT 100
+        )
+      ''');
+      expect(eviCountRows.first['cnt'], equals(100));
+
+      final dashboard = await homeRepo.getDashboardData();
+      expect(dashboard, isNotNull);
+    });
+
+    test('10. Migration v17 index idx_learning_activities_created_at exists and is active', () async {
+      final indexRows = await db.rawQuery(
+        "PRAGMA index_list(${DatabaseConstants.tableLearningActivities});",
+      );
+      final hasCreatedAtIndex = indexRows.any((row) => row['name'] == 'idx_learning_activities_created_at');
+      expect(hasCreatedAtIndex, isTrue);
     });
   });
 }

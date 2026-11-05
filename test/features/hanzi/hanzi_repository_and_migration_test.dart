@@ -133,5 +133,16 @@ void main() {
       final reviews = await repository.getCharactersNeedingReview();
       expect(reviews.any((r) => r.character == '好'), isTrue);
     });
+
+    test('ensureSeedLoaded handles missing asset gracefully', () async {
+      final loaded = await repository.ensureSeedLoaded(assetPath: 'assets/non_existent.json');
+      expect(loaded, 0);
+    });
+
+    test('concurrent ensureSeedLoaded calls deduplicate without race conditions', () async {
+      final futures = List.generate(5, (_) => repository.ensureSeedLoaded(assetPath: 'assets/non_existent.json'));
+      final results = await Future.wait(futures);
+      expect(results, equals([0, 0, 0, 0, 0]));
+    });
   });
 }

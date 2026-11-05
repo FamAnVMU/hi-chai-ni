@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:isolate';
 import 'package:flutter/services.dart';
 import '../domain/models/hanzi_models.dart';
 import 'hanzi_dao.dart';
@@ -26,6 +27,7 @@ abstract class HanziRepository {
 class DefaultHanziRepository implements HanziRepository {
   final HanziDao _dao;
   bool _isSeeded = false;
+  Future<int>? _seedingFuture;
 
   DefaultHanziRepository(this._dao);
 
@@ -144,6 +146,21 @@ class DefaultHanziRepository implements HanziRepository {
 
   @override
   Future<int> ensureSeedLoaded({String assetPath = 'assets/data/hanzi_stroke_data.json'}) async {
+    if (_isSeeded) {
+      return await _dao.countCharacters();
+    }
+    if (_seedingFuture != null) {
+      return await _seedingFuture!;
+    }
+    _seedingFuture = _performEnsureSeedLoaded(assetPath);
+    try {
+      return await _seedingFuture!;
+    } finally {
+      _seedingFuture = null;
+    }
+  }
+
+  Future<int> _performEnsureSeedLoaded(String assetPath) async {
     final count = await _dao.countCharacters();
     if (count > 0) {
       _isSeeded = true;
@@ -152,18 +169,18 @@ class DefaultHanziRepository implements HanziRepository {
 
     try {
       final jsonString = await rootBundle.loadString(assetPath);
-      final data = jsonDecode(jsonString) as Map<String, dynamic>;
-      final rawChars = data['characters'] as List;
-
-      final characters = rawChars
-          .map((item) => HanziCharacter.fromJson(item as Map<String, dynamic>))
-          .toList();
+      final characters = await Isolate.run(() {
+        final data = jsonDecode(jsonString) as Map<String, dynamic>;
+        final rawChars = data['characters'] as List<dynamic>;
+        return rawChars
+            .map((item) => HanziCharacter.fromJson(item as Map<String, dynamic>))
+            .toList();
+      });
 
       await _dao.insertCharactersBatch(characters);
       _isSeeded = true;
       return characters.length;
     } catch (_) {
-      // In tests or if asset not loaded, ignore
       return 0;
     }
   }

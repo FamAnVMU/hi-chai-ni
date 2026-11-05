@@ -194,7 +194,9 @@ class HomeRepository {
         SELECT id, activity_type, duration_seconds, items_count, activity_date, created_at
         FROM ${DatabaseConstants.tableLearningActivities}
         WHERE activity_type NOT IN ('sample_data', 'seed')
+          AND created_at >= datetime('now', '-30 days')
         ORDER BY created_at ASC
+        LIMIT 200
         ''',
       );
 
@@ -249,10 +251,12 @@ class HomeRepository {
     try {
       final evidenceRows = await _db.rawQuery(
         '''
-        SELECT id, content_id, content_type, source, score, duration_ms, metadata_json, created_at 
+        SELECT id, content_id, source, duration_ms, created_at 
         FROM ${DatabaseConstants.tableLearnerEvidence}
         WHERE source NOT IN ('sample_data', 'seed')
+          AND created_at >= datetime('now', '-30 days')
         ORDER BY created_at ASC
+        LIMIT 100
         ''',
       );
 

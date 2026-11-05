@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:isolate';
 import 'package:flutter/services.dart';
 import '../domain/models/sentence_models.dart';
 import 'sentence_dao.dart';
@@ -28,6 +29,7 @@ abstract class SentenceRepository {
 class DefaultSentenceRepository implements SentenceRepository {
   final SentenceDao _dao;
   bool _isSeeded = false;
+  Future<int>? _seedingFuture;
 
   DefaultSentenceRepository(this._dao);
 
@@ -130,6 +132,21 @@ class DefaultSentenceRepository implements SentenceRepository {
 
   @override
   Future<int> ensureSeedLoaded({String assetPath = 'assets/data/sentences_corpus.json'}) async {
+    if (_isSeeded) {
+      return await _dao.countSentences();
+    }
+    if (_seedingFuture != null) {
+      return await _seedingFuture!;
+    }
+    _seedingFuture = _performEnsureSeedLoaded(assetPath);
+    try {
+      return await _seedingFuture!;
+    } finally {
+      _seedingFuture = null;
+    }
+  }
+
+  Future<int> _performEnsureSeedLoaded(String assetPath) async {
     final count = await _dao.countSentences();
     if (count > 0) {
       _isSeeded = true;
@@ -138,12 +155,13 @@ class DefaultSentenceRepository implements SentenceRepository {
 
     try {
       final jsonString = await rootBundle.loadString(assetPath);
-      final data = jsonDecode(jsonString) as Map<String, dynamic>;
-      final rawSentences = data['sentences'] as List;
-
-      final sentences = rawSentences
-          .map((item) => SentenceItem.fromJson(item as Map<String, dynamic>))
-          .toList();
+      final sentences = await Isolate.run(() {
+        final data = jsonDecode(jsonString) as Map<String, dynamic>;
+        final rawSentences = data['sentences'] as List<dynamic>;
+        return rawSentences
+            .map((item) => SentenceItem.fromJson(item as Map<String, dynamic>))
+            .toList();
+      });
 
       await _dao.insertSentencesBatch(sentences);
       _isSeeded = true;

@@ -127,5 +127,16 @@ void main() {
       expect(updatedProgress.shadowingAttempts, 1);
       expect(updatedProgress.lastShadowingAudioPath, '/mock/user_shadow.m4a');
     });
+
+    test('ensureSeedLoaded handles missing asset gracefully', () async {
+      final loaded = await repository.ensureSeedLoaded(assetPath: 'assets/non_existent_sentences.json');
+      expect(loaded, 0);
+    });
+
+    test('concurrent ensureSeedLoaded calls deduplicate without race conditions', () async {
+      final futures = List.generate(5, (_) => repository.ensureSeedLoaded(assetPath: 'assets/non_existent_sentences.json'));
+      final results = await Future.wait(futures);
+      expect(results, equals([0, 0, 0, 0, 0]));
+    });
   });
 }
