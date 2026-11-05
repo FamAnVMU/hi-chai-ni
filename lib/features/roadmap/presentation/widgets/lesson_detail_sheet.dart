@@ -337,7 +337,9 @@ class _LessonDetailSheetState extends State<LessonDetailSheet> {
                     if (_isActionInFlight) return;
                     setState(() => _isActionInFlight = true);
                     Navigator.of(context).pop();
-                    widget.onComplete(progress?.score ?? 0.8);
+                    // Anti-Cheating (BUG-NEW-005): Never fabricate 0.8 score.
+                    // If progress?.score is null (unassessed), default to 0.0 to prevent cheating bypass.
+                    widget.onComplete(progress?.score ?? 0.0);
                   },
                 ),
               ),
