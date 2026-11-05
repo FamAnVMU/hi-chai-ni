@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/database/app_database.dart';
 import 'package:hi_chinese/features/vocabulary_srs/vocabulary_srs.dart';
+import '../../../curriculum/presentation/providers/curriculum_providers.dart';
 import '../../../profile/presentation/providers/profile_providers.dart';
 import '../../data/home_repository.dart';
 import '../../domain/models/home_dashboard_data.dart';
@@ -17,8 +18,9 @@ final homeRepositoryProvider = Provider<HomeRepository>((ref) {
 class HomeDashboardNotifier extends AsyncNotifier<HomeDashboardData> {
   @override
   Future<HomeDashboardData> build() async {
-    // Re-evaluate only when the numeric due count value changes
+    // Re-evaluate when the numeric due count value or lesson completion state changes
     ref.watch(srsDueCountProvider.select((val) => val.value));
+    ref.watch(hasCompletedLessonsProvider.select((val) => val.value));
     final profileAsync = ref.watch(userProfileProvider);
     final profile = profileAsync.value;
 

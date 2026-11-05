@@ -89,13 +89,14 @@ void main() {
       expect(find.text('Bắt đầu chuỗi học tập mới 🌱'), findsOneWidget);
       expect(find.text('Mỗi ngày học một chút để hình thành phản xạ tiếng Trung tự nhiên.'), findsOneWidget);
 
-      // SRS card empty
-      expect(find.text('Đã hoàn thành'), findsOneWidget);
-      expect(find.text('Xem lại thẻ đã học'), findsOneWidget);
+      // SRS card is hidden for fresh learner, replaced by first lesson prompt
+      expect(find.text('Xem lại thẻ đã học'), findsNothing);
+      expect(find.text('Khởi đầu mới'), findsOneWidget);
+      expect(find.text('Đến bài học ngay'), findsOneWidget);
 
       // Roadmap progress
       expect(find.textContaining('0%'), findsOneWidget);
-      expect(find.text('Bắt đầu bài học đầu tiên'), findsOneWidget);
+      expect(find.text('Bắt đầu bài học đầu tiên'), findsWidgets);
 
       // Recent activities empty state
       expect(find.text('Chưa có hoạt động học nào'), findsOneWidget);
@@ -136,6 +137,7 @@ void main() {
         ],
         dailyGoalWords: 15,
         dailyGoalMinutes: 15,
+        hasCompletedLessons: true,
       );
 
       await tester.pumpWidget(
@@ -175,6 +177,7 @@ void main() {
         srsDueCount: 8,
         roadmap: RoadmapProgress.initial(),
         recentActivities: const [],
+        hasCompletedLessons: true,
       );
 
       AppTab? selectedTab;
@@ -208,7 +211,7 @@ void main() {
     });
 
     testWidgets('6. Quick Actions Grid navigates to Learning, Review, AI Tutor, and opens Dictionary', (tester) async {
-      final activeData = HomeDashboardData.empty();
+      final activeData = HomeDashboardData.empty().copyWith(hasCompletedLessons: true);
       final container = ProviderContainer(
         overrides: [
           homeDashboardProvider.overrideWith(
@@ -273,6 +276,7 @@ void main() {
           nextLessonSnippet: '这[zhè]个[ge]多[duō]少[shao]钱[qián]？',
         ),
         recentActivities: const [],
+        hasCompletedLessons: true,
       );
 
       await tester.pumpWidget(

@@ -411,6 +411,34 @@ class HomeRepository {
     // 7. Recent learning activities
     final recentActivities = await getRecentActivities(limit: 5);
 
+    // 7b. Check if user has completed at least 1 lesson
+    bool hasCompletedLessons = false;
+    try {
+      final lessonRes = await _db.rawQuery(
+        '''
+        SELECT COUNT(*) as count 
+        FROM ${DatabaseConstants.tableCurriculumLessons} 
+        WHERE status = 'completed'
+        ''',
+      );
+      final count = (lessonRes.first['count'] as num?)?.toInt() ?? 0;
+      hasCompletedLessons = count > 0;
+    } catch (_) {}
+
+    if (!hasCompletedLessons) {
+      try {
+        final actRes = await _db.rawQuery(
+          '''
+          SELECT COUNT(*) as count
+          FROM ${DatabaseConstants.tableLearningActivities}
+          WHERE activity_type = 'lesson'
+          ''',
+        );
+        final count = (actRes.first['count'] as num?)?.toInt() ?? 0;
+        hasCompletedLessons = count > 0;
+      } catch (_) {}
+    }
+
     // 8. Daily target minutes from profile or fallback
     final goalMinutes = dailyGoalMinutes ?? await _getDailyGoalMinutes();
 
@@ -424,6 +452,7 @@ class HomeRepository {
       dailyGoalWords: dailyGoalWords,
       dailyGoalMinutes: goalMinutes,
       studyStats: sessionData.stats,
+      hasCompletedLessons: hasCompletedLessons,
     );
   }
 

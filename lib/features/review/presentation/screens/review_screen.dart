@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../app_shell/presentation/providers/app_shell_providers.dart';
+import '../../../curriculum/presentation/providers/curriculum_providers.dart';
 import '../../../vocabulary_srs/vocabulary_srs.dart';
 
 /// Tab 4: Spaced Repetition System (SRS SM-2) Review Screen.
@@ -26,7 +28,8 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen>
     WidgetsBinding.instance.addObserver(this);
     _lifecycleListener = AppLifecycleListener(
       onResume: () {
-        // Refresh due counts when app returns from background
+        // Refresh due counts and completed lessons state when app returns from background
+        ref.invalidate(hasCompletedLessonsProvider);
         ref.read(srsDueCountProvider.notifier).refreshCount();
       },
     );
@@ -43,6 +46,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen>
   Widget build(BuildContext context) {
     super.build(context);
     final theme = Theme.of(context);
+    final hasLessonsAsync = ref.watch(hasCompletedLessonsProvider);
     final sessionAsync = ref.watch(srsStudySessionProvider);
     final dueCountAsync = ref.watch(srsDueCountProvider);
 
@@ -60,6 +64,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen>
             icon: const Icon(Icons.refresh_rounded),
             tooltip: 'Tải lại hàng đợi',
             onPressed: () {
+              ref.invalidate(hasCompletedLessonsProvider);
               ref.read(srsStudySessionProvider.notifier).loadMoreCards();
               ref.read(srsDueCountProvider.notifier).refreshCount();
             },
@@ -67,19 +72,31 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen>
         ],
       ),
       body: SafeArea(
-        child: sessionAsync.when(
+        child: hasLessonsAsync.when(
           loading: () => const Center(
             child: HiLoadingIndicator(
-              message: 'Đang tải hàng đợi thẻ ôn tập SM-2...',
+              message: 'Đang tải thông tin học tập...',
             ),
           ),
-          error: (error, _) => HiErrorState(
-            title: 'Không thể tải thẻ ôn tập',
-            message: error.toString(),
-            onRetry: () => ref.refresh(srsStudySessionProvider),
-          ),
-          data: (session) {
-            final card = session.currentCard;
+          error: (_, _) => _buildNoLessonsYetState(context),
+          data: (hasCompletedLessons) {
+            if (!hasCompletedLessons) {
+              return _buildNoLessonsYetState(context);
+            }
+
+            return sessionAsync.when(
+              loading: () => const Center(
+                child: HiLoadingIndicator(
+                  message: 'Đang tải hàng đợi thẻ ôn tập SM-2...',
+                ),
+              ),
+              error: (error, _) => HiErrorState(
+                title: 'Không thể tải thẻ ôn tập',
+                message: error.toString(),
+                onRetry: () => ref.refresh(srsStudySessionProvider),
+              ),
+              data: (session) {
+                final card = session.currentCard;
 
             // Empty queue or completed session
             if (session.isEmpty || session.isCompleted || card == null) {
@@ -185,6 +202,75 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen>
               ),
             );
           },
+        );
+      },
+    ),
+  ),
+);
+  }
+
+  Widget _buildNoLessonsYetState(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Center(
+      child: SingleChildScrollView(
+        padding: AppSpacing.screenPadding,
+        child: HiCard(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.xl,
+            vertical: AppSpacing.xxl,
+          ),
+          backgroundColor: AppColors.cardBackground,
+          borderColor: AppColors.border,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryBlueLight,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.secondaryBlue, width: 2),
+                ),
+                child: const Icon(
+                  Icons.menu_book_rounded,
+                  color: AppColors.primaryBlueDark,
+                  size: 38,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Text(
+                'Bắt đầu học trước nhé!',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryText,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                'Bạn chưa hoàn thành bài học nào. Hãy vào phần Bài Học và học ít nhất 1 bài để có thể ôn tập.',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.secondaryText,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              HiButton(
+                text: 'Đến Bài Học ngay',
+                icon: const Icon(Icons.arrow_forward_rounded),
+                variant: HiButtonVariant.primary,
+                size: HiButtonSize.lg,
+                isFullWidth: true,
+                onPressed: () {
+                  ref
+                      .read(selectedTabProvider.notifier)
+                      .selectTab(AppTab.learning);
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

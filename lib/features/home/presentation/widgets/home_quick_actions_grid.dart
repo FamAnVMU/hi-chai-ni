@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../curriculum/presentation/providers/curriculum_providers.dart';
 import '../../../dictionary/dictionary.dart';
 
 /// Clean 2x2 grid providing instant single-tap access to primary learning surfaces.
-class HomeQuickActionsGrid extends StatelessWidget {
+class HomeQuickActionsGrid extends ConsumerWidget {
   final VoidCallback onNavigateLearning;
   final VoidCallback onNavigateReview;
   final VoidCallback onNavigateAiTutor;
+  final bool? hasCompletedLessons;
 
   const HomeQuickActionsGrid({
     super.key,
     required this.onNavigateLearning,
     required this.onNavigateReview,
     required this.onNavigateAiTutor,
+    this.hasCompletedLessons,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
     return Column(
@@ -50,7 +54,19 @@ class HomeQuickActionsGrid extends StatelessWidget {
                 iconColor: AppColors.warning,
                 title: 'Ôn tập thẻ',
                 subtitle: 'Thuật toán SM-2',
-                onTap: onNavigateReview,
+                onTap: () {
+                  final hasLessons = hasCompletedLessons ??
+                      ref.read(hasCompletedLessonsProvider).asData?.value ??
+                      false;
+                  if (!hasLessons) {
+                    HiSnackBar.showInfo(
+                      context,
+                      'Hãy hoàn thành ít nhất 1 bài học trước khi ôn tập!',
+                    );
+                    return;
+                  }
+                  onNavigateReview();
+                },
               ),
             ),
           ],

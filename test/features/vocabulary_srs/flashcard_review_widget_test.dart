@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hi_chinese/core/theme/theme.dart';
+import 'package:hi_chinese/features/curriculum/presentation/providers/curriculum_providers.dart';
 import 'package:hi_chinese/features/dictionary/presentation/widgets/quick_dictionary_sheet.dart';
 import 'package:hi_chinese/features/review/presentation/screens/review_screen.dart';
 import 'package:hi_chinese/features/vocabulary_srs/vocabulary_srs.dart';
@@ -73,6 +74,7 @@ void main() {
       await tester.pumpWidget(
         createTestWidget(
           overrides: [
+            hasCompletedLessonsProvider.overrideWith((ref) => Future.value(true)),
             srsStudySessionProvider.overrideWith(
               () => _TestSrsStudySessionNotifier(initialSession),
             ),
@@ -112,6 +114,7 @@ void main() {
       await tester.pumpWidget(
         createTestWidget(
           overrides: [
+            hasCompletedLessonsProvider.overrideWith((ref) => Future.value(true)),
             srsStudySessionProvider.overrideWith(
               () => _TestSrsStudySessionNotifier(initialSession),
             ),
@@ -155,6 +158,7 @@ void main() {
       await tester.pumpWidget(
         createTestWidget(
           overrides: [
+            hasCompletedLessonsProvider.overrideWith((ref) => Future.value(true)),
             srsStudySessionProvider.overrideWith(
               () => _TestSrsStudySessionNotifier(initialSession),
             ),
@@ -191,6 +195,7 @@ void main() {
       await tester.pumpWidget(
         createTestWidget(
           overrides: [
+            hasCompletedLessonsProvider.overrideWith((ref) => Future.value(true)),
             srsStudySessionProvider.overrideWith(
               () => _TestSrsStudySessionNotifier(initialSession),
             ),
@@ -222,6 +227,7 @@ void main() {
       await tester.pumpWidget(
         createTestWidget(
           overrides: [
+            hasCompletedLessonsProvider.overrideWith((ref) => Future.value(true)),
             srsStudySessionProvider.overrideWith(
               () => _TestSrsStudySessionNotifier(initialSession),
             ),
@@ -249,6 +255,7 @@ void main() {
       await tester.pumpWidget(
         createTestWidget(
           overrides: [
+            hasCompletedLessonsProvider.overrideWith((ref) => Future.value(true)),
             srsStudySessionProvider.overrideWith(
               () => _TestSrsStudySessionNotifier(initialSession),
             ),
@@ -279,6 +286,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            hasCompletedLessonsProvider.overrideWith((ref) => Future.value(true)),
             srsStudySessionProvider.overrideWith(
               () => _TestSrsStudySessionNotifier(initialSession),
             ),

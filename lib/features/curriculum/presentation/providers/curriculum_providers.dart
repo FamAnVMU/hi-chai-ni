@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/database/app_database.dart';
+import '../../../../core/database/database_constants.dart';
 import '../../data/curriculum_repository.dart';
 import '../../domain/engine/prerequisite_engine.dart';
 import '../../domain/models/curriculum_models.dart';
@@ -44,3 +45,27 @@ final exitExamProvider = FutureProvider.family<Map<String, dynamic>?, int>((ref,
   final repo = ref.watch(curriculumRepositoryProvider);
   return repo.getExitExam(level);
 });
+
+/// Checks if the learner has completed at least one curriculum lesson.
+/// Used to gate advanced learning and review features for fresh learners.
+final hasCompletedLessonsProvider = FutureProvider<bool>((ref) async {
+  final db = ref.watch(appDatabaseProvider).database;
+  try {
+    final rows = await db.rawQuery(
+      "SELECT COUNT(*) as count FROM ${DatabaseConstants.tableCurriculumLessons} WHERE status = 'completed'",
+    );
+    final count = (rows.first['count'] as num?)?.toInt() ?? 0;
+    if (count > 0) return true;
+  } catch (_) {}
+
+  try {
+    final rows = await db.rawQuery(
+      "SELECT COUNT(*) as count FROM ${DatabaseConstants.tableLearningActivities} WHERE activity_type = 'lesson'",
+    );
+    final count = (rows.first['count'] as num?)?.toInt() ?? 0;
+    return count > 0;
+  } catch (_) {}
+
+  return false;
+});
+

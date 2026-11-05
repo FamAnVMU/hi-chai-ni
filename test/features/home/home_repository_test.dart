@@ -60,6 +60,54 @@ void main() {
       expect(data.roadmap.masteredVocabCount, 0);
       expect(data.recentActivities, isEmpty);
       expect(data.greeting, isNotEmpty);
+      expect(data.hasCompletedLessons, isFalse);
+    });
+
+    test('1b. When a lesson is marked completed in curriculum_lessons, hasCompletedLessons is true', () async {
+      final nowIso = DateTime.utc(2026, 11, 1, 9, 0).toIso8601String();
+      await db.insert(DatabaseConstants.tableContentPacks, {
+        'id': 'pack_hsk1',
+        'hsk_level': 1,
+        'title': 'HSK 1',
+        'version': '1.0.0',
+        'status': 'installed',
+        'updated_at': nowIso,
+      });
+      await db.insert(DatabaseConstants.tableCurriculums, {
+        'id': 'curr_hsk1',
+        'pack_id': 'pack_hsk1',
+        'code': 'HSK1',
+        'standard_name': 'HSK 1 Standard',
+        'hsk_level': 1,
+        'created_at': nowIso,
+      });
+      await db.insert(DatabaseConstants.tableCurriculumUnits, {
+        'id': 'UNIT_001',
+        'curriculum_id': 'curr_hsk1',
+        'order_index': 1,
+        'title_vi': 'Unit 1: Chào hỏi',
+        'title_zh': '第一单元：问候',
+        'created_at': nowIso,
+      });
+      await db.insert(DatabaseConstants.tableCurriculumLessons, {
+        'id': 'LESSON_001',
+        'unit_id': 'UNIT_001',
+        'order_index': 1,
+        'title_vi': 'Bài 1: Chào hỏi',
+        'title_zh': '第一课：你好',
+        'pinyin': 'Nǐ hǎo',
+        'status': 'completed',
+        'is_locked': 0,
+        'completed_at': nowIso,
+        'created_at': nowIso,
+      });
+
+      final data = await homeRepo.getDashboardData(
+        evaluationTime: DateTime.utc(2026, 11, 1, 10, 0),
+        timeZoneOffset: const Duration(hours: 7),
+      );
+
+      expect(data.hasCompletedLessons, isTrue);
     });
 
     test('2. Real SRS items due today are accurately counted and returned', () async {

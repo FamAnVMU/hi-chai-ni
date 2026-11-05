@@ -225,6 +225,7 @@ class HomeDashboardData {
   final int dailyGoalWords;
   final int dailyGoalMinutes;
   final StudyTimeStats studyStats;
+  final bool hasCompletedLessons;
 
   const HomeDashboardData({
     required this.learnerName,
@@ -236,6 +237,7 @@ class HomeDashboardData {
     this.dailyGoalWords = 15,
     this.dailyGoalMinutes = 15,
     this.studyStats = const StudyTimeStats(),
+    this.hasCompletedLessons = false,
   });
 
   /// Progress ratio towards today's word goal (0.0 to 1.0)
@@ -248,6 +250,32 @@ class HomeDashboardData {
   bool get isDailyGoalAchieved =>
       streak.todayItemsCompleted >= dailyGoalWords && dailyGoalWords > 0;
 
+  HomeDashboardData copyWith({
+    String? learnerName,
+    String? greeting,
+    LearningStreak? streak,
+    int? srsDueCount,
+    RoadmapProgress? roadmap,
+    List<RecentActivityItem>? recentActivities,
+    int? dailyGoalWords,
+    int? dailyGoalMinutes,
+    StudyTimeStats? studyStats,
+    bool? hasCompletedLessons,
+  }) {
+    return HomeDashboardData(
+      learnerName: learnerName ?? this.learnerName,
+      greeting: greeting ?? this.greeting,
+      streak: streak ?? this.streak,
+      srsDueCount: srsDueCount ?? this.srsDueCount,
+      roadmap: roadmap ?? this.roadmap,
+      recentActivities: recentActivities ?? this.recentActivities,
+      dailyGoalWords: dailyGoalWords ?? this.dailyGoalWords,
+      dailyGoalMinutes: dailyGoalMinutes ?? this.dailyGoalMinutes,
+      studyStats: studyStats ?? this.studyStats,
+      hasCompletedLessons: hasCompletedLessons ?? this.hasCompletedLessons,
+    );
+  }
+
   /// Default initial dashboard data for empty/fresh state
   factory HomeDashboardData.empty() => HomeDashboardData(
         learnerName: 'Học viên',
@@ -257,5 +285,6 @@ class HomeDashboardData {
         roadmap: RoadmapProgress.initial(),
         recentActivities: const [],
         studyStats: const StudyTimeStats(),
+        hasCompletedLessons: false,
       );
 }

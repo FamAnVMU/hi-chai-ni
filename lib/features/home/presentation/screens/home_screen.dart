@@ -95,19 +95,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   HomeWelcomeStreakCard(data: data),
                   const SizedBox(height: AppSpacing.lg),
 
-                  // 2. SRS Review Due Alert Card
-                  HomeSrsDueCard(
-                    dueCount: data.srsDueCount,
-                    onStartReview: () {
-                      ref
-                          .read(selectedTabProvider.notifier)
-                          .selectTab(AppTab.review);
-                    },
-                  ),
+                  // 2. SRS Review Due Alert Card or First Lesson Guidance Card
+                  if (data.hasCompletedLessons)
+                    HomeSrsDueCard(
+                      dueCount: data.srsDueCount,
+                      onStartReview: () {
+                        ref
+                            .read(selectedTabProvider.notifier)
+                            .selectTab(AppTab.review);
+                      },
+                    )
+                  else
+                    _buildFirstLessonCard(context),
                   const SizedBox(height: AppSpacing.lg),
 
                   // 3. Quick Actions Grid (Học tập, Ôn tập, Từ điển, AI Tutor)
                   HomeQuickActionsGrid(
+                    hasCompletedLessons: data.hasCompletedLessons,
                     onNavigateLearning: () {
                       ref
                           .read(selectedTabProvider.notifier)
@@ -154,6 +158,62 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildFirstLessonCard(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return HiCard(
+      borderColor: isDark ? AppColors.darkForestBorder : AppColors.border,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.menu_book_rounded,
+                color: isDark ? AppColors.accentBlue : AppColors.primaryBlueDark,
+                size: AppDimensions.iconMd,
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  'Bắt đầu bài học đầu tiên',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryText,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.xs),
+              const HiChip(
+                label: 'Khởi đầu mới',
+                status: HiChipStatus.info,
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            'Bạn chưa có thẻ ôn tập nào. Hãy hoàn thành bài học đầu tiên để kích hoạt tính năng ôn tập ngắt quãng (SM-2).',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppColors.secondaryText,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          HiButton(
+            text: 'Đến bài học ngay',
+            icon: const Icon(Icons.arrow_forward_rounded),
+            variant: HiButtonVariant.primary,
+            size: HiButtonSize.md,
+            isFullWidth: true,
+            onPressed: () {
+              ref.read(selectedTabProvider.notifier).selectTab(AppTab.learning);
+            },
+          ),
+        ],
       ),
     );
   }
