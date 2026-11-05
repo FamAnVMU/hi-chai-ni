@@ -188,7 +188,7 @@ class SrsRepository {
       });
 
       // Update cooldown timestamp & invalidate due count cache
-      _lastReviewTimes[lockKey] = nowUtc;
+      _lastReviewTimes[lockKey] = DateTime.now().toUtc();
       _dueCountCache.clear();
 
       return reviewResult;

@@ -118,6 +118,16 @@ void main() {
       },
       'content_items': [
         {
+          'content_id': 'WARMUP_L1',
+          'curriculum_id': 'curr_hsk1',
+          'hsk_level': 1,
+          'knowledge_type': 'warmup',
+          'title': 'Khởi động Bài 1',
+          'content_json': '{"prompt":"Khởi động chào hỏi"}',
+          'objectives': ['Làm quen chủ đề'],
+          'source_reference': 'HSK 2.0 Standard Course',
+        },
+        {
           'content_id': 'VOCAB_L1',
           'curriculum_id': 'curr_hsk1',
           'hsk_level': 1,
@@ -128,6 +138,26 @@ void main() {
           'source_reference': 'HSK 2.0 Standard Course',
         },
         {
+          'content_id': 'GRAMMAR_L1',
+          'curriculum_id': 'curr_hsk1',
+          'hsk_level': 1,
+          'knowledge_type': 'grammar',
+          'title': 'Ngữ pháp Bài 1',
+          'content_json': '{"points":[]}',
+          'objectives': ['Nắm ngữ pháp cơ bản'],
+          'source_reference': 'HSK 2.0 Standard Course',
+        },
+        {
+          'content_id': 'DIALOGUE_L1',
+          'curriculum_id': 'curr_hsk1',
+          'hsk_level': 1,
+          'knowledge_type': 'dialogue',
+          'title': 'Hội thoại Bài 1',
+          'content_json': '{"lines":[]}',
+          'objectives': ['Luyện hội thoại'],
+          'source_reference': 'HSK 2.0 Standard Course',
+        },
+        {
           'content_id': 'PRACTICE_L1',
           'curriculum_id': 'curr_hsk1',
           'hsk_level': 1,
@@ -135,6 +165,16 @@ void main() {
           'title': 'Bài tập Bài 1',
           'content_json': '{"exercises":[{"id":"ex1","type":"multiple_choice","prompt":"你好 nghĩa là gì?","options":["Xin chào","Tạm biệt"],"correct_answer":"Xin chào"}]}',
           'objectives': ['Luyện tập phản xạ chào hỏi'],
+          'source_reference': 'HSK 2.0 Standard Course',
+        },
+        {
+          'content_id': 'MASTERY_L1',
+          'curriculum_id': 'curr_hsk1',
+          'hsk_level': 1,
+          'knowledge_type': 'mastery_check',
+          'title': 'Đánh giá hoàn thành Bài 1',
+          'content_json': '{"exercises":[]}',
+          'objectives': ['Kiểm tra hoàn thành'],
           'source_reference': 'HSK 2.0 Standard Course',
         },
       ],
@@ -161,7 +201,7 @@ void main() {
       expect(result.isSuccess, isTrue);
       expect(result.packId, 'pack_hsk1_v1');
       expect(result.installedLessonsCount, 1);
-      expect(result.installedContentItemsCount, 2);
+      expect(result.installedContentItemsCount, 6);
 
       // Query through CurriculumRepository
       final curriculum = await repo.getCurriculumByLevel(1);
