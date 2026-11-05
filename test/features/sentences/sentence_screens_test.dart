@@ -189,6 +189,20 @@ void main() {
       expect(find.text('您好'), findsWidgets);
       expect(find.text('Ngữ pháp trong câu:'), findsOneWidget);
       expect(find.text('您 (polite you)'), findsOneWidget);
+
+      // Verify that score is NOT auto-recorded on initial screen load
+      expect(await fakeRepo.getProgress('tat_1'), isNull);
+
+      // Scroll to button and tap to complete reading
+      final completeButton = find.byKey(const Key('complete_reading_button'));
+      await tester.ensureVisible(completeButton);
+      await tester.tap(completeButton);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Đã ghi nhận hoàn thành'), findsOneWidget);
+      final progress = await fakeRepo.getProgress('tat_1');
+      expect(progress, isNotNull);
+      expect(progress!.lastScore, 100.0);
     });
 
     testWidgets('SentenceShadowingScreen displays model sentence and mic button', (tester) async {

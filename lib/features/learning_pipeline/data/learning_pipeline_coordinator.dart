@@ -109,6 +109,51 @@ class LearningPipelineCoordinator {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
 
+      // Step B2: Sync with tableLessonProgress (Eliminates Roadmap & Curriculum Split-Brain)
+      final lessonRows = await txn.query(
+        DatabaseConstants.tableCurriculumLessons,
+        where: 'id = ?',
+        whereArgs: [lessonId],
+        limit: 1,
+      );
+      final unitId = lessonRows.isNotEmpty ? (lessonRows.first['unit_id'] as String? ?? 'unit_1') : 'unit_1';
+      final hskLevel = lessonRows.isNotEmpty ? ((lessonRows.first['level'] as num?)?.toInt() ?? 1) : 1;
+
+      final existingLessonProg = await txn.query(
+        DatabaseConstants.tableLessonProgress,
+        where: 'lesson_id = ?',
+        whereArgs: [lessonId],
+        limit: 1,
+      );
+
+      await txn.insert(
+        DatabaseConstants.tableLessonProgress,
+        {
+          'id': existingLessonProg.isNotEmpty
+              ? existingLessonProg.first['id']
+              : 'prog_${lessonId}_${nowUtc.millisecondsSinceEpoch}',
+          'lesson_id': lessonId,
+          'unit_id': unitId,
+          'hsk_level': hskLevel,
+          'status': isPassed ? 'completed' : 'inProgress',
+          'completion_score': scorePercent,
+          'evidence_count': (existingLessonProg.isNotEmpty
+                  ? ((existingLessonProg.first['evidence_count'] as num?)?.toInt() ?? 0)
+                  : 0) +
+              (questionResults?.length ?? 1),
+          'started_at': existingLessonProg.isNotEmpty
+              ? existingLessonProg.first['started_at']
+              : nowIso,
+          'completed_at': isPassed ? nowIso : null,
+          'last_studied_at': nowIso,
+          'created_at': existingLessonProg.isNotEmpty
+              ? existingLessonProg.first['created_at']
+              : nowIso,
+          'updated_at': nowIso,
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+
       // Step C: Discover all knowledge items taught in this lesson
       final segments = await txn.query(
         DatabaseConstants.tableLessonSegments,
@@ -448,6 +493,13 @@ class LearningPipelineCoordinator {
                       {'is_locked': 0},
                       where: 'id = ?',
                       whereArgs: [targetId],
+                    );
+                    // Also update tableLessonProgress if currently locked
+                    await txn.update(
+                      DatabaseConstants.tableLessonProgress,
+                      {'status': 'available', 'updated_at': nowIso},
+                      where: 'lesson_id = ? AND status = ?',
+                      whereArgs: [targetId, 'locked'],
                     );
                     unlockedLessons.add(targetId);
                   }

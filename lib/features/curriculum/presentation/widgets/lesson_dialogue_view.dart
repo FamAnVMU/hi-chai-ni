@@ -18,10 +18,14 @@ class LessonDialogueView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final rawLines = (segment?.contentPayload?['lines'] as List<dynamic>?) ??
-        (segment?.contentPayload?['dialogue']?['lines'] as List<dynamic>?) ??
+    final rawLines = segment?.contentPayload?['lines'] ??
+        segment?.contentPayload?['dialogue']?['lines'] ??
+        segment?.contentPayload?['dialogue'] ??
+        segment?.contentPayload?['dialogues'] ??
         [];
-    final lines = rawLines.whereType<Map<String, dynamic>>().toList();
+    final lines = (rawLines is List)
+        ? rawLines.whereType<Map>().map((m) => m.cast<String, dynamic>()).toList()
+        : <Map<String, dynamic>>[];
 
     if (lines.isEmpty) {
       return LessonContentEmptyState(
@@ -43,10 +47,10 @@ class LessonDialogueView extends StatelessWidget {
       separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.md),
       itemBuilder: (context, index) {
         final item = lines[index];
-        final speaker = (item['speaker'] ?? 'A') as String;
-        final hanzi = (item['hanzi'] ?? item['chinese'] ?? '') as String;
-        final pinyin = (item['pinyin'] ?? '') as String;
-        final meaning = (item['meaning'] ?? item['vietnamese'] ?? '') as String;
+        final speaker = (item['speaker'] ?? item['role'] ?? 'A').toString();
+        final hanzi = (item['text_zh'] ?? item['hanzi'] ?? item['chinese'] ?? item['text'] ?? '').toString();
+        final pinyin = (item['pinyin'] ?? item['transcription'] ?? '').toString();
+        final meaning = (item['text_vi'] ?? item['meaning'] ?? item['vietnamese'] ?? item['translation'] ?? '').toString();
 
         final isSpeakerA = speaker == 'A';
 

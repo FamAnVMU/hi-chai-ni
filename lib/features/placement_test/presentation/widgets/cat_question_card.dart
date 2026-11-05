@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/models/cat_item.dart';
+import '../../domain/models/cat_skill.dart';
 
 /// Card rendering adaptive question formats (Multiple Choice, Pinyin Input, Speaking).
 class CatQuestionCard extends StatefulWidget {
@@ -69,8 +70,8 @@ class _CatQuestionCardState extends State<CatQuestionCard> {
           ),
           const SizedBox(height: AppSpacing.md),
 
-          // Annotated Chinese sentence with RubyText
-          if (item.annotatedPrompt != null) ...[
+          // Annotated Chinese sentence with RubyText (hidden for listening questions)
+          if (item.annotatedPrompt != null && item.skill != CatSkill.listening) ...[
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
@@ -89,32 +90,43 @@ class _CatQuestionCardState extends State<CatQuestionCard> {
           ],
 
           // Audio prompt if applicable
-          if (item.audioUri != null) ...[
-            Row(
-              children: [
-                IconButton.filled(
-                  icon: const Icon(Icons.volume_up_rounded),
-                  tooltip: 'Nghe lại phát âm',
-                  onPressed: () {
-                    // Audio trigger (handled via AudioService / TTS)
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Đang phát âm thanh bài kiểm tra...'),
-                        duration: Duration(seconds: 1),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Text(
-                  'Nhấn để nghe câu hỏi',
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+          if (item.audioUri != null || item.skill == CatSkill.listening) ...[
+            Container(
+              margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+              decoration: BoxDecoration(
+                color: AppColors.primaryBlueLight.withAlpha(50),
+                borderRadius: AppRadius.borderMd,
+                border: Border.all(color: AppColors.primaryBlueLight),
+              ),
+              child: Row(
+                children: [
+                  IconButton.filled(
+                    icon: const Icon(Icons.volume_up_rounded),
+                    tooltip: 'Nghe lại phát âm',
+                    onPressed: () {
+                      // Audio trigger (handled via AudioService / TTS)
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Đang phát âm thanh bài kiểm tra...'),
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+                    },
                   ),
-                ),
-              ],
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Text(
+                      'Nhấn để nghe câu hỏi âm thanh (ẩn chữ Hán & phụ đề)',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: AppColors.primaryBlueDark,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: AppSpacing.lg),
           ],
 
           // Formats:
@@ -223,12 +235,18 @@ class _CatQuestionCardState extends State<CatQuestionCard> {
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    _isSpeakingSimulated ? 'Đang phân tích phát âm...' : 'Nhấn micro và đọc to câu trên',
+                    _isSpeakingSimulated ? 'Đang gửi bản ghi âm...' : 'Nhấn micro và đọc to câu trên',
                     style: theme.textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    'Bản ghi âm sẽ được lưu và chuyển trạng thái "Chờ kiểm tra"',
+                    style: theme.textTheme.bodySmall?.copyWith(color: AppColors.secondaryText),
+                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacing.md),
                   HiButton(
-                    text: _isSpeakingSimulated ? 'Đang chấm điểm...' : 'Bắt đầu phát âm',
+                    text: _isSpeakingSimulated ? 'Đã ghi nhận (Chờ kiểm tra)' : 'Bắt đầu phát âm',
                     variant: HiButtonVariant.primary,
                     onPressed: _isSpeakingSimulated
                         ? null

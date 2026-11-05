@@ -87,8 +87,12 @@ void main() {
   });
 
   group('SRS Integration & Due Date Precision Tests', () {
-    test('1. getDueFlashcards seamlessly introduces new unstudied words with preview intervals', () async {
-      final cards = await repository.getDueFlashcards(limit: 10);
+    test('1. getDueFlashcards strictly returns enrolled due cards by default, introduces unstudied words only when requested', () async {
+      // By default without enrolled cards, due list is empty (prevents auto-enrolling unlearned words into review queue)
+      final emptyCards = await repository.getDueFlashcards(limit: 10);
+      expect(emptyCards, isEmpty);
+
+      final cards = await repository.getDueFlashcards(limit: 10, includeUnlearned: true);
       expect(cards.length, equals(2));
 
       final firstCard = cards.first;
@@ -104,14 +108,14 @@ void main() {
       expect(firstCard.estimatedIntervalDays.containsKey(SrsRating.good), isTrue);
       expect(firstCard.estimatedIntervalDays.containsKey(SrsRating.easy), isTrue);
 
-      // New card initial preview intervals
-      expect(firstCard.estimatedIntervalDays[SrsRating.again], equals(1));
+      // New card initial preview intervals: Again is 0 (< 10 min), Good is 1, Easy is 3
+      expect(firstCard.estimatedIntervalDays[SrsRating.again], equals(0));
       expect(firstCard.estimatedIntervalDays[SrsRating.good], equals(1));
       expect(firstCard.estimatedIntervalDays[SrsRating.easy], equals(3));
     });
 
     test('2. Rating "Good" advances intervals, updates due_at, and writes immutable learner evidence', () async {
-      final cards = await repository.getDueFlashcards(limit: 10);
+      final cards = await repository.getDueFlashcards(limit: 10, includeUnlearned: true);
       final card = cards.first;
 
       final reviewTime = DateTime.utc(2026, 11, 1, 10, 0, 0);
@@ -156,8 +160,8 @@ void main() {
       expect(activityRows.first['activity_type'], equals('srs_review'));
     });
 
-    test('3. Rating "Again" resets interval to 1 day and increments lapses', () async {
-      final cards = await repository.getDueFlashcards(limit: 10);
+    test('3. Rating "Again" resets interval to 0 days (< 10 minutes) and increments lapses', () async {
+      final cards = await repository.getDueFlashcards(limit: 10, includeUnlearned: true);
       final card = cards.first;
 
       // Simulate prior mastery: reps = 3, interval = 15 days
@@ -182,7 +186,8 @@ void main() {
         rating: SrsRating.again,
       );
 
-      expect(reviewResult.newIntervalDays, equals(1));
+      expect(reviewResult.newIntervalDays, equals(0));
+      expect(reviewResult.scheduledDueAt, isNotNull);
       expect(reviewResult.nextState.repetitions, equals(0));
       expect(reviewResult.nextState.lapses, equals(1));
       expect(reviewResult.nextState.state, equals(SrsItemState.relearning));
@@ -193,14 +198,14 @@ void main() {
         where: 'content_id = ?',
         whereArgs: [card.id],
       );
-      expect(row.first['interval_days'], equals(1));
+      expect(row.first['interval_days'], equals(0));
       expect(row.first['repetitions'], equals(0));
       expect(row.first['lapses'], equals(1));
       expect(row.first['state'], equals('relearning'));
     });
 
     test('4. Rating "Easy" applies bonus multiplier and boosts Ease Factor', () async {
-      final cards = await repository.getDueFlashcards(limit: 10);
+      final cards = await repository.getDueFlashcards(limit: 10, includeUnlearned: true);
       final card = cards.first;
 
       final result = await repository.recordReviewAndProgress(
@@ -213,7 +218,7 @@ void main() {
     });
 
     test('5. Rejects duplicate rapid review taps within debounce threshold', () async {
-      final cards = await repository.getDueFlashcards(limit: 10);
+      final cards = await repository.getDueFlashcards(limit: 10, includeUnlearned: true);
       final card = cards.first;
 
       // First review succeeds

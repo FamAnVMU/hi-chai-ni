@@ -80,7 +80,8 @@ class CatItem {
   });
 
   /// Evaluates whether a given user answer string or option index is correct.
-  bool checkAnswer(dynamic answer) {
+  /// Returns null if the submission requires asynchronous/manual review (e.g., recorded speech sample pending review).
+  bool? checkAnswer(dynamic answer) {
     if (answer == null) return false;
 
     if (type == CatItemType.multipleChoice ||
@@ -122,6 +123,9 @@ class CatItem {
           final threshold = score <= 1.0 ? 0.60 : 60.0;
           return score >= threshold;
         }
+        if (answer['status'] == 'pending_review' || answer['status'] == 'unassessed') {
+          return null; // Chờ kiểm tra
+        }
       }
 
       // 4. String transcript or evaluation indicator
@@ -129,9 +133,12 @@ class CatItem {
         final trimmed = answer.trim().toLowerCase();
         if (trimmed == 'true' ||
             trimmed == 'correct' ||
-            trimmed == 'passed' ||
-            trimmed == 'speech_sample_recorded') {
+            trimmed == 'passed') {
           return true;
+        }
+        if (trimmed == 'speech_sample_recorded' || trimmed == 'pending_review') {
+          // Ghi nhận mẫu phát âm nhưng đánh dấu "Chờ kiểm tra", KHÔNG tự động chấm đúng
+          return null;
         }
         if (correctAnswerText != null && correctAnswerText!.isNotEmpty) {
           final cleanInput = trimmed.replaceAll(RegExp(r'[\s\p{P}]', unicode: true), '');
@@ -140,7 +147,7 @@ class CatItem {
         }
       }
 
-      return false;
+      return null;
     }
 
     return false;

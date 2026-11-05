@@ -88,6 +88,35 @@ class DefaultRoadmapRepository implements RoadmapRepository {
         map[alias] = progress;
       }
     }
+
+    // Enrich from curriculum_mastery to ensure complete synchronization
+    try {
+      final masteryRows = await _db.query(
+        DatabaseConstants.tableCurriculumMastery,
+        where: 'item_type = ? AND mastery_state = ?',
+        whereArgs: ['lesson', 'completed'],
+      );
+      for (final m in masteryRows) {
+        final lId = m['item_id'] as String;
+        if (!map.containsKey(lId) || !map[lId]!.isCompleted) {
+          final catalogLesson = CurriculumCatalog.findLessonById(lId);
+          final p = LessonProgress(
+            id: 'prog_$lId',
+            lessonId: lId,
+            unitId: catalogLesson?.unitId ?? 'unit_1',
+            hskLevel: catalogLesson?.level ?? 1,
+            status: LessonStatus.completed,
+            completionScore: (m['score'] as num?)?.toDouble() ?? 1.0,
+            completedAt: DateTime.tryParse(m['updated_at'] as String? ?? ''),
+            updatedAt: DateTime.tryParse(m['updated_at'] as String? ?? '') ?? DateTime.now(),
+          );
+          map[lId] = p;
+          final canonical = await _identityRegistry.toCanonicalLessonId(lId);
+          map[canonical] = p;
+        }
+      }
+    } catch (_) {}
+
     return map;
   }
 

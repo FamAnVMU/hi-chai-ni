@@ -109,7 +109,7 @@ void main() {
     meaningVi: 'Xin chào',
     srsState: SrsCardState.newCard(id: 's_1', contentId: 'srs_1'),
     estimatedIntervalDays: const {
-      SrsRating.again: 1,
+      SrsRating.again: 0,
       SrsRating.hard: 2,
       SrsRating.good: 4,
       SrsRating.easy: 7,
@@ -125,7 +125,7 @@ void main() {
     meaningVi: 'Cảm ơn',
     srsState: SrsCardState.newCard(id: 's_2', contentId: 'srs_2'),
     estimatedIntervalDays: const {
-      SrsRating.again: 1,
+      SrsRating.again: 0,
       SrsRating.hard: 2,
       SrsRating.good: 4,
       SrsRating.easy: 7,

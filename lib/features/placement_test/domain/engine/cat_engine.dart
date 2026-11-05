@@ -312,8 +312,21 @@ class CatEngine {
       }
 
       final attempted = skillResponses.where((r) => !r.isSkipped).toList();
-      final correctCount = attempted.where((r) => r.isCorrect == true).length;
-      final accuracy = attempted.isEmpty ? 0.0 : correctCount / attempted.length;
+      final assessedResponses = attempted.where((r) => r.isCorrect != null).toList();
+
+      if (assessedResponses.isEmpty) {
+        // Items attempted but pending review or unassessed by acoustic engine
+        skillScores[skill] = SkillScoreEstimate.unassessed(
+          skill,
+          reason: skill == CatSkill.speaking
+              ? 'Bản ghi âm đang chờ kiểm tra'
+              : 'Chưa đủ dữ liệu đánh giá',
+        );
+        continue;
+      }
+
+      final correctCount = assessedResponses.where((r) => r.isCorrect == true).length;
+      final accuracy = assessedResponses.isEmpty ? 0.0 : correctCount / assessedResponses.length;
 
       // Calculate skill specific theta
       double skillTheta = overallTheta;

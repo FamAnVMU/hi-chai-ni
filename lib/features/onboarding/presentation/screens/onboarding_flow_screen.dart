@@ -23,6 +23,21 @@ class OnboardingFlowScreen extends ConsumerWidget {
     final onboardingState = ref.watch(onboardingProvider);
     final notifier = ref.read(onboardingProvider.notifier);
 
+    ref.listen<String?>(
+      onboardingProvider.select((s) => s.errorMessage),
+      (prev, next) {
+        if (next != null && next.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Lỗi khởi tạo cấu hình: $next'),
+              backgroundColor: AppColors.error,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        }
+      },
+    );
+
     if (onboardingState.isLoading) {
       return const Scaffold(
         body: Center(
@@ -82,7 +97,7 @@ class OnboardingFlowScreen extends ConsumerWidget {
           child: OnboardingPersonalizationScreen(
             onBack: () => notifier.previousStep(),
             onComplete: (dailyMinutes, focusSkill, [PersonalizationData? data]) async {
-              await notifier.completePersonalization(
+              final success = await notifier.completePersonalization(
                 dailyMinutes: dailyMinutes,
                 focusSkill: focusSkill,
                 learningPurpose: data?.purpose ?? 'dailyCommunication',
@@ -94,7 +109,9 @@ class OnboardingFlowScreen extends ConsumerWidget {
                 reminderEnabled: data?.reminderEnabled ?? true,
                 reminderTime: data?.reminderTime ?? '20:00',
               );
-              onOnboardingComplete();
+              if (success) {
+                onOnboardingComplete();
+              }
             },
           ),
         );

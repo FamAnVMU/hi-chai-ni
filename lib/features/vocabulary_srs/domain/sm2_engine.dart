@@ -100,7 +100,7 @@ class Sm2Engine {
       // Recall Failure (Again)
       newReps = 0;
       newLapses = prevLapses + 1;
-      newInterval = 1; // Reset to 1 day
+      newInterval = 0; // Reset to 0 days for same-day immediate review (< 10 minutes)
       newState = (currentState.state == SrsItemState.newCard)
           ? SrsItemState.learning
           : SrsItemState.relearning;
@@ -152,7 +152,9 @@ class Sm2Engine {
     }
 
     // Calculate scheduled due date cleanly in UTC
-    final scheduledDueAt = nowUtc.add(Duration(days: newInterval));
+    final scheduledDueAt = (newInterval == 0)
+        ? nowUtc.add(const Duration(minutes: 10))
+        : nowUtc.add(Duration(days: newInterval));
 
     final nextCardState = currentState.copyWith(
       state: newState,

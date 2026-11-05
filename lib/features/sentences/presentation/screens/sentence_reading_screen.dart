@@ -22,6 +22,7 @@ class SentenceReadingScreen extends StatefulWidget {
 class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
   late final SentenceAudioManager _audioManager;
   bool _isPlaying = false;
+  bool _isCompleted = false;
 
   @override
   void initState() {
@@ -30,12 +31,6 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
     _audioManager.isPlayingStream.listen((playing) {
       if (mounted) setState(() => _isPlaying = playing);
     });
-
-    widget.repository.recordPracticeAttempt(
-      sentenceId: widget.sentence.id,
-      practiceType: 'reading',
-      score: 100.0,
-    );
   }
 
   @override
@@ -260,6 +255,47 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
                   ),
                 ),
             ],
+
+            const SizedBox(height: 24),
+
+            // Completion Button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                key: const Key('complete_reading_button'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _isCompleted ? Colors.green : const Color(0xFF10B981),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                icon: Icon(_isCompleted ? Icons.check_circle : Icons.task_alt),
+                label: Text(
+                  _isCompleted ? 'Đã ghi nhận hoàn thành' : 'Hoàn thành bài đọc',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                onPressed: _isCompleted
+                    ? null
+                    : () async {
+                        final messenger = ScaffoldMessenger.of(context);
+                        await widget.repository.recordPracticeAttempt(
+                          sentenceId: widget.sentence.id,
+                          practiceType: 'reading',
+                          score: 100.0,
+                        );
+                        if (!mounted) return;
+                        setState(() => _isCompleted = true);
+                        messenger.showSnackBar(
+                          const SnackBar(
+                            content: Text('Đã hoàn thành bài đọc câu!'),
+                            backgroundColor: Colors.green,
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      },
+              ),
+            ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

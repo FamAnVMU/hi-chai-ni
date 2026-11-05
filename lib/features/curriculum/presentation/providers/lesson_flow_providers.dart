@@ -90,6 +90,25 @@ class LessonFlowNotifier extends Notifier<LessonFlowState> {
 
     return result;
   }
+
+  /// Explicitly records lesson completion when learner finishes all segments
+  /// (e.g. via Exit Exam completion or when masteryCheck has no standalone questions).
+  Future<MasteryUpdateResult> completeLesson({double defaultScorePercent = 1.0}) async {
+    final masteryEngine = ref.read(masteryEngineProvider);
+    final scoreToRecord = state.lastScorePercent ?? defaultScorePercent;
+
+    final result = await masteryEngine.recordLessonAttempt(
+      lessonId: state.lessonId,
+      scorePercent: scoreToRecord,
+    );
+
+    state = state.copyWith(
+      isCompleted: result.isPassed,
+      lastScorePercent: scoreToRecord,
+    );
+
+    return result;
+  }
 }
 
 final lessonFlowNotifierProvider =

@@ -229,12 +229,13 @@ class SrsRepository {
     );
   }
 
-  /// Retrieves rich flashcard items due for study, seamlessly pulling from
-  /// unlearned vocabularies when due cards in SRS items are fewer than [limit].
+  /// Retrieves rich flashcard items due for study.
+  /// Only includes items that have actually been enrolled into SRS (e.g. via learning pipeline) and are due.
   Future<List<SrsFlashcardItem>> getDueFlashcards({
     int limit = 30,
     int? hskLevel,
     DateTime? asOf,
+    bool includeUnlearned = false,
   }) async {
     final asOfUtc = (asOf ?? DateTime.now()).toUtc().toIso8601String();
 
@@ -279,8 +280,8 @@ class SrsRepository {
       ));
     }
 
-    // 2. If fewer than limit, pull unlearned words from vocabularies
-    if (results.length < limit) {
+    // 2. Only pull unlearned words from vocabularies if explicitly requested (not during default review)
+    if (includeUnlearned && results.length < limit) {
       final remaining = limit - results.length;
       final newWhere = hskLevel != null ? 'AND v.hsk_level = ?' : '';
       final newVocabsQuery = '''

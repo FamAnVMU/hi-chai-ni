@@ -102,7 +102,11 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
           segment: _getSegment('masteryCheck'),
           onAnswerRecorded: (qId, ans) => flowNotifier.recordAnswer(qId, ans),
           onSubmit: (questions) => flowNotifier.submitPractice(questions),
-          onFinishLesson: () => Navigator.of(context).pop(true),
+          onFinishLesson: () async {
+            await flowNotifier.completeLesson();
+            if (!mounted) return;
+            Navigator.of(context).pop(true);
+          },
         );
       default:
         return const SizedBox.shrink();

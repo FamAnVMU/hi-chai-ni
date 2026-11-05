@@ -50,10 +50,6 @@ class ContentPackManager {
     await executor.insert(table, values, conflictAlgorithm: ConflictAlgorithm.ignore);
   }
 
-  static Map<String, dynamic> _decodeJson(String rawJson) {
-    return json.decode(rawJson) as Map<String, dynamic>;
-  }
-
   static String computeChecksum(String rawJson) {
     try {
       final decoded = json.decode(rawJson);

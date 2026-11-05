@@ -217,7 +217,8 @@ void main() {
 
       // String transcript and indicators
       expect(speakingItem.checkAnswer('passed'), isTrue);
-      expect(speakingItem.checkAnswer('speech_sample_recorded'), isTrue);
+      expect(speakingItem.checkAnswer('speech_sample_recorded'), isNull);
+      expect(speakingItem.checkAnswer({'status': 'pending_review'}), isNull);
       expect(speakingItem.checkAnswer('你好'), isTrue);
       expect(speakingItem.checkAnswer('nǐ hǎo'), isFalse); // Non-matching text
       expect(speakingItem.checkAnswer(null), isFalse);
@@ -243,6 +244,25 @@ void main() {
       state = state.copyWith(activeItem: speakingItem, currentSkill: CatSkill.speaking);
 
       final initialTheta = state.currentTheta;
+
+      // Unassessed sample recording without acoustic score -> marked pending review (isCorrect == null)
+      final recordedState = engine.processTurn(
+        currentState: state,
+        userAnswer: 'speech_sample_recorded',
+        latencyMs: 1500,
+      );
+      expect(recordedState.responses.last.isCorrect, isNull);
+      expect(recordedState.currentTheta, equals(initialTheta));
+
+      final assessmentPending = engine.generateAssessmentResult(
+        sessionId: recordedState.sessionId,
+        overallTheta: recordedState.currentTheta,
+        overallStandardError: recordedState.currentStandardError,
+        responses: recordedState.responses,
+        completedAt: DateTime.now().toUtc(),
+      );
+      expect(assessmentPending.skillScores[CatSkill.speaking]!.isAssessed, isFalse);
+      expect(assessmentPending.skillScores[CatSkill.speaking]!.subMetrics['reason'], 'Bản ghi âm đang chờ kiểm tra');
 
       // Pass turn with 0.85 pronunciation score
       final nextState = engine.processTurn(

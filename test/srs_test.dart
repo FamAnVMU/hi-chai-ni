@@ -65,14 +65,15 @@ void main() {
         now: DateTime.utc(2026, 11, 1, 10, 0, 0),
       );
 
-      // Again: restarts learning, 1 day interval, lapses incremented
+      // Again: restarts learning, 0 day interval (< 10 min), lapses incremented
       final resAgain = engine.calculateNextState(
         currentState: newCard,
         rating: SrsRating.again,
         reviewTime: DateTime.utc(2026, 11, 1, 10, 0, 0),
       );
       expect(resAgain.nextState.state, equals(SrsItemState.learning));
-      expect(resAgain.newIntervalDays, equals(1));
+      expect(resAgain.newIntervalDays, equals(0));
+      expect(resAgain.scheduledDueAt, equals(DateTime.utc(2026, 11, 1, 10, 10, 0)));
       expect(resAgain.nextState.repetitions, equals(0));
       expect(resAgain.nextState.lapses, equals(1));
       expect((resAgain.newEaseFactor - 1.96).abs(), lessThan(1e-6));
@@ -193,7 +194,8 @@ void main() {
       );
 
       expect(res.nextState.state, equals(SrsItemState.relearning));
-      expect(res.nextState.intervalDays, equals(1));
+      expect(res.nextState.intervalDays, equals(0));
+      expect(res.scheduledDueAt, equals(DateTime.utc(2026, 6, 1).add(const Duration(minutes: 10))));
       expect(res.nextState.repetitions, equals(0));
       expect(res.nextState.lapses, equals(1));
       expect(res.newEaseFactor, equals(1.96)); // 2.5 - 0.54

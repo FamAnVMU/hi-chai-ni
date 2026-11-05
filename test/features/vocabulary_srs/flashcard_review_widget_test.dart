@@ -44,7 +44,7 @@ void main() {
       exampleVi: exampleVi,
       srsState: srs,
       estimatedIntervalDays: const {
-        SrsRating.again: 1,
+        SrsRating.again: 0,
         SrsRating.hard: 2,
         SrsRating.good: 4,
         SrsRating.easy: 8,

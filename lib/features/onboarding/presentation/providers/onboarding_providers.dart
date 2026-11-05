@@ -47,6 +47,8 @@ class PersonalizationData {
 class OnboardingState {
   final bool isLoading;
   final bool isCompleted;
+  final bool isSubmitting;
+  final String? errorMessage;
   final OnboardingStep currentStep;
   final bool hasSkippedAiSetup;
   final int? assessedHskLevel;
@@ -64,6 +66,8 @@ class OnboardingState {
   const OnboardingState({
     this.isLoading = false,
     this.isCompleted = false,
+    this.isSubmitting = false,
+    this.errorMessage,
     this.currentStep = OnboardingStep.aiSetup,
     this.hasSkippedAiSetup = false,
     this.assessedHskLevel,
@@ -82,6 +86,9 @@ class OnboardingState {
   OnboardingState copyWith({
     bool? isLoading,
     bool? isCompleted,
+    bool? isSubmitting,
+    String? errorMessage,
+    bool clearErrorMessage = false,
     OnboardingStep? currentStep,
     bool? hasSkippedAiSetup,
     int? assessedHskLevel,
@@ -99,6 +106,8 @@ class OnboardingState {
     return OnboardingState(
       isLoading: isLoading ?? this.isLoading,
       isCompleted: isCompleted ?? this.isCompleted,
+      isSubmitting: isSubmitting ?? this.isSubmitting,
+      errorMessage: clearErrorMessage ? null : (errorMessage ?? this.errorMessage),
       currentStep: currentStep ?? this.currentStep,
       hasSkippedAiSetup: hasSkippedAiSetup ?? this.hasSkippedAiSetup,
       assessedHskLevel: assessedHskLevel ?? this.assessedHskLevel,
@@ -283,7 +292,7 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
     } catch (_) {}
   }
 
-  Future<void> completePersonalization({
+  Future<bool> completePersonalization({
     required int dailyMinutes,
     required String focusSkill,
     String learningPurpose = 'dailyCommunication',
@@ -295,11 +304,11 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
     bool reminderEnabled = true,
     String reminderTime = '20:00',
   }) async {
-    if (!ref.mounted) return;
+    if (!ref.mounted) return false;
     state = state.copyWith(
-      isLoading: false,
-      isCompleted: true,
-      currentStep: OnboardingStep.completed,
+      isLoading: true,
+      isSubmitting: true,
+      clearErrorMessage: true,
       dailyMinutes: dailyMinutes,
       focusSkill: focusSkill,
       learningPurpose: learningPurpose,
@@ -443,7 +452,27 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
           );
         });
       }
-    } catch (_) {}
+
+      if (ref.mounted) {
+        state = state.copyWith(
+          isLoading: false,
+          isSubmitting: false,
+          isCompleted: true,
+          currentStep: OnboardingStep.completed,
+          clearErrorMessage: true,
+        );
+      }
+      return true;
+    } catch (e) {
+      if (ref.mounted) {
+        state = state.copyWith(
+          isLoading: false,
+          isSubmitting: false,
+          errorMessage: e.toString(),
+        );
+      }
+      return false;
+    }
   }
 
   Future<void> previousStep() async {
