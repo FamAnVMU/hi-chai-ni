@@ -25,15 +25,17 @@ class SrsDueCountNotifier extends AsyncNotifier<int> {
   }
 
   Future<void> refreshCount() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
+    try {
       final repo = ref.read(srsRepositoryProvider);
       final profile = ref.read(userProfileProvider).value;
-      return await repo.getDueCardsCount(
+      final count = await repo.getDueCardsCount(
         hskLevel: profile?.currentHskLevel,
         forceRefresh: true,
       );
-    });
+      state = AsyncValue.data(count);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
   }
 }
 
