@@ -162,7 +162,7 @@ class DefaultRoadmapRepository implements RoadmapRepository {
             unitId: catalogLesson?.unitId ?? 'unit_1',
             hskLevel: catalogLesson?.level ?? 1,
             status: LessonStatus.completed,
-            completionScore: (m['score'] as num?)?.toDouble() ?? 1.0,
+            completionScore: (m['score'] as num?)?.toDouble() ?? 0.8,
             completedAt: DateTime.tryParse(m['updated_at'] as String? ?? ''),
             updatedAt: DateTime.tryParse(m['updated_at'] as String? ?? '') ?? DateTime.now(),
           );
@@ -238,10 +238,11 @@ class DefaultRoadmapRepository implements RoadmapRepository {
 
     final canonicalId = await _identityRegistry.toCanonicalLessonId(lessonId);
     final nowUtc = DateTime.now().toUtc().toIso8601String();
-    final clampedScore = score.clamp(0.0, 1.0);
+    final clampedScore = (score.isNaN || score.isInfinite) ? 0.0 : score.clamp(0.0, 1.0);
+    final isPassed = clampedScore >= 0.8;
 
     await _db.transaction((txn) async {
-      // 1. Update lesson progress
+      // 1. Update lesson progress - only mark completed if passed (score >= 0.8)
       await txn.insert(
         DatabaseConstants.tableLessonProgress,
         {
@@ -249,11 +250,11 @@ class DefaultRoadmapRepository implements RoadmapRepository {
           'lesson_id': lessonId,
           'unit_id': lesson.unitId,
           'hsk_level': lesson.level,
-          'status': LessonStatus.completed.name,
+          'status': isPassed ? LessonStatus.completed.name : LessonStatus.inProgress.name,
           'completion_score': clampedScore,
-          'evidence_count': 1,
+          'evidence_count': isPassed ? 1 : 0,
           'started_at': nowUtc,
-          'completed_at': nowUtc,
+          'completed_at': isPassed ? nowUtc : null,
           'last_studied_at': nowUtc,
           'created_at': nowUtc,
           'updated_at': nowUtc,
@@ -261,41 +262,45 @@ class DefaultRoadmapRepository implements RoadmapRepository {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
 
-      // 2. Persist learner evidence
-      final evidenceId = 'ev_les_${DateTime.now().microsecondsSinceEpoch}';
-      await _evidenceDao.appendEvidence(
-        {
-          'id': evidenceId,
-          'content_id': lessonId,
-          'content_type': lesson.primarySkill.name,
-          'source': 'curriculum_lesson',
-          'score': clampedScore,
-          'duration_ms': lesson.estimatedMinutes * 60 * 1000,
-          'metadata_json': json.encode({
-            'lesson_title': lesson.title,
-            'unit_id': lesson.unitId,
-            'hsk_level': lesson.level,
-            'canonical_id': canonicalId,
-          }),
-          'created_at': nowUtc,
-        },
-        txn: txn,
-      );
+      // 2. Persist learner evidence only when valid empirical evidence exists
+      if (clampedScore > 0.0) {
+        final evidenceId = 'ev_les_${DateTime.now().microsecondsSinceEpoch}';
+        await _evidenceDao.appendEvidence(
+          {
+            'id': evidenceId,
+            'content_id': lessonId,
+            'content_type': lesson.primarySkill.name,
+            'source': 'curriculum_lesson',
+            'score': clampedScore,
+            'duration_ms': lesson.estimatedMinutes * 60 * 1000,
+            'metadata_json': json.encode({
+              'lesson_title': lesson.title,
+              'unit_id': lesson.unitId,
+              'hsk_level': lesson.level,
+              'canonical_id': canonicalId,
+            }),
+            'created_at': nowUtc,
+          },
+          txn: txn,
+        );
+      }
 
-      // 3. Log activity for daily streak
-      final activityId = 'act_les_${DateTime.now().microsecondsSinceEpoch}';
-      await _activityDao.logActivity(
-        {
-          'id': activityId,
-          'activity_type': 'lesson',
-          'duration_seconds': lesson.estimatedMinutes * 60,
-          'items_count': 1,
-          'activity_date': AppClock.todayLocalDateString(),
-          'created_at': nowUtc,
-          'timezone_offset_minutes': AppClock.currentOffset.inMinutes,
-        },
-        txn: txn,
-      );
+      // 3. Log activity for daily streak only if passed
+      if (isPassed) {
+        final activityId = 'act_les_${DateTime.now().microsecondsSinceEpoch}';
+        await _activityDao.logActivity(
+          {
+            'id': activityId,
+            'activity_type': 'lesson',
+            'duration_seconds': lesson.estimatedMinutes * 60,
+            'items_count': 1,
+            'activity_date': AppClock.todayLocalDateString(),
+            'created_at': nowUtc,
+            'timezone_offset_minutes': AppClock.currentOffset.inMinutes,
+          },
+          txn: txn,
+        );
+      }
     });
   }
 
@@ -304,11 +309,26 @@ class DefaultRoadmapRepository implements RoadmapRepository {
     final lesson = CurriculumCatalog.findLessonById(lessonId);
     if (lesson == null) return;
 
+    final canonicalId = await _identityRegistry.toCanonicalLessonId(lessonId);
     final nowUtc = DateTime.now().toUtc().toIso8601String();
+
+    final existingRows = await _db.query(
+      DatabaseConstants.tableLessonProgress,
+      where: 'lesson_id = ? OR lesson_id = ?',
+      whereArgs: [lessonId, canonicalId],
+      limit: 1,
+    );
+
+    final createdAt = existingRows.isNotEmpty
+        ? (existingRows.first['created_at'] as String? ?? nowUtc)
+        : nowUtc;
+
     await _db.insert(
       DatabaseConstants.tableLessonProgress,
       {
-        'id': 'prog_${lessonId}_${DateTime.now().millisecondsSinceEpoch}',
+        'id': existingRows.isNotEmpty
+            ? existingRows.first['id'] as String
+            : 'prog_${lessonId}_${DateTime.now().millisecondsSinceEpoch}',
         'lesson_id': lessonId,
         'unit_id': lesson.unitId,
         'hsk_level': lesson.level,
@@ -316,7 +336,7 @@ class DefaultRoadmapRepository implements RoadmapRepository {
         'completion_score': 0.0,
         'completed_at': null,
         'last_studied_at': nowUtc,
-        'created_at': nowUtc,
+        'created_at': createdAt,
         'updated_at': nowUtc,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,

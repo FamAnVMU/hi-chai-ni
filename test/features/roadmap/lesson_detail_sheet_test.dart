@@ -104,7 +104,7 @@ void main() {
       expect(find.text('Xác nhận hoàn thành bài học'), findsNothing);
     });
 
-    testWidgets('3. Tapping "Xác nhận hoàn thành bài học" calls onComplete exactly once and pops sheet', (tester) async {
+    testWidgets('3. Tapping "Xác nhận hoàn thành bài học" calls onComplete with 0.0 when unassessed and pops sheet', (tester) async {
       int completeCallCount = 0;
       double? receivedScore;
 
@@ -135,7 +135,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(completeCallCount, equals(1));
-      expect(receivedScore, equals(0.8)); // Default fallback score
+      expect(receivedScore, equals(0.0)); // Anti-cheating (BUG-NEW-005): Zero score when unassessed
       expect(find.text('Xác nhận hoàn thành bài học'), findsNothing); // Sheet popped
     });
 

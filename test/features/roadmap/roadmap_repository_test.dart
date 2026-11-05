@@ -123,7 +123,7 @@ void main() {
       expect(activityRows, isNotEmpty);
     });
 
-    test('5. skipLesson marks lesson as skipped in database', () async {
+    test('5. skipLesson marks lesson as skipped in database with 0.0 score and null completed_at', () async {
       const lessonId = 'LES_HSK1_03_GREETINGS';
 
       await repository.skipLesson(lessonId);
@@ -134,8 +134,45 @@ void main() {
       expect(progress, isNotNull);
       expect(progress!.status, LessonStatus.skipped);
       expect(progress.isCompleted, isFalse);
-      expect(progress.completionScore, equals(0.0));
+      expect(progress.completionScore, 0.0);
       expect(progress.completedAt, isNull);
+
+      // Verify direct database persistence (BUG-NEW-002)
+      final rows = await db.query(
+        DatabaseConstants.tableLessonProgress,
+        where: 'lesson_id = ?',
+        whereArgs: [lessonId],
+      );
+      expect(rows, isNotEmpty);
+      expect(rows.first['status'], 'skipped');
+      expect(rows.first['completion_score'], 0.0);
+      expect(rows.first['completed_at'], isNull);
+    });
+
+    test('5b. completeLesson with score < 0.8 leaves status as inProgress without marking completed', () async {
+      const lessonId = 'LES_HSK1_02_WRITING_BASICS';
+
+      await repository.startLesson(lessonId);
+      await repository.completeLesson(lessonId: lessonId, score: 0.0);
+
+      final progressMap = await repository.getLessonProgressMap();
+      final progress = progressMap[lessonId];
+
+      expect(progress, isNotNull);
+      expect(progress!.status, LessonStatus.inProgress);
+      expect(progress.isCompleted, isFalse);
+      expect(progress.completionScore, 0.0);
+      expect(progress.completedAt, isNull);
+
+      final rows = await db.query(
+        DatabaseConstants.tableLessonProgress,
+        where: 'lesson_id = ?',
+        whereArgs: [lessonId],
+      );
+      expect(rows, isNotEmpty);
+      expect(rows.first['status'], 'inProgress');
+      expect(rows.first['completion_score'], 0.0);
+      expect(rows.first['completed_at'], isNull);
     });
 
     test('6. getAdaptiveRoadmapState calculates and snapshots state to SQLite', () async {
