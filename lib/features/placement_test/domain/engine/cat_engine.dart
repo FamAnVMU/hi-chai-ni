@@ -32,25 +32,33 @@ class CatEngine {
     return discrimination * discrimination * p * (1.0 - p);
   }
 
-  CatItem? selectInitialItem(CatSkill skill, {double? targetTheta}) {
-    final available = itemBank.where((i) => i.skill == skill).toList();
-    if (available.isEmpty) return null;
+  CatItem? selectInitialItem(
+    CatSkill skill, {
+    double? targetTheta,
+    Set<String>? usedItemIds,
+  }) {
+    var available = itemBank.where((i) => i.skill == skill);
+    if (usedItemIds != null && usedItemIds.isNotEmpty) {
+      available = available.where((i) => !usedItemIds.contains(i.id));
+    }
+    final list = available.toList();
+    if (list.isEmpty) return null;
 
     if (targetTheta != null) {
-      available.sort((a, b) {
+      list.sort((a, b) {
         final diffA = (a.difficulty - targetTheta).abs();
         final diffB = (b.difficulty - targetTheta).abs();
         return diffA.compareTo(diffB);
       });
-      return available.first;
+      return list.first;
     }
 
-    for (final item in available) {
+    for (final item in list) {
       if (item.isCalibration && item.difficulty <= -1.0) {
         return item;
       }
     }
-    return available.first;
+    return list.first;
   }
 
   /// Selects the optimal next item in [currentSkill] that maximizes Fisher Information at [currentTheta].
@@ -137,6 +145,30 @@ class CatEngine {
     // Determine active blueprint based on session configuration
     final activeBlueprint = _resolveBlueprint(currentState);
 
+    // Hard ceiling: Maximum total items reached (fatigue control on mobile)
+    if (updatedResponses.length >= activeBlueprint.maxTotalItems) {
+      final finalResult = generateAssessmentResult(
+        sessionId: currentState.sessionId,
+        overallTheta: newTheta,
+        overallStandardError: newSe,
+        responses: updatedResponses,
+        completedAt: DateTime.now().toUtc(),
+        blueprintVersion: activeBlueprint.version,
+      );
+
+      return currentState.copyWith(
+        status: 'completed',
+        isCompleted: true,
+        stepIndex: currentState.stepIndex + 1,
+        currentTheta: newTheta,
+        currentStandardError: newSe,
+        responses: updatedResponses,
+        skillItemCounts: updatedSkillCounts,
+        clearActiveItem: true,
+        result: finalResult,
+      );
+    }
+
     // 4. Evaluate stopping rule for current skill
     final shouldStopCurrentSkill = isSkipped || _evaluateSkillStopRule(
       currentSkill: currentSkill,
@@ -146,86 +178,18 @@ class CatEngine {
       blueprint: activeBlueprint,
     );
 
-    if (shouldStopCurrentSkill) {
-      // Find next skill in sequence
-      final nextSkill = _findNextSkill(currentSkill, blueprint: activeBlueprint);
-
-      if (nextSkill == null || updatedResponses.length >= activeBlueprint.maxTotalItems) {
-        // Complete test!
-        final finalResult = generateAssessmentResult(
-          sessionId: currentState.sessionId,
-          overallTheta: newTheta,
-          overallStandardError: newSe,
-          responses: updatedResponses,
-          completedAt: DateTime.now().toUtc(),
-          blueprintVersion: activeBlueprint.version,
-        );
-
-        return currentState.copyWith(
-          status: 'completed',
-          isCompleted: true,
-          currentTheta: newTheta,
-          currentStandardError: newSe,
-          responses: updatedResponses,
-          skillItemCounts: updatedSkillCounts,
-          clearActiveItem: true,
-          result: finalResult,
-        );
-      } else {
-        // Advance to next skill
-        final nextItem = selectInitialItem(nextSkill, targetTheta: newTheta);
-        return currentState.copyWith(
-          currentSkill: nextSkill,
-          activeItem: nextItem,
-          stepIndex: currentState.stepIndex + 1,
-          currentTheta: newTheta,
-          currentStandardError: newSe,
-          responses: updatedResponses,
-          skillItemCounts: updatedSkillCounts,
-        );
-      }
-    } else {
-      // Continue within same skill
-      final nextItem = selectNextItem(
+    // Try selecting next item within current skill if stop rule not met
+    CatItem? nextItem;
+    if (!shouldStopCurrentSkill) {
+      nextItem = selectNextItem(
         currentSkill: currentSkill,
         currentTheta: newTheta,
         usedItemIds: usedItemIds,
       );
+    }
 
-      if (nextItem == null) {
-        // Skill items exhausted early -> advance to next skill
-        final nextSkill = _findNextSkill(currentSkill, blueprint: activeBlueprint);
-        if (nextSkill == null || updatedResponses.length >= activeBlueprint.minTotalItems) {
-          final finalResult = generateAssessmentResult(
-            sessionId: currentState.sessionId,
-            overallTheta: newTheta,
-            overallStandardError: newSe,
-            responses: updatedResponses,
-            completedAt: DateTime.now().toUtc(),
-            blueprintVersion: activeBlueprint.version,
-          );
-          return currentState.copyWith(
-            status: 'completed',
-            isCompleted: true,
-            currentTheta: newTheta,
-            currentStandardError: newSe,
-            responses: updatedResponses,
-            skillItemCounts: updatedSkillCounts,
-            clearActiveItem: true,
-            result: finalResult,
-          );
-        }
-        return currentState.copyWith(
-          currentSkill: nextSkill,
-          activeItem: selectInitialItem(nextSkill, targetTheta: newTheta),
-          stepIndex: currentState.stepIndex + 1,
-          currentTheta: newTheta,
-          currentStandardError: newSe,
-          responses: updatedResponses,
-          skillItemCounts: updatedSkillCounts,
-        );
-      }
-
+    if (nextItem != null) {
+      // Continue within same skill
       return currentState.copyWith(
         activeItem: nextItem,
         stepIndex: currentState.stepIndex + 1,
@@ -235,6 +199,60 @@ class CatEngine {
         skillItemCounts: updatedSkillCounts,
       );
     }
+
+    // Either stop rule met OR current skill items exhausted: advance to next skill in sequence
+    CatSkill? nextSkill = currentSkill;
+    CatItem? initialItem;
+
+    while (true) {
+      nextSkill = _findNextSkill(nextSkill!, blueprint: activeBlueprint);
+      if (nextSkill == null) {
+        break; // Reached end of blueprint skill sequence
+      }
+      initialItem = selectInitialItem(
+        nextSkill,
+        targetTheta: newTheta,
+        usedItemIds: usedItemIds,
+      );
+      if (initialItem != null) {
+        break; // Found next skill with available unadministered items
+      }
+    }
+
+    if (nextSkill == null || initialItem == null) {
+      // No further skills available to evaluate -> complete test!
+      final finalResult = generateAssessmentResult(
+        sessionId: currentState.sessionId,
+        overallTheta: newTheta,
+        overallStandardError: newSe,
+        responses: updatedResponses,
+        completedAt: DateTime.now().toUtc(),
+        blueprintVersion: activeBlueprint.version,
+      );
+
+      return currentState.copyWith(
+        status: 'completed',
+        isCompleted: true,
+        stepIndex: currentState.stepIndex + 1,
+        currentTheta: newTheta,
+        currentStandardError: newSe,
+        responses: updatedResponses,
+        skillItemCounts: updatedSkillCounts,
+        clearActiveItem: true,
+        result: finalResult,
+      );
+    }
+
+    // Advance to next skill
+    return currentState.copyWith(
+      currentSkill: nextSkill,
+      activeItem: initialItem,
+      stepIndex: currentState.stepIndex + 1,
+      currentTheta: newTheta,
+      currentStandardError: newSe,
+      responses: updatedResponses,
+      skillItemCounts: updatedSkillCounts,
+    );
   }
 
   CatBlueprint _resolveBlueprint(CatSessionState state) {

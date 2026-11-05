@@ -17,8 +17,8 @@ final homeRepositoryProvider = Provider<HomeRepository>((ref) {
 class HomeDashboardNotifier extends AsyncNotifier<HomeDashboardData> {
   @override
   Future<HomeDashboardData> build() async {
-    // Re-evaluate if srsDueCount changes or profile changes
-    ref.watch(srsDueCountProvider);
+    // Re-evaluate only when the numeric due count value changes
+    ref.watch(srsDueCountProvider.select((val) => val.value));
     final profileAsync = ref.watch(userProfileProvider);
     final profile = profileAsync.value;
 
