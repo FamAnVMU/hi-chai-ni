@@ -1,9 +1,11 @@
+import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../../../core/database/dao/dictionary_history_dao.dart';
 import '../../../../core/database/dao/user_saved_words_dao.dart';
 import '../../../../core/database/dao/vocabulary_dao.dart';
 import '../domain/models/dictionary_models.dart';
 import '../domain/utils/pinyin_helper.dart';
+import 'offline_dictionary_loader.dart';
 
 abstract class DictionaryRepository {
   Future<List<DictionaryEntry>> search(String query, {int limit = 30});
@@ -15,6 +17,13 @@ abstract class DictionaryRepository {
   Future<List<DictionaryHistoryItem>> getRecentSearches({int limit = 20});
   Future<void> clearSearchHistory();
   Future<String> explainWordWithAi(String word, {String? contextSentence});
+  Future<int> ensureDictionarySeedLoaded({
+    String? assetPath,
+    AssetBundle? bundle,
+    String? filePath,
+    String? jsonString,
+    void Function(int processed, int total)? onProgress,
+  });
   Database? get database => null;
 }
 
@@ -23,6 +32,7 @@ class DefaultDictionaryRepository implements DictionaryRepository {
   late final VocabularyDao _vocabDao;
   late final UserSavedWordsDao _savedWordsDao;
   late final DictionaryHistoryDao _historyDao;
+  late final OfflineDictionaryLoader _dictLoader;
 
   @override
   Database? get database => _db;
@@ -31,6 +41,24 @@ class DefaultDictionaryRepository implements DictionaryRepository {
     _vocabDao = VocabularyDao(_db);
     _savedWordsDao = UserSavedWordsDao(_db);
     _historyDao = DictionaryHistoryDao(_db);
+    _dictLoader = OfflineDictionaryLoader(_db);
+  }
+
+  @override
+  Future<int> ensureDictionarySeedLoaded({
+    String? assetPath,
+    AssetBundle? bundle,
+    String? filePath,
+    String? jsonString,
+    void Function(int processed, int total)? onProgress,
+  }) async {
+    return _dictLoader.ensureSeedLoaded(
+      assetPath: assetPath ?? 'assets/data/offline_dictionary_entries.json',
+      bundle: bundle,
+      filePath: filePath,
+      jsonString: jsonString,
+      onProgress: onProgress,
+    );
   }
 
   @override
@@ -45,7 +73,6 @@ class DefaultDictionaryRepository implements DictionaryRepository {
       normalizedPinyin: normalized != trimmed.toLowerCase() ? normalized : null,
     );
 
-    // Record search in history asynchronously
     final historyId = 'hist_${DateTime.now().microsecondsSinceEpoch}';
     final searchType = PinyinHelper.containsChinese(trimmed)
         ? 'hanzi'
@@ -79,12 +106,16 @@ class DefaultDictionaryRepository implements DictionaryRepository {
       ));
     }
 
-    // Fallback: If no core HSK word matched and limit permits, search 122k general offline dictionary
     if (entries.length < limit) {
       final dictRows = await _vocabDao.searchDictionaryEntries(trimmed, limit: limit - entries.length);
+      final dictIds = dictRows.map((d) => 'dict_${d['id'] ?? d['simplified']}').toList();
+      final dictSavedMap = await _savedWordsDao.getSavedWordsByIds(dictIds);
+
       for (final d in dictRows) {
         final dId = 'dict_${d['id'] ?? d['simplified']}';
         if (entries.any((e) => e.simplified == d['simplified'])) continue;
+
+        final savedData = dictSavedMap[dId];
 
         entries.add(DictionaryEntry(
           id: dId,
@@ -95,13 +126,15 @@ class DefaultDictionaryRepository implements DictionaryRepository {
           hanviet: d['hanviet'] as String?,
           hskLevel: (d['hsk_level'] as num?)?.toInt() ?? 0,
           source: d['source'] as String? ?? 'CVDICT',
+          isSaved: savedData != null && (savedData['is_favorite'] == 1),
+          customNote: savedData?['custom_note'] as String?,
           senses: [
             DictionarySense(
               id: 'sns_$dId',
               partOfSpeech: 'từ vựng',
               meaningVi: d['meaning_vi'] as String? ?? '',
               meaningEn: d['meaning_en'] as String?,
-              source: 'CVDICT',
+              source: d['source'] as String? ?? 'CVDICT',
             )
           ],
         ));
@@ -114,20 +147,48 @@ class DefaultDictionaryRepository implements DictionaryRepository {
   @override
   Future<DictionaryEntry?> getWordById(String id) async {
     final row = await _vocabDao.getVocabularyById(id);
-    if (row == null) return null;
+    if (row != null) {
+      final rawSenses = await _vocabDao.getSensesByVocabularyId(id);
+      final senses = rawSenses.map((s) => DictionarySense.fromMap(s)).toList();
+      final rawExamples = await _vocabDao.getExamplesByVocabularyId(id);
+      final examples = rawExamples.map((e) => DictionaryExample.fromMap(e)).toList();
+      final savedData = await _savedWordsDao.getSavedWord(id);
 
-    final rawSenses = await _vocabDao.getSensesByVocabularyId(id);
-    final senses = rawSenses.map((s) => DictionarySense.fromMap(s)).toList();
-    final rawExamples = await _vocabDao.getExamplesByVocabularyId(id);
-    final examples = rawExamples.map((e) => DictionaryExample.fromMap(e)).toList();
-    final savedData = await _savedWordsDao.getSavedWord(id);
+      return DictionaryEntry.fromMap(
+        row,
+        senses: senses,
+        examples: examples,
+        isSaved: savedData != null && (savedData['is_favorite'] == 1),
+        customNote: savedData?['custom_note'] as String?,
+      );
+    }
 
-    return DictionaryEntry.fromMap(
-      row,
-      senses: senses,
-      examples: examples,
+    final dictRow = await _vocabDao.getDictionaryEntryById(id);
+    if (dictRow == null) return null;
+
+    final dId = 'dict_${dictRow['id'] ?? dictRow['simplified']}';
+    final savedData = await _savedWordsDao.getSavedWord(dId) ?? await _savedWordsDao.getSavedWord(id);
+
+    return DictionaryEntry(
+      id: dId,
+      simplified: dictRow['simplified'] as String,
+      traditional: dictRow['traditional'] as String?,
+      pinyin: dictRow['pinyin'] as String,
+      pinyinClean: dictRow['pinyin_clean'] as String?,
+      hanviet: dictRow['hanviet'] as String?,
+      hskLevel: (dictRow['hsk_level'] as num?)?.toInt() ?? 0,
+      source: dictRow['source'] as String? ?? 'CVDICT',
       isSaved: savedData != null && (savedData['is_favorite'] == 1),
       customNote: savedData?['custom_note'] as String?,
+      senses: [
+        DictionarySense(
+          id: 'sns_$dId',
+          partOfSpeech: 'từ vựng',
+          meaningVi: dictRow['meaning_vi'] as String? ?? '',
+          meaningEn: dictRow['meaning_en'] as String?,
+          source: dictRow['source'] as String? ?? 'CVDICT',
+        )
+      ],
     );
   }
 
@@ -139,8 +200,17 @@ class DefaultDictionaryRepository implements DictionaryRepository {
       (r) => (r['simplified'] == trimmed || r['traditional'] == trimmed),
     );
 
-    if (match.isEmpty) return null;
-    return getWordById(match.first['id'] as String);
+    if (match.isNotEmpty) {
+      return getWordById(match.first['id'] as String);
+    }
+
+    final dictRow = await _vocabDao.getDictionaryEntryByHanzi(trimmed);
+    if (dictRow != null) {
+      final dId = 'dict_${dictRow['id'] ?? dictRow['simplified']}';
+      return getWordById(dId);
+    }
+
+    return null;
   }
 
   @override
@@ -150,6 +220,13 @@ class DefaultDictionaryRepository implements DictionaryRepository {
       await _savedWordsDao.removeSavedWord(entry.id);
       return false;
     } else {
+      final existsInVocab = await _vocabDao.getVocabularyById(entry.id);
+      if (existsInVocab == null) {
+        await _vocabDao.insertMinimalVocabularyFromDictionary(
+          VocabularyMinimal.fromDictionaryEntry(entry),
+        );
+      }
+
       final saveId = 'save_${entry.id}_${DateTime.now().millisecondsSinceEpoch}';
       await _savedWordsDao.saveWord(
         id: saveId,

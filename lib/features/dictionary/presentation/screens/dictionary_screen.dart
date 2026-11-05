@@ -48,6 +48,10 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
     });
 
     _loadHistory();
+    _repository.ensureDictionarySeedLoaded().catchError((e) {
+      debugPrint('[DictionaryScreen] Offline dictionary preload error: $e');
+      return 0;
+    });
   }
 
   Timer? _debounceTimer;

@@ -242,4 +242,61 @@ class LessonSegment {
       contentPayload: payload,
     );
   }
+
+  List<GrammarPoint> get grammarPoints {
+    final rawPoints = (contentPayload?['points'] as List<dynamic>?) ??
+        (contentPayload?['grammar_points'] as List<dynamic>?) ??
+        [];
+    return rawPoints
+        .whereType<Map<String, dynamic>>()
+        .map((m) => GrammarPoint.fromMap(m))
+        .toList();
+  }
+}
+
+class GrammarPoint {
+  final String title;
+  final String structure;
+  final String explanation;
+  final List<Map<String, dynamic>> examples;
+  final String? positiveExample;
+  final String? contrastiveExample;
+
+  const GrammarPoint({
+    required this.title,
+    required this.structure,
+    required this.explanation,
+    this.examples = const [],
+    this.positiveExample,
+    this.contrastiveExample,
+  });
+
+  factory GrammarPoint.fromMap(Map<String, dynamic> map) {
+    final rawExamples = (map['examples'] as List<dynamic>?) ?? [];
+    final examplesList = rawExamples
+        .whereType<Map<String, dynamic>>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
+
+    final pos = (map['positive_example'] ?? map['positiveExample']) as String?;
+    final con = (map['contrastive_example'] ?? map['contrastiveExample']) as String?;
+
+    return GrammarPoint(
+      title: (map['title'] ?? '') as String,
+      structure: (map['structure'] ?? '') as String,
+      explanation: (map['explanation'] ?? map['explanation_vi'] ?? '') as String,
+      examples: examplesList,
+      positiveExample: pos,
+      contrastiveExample: con,
+    );
+  }
+
+  Map<String, dynamic> toMap() => {
+        'title': title,
+        'structure': structure,
+        'explanation': explanation,
+        if (examples.isNotEmpty) 'examples': examples,
+        if (positiveExample != null) 'positive_example': positiveExample,
+        if (contrastiveExample != null) 'contrastive_example': contrastiveExample,
+      };
 }

@@ -44,12 +44,13 @@ class LessonGrammarView extends StatelessWidget {
       itemCount: points.length,
       separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.md),
       itemBuilder: (context, index) {
-        final p = points[index];
-        final title = (p['title'] ?? '') as String;
-        final structure = (p['structure'] ?? '') as String;
-        final explanation = (p['explanation'] ?? p['explanation_vi'] ?? '') as String;
-        final rawExamples = (p['examples'] as List<dynamic>?) ?? [];
-        final examples = rawExamples.map((e) => e as Map<String, dynamic>).toList();
+        final point = GrammarPoint.fromMap(points[index]);
+        final title = point.title;
+        final structure = point.structure;
+        final explanation = point.explanation;
+        final examples = point.examples;
+        final positiveExample = point.positiveExample ?? '';
+        final contrastiveExample = point.contrastiveExample ?? '';
 
         return HiCard(
           backgroundColor: AppColors.cardBackground,
@@ -161,6 +162,91 @@ class LessonGrammarView extends StatelessWidget {
                     ),
                   );
                 }),
+              ],
+              if (positiveExample.isNotEmpty || contrastiveExample.isNotEmpty) ...[
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: Divider(color: AppColors.divider),
+                ),
+                if (positiveExample.isNotEmpty) ...[
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.successContainerLight,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.success.withAlpha(80)),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.check_circle_outline, size: 18, color: AppColors.success),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Ví dụ đúng:',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.success,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                positiveExample,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryText,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                if (contrastiveExample.isNotEmpty) ...[
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.warningContainerLight,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.warning.withAlpha(80)),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.info_outline, size: 18, color: AppColors.warning),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Lưu ý / Phản ví dụ:',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.warning,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                contrastiveExample,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: AppColors.primaryText,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ],
               const SizedBox(height: AppSpacing.sm),
               Align(

@@ -1,4 +1,5 @@
 import 'package:sqflite/sqflite.dart';
+import '../../../features/dictionary/domain/models/dictionary_models.dart';
 import '../../../features/dictionary/domain/utils/pinyin_helper.dart';
 import '../database_constants.dart';
 
@@ -353,6 +354,178 @@ class VocabularyDao {
       }
     } catch (_) {
       return [];
+    }
+  }
+
+  Future<int> countDictionaryEntries() async {
+    try {
+      final res = await _db.rawQuery(
+        'SELECT COUNT(*) as count FROM ${DatabaseConstants.tableDictionaryEntries}',
+      );
+      return Sqflite.firstIntValue(res) ?? 0;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getDictionaryEntryById(String id) async {
+    try {
+      final cleanId = id.startsWith('dict_') ? id.substring(5) : id;
+      final results = await _db.query(
+        DatabaseConstants.tableDictionaryEntries,
+        where: 'id = ? OR id = ? OR simplified = ?',
+        whereArgs: [id, cleanId, cleanId],
+        limit: 1,
+      );
+      return results.isNotEmpty ? results.first : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getDictionaryEntryByHanzi(String hanzi) async {
+    final trimmed = hanzi.trim();
+    if (trimmed.isEmpty) return null;
+    try {
+      final results = await _db.query(
+        DatabaseConstants.tableDictionaryEntries,
+        where: 'simplified = ? OR traditional = ?',
+        whereArgs: [trimmed, trimmed],
+        limit: 1,
+      );
+      return results.isNotEmpty ? results.first : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> insertMinimalVocabularyFromDictionary(
+    dynamic item, {
+    Transaction? txn,
+  }) async {
+    final executor = txn ?? _db;
+    final now = DateTime.now().toUtc().toIso8601String();
+
+    String id;
+    String simplified;
+    String traditional;
+    String pinyin;
+    String cleanPinyin;
+    int hskLevel;
+    String? source;
+    String? meaningVi;
+    List<DictionarySense>? senses;
+
+    if (item is VocabularyMinimal) {
+      id = item.id;
+      simplified = item.hanzi;
+      traditional = item.hanzi;
+      pinyin = item.pinyin;
+      cleanPinyin = item.pinyinClean ??
+          PinyinHelper.removeTones(item.pinyin).toLowerCase().replaceAll(RegExp(r'\s+'), '');
+      hskLevel = item.hskLevel;
+      source = item.source ?? 'CVDICT';
+      meaningVi = item.meaningVi;
+    } else if (item is DictionaryEntry) {
+      id = item.id;
+      simplified = item.simplified;
+      traditional = item.traditional ?? item.simplified;
+      pinyin = item.pinyin;
+      cleanPinyin = item.pinyinClean ??
+          PinyinHelper.removeTones(item.pinyin).toLowerCase().replaceAll(RegExp(r'\s+'), '');
+      hskLevel = item.hskLevel;
+      source = item.source ?? 'CVDICT';
+      meaningVi = item.senses.isNotEmpty ? item.senses.first.meaningVi : null;
+      senses = item.senses;
+    } else if (item is Map<String, dynamic>) {
+      id = item['id'] as String;
+      simplified = (item['hanzi'] ?? item['simplified']) as String;
+      traditional = (item['traditional'] ?? simplified) as String;
+      pinyin = (item['pinyin'] ?? '') as String;
+      cleanPinyin = (item['pinyin_clean'] ??
+          PinyinHelper.removeTones(pinyin).toLowerCase().replaceAll(RegExp(r'\s+'), '')) as String;
+      hskLevel = (item['hsk_level'] as num?)?.toInt() ?? 0;
+      source = (item['source'] ?? 'CVDICT') as String?;
+      meaningVi = item['meaning_vi'] as String?;
+    } else {
+      throw ArgumentError('Unsupported item type: ${item.runtimeType}');
+    }
+
+    await executor.rawInsert('''
+      INSERT OR REPLACE INTO ${DatabaseConstants.tableVocabularies} (
+        id, simplified, traditional, pinyin, pinyin_clean, hanviet, hsk_level,
+        stroke_count, radicals, frequency_rank, source, license,
+        verification_status, is_polyphone, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', [
+      id,
+      simplified,
+      traditional,
+      pinyin,
+      cleanPinyin,
+      null,
+      hskLevel,
+      null,
+      null,
+      null,
+      source ?? 'CVDICT',
+      'CC BY-SA 4.0',
+      'verified',
+      0,
+      now,
+      now,
+    ]);
+
+    if (senses != null && senses.isNotEmpty) {
+      for (final s in senses) {
+        await executor.rawInsert('''
+          INSERT OR REPLACE INTO ${DatabaseConstants.tableVocabularySenses} (
+            id, vocabulary_id, part_of_speech, meaning_vi, meaning_en,
+            example_cn, example_pinyin, example_vi, source, order_index, created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', [
+          s.id,
+          id,
+          s.partOfSpeech,
+          s.meaningVi,
+          s.meaningEn,
+          s.exampleCn,
+          s.examplePinyin,
+          s.exampleVi,
+          s.source ?? 'CVDICT',
+          s.orderIndex,
+          now,
+          now,
+        ]);
+      }
+    } else if (meaningVi != null && meaningVi.isNotEmpty) {
+      await executor.rawInsert('''
+        INSERT OR REPLACE INTO ${DatabaseConstants.tableVocabularySenses} (
+          id, vocabulary_id, part_of_speech, meaning_vi, meaning_en,
+          example_cn, example_pinyin, example_vi, source, order_index, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ''', [
+        'sns_$id',
+        id,
+        'từ vựng',
+        meaningVi,
+        null,
+        null,
+        null,
+        null,
+        source ?? 'CVDICT',
+        1,
+        now,
+        now,
+      ]);
+    }
+  }
+
+  Future<int> clearDictionaryEntries() async {
+    try {
+      return await _db.delete(DatabaseConstants.tableDictionaryEntries);
+    } catch (_) {
+      return 0;
     }
   }
 

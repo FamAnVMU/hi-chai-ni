@@ -324,3 +324,35 @@ class DictionaryHistoryItem {
         'created_at': createdAt.toUtc().toIso8601String(),
       };
 }
+
+class VocabularyMinimal {
+  final String id;
+  final String hanzi;
+  final String pinyin;
+  final String? pinyinClean;
+  final String? meaningVi;
+  final int hskLevel;
+  final String? source;
+
+  const VocabularyMinimal({
+    required this.id,
+    required this.hanzi,
+    required this.pinyin,
+    this.pinyinClean,
+    this.meaningVi,
+    this.hskLevel = 0,
+    this.source = 'CVDICT',
+  });
+
+  factory VocabularyMinimal.fromDictionaryEntry(DictionaryEntry entry) {
+    return VocabularyMinimal(
+      id: entry.id,
+      hanzi: entry.simplified,
+      pinyin: entry.pinyin,
+      pinyinClean: entry.pinyinClean,
+      meaningVi: entry.senses.isNotEmpty ? entry.senses.first.meaningVi : null,
+      hskLevel: entry.hskLevel,
+      source: entry.source ?? 'CVDICT',
+    );
+  }
+}
