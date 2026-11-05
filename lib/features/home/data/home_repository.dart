@@ -417,6 +417,9 @@ class HomeRepository {
     // 8. Daily target minutes from profile or fallback
     final goalMinutes = dailyGoalMinutes ?? await _getDailyGoalMinutes();
 
+    // 9. Query actual completed lessons (excluding placement test credits)
+    final hasCompleted = await hasCompletedLessons();
+
     return HomeDashboardData(
       learnerName: resolvedName,
       greeting: greeting,
@@ -427,7 +430,24 @@ class HomeRepository {
       dailyGoalWords: dailyGoalWords,
       dailyGoalMinutes: goalMinutes,
       studyStats: sessionData.stats,
+      hasCompletedLessons: hasCompleted,
     );
+  }
+
+  /// Checks if the learner has actually completed at least one lesson
+  /// (excluding auto-credits from placement tests).
+  Future<bool> hasCompletedLessons() async {
+    try {
+      final res = await _db.rawQuery('''
+        SELECT COUNT(*) as cnt FROM ${DatabaseConstants.tableCurriculumLessons}
+        WHERE status = 'completed'
+        AND (credited_reason IS NULL OR credited_reason != 'credited_by_placement_test')
+      ''');
+      final cnt = res.isNotEmpty ? (res.first['cnt'] as int? ?? 0) : 0;
+      return cnt > 0;
+    } catch (_) {
+      return false;
+    }
   }
 
   /// Calculates the learner's continuous streak and today's activity stats from SQLite.

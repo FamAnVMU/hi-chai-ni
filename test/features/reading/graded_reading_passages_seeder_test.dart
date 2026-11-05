@@ -76,7 +76,7 @@ void main() {
         final level = item['hsk_level'] as int;
         levelCounts[level] = (levelCounts[level] ?? 0) + 1;
 
-        expect(item['id'], startsWith('RDG_C3_'));
+        expect(item['id'], startsWith('RDG_'));
         expect((item['title_cn'] as String).isNotEmpty, isTrue);
         expect((item['content_cn'] as String).isNotEmpty, isTrue);
         expect((item['pinyin'] as String).isNotEmpty, isTrue);
@@ -88,9 +88,9 @@ void main() {
         for (final q in questions) {
           expect((q['question'] as String).isNotEmpty, isTrue);
           final options = q['options'] as List<dynamic>;
-          expect(options.length, equals(4));
+          expect(options.length, inInclusiveRange(2, 4));
           final answer = q['answer'] as int;
-          expect(answer, inInclusiveRange(0, 3));
+          expect(answer, inInclusiveRange(0, options.length - 1));
           expect((q['citationText'] as String).isNotEmpty, isTrue);
           expect((q['explanationVi'] as String).isNotEmpty, isTrue);
         }

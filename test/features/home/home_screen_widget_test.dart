@@ -9,6 +9,7 @@ import 'package:hi_chinese/features/home/domain/models/learning_streak.dart';
 import 'package:hi_chinese/features/home/presentation/providers/home_providers.dart';
 import 'package:hi_chinese/features/home/presentation/screens/home_screen.dart';
 import 'package:hi_chinese/features/home/presentation/widgets/home_skeleton_loading.dart';
+import 'package:hi_chinese/features/home/presentation/widgets/home_srs_due_card.dart';
 
 void main() {
   Widget buildTestWidget({
@@ -89,13 +90,12 @@ void main() {
       expect(find.text('Bắt đầu chuỗi học tập mới 🌱'), findsOneWidget);
       expect(find.text('Mỗi ngày học một chút để hình thành phản xạ tiếng Trung tự nhiên.'), findsOneWidget);
 
-      // SRS card empty
-      expect(find.text('Đã hoàn thành'), findsOneWidget);
-      expect(find.text('Xem lại thẻ đã học'), findsOneWidget);
+      // SRS card should NOT be displayed when user has not completed any lessons yet
+      expect(find.byType(HomeSrsDueCard), findsNothing);
 
-      // Roadmap progress
-      expect(find.textContaining('0%'), findsOneWidget);
-      expect(find.text('Bắt đầu bài học đầu tiên'), findsOneWidget);
+      // Lesson access card
+      expect(find.text('Tiếp tục bài học'), findsOneWidget);
+      expect(find.text('Bắt đầu Bài 1 – HSK 1'), findsOneWidget);
 
       // Recent activities empty state
       expect(find.text('Chưa có hoạt động học nào'), findsOneWidget);
@@ -136,6 +136,7 @@ void main() {
         ],
         dailyGoalWords: 15,
         dailyGoalMinutes: 15,
+        hasCompletedLessons: true,
       );
 
       await tester.pumpWidget(
@@ -164,6 +165,11 @@ void main() {
     });
 
     testWidgets('5. Tapping SRS review CTA navigates to Review tab', (tester) async {
+      tester.view.physicalSize = const Size(800, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
       final activeData = HomeDashboardData(
         learnerName: 'Học viên',
         greeting: 'Chào bạn!',
@@ -175,6 +181,7 @@ void main() {
         srsDueCount: 8,
         roadmap: RoadmapProgress.initial(),
         recentActivities: const [],
+        hasCompletedLessons: true,
       );
 
       AppTab? selectedTab;
@@ -208,7 +215,20 @@ void main() {
     });
 
     testWidgets('6. Quick Actions Grid navigates to Learning, Review, AI Tutor, and opens Dictionary', (tester) async {
-      final activeData = HomeDashboardData.empty();
+      tester.view.physicalSize = const Size(800, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final activeData = HomeDashboardData(
+        learnerName: 'Học viên',
+        greeting: 'Chào bạn!',
+        streak: LearningStreak.empty(),
+        srsDueCount: 5,
+        roadmap: RoadmapProgress.initial(),
+        recentActivities: const [],
+        hasCompletedLessons: true,
+      );
       final container = ProviderContainer(
         overrides: [
           homeDashboardProvider.overrideWith(
@@ -273,6 +293,7 @@ void main() {
           nextLessonSnippet: '这[zhè]个[ge]多[duō]少[shao]钱[qián]？',
         ),
         recentActivities: const [],
+        hasCompletedLessons: true,
       );
 
       await tester.pumpWidget(

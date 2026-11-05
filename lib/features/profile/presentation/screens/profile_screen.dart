@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:permission_handler/permission_handler.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/app_info_provider.dart';
 import '../../../../core/database/database_constants.dart';
 import '../../../../core/theme/theme.dart';
-import '../../../../core/utils/permission_helper.dart';
-import '../../../design_system/presentation/screens/design_system_demo_screen.dart';
 import '../../../roadmap/domain/models/roadmap_models.dart';
-import '../../../settings/presentation/screens/ai_settings_screen.dart';
 import '../../../settings/presentation/providers/settings_providers.dart';
-import '../../../settings/presentation/widgets/data_management_sheet.dart';
+import '../../../settings/presentation/screens/settings_screen.dart';
 import '../../../settings/presentation/widgets/about_and_privacy_dialog.dart';
 import '../../../settings/domain/models/app_settings.dart';
 import '../providers/profile_providers.dart';
@@ -50,23 +46,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with AutomaticKee
     }
   }
 
-  Future<void> _checkOrRequestMic() async {
-    final result = await PermissionHelper.requestMicrophoneWithRationale(
-      context,
-      featureName: 'Luyện phát âm & Hội thoại cùng AI Tutor',
-    );
-    ref.invalidate(microphoneStatusProvider);
-    if (mounted) {
-      if (result == AudioPermissionResult.granted) {
-        HiSnackBar.showSuccess(context, 'Quyền Micro: Đã được cấp phép!');
-      } else if (result == AudioPermissionResult.permanentlyDenied) {
-        HiSnackBar.showWarning(context, 'Quyền Micro bị từ chối vĩnh viễn. Vui lòng bật trong Cài đặt hệ thống.');
-      } else {
-        HiSnackBar.showWarning(context, 'Quyền Micro chưa được cấp phép.');
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -76,11 +55,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with AutomaticKee
     final profileAsync = ref.watch(userProfileProvider);
     final goalHistoryAsync = ref.watch(goalHistoryProvider);
     final settings = ref.watch(appSettingsProvider);
-    final micStatusAsync = ref.watch(microphoneStatusProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cá Nhân & Cài Đặt'),
+        title: const Text('Cá Nhân'),
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline_rounded),
@@ -376,132 +354,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with AutomaticKee
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            // ==================== 3. CÀI ĐẶT ÂM THANH & MICROPHONE ====================
-            Text(
-              'Âm Thanh & Giọng Đọc',
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: theme.colorScheme.primary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            HiCard(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Tốc độ phát âm:', style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-                  const SizedBox(height: AppSpacing.xs),
-                  Wrap(
-                    spacing: AppSpacing.xs,
-                    children: SpeechRateOption.values.map((opt) {
-                      final isSelected = (settings.speechRate - opt.rate).abs() < 0.05;
-                      return ChoiceChip(
-                        label: Text(opt.labelVi),
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          if (selected) {
-                            ref.read(appSettingsProvider.notifier).setSpeechRate(opt.rate);
-                          }
-                        },
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: const Text('Tự động phát âm thanh'),
-                    subtitle: const Text('Tự phát audio khi lật thẻ SRS hoặc tra từ'),
-                    value: settings.autoPlayAudio,
-                    onChanged: (val) {
-                      ref.read(appSettingsProvider.notifier).toggleAutoPlayAudio(val);
-                    },
-                  ),
-
-                  const Divider(height: AppSpacing.md),
-
-                  // Quản lý quyền Micro
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.mic_rounded, color: AppColors.primaryBlueDark),
-                    title: const Text('Quyền truy cập Micro'),
-                    subtitle: micStatusAsync.when(
-                      loading: () => const Text('Đang kiểm tra...'),
-                      error: (_, _) => const Text('Không thể kiểm tra quyền'),
-                      data: (status) => Text(
-                        status.isGranted ? 'Trạng thái: Đã cấp quyền (Sẵn sàng)' : 'Trạng thái: Chưa cấp quyền',
-                        style: TextStyle(
-                          color: status.isGranted ? AppColors.success : AppColors.warning,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    trailing: OutlinedButton(
-                      onPressed: _checkOrRequestMic,
-                      child: const Text('Kiểm tra'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // ==================== 3. LỐI TẮT CÀI ĐẶT HỆ THỐNG ====================
             const SizedBox(height: AppSpacing.lg),
-
-            // ==================== 4. AI TUTOR & CẤU HÌNH HỆ THỐNG ====================
-            Text(
-              'Hệ Thống, AI & Dữ Liệu',
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: AppColors.primaryBlueDark,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            HiCard(
-              padding: EdgeInsets.zero,
-              backgroundColor: AppColors.cardBackground,
-              borderColor: AppColors.border,
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.psychology_outlined, color: AppColors.primaryBlueDark),
-                    title: const Text('Cài đặt AI Tutor & Chẩn đoán kết nối'),
-                    subtitle: const Text('BYOK API Key, model routing, ping latency'),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const AiSettingsScreen()),
-                      );
-                    },
-                  ),
-                  const Divider(height: 1, color: AppColors.divider),
-                  ListTile(
-                    leading: const Icon(Icons.storage_rounded, color: AppColors.primaryBlueDark),
-                    title: const Text('Quản lý Dữ liệu & Sao lưu'),
-                    subtitle: const Text('Backup, restore, export JSON, dung lượng DB'),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => DataManagementSheet.show(context),
-                  ),
-                  const Divider(height: 1, color: AppColors.divider),
-                  ListTile(
-                    leading: const Icon(Icons.palette_outlined, color: AppColors.primaryBlueDark),
-                    title: const Text('Design System Showcase'),
-                    subtitle: const Text('Bảng màu, typography Việt-Trung, RubyText'),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const DesignSystemDemoScreen()),
-                      );
-                    },
-                  ),
-                  const Divider(height: 1, color: AppColors.divider),
-                  ListTile(
-                    leading: const Icon(Icons.policy_outlined, color: AppColors.primaryBlueDark),
-                    title: const Text('Thông tin & Chính sách bảo vệ dữ liệu'),
-                    subtitle: Text('Standalone Offline-first • Schema v${DatabaseConstants.currentDatabaseVersion}'),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => AboutAndPrivacyDialog.show(context),
-                  ),
-                ],
+            ListTile(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              tileColor: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
+              leading: const Icon(Icons.settings_outlined),
+              title: const Text('Cài Đặt'),
+              subtitle: const Text('Âm thanh, AI Tutor, Dữ liệu & Quyền riêng tư'),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const SettingsScreen()),
               ),
             ),
             const SizedBox(height: AppSpacing.xl),

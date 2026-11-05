@@ -43,30 +43,17 @@ import '../../../../core/database/app_database.dart';
 ///   - [true]  → User đã học ít nhất 1 bài lesson (status = 'completed').
 ///   - [false] → User chưa học bài nào (user mới, hoặc chỉ làm placement test).
 final hasCompletedLessonsProvider = FutureProvider<bool>((ref) async {
-  // ── STUB IMPLEMENTATION ──────────────────────────────────────────────
-  // TODO(Thread1): Thay thế stub này bằng query thực tế:
-  //
-  //   final db = AppDatabase.instance.database;
-  //   final result = await db.rawQuery('''
-  //     SELECT COUNT(*) as cnt FROM lesson_progress
-  //     WHERE completion_score IS NOT NULL
-  //     AND (source IS NULL OR source != 'placement_test')
-  //   ''');
-  //   final count = result.first['cnt'] as int? ?? 0;
-  //   return count > 0;
-  //
-  // Trước khi implement, kiểm tra tên bảng và cột thực tế trong:
-  //   lib/core/database/database_constants.dart
-  // ─────────────────────────────────────────────────────────────────────
   if (!AppDatabase.instance.isOpen) return false;
 
   try {
     final db = AppDatabase.instance.database;
-    // Stub: đếm lesson_progress có completion_score > 0 (không phải placement test)
-    // Thread 1 phải xác nhận tên bảng, tên cột chính xác trước khi uncomment.
-    // Tạm thời trả về false để Thread 4 build UI "chưa học gì" trước.
-    final _ = db; // suppress unused warning
-    return false; // ← Thread 1 thay dòng này
+    final result = await db.rawQuery('''
+      SELECT COUNT(*) as cnt FROM curriculum_lessons
+      WHERE status = 'completed'
+      AND (credited_reason IS NULL OR credited_reason != 'credited_by_placement_test')
+    ''');
+    final count = result.isNotEmpty ? (result.first['cnt'] as int? ?? 0) : 0;
+    return count > 0;
   } catch (_) {
     return false;
   }

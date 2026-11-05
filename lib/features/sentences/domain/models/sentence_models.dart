@@ -205,6 +205,37 @@ class SentenceAudio {
   }
 }
 
+/// Comprehension check question for validating sentence understanding.
+class SentenceComprehensionCheck {
+  final String question;
+  final List<String> options;
+  final int correctOptionIndex;
+  final String explanation;
+
+  const SentenceComprehensionCheck({
+    required this.question,
+    required this.options,
+    required this.correctOptionIndex,
+    this.explanation = '',
+  });
+
+  factory SentenceComprehensionCheck.fromJson(Map<String, dynamic> json) {
+    return SentenceComprehensionCheck(
+      question: json['question'] as String? ?? '',
+      options: (json['options'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const [],
+      correctOptionIndex: (json['correct_option_index'] as num?)?.toInt() ?? 0,
+      explanation: json['explanation'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'question': question,
+    'options': options,
+    'correct_option_index': correctOptionIndex,
+    'explanation': explanation,
+  };
+}
+
 /// Core domain entity for an example sentence in HI Chinese
 class SentenceItem {
   final String id;
@@ -227,6 +258,7 @@ class SentenceItem {
   final bool hasHumanAudio;
   final bool hasTtsFallback;
   final List<SentenceAudio> audios;
+  final SentenceComprehensionCheck? comprehensionCheck;
 
   const SentenceItem({
     required this.id,
@@ -249,6 +281,7 @@ class SentenceItem {
     this.hasHumanAudio = false,
     this.hasTtsFallback = true,
     this.audios = const [],
+    this.comprehensionCheck,
   });
 
   factory SentenceItem.fromJson(Map<String, dynamic> json) {
@@ -306,6 +339,18 @@ class SentenceItem {
         json['has_human_audio'] == true ||
         parsedAudios.any((a) => a.audioType == AudioType.humanRecording);
 
+    SentenceComprehensionCheck? check;
+    if (json['comprehension_check'] is Map<String, dynamic>) {
+      check = SentenceComprehensionCheck.fromJson(json['comprehension_check'] as Map<String, dynamic>);
+    } else if (json['comprehension_check'] is String) {
+      try {
+        final decoded = jsonDecode(json['comprehension_check'] as String);
+        if (decoded is Map<String, dynamic>) {
+          check = SentenceComprehensionCheck.fromJson(decoded);
+        }
+      } catch (_) {}
+    }
+
     return SentenceItem(
       id: sentId,
       chinese: json['chinese'] as String? ?? '',
@@ -327,6 +372,7 @@ class SentenceItem {
       hasHumanAudio: hasHuman,
       hasTtsFallback: json['has_tts_fallback'] != 0,
       audios: parsedAudios,
+      comprehensionCheck: check,
     );
   }
 
@@ -350,6 +396,8 @@ class SentenceItem {
     'license': license,
     'has_human_audio': hasHumanAudio ? 1 : 0,
     'has_tts_fallback': hasTtsFallback ? 1 : 0,
+    if (comprehensionCheck != null)
+      'comprehension_check': jsonEncode(comprehensionCheck!.toJson()),
   };
 }
 

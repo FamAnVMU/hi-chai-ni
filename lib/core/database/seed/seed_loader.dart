@@ -514,8 +514,8 @@ class SeedLoader {
           final List<dynamic> rawList;
           if (decoded is List) {
             rawList = decoded;
-          } else if (decoded is Map<String, dynamic> && decoded['readingPassages'] is List) {
-            rawList = decoded['readingPassages'] as List<dynamic>;
+          } else if (decoded is Map<String, dynamic> && (decoded['passages'] is List || decoded['readingPassages'] is List)) {
+            rawList = (decoded['passages'] ?? decoded['readingPassages']) as List<dynamic>;
           } else {
             return (<Map<String, dynamic>>[], 'Unrecognized JSON structure for reading passages');
           }

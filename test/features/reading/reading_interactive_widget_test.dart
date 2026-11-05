@@ -104,17 +104,17 @@ void main() {
       );
 
       expect(find.text('Đầy đủ'), findsOneWidget);
-      expect(find.text('Hanzi + Pinyin'), findsOneWidget);
-      expect(find.text('Chỉ chữ Hán'), findsOneWidget);
-      expect(find.text('Hanzi + Dịch'), findsOneWidget);
+      expect(find.text('Chữ + Pinyin'), findsOneWidget);
+      expect(find.text('Chỉ Chữ Hán'), findsOneWidget);
+      expect(find.text('Luyện dịch'), findsOneWidget);
 
-      // Select 'Chỉ chữ Hán'
-      await tester.tap(find.text('Chỉ chữ Hán'));
+      // Select 'Chỉ Chữ Hán'
+      await tester.tap(find.text('Chỉ Chữ Hán'));
       await tester.pumpAndSettle();
       expect(activeMode, equals(ReadingDisplayMode.hanziOnly));
 
-      // Select 'Hanzi + Pinyin'
-      await tester.tap(find.text('Hanzi + Pinyin'));
+      // Select 'Chữ + Pinyin'
+      await tester.tap(find.text('Chữ + Pinyin'));
       await tester.pumpAndSettle();
       expect(activeMode, equals(ReadingDisplayMode.hanziAndPinyin));
     });

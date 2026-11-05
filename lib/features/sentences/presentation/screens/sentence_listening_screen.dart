@@ -68,7 +68,7 @@ class _SentenceListeningScreenState extends State<SentenceListeningScreen> {
     super.dispose();
   }
 
-  void _setupQuiz() {
+  Future<void> _setupQuiz() async {
     _selectedOption = null;
 
     final correct = _currentSentence.translationVi.isNotEmpty
@@ -76,6 +76,8 @@ class _SentenceListeningScreenState extends State<SentenceListeningScreen> {
         : _currentSentence.translationEn;
 
     final distractors = <String>[];
+
+    // 1. First priority: Gather distractors from the current sentence list
     for (final s in widget.sentenceList) {
       if (s.id != _currentSentence.id) {
         final t = s.translationVi.isNotEmpty ? s.translationVi : s.translationEn;
@@ -86,14 +88,57 @@ class _SentenceListeningScreenState extends State<SentenceListeningScreen> {
       if (distractors.length >= 3) break;
     }
 
-    while (distractors.length < 3) {
-      distractors.add('Nghĩa khác mẫu ${distractors.length + 1}');
+    // 2. Second priority: Query real authentic sentences in the same HSK level from repository
+    if (distractors.length < 3) {
+      try {
+        final levelSentences = await widget.repository.getSentencesByHskLevel(
+          _currentSentence.hskLevel,
+          limit: 20,
+        );
+        for (final s in levelSentences) {
+          if (s.id != _currentSentence.id) {
+            final t = s.translationVi.isNotEmpty ? s.translationVi : s.translationEn;
+            if (t.isNotEmpty && t != correct && !distractors.contains(t)) {
+              distractors.add(t);
+            }
+          }
+          if (distractors.length >= 3) break;
+        }
+      } catch (_) {}
     }
 
-    final all = [correct, ...distractors.take(3)]..shuffle(Random());
-    setState(() {
-      _quizOptions = all;
-    });
+    // 3. Third priority: Authentic standard conversational sentences from HSK 1/2
+    const fallbackDistractors = [
+      'Hôm nay thời tiết rất đẹp.',
+      'Bây giờ là mấy giờ rồi?',
+      'Tôi không biết việc này.',
+      'Ngày mai bạn có rảnh không?',
+      'Chúng tôi đang ở trường học.',
+      'Bạn muốn uống trà hay cà phê?',
+      'Tôi thích đọc sách vào buổi tối.',
+      'Tôi muốn đi siêu thị mua ít đồ.',
+    ];
+    for (final fb in fallbackDistractors) {
+      if (distractors.length >= 3) break;
+      if (fb != correct && !distractors.contains(fb)) {
+        distractors.add(fb);
+      }
+    }
+
+    // 4. Safe construction: If distractors exist, build 4-choice quiz; otherwise True/False
+    List<String> options;
+    if (distractors.isNotEmpty) {
+      options = [correct, ...distractors.take(3)]..shuffle(Random());
+    } else {
+      // Fallback to True/False check when no distractors are available
+      options = ['Đúng (Chính xác)', 'Sai (Không đúng)'];
+    }
+
+    if (mounted) {
+      setState(() {
+        _quizOptions = options;
+      });
+    }
   }
 
   Future<void> _playCurrent({double? speed}) async {

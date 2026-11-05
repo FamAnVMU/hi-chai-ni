@@ -210,9 +210,8 @@ $passageText
       hskLevel: 1,
       titleCn: '我的中国朋友',
       contentCn: '我有一个好朋友，他叫李明。他是中国人，今年二十岁。李明很喜欢学习英语，我也喜欢学习汉语。我们常常一起去图书馆看书，一起喝茶。',
-      pinyin: 'wǒ yǒu yí gè hǎo péng yǒu tā jiào lǐ míng tā shì zhōng guó rén jīn nián èr shí suì lǐ míng hěn xǐ huān xué xí yīng yǔ wǒ yě xǐ huān xué xí hàn yǔ wǒ men cháng cháng yì qǐ qù tú shū guǎn kàn shū yì qǐ hē chá',
+      pinyin: 'Wǒ yǒu yí gè hǎo péngyou, tā jiào Lǐ Míng. Tā shì Zhōngguó rén, jīnnián èrshí suì. Lǐ Míng hěn xǐhuan xuéxí Yīngyǔ, wǒ yě xǐhuan xuéxí Hànyǔ. Wǒmen chángcháng yìqǐ qù túshūguǎn kàn shū, yìqǐ hē chá.',
       translationVi: 'Tôi có một người bạn tốt, anh ấy tên là Lý Minh. Anh ấy là người Trung Quốc, năm nay hai mươi tuổi. Lý Minh rất thích học tiếng Anh, tôi cũng thích học tiếng Trung. Chúng tôi thường cùng nhau đến thư viện đọc sách, cùng nhau uống trà.',
-      audioUri: 'assets/audio/reading/rdg_hsk1_friend.mp3',
       topic: 'Đời sống',
       estimatedMinutes: 2,
       questions: [
@@ -241,9 +240,8 @@ $passageText
       hskLevel: 2,
       titleCn: '在饭馆点菜',
       contentCn: '今天晚上我和家人一起去中国饭馆吃饭。服务员很热情，给我们介绍了几个特色菜。我们点了宫保鸡丁、西红柿炒鸡蛋和两碗米饭。菜的味道非常好，我们吃得很高兴。',
-      pinyin: 'jīn tiān wǎn shàng wǒ hé jiā rén yì qǐ qù zhōng guó fàn guǎn chī fàn fú wù yuán hěn rè qíng gěi wǒ men jiè shào le jǐ gè tè sè cài wǒ men diǎn le gōng bǎo jī dīng xī hóng shì chǎo jī dàn hé liǎng wǎn mǐ fàn cài de wèi dào fēi cháng hǎo wǒ men chī de hěn gāo xìng',
+      pinyin: 'Jīntiān wǎnshang wǒ hé jiārén yìqǐ qù Zhōngguó fànguǎn chīfàn. Fúwùyuán hěn rèqíng, gěi wǒmen jièshào le jǐ gè tèsè cài. Wǒmen diǎn le gōngbǎo jīdīng, xīhóngshì chǎo jīdàn hé liǎng wǎn mǐfàn. Cài de wèidao fēicháng hǎo, wǒmen chī de hěn gāoxìng.',
       translationVi: 'Tối nay tôi cùng gia đình đến một nhà hàng Trung Quốc dùng bữa. Nhân viên phục vụ rất nhiệt tình, giới thiệu cho chúng tôi vài món đặc sắc. Chúng tôi gọi gà Cung Bảo, trứng xào cà chua và hai bát cơm trắng. Hương vị món ăn rất ngon, chúng tôi ăn uống rất vui vẻ.',
-      audioUri: 'assets/audio/reading/rdg_hsk2_restaurant.mp3',
       topic: 'Ẩm thực',
       estimatedMinutes: 3,
       questions: [

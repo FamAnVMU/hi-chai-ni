@@ -129,8 +129,30 @@ class TrueFalseOrErrorWidget extends StatelessWidget {
     final isSubmitted = result != null;
     final text = definition.stimulus ?? definition.sentenceWithBlank ?? '';
 
-    // Split into segments/tokens roughly by space or Chinese punctuation
-    final tokens = text.split(RegExp(r'(?<=\s)|(?<=\p{P})|(?=\p{P})', unicode: true)).where((s) => s.trim().isNotEmpty).toList();
+    // Prefer tokens provided by seed catalog / definition
+    List<String> rawTokens;
+    if (definition.tokens.isNotEmpty) {
+      rawTokens = List<String>.from(definition.tokens);
+      final lastPunctMatch = RegExp(r'[\p{P}]+$', unicode: true).firstMatch(text);
+      if (lastPunctMatch != null) {
+        final trailingPunct = lastPunctMatch.group(0)!;
+        final lastToken = rawTokens.last;
+        if (!lastToken.endsWith(trailingPunct) && !rawTokens.contains(trailingPunct)) {
+          rawTokens.add(trailingPunct);
+        }
+      }
+    } else {
+      // Split into segments/tokens roughly by space or punctuation
+      rawTokens = text
+          .split(RegExp(r'(?<=\s)|(?<=\p{P})|(?=\p{P})', unicode: true))
+          .map((s) => s.trim())
+          .where((s) => s.isNotEmpty)
+          .toList();
+    }
+
+    final punctuationRegex = RegExp(r'^[\p{P}\s]+$', unicode: true);
+    final cleanTargetError = (definition.errorToken ?? '').replaceAll(RegExp(r'[\p{P}\s]', unicode: true), '');
+    final cleanSelected = (selectedErrorToken ?? '').replaceAll(RegExp(r'[\p{P}\s]', unicode: true), '');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,9 +167,24 @@ class TrueFalseOrErrorWidget extends StatelessWidget {
         Wrap(
           spacing: AppSpacing.xs,
           runSpacing: AppSpacing.xs,
-          children: tokens.map((token) {
-            final isSelected = selectedErrorToken == token;
-            final isTargetError = definition.errorToken == token;
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: rawTokens.map((token) {
+            final isPunctuation = punctuationRegex.hasMatch(token);
+            if (isPunctuation) {
+              return Text(
+                token,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.bold,
+                ),
+              );
+            }
+
+            final cleanToken = token.replaceAll(RegExp(r'[\p{P}\s]', unicode: true), '');
+            final isSelected = selectedErrorToken == token ||
+                (cleanSelected.isNotEmpty && cleanToken == cleanSelected);
+            final isTargetError = definition.errorToken == token ||
+                (cleanTargetError.isNotEmpty && cleanToken == cleanTargetError);
 
             Color chipBg = AppColors.cardBackground;
             Color chipBorder = AppColors.border;

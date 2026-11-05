@@ -16,7 +16,7 @@ class StrokeEvaluator {
   }) {
     final isTracing = mode == WritingMode.tracing;
 
-    // Case 1: Unverified or missing stroke order data
+    // Case 1: Unverified or missing stroke order data -> Free Writing Mode (Luyện viết tự do)
     if (strokeData == null) {
       return WritingEvaluationResult(
         strokeOrderAccuracy: 1.0,
@@ -26,10 +26,10 @@ class StrokeEvaluator {
         isTracingMode: isTracing,
         hasStandardStrokeData: false,
         strokeFeedbackList: const [
-          'Chưa có dữ liệu thứ tự nét chuẩn cho chữ này. Hoàn thành chế độ luyện tự do trên ô lưới.'
+          'Chưa có dữ liệu thứ tự nét chuẩn cho chữ này. Hoàn thành ở chế độ luyện viết tự do.'
         ],
         overallVerdict:
-            'Chưa có dữ liệu nét chuẩn để chấm điểm thứ tự. Bạn đã tự do hoàn thành ${drawnStrokes.length} nét trên ô lưới.',
+            'Chưa có dữ liệu nét chuẩn cho chữ này. Bạn đã hoàn thành ${drawnStrokes.length} nét ở chế độ luyện viết tự do (không phạt điểm).',
       );
     }
 

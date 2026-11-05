@@ -78,10 +78,17 @@ flutter:
     - assets/data/
     - assets/data/content_packs/hsk1/
     - assets/data/content_packs/hsk2/
+    - assets/data/content_packs/hsk3/
+    - assets/audio/
     - assets/audio/hsk1/
     - assets/audio/hsk2/
+    - assets/audio/hsk3/
     - assets/audio/curriculum/
     - assets/audio/reading/
+    - assets/audio/pinyin/
+    - assets/audio/pronunciation/
+    - assets/audio/shadowing/
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:

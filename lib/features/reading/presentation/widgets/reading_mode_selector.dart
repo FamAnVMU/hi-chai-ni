@@ -35,7 +35,7 @@ class ReadingModeSelector extends StatelessWidget {
           _buildChip(
             context,
             mode: ReadingDisplayMode.hanziAndPinyin,
-            label: 'Hanzi + Pinyin',
+            label: 'Chữ + Pinyin',
             icon: Icons.subtitles_rounded,
             theme: theme,
             isDark: isDark,
@@ -44,7 +44,7 @@ class ReadingModeSelector extends StatelessWidget {
           _buildChip(
             context,
             mode: ReadingDisplayMode.hanziOnly,
-            label: 'Chỉ chữ Hán',
+            label: 'Chỉ Chữ Hán',
             icon: Icons.translate_rounded,
             theme: theme,
             isDark: isDark,
@@ -53,7 +53,7 @@ class ReadingModeSelector extends StatelessWidget {
           _buildChip(
             context,
             mode: ReadingDisplayMode.hanziAndTranslation,
-            label: 'Hanzi + Dịch',
+            label: 'Luyện dịch',
             icon: Icons.g_translate_rounded,
             theme: theme,
             isDark: isDark,
@@ -72,28 +72,45 @@ class ReadingModeSelector extends StatelessWidget {
     required bool isDark,
   }) {
     final isSelected = currentMode == mode;
+    final activeColor = AppColors.primaryBlueDark;
 
-    return FilterChip(
-      selected: isSelected,
-      showCheckmark: false,
-      avatar: Icon(
-        icon,
-        size: 16,
-        color: isSelected
-            ? (isDark ? Colors.black : Colors.white)
-            : theme.colorScheme.onSurfaceVariant,
+    return InkWell(
+      onTap: () => onModeChanged(mode),
+      borderRadius: BorderRadius.circular(AppRadius.full),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? activeColor
+              : (isDark ? theme.colorScheme.surfaceContainerHighest.withAlpha(60) : AppColors.cardBackground),
+          borderRadius: BorderRadius.circular(AppRadius.full),
+          border: Border.all(
+            color: isSelected ? activeColor : AppColors.border,
+            width: isSelected ? 1.5 : 1.0,
+          ),
+          boxShadow: isSelected ? AppElevation.shadowLow(theme.brightness) : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 15,
+              color: isSelected ? Colors.white : AppColors.secondaryText,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? Colors.white : AppColors.primaryText,
+              ),
+            ),
+          ],
+        ),
       ),
-      label: Text(label),
-      labelStyle: TextStyle(
-        fontSize: 12,
-        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        color: isSelected
-            ? (isDark ? Colors.black : Colors.white)
-            : theme.colorScheme.onSurface,
-      ),
-      selectedColor: isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary,
-      backgroundColor: theme.colorScheme.surfaceContainerHighest.withAlpha(60),
-      onSelected: (_) => onModeChanged(mode),
     );
   }
 }

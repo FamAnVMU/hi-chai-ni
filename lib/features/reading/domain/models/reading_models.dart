@@ -104,6 +104,15 @@ class ReadingPassage {
   final int estimatedMinutes;
   final List<ReadingQuestion> questions;
 
+  static const List<String> officialTopics = [
+    'Đời sống & Gia đình',
+    'Ẩm thực Trung Hoa',
+    'Du lịch & Khám phá',
+    'Truyện ngụ ngôn & Thành ngữ',
+    'Văn hóa & Lễ hội',
+    'Khoa học & Tự nhiên',
+  ];
+
   const ReadingPassage({
     required this.id,
     required this.hskLevel,
@@ -112,16 +121,50 @@ class ReadingPassage {
     required this.pinyin,
     required this.translationVi,
     this.audioUri,
-    this.topic = 'Đời sống',
+    this.topic = 'Đời sống & Gia đình',
     this.estimatedMinutes = 3,
     this.questions = const [],
   });
 
   int get wordCount => contentCn.replaceAll(RegExp(r'[^\u4e00-\u9fa5]'), '').length;
 
+  static String resolveOfficialTopic({
+    required String id,
+    required int hskLevel,
+    String? explicitTopic,
+  }) {
+    if (explicitTopic != null && officialTopics.contains(explicitTopic)) {
+      return explicitTopic;
+    }
+    final lowerId = id.toLowerCase();
+    if (lowerId.contains('friend') || lowerId.contains('family') || lowerId.contains('daily')) {
+      return 'Đời sống & Gia đình';
+    }
+    if (lowerId.contains('restaurant') || lowerId.contains('breakfast') || lowerId.contains('food') || lowerId.contains('tea')) {
+      return 'Ẩm thực Trung Hoa';
+    }
+    if (lowerId.contains('travel') || lowerId.contains('train') || lowerId.contains('beijing') || lowerId.contains('trip')) {
+      return 'Du lịch & Khám phá';
+    }
+    if (lowerId.contains('idiom') || lowerId.contains('fable') || lowerId.contains('frog') || lowerId.contains('rabbit')) {
+      return 'Truyện ngụ ngôn & Thành ngữ';
+    }
+    if (lowerId.contains('festival') || lowerId.contains('autumn') || lowerId.contains('spring') || lowerId.contains('culture')) {
+      return 'Văn hóa & Lễ hội';
+    }
+    if (lowerId.contains('nature') || lowerId.contains('seasons') || lowerId.contains('panda') || lowerId.contains('science')) {
+      return 'Khoa học & Tự nhiên';
+    }
+    if (hskLevel == 2) return 'Ẩm thực Trung Hoa';
+    if (hskLevel == 3) return 'Du lịch & Khám phá';
+    if (hskLevel == 4) return 'Văn hóa & Lễ hội';
+    if (hskLevel >= 5) return 'Truyện ngụ ngôn & Thành ngữ';
+    return 'Đời sống & Gia đình';
+  }
+
   factory ReadingPassage.fromMap(Map<String, dynamic> map) {
     List<ReadingQuestion> parsedQuestions = [];
-    final rawQuestions = map['questions_json'];
+    final rawQuestions = map['questions_json'] ?? map['questions'];
     if (rawQuestions is String && rawQuestions.isNotEmpty) {
       try {
         final decoded = json.decode(rawQuestions) as List<dynamic>;
@@ -129,25 +172,43 @@ class ReadingPassage {
             .map((q) => ReadingQuestion.fromJson(q as Map<String, dynamic>))
             .toList();
       } catch (_) {}
+    } else if (rawQuestions is List) {
+      parsedQuestions = rawQuestions
+          .whereType<Map<String, dynamic>>()
+          .map(ReadingQuestion.fromJson)
+          .toList();
     }
 
-    int hsk = map['hsk_level'] as int? ?? 1;
-    String topicName = 'Đời sống';
-    if (hsk == 2) topicName = 'Ẩm thực';
-    if (hsk == 3) topicName = 'Du lịch';
-    if (hsk == 4) topicName = 'Văn hóa';
-    if (hsk >= 5) topicName = 'Thành ngữ';
+    final id = map['id'] as String? ?? '';
+    final hsk = (map['hsk_level'] as int?) ?? (map['hskLevel'] as int?) ?? 1;
+    final content = map['content_cn'] as String? ??
+        map['contentCn'] as String? ??
+        map['contentZh'] as String? ??
+        '';
+    final topicName = resolveOfficialTopic(
+      id: id,
+      hskLevel: hsk,
+      explicitTopic: map['topic'] as String?,
+    );
+    final explicitEst = (map['estimatedMinutes'] as int?) ??
+        (map['estimated_minutes'] as int?);
+    final estMinutes = explicitEst ?? ((content.length ~/ 40) + 1).clamp(2, 10);
 
     return ReadingPassage(
-      id: map['id'] as String,
+      id: id,
       hskLevel: hsk,
-      titleCn: map['title_cn'] as String? ?? map['title'] as String? ?? '',
-      contentCn: map['content_cn'] as String? ?? map['contentZh'] as String? ?? '',
+      titleCn: map['title_cn'] as String? ??
+          map['titleCn'] as String? ??
+          map['title'] as String? ??
+          '',
+      contentCn: content,
       pinyin: map['pinyin'] as String? ?? '',
-      translationVi: map['translation_vi'] as String? ?? map['translationVi'] as String? ?? '',
-      audioUri: map['audio_uri'] as String?,
+      translationVi: map['translation_vi'] as String? ??
+          map['translationVi'] as String? ??
+          '',
+      audioUri: map['audio_uri'] as String? ?? map['audioUri'] as String?,
       topic: topicName,
-      estimatedMinutes: (map['content_cn']?.toString().length ?? 100) ~/ 40 + 1,
+      estimatedMinutes: estMinutes,
       questions: parsedQuestions,
     );
   }

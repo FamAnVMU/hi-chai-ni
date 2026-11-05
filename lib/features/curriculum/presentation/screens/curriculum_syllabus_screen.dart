@@ -18,6 +18,14 @@ class CurriculumSyllabusScreen extends ConsumerWidget {
     this.curriculumId = CurriculumConstants.currHsk1,
   });
 
+  int get hskLevel {
+    final match = RegExp(r'hsk\s*([1-6])', caseSensitive: false).firstMatch('$curriculumId $curriculumTitle');
+    if (match != null) {
+      return int.tryParse(match.group(1)!) ?? 1;
+    }
+    return 1;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (units != null) {
@@ -75,7 +83,7 @@ class CurriculumSyllabusScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Thi tốt nghiệp HSK 1',
+                      'Thi tốt nghiệp HSK $hskLevel',
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: AppColors.primaryBlueDark,
@@ -99,7 +107,7 @@ class CurriculumSyllabusScreen extends ConsumerWidget {
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (_) => const LevelExitExamScreen(),
+                      builder: (_) => LevelExitExamScreen(level: hskLevel.toString()),
                     ),
                   );
                 },

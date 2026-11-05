@@ -7,12 +7,14 @@ class HomeQuickActionsGrid extends StatelessWidget {
   final VoidCallback onNavigateLearning;
   final VoidCallback onNavigateReview;
   final VoidCallback onNavigateAiTutor;
+  final bool hasCompletedLessons;
 
   const HomeQuickActionsGrid({
     super.key,
     required this.onNavigateLearning,
     required this.onNavigateReview,
     required this.onNavigateAiTutor,
+    this.hasCompletedLessons = false,
   });
 
   @override
@@ -47,10 +49,23 @@ class HomeQuickActionsGrid extends StatelessWidget {
               child: _buildActionTile(
                 context: context,
                 icon: Icons.psychology_rounded,
-                iconColor: AppColors.warning,
+                iconColor: hasCompletedLessons ? AppColors.warning : AppColors.secondaryText,
                 title: 'Ôn tập thẻ',
-                subtitle: 'Thuật toán SM-2',
-                onTap: onNavigateReview,
+                subtitle: hasCompletedLessons ? 'Thuật toán SM-2' : 'Chưa có bài học',
+                onTap: () {
+                  if (!hasCompletedLessons) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Bạn chưa học bài nào. Hãy hoàn thành ít nhất 1 bài học để mở khóa ôn tập thẻ SRS!',
+                        ),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                    return;
+                  }
+                  onNavigateReview();
+                },
               ),
             ),
           ],

@@ -1,4 +1,6 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../../../../core/utils/app_clock.dart';
 import '../../data/sentence_repository.dart';
 import '../../domain/models/sentence_models.dart';
 import '../../domain/services/sentence_audio_manager.dart';
@@ -8,11 +10,15 @@ import '../../domain/services/sentence_audio_manager.dart';
 class SentenceReadingScreen extends StatefulWidget {
   final SentenceItem sentence;
   final SentenceRepository repository;
+  final SentenceComprehensionCheck? comprehensionCheck;
+  final Duration? minReadingDuration;
 
   const SentenceReadingScreen({
     super.key,
     required this.sentence,
     required this.repository,
+    this.comprehensionCheck,
+    this.minReadingDuration,
   });
 
   @override
@@ -21,17 +27,39 @@ class SentenceReadingScreen extends StatefulWidget {
 
 class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
   late final SentenceAudioManager _audioManager;
+  late final DateTime _screenOpenedAt;
   bool _isPlaying = false;
   bool _isCompleted = false;
+
+  // Comprehension check state
+  int? _selectedCheckOptionIndex;
+  bool _isAnswerSubmitted = false;
+  bool? _isCheckCorrect;
 
   @override
   void initState() {
     super.initState();
+    _screenOpenedAt = AppClock.now();
     _audioManager = SentenceAudioManager();
     _audioManager.isPlayingStream.listen((playing) {
       if (mounted) setState(() => _isPlaying = playing);
     });
   }
+
+  /// Calculates minimum required reading time based on standard beginner Chinese reading speed
+  /// (100-150 characters per minute ~ 2 characters per second; minimum 3 seconds).
+  int get _requiredReadingSeconds {
+    if (widget.minReadingDuration != null) {
+      return widget.minReadingDuration!.inSeconds;
+    }
+    final hanziMatches = RegExp(r'[\u4e00-\u9fa5]').allMatches(widget.sentence.chinese).length;
+    final count = hanziMatches > 0 ? hanziMatches : widget.sentence.chinese.length;
+    final calculated = (count / 2.0).ceil();
+    return math.max(3, calculated);
+  }
+
+  SentenceComprehensionCheck? get _effectiveCheck =>
+      widget.comprehensionCheck ?? widget.sentence.comprehensionCheck;
 
   @override
   void dispose() {
@@ -256,6 +284,130 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
                 ),
             ],
 
+            // Comprehension Check Card (if available)
+            if (_effectiveCheck != null) ...[
+              const SizedBox(height: 16),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50.withAlpha(120),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.blue.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.quiz_outlined, color: Colors.blue.shade700, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Câu hỏi đọc hiểu (Comprehension Check):',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: Colors.blue.shade900,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      _effectiveCheck!.question,
+                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 12),
+                    for (int i = 0; i < _effectiveCheck!.options.length; i++) ...[
+                      InkWell(
+                        onTap: _isAnswerSubmitted
+                            ? null
+                            : () {
+                                setState(() {
+                                  _selectedCheckOptionIndex = i;
+                                });
+                              },
+                        borderRadius: BorderRadius.circular(10),
+                        child: Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: _isAnswerSubmitted
+                                ? (i == _effectiveCheck!.correctOptionIndex
+                                    ? Colors.green.shade50
+                                    : (i == _selectedCheckOptionIndex
+                                        ? Colors.red.shade50
+                                        : Colors.white))
+                                : (_selectedCheckOptionIndex == i
+                                    ? Colors.blue.shade100
+                                    : Colors.white),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: _isAnswerSubmitted
+                                  ? (i == _effectiveCheck!.correctOptionIndex
+                                      ? Colors.green
+                                      : (i == _selectedCheckOptionIndex
+                                          ? Colors.red
+                                          : Colors.grey.shade300))
+                                  : (_selectedCheckOptionIndex == i
+                                      ? Colors.blue
+                                      : Colors.grey.shade300),
+                              width: _selectedCheckOptionIndex == i ? 1.5 : 1.0,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Text(
+                                '${String.fromCharCode(65 + i)}. ',
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Expanded(
+                                child: Text(_effectiveCheck!.options[i]),
+                              ),
+                              if (_isAnswerSubmitted && i == _effectiveCheck!.correctOptionIndex)
+                                const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                              if (_isAnswerSubmitted &&
+                                  i == _selectedCheckOptionIndex &&
+                                  i != _effectiveCheck!.correctOptionIndex)
+                                const Icon(Icons.cancel, color: Colors.red, size: 20),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                    if (!_isAnswerSubmitted && _selectedCheckOptionIndex != null) ...[
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            setState(() {
+                              _isAnswerSubmitted = true;
+                              _isCheckCorrect =
+                                  _selectedCheckOptionIndex == _effectiveCheck!.correctOptionIndex;
+                            });
+                          },
+                          child: const Text('Xác nhận câu trả lời'),
+                        ),
+                      ),
+                    ],
+                    if (_isAnswerSubmitted && _effectiveCheck!.explanation.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        'Giải thích: ${_effectiveCheck!.explanation}',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontStyle: FontStyle.italic,
+                          color: _isCheckCorrect == true ? Colors.green.shade800 : Colors.red.shade800,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+
             const SizedBox(height: 24),
 
             // Completion Button
@@ -278,18 +430,68 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
                     ? null
                     : () async {
                         final messenger = ScaffoldMessenger.of(context);
+                        final elapsedSeconds =
+                            AppClock.now().difference(_screenOpenedAt).inSeconds;
+                        final minSeconds = _requiredReadingSeconds;
+
+                        // Anti-cheating check: Minimum reading duration
+                        if (elapsedSeconds < minSeconds) {
+                          messenger.showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Bạn đọc quá nhanh ($elapsedSeconds giây)! Hãy đọc kỹ câu văn và phân tích từ vựng ít nhất $minSeconds giây trước khi hoàn thành.',
+                              ),
+                              backgroundColor: Colors.orange.shade800,
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                          return;
+                        }
+
+                        // Anti-cheating check: Must submit comprehension check if present
+                        if (_effectiveCheck != null && !_isAnswerSubmitted) {
+                          messenger.showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Vui lòng trả lời câu hỏi đọc hiểu trước khi bấm hoàn thành bài đọc!',
+                              ),
+                              backgroundColor: Colors.amber,
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                          return;
+                        }
+
+                        // Determine score:
+                        // With comprehension check: 100.0 if correct, 40.0 if incorrect.
+                        // Without comprehension check: 50.0 (viewed / basic completion), NOT 100.0 mastery!
+                        double score;
+                        String feedback;
+                        if (_effectiveCheck != null) {
+                          if (_isCheckCorrect == true) {
+                            score = 100.0;
+                            feedback = 'Xuất sắc! Đã hoàn thành bài đọc và trả lời đúng câu hỏi đọc hiểu!';
+                          } else {
+                            score = 40.0;
+                            feedback = 'Đã hoàn thành lượt đọc. Cần lưu ý ôn lại nội dung đọc hiểu.';
+                          }
+                        } else {
+                          score = 50.0;
+                          feedback = 'Đã ghi nhận đọc câu (chế độ xem đọc cơ bản).';
+                        }
+
                         await widget.repository.recordPracticeAttempt(
                           sentenceId: widget.sentence.id,
                           practiceType: 'reading',
-                          score: 100.0,
+                          score: score,
                         );
                         if (!mounted) return;
                         setState(() => _isCompleted = true);
                         messenger.showSnackBar(
-                          const SnackBar(
-                            content: Text('Đã hoàn thành bài đọc câu!'),
-                            backgroundColor: Colors.green,
-                            duration: Duration(seconds: 2),
+                          SnackBar(
+                            content: Text(feedback),
+                            backgroundColor: score >= 85.0 ? Colors.green : Colors.blueGrey,
+                            duration: const Duration(seconds: 2),
                           ),
                         );
                       },

@@ -71,49 +71,89 @@ class WritingEvaluationSheet extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-                        decoration: BoxDecoration(
-                          color: isSuccess
-                              ? AppColors.primaryBlueDark.withAlpha(40)
-                              : theme.colorScheme.error.withAlpha(40),
-                          borderRadius: AppRadius.borderMd,
-                          border: Border.all(
-                            color: isSuccess ? AppColors.primaryBlueDark : theme.colorScheme.error,
+                      if (result.hasStandardStrokeData) ...[
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                          decoration: BoxDecoration(
+                            color: isSuccess
+                                ? AppColors.primaryBlueDark.withAlpha(40)
+                                : theme.colorScheme.error.withAlpha(40),
+                            borderRadius: AppRadius.borderMd,
+                            border: Border.all(
+                              color: isSuccess ? AppColors.primaryBlueDark : theme.colorScheme.error,
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          '$score%',
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: isSuccess ? AppColors.primaryBlueDark : theme.colorScheme.error,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            isSuccess ? 'Đạt tiêu chuẩn nét' : 'Cần điều chỉnh nét',
-                            style: theme.textTheme.titleSmall?.copyWith(
+                          child: Text(
+                            '$score%',
+                            style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
+                              color: isSuccess ? AppColors.primaryBlueDark : theme.colorScheme.error,
                             ),
                           ),
-                          Text(
-                            result.isTracingMode ? 'Chế độ tô theo mẫu' : 'Chế độ tự viết',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              isSuccess ? 'Đạt tiêu chuẩn nét' : 'Cần điều chỉnh nét',
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
+                            Text(
+                              result.isTracingMode ? 'Chế độ tô theo mẫu' : 'Chế độ tự viết',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ] else ...[
+                        Container(
+                          padding: const EdgeInsets.all(AppSpacing.sm),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryBlueLight,
+                            borderRadius: AppRadius.borderMd,
+                            border: Border.all(color: AppColors.secondaryBlue),
                           ),
-                        ],
-                      ),
+                          child: const Icon(
+                            Icons.draw_rounded,
+                            color: AppColors.primaryBlueDark,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Luyện viết tự do',
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'Không đánh giá nét chuẩn',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
-                  HiChip(
-                    label: '${result.correctStrokeCount}/${result.totalStandardStrokes} nét đúng',
-                    status: isSuccess ? HiChipStatus.success : HiChipStatus.warning,
-                  ),
+                  if (result.hasStandardStrokeData)
+                    HiChip(
+                      label: '${result.correctStrokeCount}/${result.totalStandardStrokes} nét đúng',
+                      status: isSuccess ? HiChipStatus.success : HiChipStatus.warning,
+                    )
+                  else
+                    const HiChip(
+                      label: 'Chế độ Luyện viết Tự do',
+                      status: HiChipStatus.info,
+                    ),
                 ],
               ),
               const SizedBox(height: AppSpacing.md),
@@ -178,7 +218,9 @@ class WritingEvaluationSheet extends StatelessWidget {
 
               // Methodological Disclaimer
               Text(
-                'Ghi chú: Đánh giá dựa trên hướng vector và thứ tự nét bút thuận theo quy chuẩn GB/T 13000, không so sánh nhận dạng chữ thô.',
+                result.hasStandardStrokeData
+                    ? 'Ghi chú: Đánh giá dựa trên hướng vector và thứ tự nét bút thuận theo quy chuẩn GB/T 13000, không so sánh nhận dạng chữ thô.'
+                    : 'Ghi chú: Chữ Hán này đang ở chế độ luyện viết tự do do chưa có dữ liệu nét chuẩn GB/T 13000. Hệ thống không chấm điểm thứ tự nét.',
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontSize: 10,
                   color: theme.colorScheme.onSurfaceVariant.withAlpha(160),
@@ -203,7 +245,7 @@ class WritingEvaluationSheet extends StatelessWidget {
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: HiButton(
-                      text: 'Lưu kết quả',
+                      text: result.hasStandardStrokeData ? 'Lưu kết quả' : 'Tiếp tục luyện tập',
                       variant: HiButtonVariant.primary,
                       onPressed: () {
                         Navigator.of(context).pop();

@@ -943,11 +943,11 @@
       "hsk_level": 1,
       "knowledge_type": "dialogue",
       "title": "Hội thoại ứng dụng Bài 1",
-      "content_json": "{\"context\":\"Hội thoại giao tiếp hàng ngày tại trường học hoặc công sở\",\"lines\":[{\"speaker\":\"A\",\"text_zh\":\"A: 你，你好！\",\"pinyin\":\"A: nǐ, Nǐ hǎo!\",\"text_vi\":\"A: Xin chào bạn!\"},{\"speaker\":\"B\",\"text_zh\":\"B: 你好！谢谢你！ (Cảm ơn bạn!)\",\"pinyin\":\"B: Nǐ hǎo! ...\",\"text_vi\":\"B: Chào bạn! Cảm ơn bạn!\"}]}",
+      "content_json": "{\"context\": \"Chào hỏi lịch sự, cảm ơn và xin lỗi khi mới gặp mặt tại lớp học (HSK Standard Course 1 - Bài 1 & 2)\", \"lines\": [{\"speaker\": \"A\", \"text_zh\": \"你好！请进，请坐。\", \"pinyin\": \"Nǐ hǎo! Qǐng jìn, qǐng zuò.\", \"text_vi\": \"Chào bạn! Mời vào, mời ngồi.\"}, {\"speaker\": \"B\", \"text_zh\": \"你好！谢谢你。\", \"pinyin\": \"Nǐ hǎo! Xièxie nǐ.\", \"text_vi\": \"Chào bạn! Cảm ơn bạn nhé.\"}, {\"speaker\": \"A\", \"text_zh\": \"不客气。对不起，我是新来的学生。\", \"pinyin\": \"Bú kèqi. Duìbuqǐ, wǒ shì xīn lái de xuésheng.\", \"text_vi\": \"Đừng khách sáo. Xin lỗi, mình là học sinh mới đến.\"}, {\"speaker\": \"B\", \"text_zh\": \"没关系，我们都是好朋友。\", \"pinyin\": \"Méi guānxi, wǒmen dōu shì hǎo péngyou.\", \"text_vi\": \"Không sao đâu, chúng mình đều là bạn tốt mà.\"}, {\"speaker\": \"A\", \"text_zh\": \"太好了，明天见！\", \"pinyin\": \"Tài hǎo le, míngtiān jiàn!\", \"text_vi\": \"Tuyệt quá, hẹn gặp lại ngày mai nhé!\"}, {\"speaker\": \"B\", \"text_zh\": \"好，再见！\", \"pinyin\": \"Hǎo, zàijiàn!\", \"text_vi\": \"Ừ, tạm biệt!\"}]}",
       "objectives": [
         "Luyện đọc diễn cảm và nắm bắt ngữ cảnh hội thoại"
       ],
-      "source_reference": "HSK 2.0 Standard Course Dialogue 1"
+      "source_reference": "HSK Standard Course 1 (Giáo trình Chuẩn HSK 1) - Bài 1 & Boya Sơ cấp"
     },
     {
       "content_id": "PRACTICE_L1",
@@ -1003,11 +1003,11 @@
       "hsk_level": 1,
       "knowledge_type": "dialogue",
       "title": "Hội thoại ứng dụng Bài 2",
-      "content_json": "{\"context\":\"Hội thoại giao tiếp hàng ngày tại trường học hoặc công sở\",\"lines\":[{\"speaker\":\"A\",\"text_zh\":\"A: 我，谢谢你！\",\"pinyin\":\"A: wǒ, Xièxie nǐ!\",\"text_vi\":\"A: Xin chào bạn!\"},{\"speaker\":\"B\",\"text_zh\":\"B: 谢谢你！这是我的名字。 (Đây là tên của tôi.)\",\"pinyin\":\"B: Xièxie nǐ! ...\",\"text_vi\":\"B: Chào bạn! Cảm ơn bạn!\"}]}",
+      "content_json": "{\"context\": \"Làm quen, hỏi tên tuổi và quốc tịch trong ngày đầu nhập học (HSK Standard Course 1 - Bài 3)\", \"lines\": [{\"speaker\": \"A\", \"text_zh\": \"你好！请问，你叫什么名字？\", \"pinyin\": \"Nǐ hǎo! Qǐngwèn, nǐ jiào shénme míngzi?\", \"text_vi\": \"Chào bạn! Xin hỏi bạn tên là gì?\"}, {\"speaker\": \"B\", \"text_zh\": \"我叫李月。你是老师吗？\", \"pinyin\": \"Wǒ jiào Lǐ Yuè. Nǐ shì lǎoshī ma?\", \"text_vi\": \"Mình tên là Lý Nguyệt. Bạn là giáo viên phải không?\"}, {\"speaker\": \"A\", \"text_zh\": \"我不是老师，我是学生。我叫大卫。\", \"pinyin\": \"Wǒ bú shì lǎoshī, wǒ shì xuésheng. Wǒ jiào Dàwèi.\", \"text_vi\": \"Mình không phải là giáo viên, mình là sinh viên. Mình tên là David.\"}, {\"speaker\": \"B\", \"text_zh\": \"大卫，你是美国人吗？\", \"pinyin\": \"Dàwèi, nǐ shì Měiguó rén ma?\", \"text_vi\": \"David này, bạn là người Mỹ hả?\"}, {\"speaker\": \"A\", \"text_zh\": \"是，我是美国人。你呢？\", \"pinyin\": \"Shì, wǒ shì Měiguó rén. Nǐ ne?\", \"text_vi\": \"Đúng rồi, mình là người Mỹ. Còn bạn thì sao?\"}, {\"speaker\": \"B\", \"text_zh\": \"我是中国人，很高兴认识你。\", \"pinyin\": \"Wǒ shì Zhōngguó rén, hěn gāoxìng rènshi nǐ.\", \"text_vi\": \"Mình là người Trung Quốc, rất vui được làm quen với bạn.\"}]}",
       "objectives": [
         "Luyện đọc diễn cảm và nắm bắt ngữ cảnh hội thoại"
       ],
-      "source_reference": "HSK 2.0 Standard Course Dialogue 2"
+      "source_reference": "HSK Standard Course 1 (Giáo trình Chuẩn HSK 1) - Bài 3"
     },
     {
       "content_id": "PRACTICE_L2",
@@ -1063,11 +1063,11 @@
       "hsk_level": 1,
       "knowledge_type": "dialogue",
       "title": "Hội thoại ứng dụng Bài 3",
-      "content_json": "{\"context\":\"Hội thoại giao tiếp hàng ngày tại trường học hoặc công sở\",\"lines\":[{\"speaker\":\"A\",\"text_zh\":\"A: 他，他是谁！\",\"pinyin\":\"A: tā, Tā shì shéi!\",\"text_vi\":\"A: Xin chào bạn!\"},{\"speaker\":\"B\",\"text_zh\":\"B: 他是谁！他是我的同学。 (Cậu ấy là bạn học của tôi.)\",\"pinyin\":\"B: Tā shì shéi! ...\",\"text_vi\":\"B: Chào bạn! Cảm ơn bạn!\"}]}",
+      "content_json": "{\"context\": \"Hỏi thông tin về bạn cùng lớp và giáo viên dạy tiếng Trung (HSK Standard Course 1 - Bài 4)\", \"lines\": [{\"speaker\": \"A\", \"text_zh\": \"她是你的同学吗？\", \"pinyin\": \"Tā shì nǐ de tóngxué ma?\", \"text_vi\": \"Cô ấy là bạn cùng lớp của bạn phải không?\"}, {\"speaker\": \"B\", \"text_zh\": \"不是，她是我的汉语老师。\", \"pinyin\": \"Bú shì, tā shì wǒ de Hànyǔ lǎoshī.\", \"text_vi\": \"Không phải, cô ấy là cô giáo dạy tiếng Trung của mình.\"}, {\"speaker\": \"A\", \"text_zh\": \"你的汉语老师是哪国人？\", \"pinyin\": \"Nǐ de Hànyǔ lǎoshī shì nǎ guó rén?\", \"text_vi\": \"Cô giáo tiếng Trung của bạn là người nước nào?\"}, {\"speaker\": \"B\", \"text_zh\": \"她是中国人，她的汉语说得很好。\", \"pinyin\": \"Tā shì Zhōngguó rén, tā de Hànyǔ shuō de hěn hǎo.\", \"text_vi\": \"Cô ấy là người Trung Quốc, cô nói tiếng Trung rất hay.\"}, {\"speaker\": \"A\", \"text_zh\": \"那个人是谁呢？\", \"pinyin\": \"Nàge rén shì shéi ne?\", \"text_vi\": \"Thế còn người kia là ai vậy?\"}, {\"speaker\": \"B\", \"text_zh\": \"他是我的好朋友，我们一起学汉语。\", \"pinyin\": \"Tā shì wǒ de hǎo péngyou, wǒmen yìqǐ xué Hànyǔ.\", \"text_vi\": \"Cậu ấy là bạn thân của mình, tụi mình cùng nhau học tiếng Trung.\"}]}",
       "objectives": [
         "Luyện đọc diễn cảm và nắm bắt ngữ cảnh hội thoại"
       ],
-      "source_reference": "HSK 2.0 Standard Course Dialogue 3"
+      "source_reference": "HSK Standard Course 1 (Giáo trình Chuẩn HSK 1) - Bài 4"
     },
     {
       "content_id": "PRACTICE_L3",
@@ -1123,11 +1123,11 @@
       "hsk_level": 1,
       "knowledge_type": "dialogue",
       "title": "Hội thoại ứng dụng Bài 4",
-      "content_json": "{\"context\":\"Hội thoại giao tiếp hàng ngày tại trường học hoặc công sở\",\"lines\":[{\"speaker\":\"A\",\"text_zh\":\"A: 家，她是中国人！\",\"pinyin\":\"A: jiā, Tā shì Zhōngguó rén!\",\"text_vi\":\"A: Xin chào bạn!\"},{\"speaker\":\"B\",\"text_zh\":\"B: 她是中国人！这个苹果很大。 (Quả táo này rất to.)\",\"pinyin\":\"B: Tā shì Zhōngguó rén! ...\",\"text_vi\":\"B: Chào bạn! Cảm ơn bạn!\"}]}",
+      "content_json": "{\"context\": \"Trò chuyện về các thành viên trong gia đình và tuổi tác (HSK Standard Course 1 - Bài 5)\", \"lines\": [{\"speaker\": \"A\", \"text_zh\": \"李老师，你家有几口人？\", \"pinyin\": \"Lǐ lǎoshī, nǐ jiā yǒu jǐ kǒu rén?\", \"text_vi\": \"Cô Lý ơi, gia đình cô có mấy người ạ?\"}, {\"speaker\": \"B\", \"text_zh\": \"我家有四口人：爸爸、妈妈、我跟我的女儿。\", \"pinyin\": \"Wǒ jiā yǒu sì kǒu rén: bàba, māma, wǒ gēn wǒ de nǚ'ér.\", \"text_vi\": \"Nhà cô có bốn người: bố, mẹ, cô và con gái của cô.\"}, {\"speaker\": \"A\", \"text_zh\": \"你的女儿今年几岁了？\", \"pinyin\": \"Nǐ de nǚ'ér jīnnián jǐ suì le?\", \"text_vi\": \"Con gái của cô năm nay mấy tuổi rồi ạ?\"}, {\"speaker\": \"B\", \"text_zh\": \"她今年五岁了。你呢，你今年多大？\", \"pinyin\": \"Tā jīnnián wǔ suì le. Nǐ ne, nǐ jīnnián duō dà?\", \"text_vi\": \"Bé năm nay lên năm tuổi rồi. Còn em, năm nay em bao nhiêu tuổi?\"}, {\"speaker\": \"A\", \"text_zh\": \"我今年二十岁。我爸爸今年五十岁。\", \"pinyin\": \"Wǒ jīnnián èrshí suì. Wǒ bàba jīnnián wǔshí suì.\", \"text_vi\": \"Em năm nay hai mươi tuổi. Bố em năm nay năm mươi tuổi ạ.\"}, {\"speaker\": \"B\", \"text_zh\": \"你爸爸身体好吗？\", \"pinyin\": \"Nǐ bàba shēntǐ hǎo ma?\", \"text_vi\": \"Sức khỏe của bố em có tốt không?\"}]}",
       "objectives": [
         "Luyện đọc diễn cảm và nắm bắt ngữ cảnh hội thoại"
       ],
-      "source_reference": "HSK 2.0 Standard Course Dialogue 4"
+      "source_reference": "HSK Standard Course 1 (Giáo trình Chuẩn HSK 1) - Bài 5"
     },
     {
       "content_id": "PRACTICE_L4",
@@ -1183,11 +1183,11 @@
       "hsk_level": 1,
       "knowledge_type": "dialogue",
       "title": "Hội thoại ứng dụng Bài 5",
-      "content_json": "{\"context\":\"Hội thoại giao tiếp hàng ngày tại trường học hoặc công sở\",\"lines\":[{\"speaker\":\"A\",\"text_zh\":\"A: 一，你家有几口人！\",\"pinyin\":\"A: yī, Nǐ jiā yǒu jǐ kǒu rén!\",\"text_vi\":\"A: Xin chào bạn!\"},{\"speaker\":\"B\",\"text_zh\":\"B: 你家有几口人！六块钱。 (Sáu tệ.)\",\"pinyin\":\"B: Nǐ jiā yǒu jǐ kǒu rén! ...\",\"text_vi\":\"B: Chào bạn! Cảm ơn bạn!\"}]}",
+      "content_json": "{\"context\": \"Hỏi thăm số lượng thành viên gia đình, tuổi của các con và số phòng (HSK Standard Course 1 - Bài 5 & Boya Sơ cấp)\", \"lines\": [{\"speaker\": \"A\", \"text_zh\": \"王先生，你家有几口人？\", \"pinyin\": \"Wáng xiānsheng, nǐ jiā yǒu jǐ kǒu rén?\", \"text_vi\": \"Anh Vương này, gia đình anh có mấy người?\"}, {\"speaker\": \"B\", \"text_zh\": \"我家有五口人：我、我妻子、两个儿子和一个女儿。\", \"pinyin\": \"Wǒ jiā yǒu wǔ kǒu rén: wǒ, wǒ qīzi, liǎng gè érzi hé yí gè nǚ'ér.\", \"text_vi\": \"Nhà tôi có năm người: vợ chồng tôi, hai cậu con trai và một cô con gái.\"}, {\"speaker\": \"A\", \"text_zh\": \"你的两个儿子今年几岁了？\", \"pinyin\": \"Nǐ de liǎng gè érzi jīnnián jǐ suì le?\", \"text_vi\": \"Hai cậu con trai của anh năm nay mấy tuổi rồi?\"}, {\"speaker\": \"B\", \"text_zh\": \"大儿子九岁，小儿子六岁，女儿三岁。\", \"pinyin\": \"Dà érzi jiǔ suì, xiǎo érzi liù suì, nǚ'ér sān suì.\", \"text_vi\": \"Cháu lớn chín tuổi, cháu nhỏ sáu tuổi, còn bé gái mới ba tuổi.\"}, {\"speaker\": \"A\", \"text_zh\": \"你们去哪儿？\", \"pinyin\": \"Nǐmen qù nǎr?\", \"text_vi\": \"Gia đình anh đang đi đâu thế?\"}, {\"speaker\": \"B\", \"text_zh\": \"我们今天下午四点去公园玩儿。\", \"pinyin\": \"Wǒmen jīntiān xiàwǔ sì diǎn qù gōngyuán wánr.\", \"text_vi\": \"Chiều nay lúc bốn giờ cả nhà tôi đi công viên chơi.\"}]}",
       "objectives": [
         "Luyện đọc diễn cảm và nắm bắt ngữ cảnh hội thoại"
       ],
-      "source_reference": "HSK 2.0 Standard Course Dialogue 5"
+      "source_reference": "HSK Standard Course 1 & Giáo trình Boya Sơ cấp 1"
     },
     {
       "content_id": "PRACTICE_L5",
@@ -1243,11 +1243,11 @@
       "hsk_level": 1,
       "knowledge_type": "dialogue",
       "title": "Hội thoại ứng dụng Bài 6",
-      "content_json": "{\"context\":\"Hội thoại giao tiếp hàng ngày tại trường học hoặc công sở\",\"lines\":[{\"speaker\":\"A\",\"text_zh\":\"A: 今天，今天几号！\",\"pinyin\":\"A: jīntiān, Jīntiān jǐ hào!\",\"text_vi\":\"A: Xin chào bạn!\"},{\"speaker\":\"B\",\"text_zh\":\"B: 今天几号！星期天去北京。 (Chủ nhật đi Bắc Kinh.)\",\"pinyin\":\"B: Jīntiān jǐ hào! ...\",\"text_vi\":\"B: Chào bạn! Cảm ơn bạn!\"}]}",
+      "content_json": "{\"context\": \"Hỏi ngày tháng, thứ trong tuần và rủ bạn đến trường đọc sách (HSK Standard Course 1 - Bài 7)\", \"lines\": [{\"speaker\": \"A\", \"text_zh\": \"请问，今天几月几号？\", \"pinyin\": \"Qǐngwèn, jīntiān jǐ yuè jǐ hào?\", \"text_vi\": \"Xin hỏi, hôm nay là ngày mấy tháng mấy?\"}, {\"speaker\": \"B\", \"text_zh\": \"今天九月二号。\", \"pinyin\": \"Jīntiān jiǔ yuè èr hào.\", \"text_vi\": \"Hôm nay là ngày mùng 2 tháng 9.\"}, {\"speaker\": \"A\", \"text_zh\": \"今天星期几？\", \"pinyin\": \"Jīntiān xīngqī jǐ?\", \"text_vi\": \"Hôm nay là thứ mấy nhỉ?\"}, {\"speaker\": \"B\", \"text_zh\": \"今天星期三，明天星期四。\", \"pinyin\": \"Jīntiān xīngqīsān, míngtiān xīngqīsì.\", \"text_vi\": \"Hôm nay là thứ Tư, ngày mai là thứ Năm.\"}, {\"speaker\": \"A\", \"text_zh\": \"明天你去学校做什么？\", \"pinyin\": \"Míngtiān nǐ qù xuéxiào zuò shénme?\", \"text_vi\": \"Ngày mai cậu đến trường làm gì thế?\"}, {\"speaker\": \"B\", \"text_zh\": \"明天我去学校看书，你去吗？\", \"pinyin\": \"Míngtiān wǒ qù xuéxiào kàn shū, nǐ qù ma?\", \"text_vi\": \"Ngày mai mình đến trường đọc sách, cậu có đi không?\"}]}",
       "objectives": [
         "Luyện đọc diễn cảm và nắm bắt ngữ cảnh hội thoại"
       ],
-      "source_reference": "HSK 2.0 Standard Course Dialogue 6"
+      "source_reference": "HSK Standard Course 1 (Giáo trình Chuẩn HSK 1) - Bài 7"
     },
     {
       "content_id": "PRACTICE_L6",
@@ -1303,11 +1303,11 @@
       "hsk_level": 1,
       "knowledge_type": "dialogue",
       "title": "Hội thoại ứng dụng Bài 7",
-      "content_json": "{\"context\":\"Hội thoại giao tiếp hàng ngày tại trường học hoặc công sở\",\"lines\":[{\"speaker\":\"A\",\"text_zh\":\"A: 会，我会说汉语！\",\"pinyin\":\"A: huì, Wǒ huì shuō Hànyǔ!\",\"text_vi\":\"A: Xin chào bạn!\"},{\"speaker\":\"B\",\"text_zh\":\"B: 我会说汉语！米饭好吃。 (Cơm ngon.)\",\"pinyin\":\"B: Wǒ huì shuō Hànyǔ! ...\",\"text_vi\":\"B: Chào bạn! Cảm ơn bạn!\"}]}",
+      "content_json": "{\"context\": \"Hỏi về kỹ năng nói tiếng Trung, viết chữ Hán và nấu món ăn Trung Hoa (HSK Standard Course 1 - Bài 6)\", \"lines\": [{\"speaker\": \"A\", \"text_zh\": \"你会说汉语吗？\", \"pinyin\": \"Nǐ huì shuō Hànyǔ ma?\", \"text_vi\": \"Bạn có biết nói tiếng Trung không?\"}, {\"speaker\": \"B\", \"text_zh\": \"我会说汉语，可是不会写汉字。\", \"pinyin\": \"Wǒ huì shuō Hànyǔ, kěshì bú huì xiě Hànzì.\", \"text_vi\": \"Mình biết nói tiếng Trung, nhưng chưa biết viết chữ Hán.\"}, {\"speaker\": \"A\", \"text_zh\": \"这个字怎么读，怎么写？\", \"pinyin\": \"Zhège zì zěnme dú, zěnme xiě?\", \"text_vi\": \"Chữ này đọc thế nào và viết ra sao nhỉ?\"}, {\"speaker\": \"B\", \"text_zh\": \"这个字读“菜”。你妈妈会做中国菜吗？\", \"pinyin\": \"Zhège zì dú \\\"cài\\\". Nǐ māma huì zuò Zhōngguó cài ma?\", \"text_vi\": \"Chữ này đọc là \\\"cài\\\" (món ăn). Mẹ bạn có biết nấu món Trung Quốc không?\"}, {\"speaker\": \"A\", \"text_zh\": \"她会做，她做的中国菜很好吃！\", \"pinyin\": \"Tā huì zuò, tā zuò de Zhōngguó cài hěn hǎochī!\", \"text_vi\": \"Mẹ mình biết nấu chứ, món Trung Quốc mẹ nấu ngon lắm!\"}, {\"speaker\": \"B\", \"text_zh\": \"太好了，我也想学做中国菜。\", \"pinyin\": \"Tài hǎo le, wǒ yě xiǎng xué zuò Zhōngguó cài.\", \"text_vi\": \"Tuyệt quá, mình cũng muốn học nấu món ăn Trung Quốc.\"}]}",
       "objectives": [
         "Luyện đọc diễn cảm và nắm bắt ngữ cảnh hội thoại"
       ],
-      "source_reference": "HSK 2.0 Standard Course Dialogue 7"
+      "source_reference": "HSK Standard Course 1 (Giáo trình Chuẩn HSK 1) - Bài 6"
     },
     {
       "content_id": "PRACTICE_L7",
@@ -1363,11 +1363,11 @@
       "hsk_level": 1,
       "knowledge_type": "dialogue",
       "title": "Hội thoại ứng dụng Bài 8",
-      "content_json": "{\"context\":\"Hội thoại giao tiếp hàng ngày tại trường học hoặc công sở\",\"lines\":[{\"speaker\":\"A\",\"text_zh\":\"A: 想，我想喝茶！\",\"pinyin\":\"A: xiǎng, Wǒ xiǎng hē chá!\",\"text_vi\":\"A: Xin chào bạn!\"},{\"speaker\":\"B\",\"text_zh\":\"B: 我想喝茶！买苹果。 (Mua táo.)\",\"pinyin\":\"B: Wǒ xiǎng hē chá! ...\",\"text_vi\":\"B: Chào bạn! Cảm ơn bạn!\"}]}",
+      "content_json": "{\"context\": \"Đi ăn trưa, uống trà và hỏi giá mua cốc tại cửa hàng (HSK Standard Course 1 - Bài 8)\", \"lines\": [{\"speaker\": \"A\", \"text_zh\": \"中午你想吃什么？\", \"pinyin\": \"Zhōngwǔ nǐ xiǎng chī shénme?\", \"text_vi\": \"Buổi trưa bạn muốn ăn gì?\"}, {\"speaker\": \"B\", \"text_zh\": \"我想吃米饭，还想喝一杯茶。\", \"pinyin\": \"Wǒ xiǎng chī mǐfàn, hái xiǎng hē yì bēi chá.\", \"text_vi\": \"Mình muốn ăn cơm trắng, và muốn uống thêm một tách trà.\"}, {\"speaker\": \"A\", \"text_zh\": \"下午我们去商店买什么？\", \"pinyin\": \"Xiàwǔ wǒmen qù shāngdiàn mǎi shénme?\", \"text_vi\": \"Chiều nay chúng mình đi cửa hàng mua gì nhỉ?\"}, {\"speaker\": \"B\", \"text_zh\": \"我想买几个新杯子。请问，这个杯子多少钱？\", \"pinyin\": \"Wǒ xiǎng mǎi jǐ gè xīn bēizi. Qǐngwèn, zhège bēizi duōshao qián?\", \"text_vi\": \"Mình muốn mua mấy chiếc cốc mới. Xin hỏi chiếc cốc này giá bao nhiêu tiền?\"}, {\"speaker\": \"A\", \"text_zh\": \"这个杯子二十八块钱，那个十八块钱。\", \"pinyin\": \"Zhège bēizi èrshíbā kuài qián, nàge shíbā kuài qián.\", \"text_vi\": \"Chiếc cốc này 28 tệ, còn chiếc kia 18 tệ.\"}, {\"speaker\": \"B\", \"text_zh\": \"好，我买这个十八块钱的杯子。\", \"pinyin\": \"Hǎo, wǒ mǎi zhège shíbā kuài qián de bēizi.\", \"text_vi\": \"Được, mình lấy chiếc cốc 18 tệ này nhé.\"}]}",
       "objectives": [
         "Luyện đọc diễn cảm và nắm bắt ngữ cảnh hội thoại"
       ],
-      "source_reference": "HSK 2.0 Standard Course Dialogue 8"
+      "source_reference": "HSK Standard Course 1 (Giáo trình Chuẩn HSK 1) - Bài 8"
     },
     {
       "content_id": "PRACTICE_L8",
@@ -1423,11 +1423,11 @@
       "hsk_level": 1,
       "knowledge_type": "dialogue",
       "title": "Hội thoại ứng dụng Bài 9",
-      "content_json": "{\"context\":\"Hội thoại giao tiếp hàng ngày tại trường học hoặc công sở\",\"lines\":[{\"speaker\":\"A\",\"text_zh\":\"A: 在，你儿子在哪儿工作！\",\"pinyin\":\"A: zài, Nǐ érzi zài nǎr gōngzuò!\",\"text_vi\":\"A: Xin chào bạn!\"},{\"speaker\":\"B\",\"text_zh\":\"B: 你儿子在哪儿工作！爸爸是医生。 (Bố là bác sĩ.)\",\"pinyin\":\"B: Nǐ érzi zài nǎr gōngzuò! ...\",\"text_vi\":\"B: Chào bạn! Cảm ơn bạn!\"}]}",
+      "content_json": "{\"context\": \"Hỏi thăm nơi làm việc của người thân trong gia đình (HSK Standard Course 1 - Bài 9)\", \"lines\": [{\"speaker\": \"A\", \"text_zh\": \"请问，你儿子在哪儿工作？\", \"pinyin\": \"Qǐngwèn, nǐ érzi zài nǎr gōngzuò?\", \"text_vi\": \"Xin hỏi, con trai bác làm việc ở đâu thế ạ?\"}, {\"speaker\": \"B\", \"text_zh\": \"我儿子在医院工作，他是医生。\", \"pinyin\": \"Wǒ érzi zài yīyuàn gōngzuò, tā shì yīshēng.\", \"text_vi\": \"Con trai bác làm việc ở bệnh viện, cháu nó là bác sĩ.\"}, {\"speaker\": \"A\", \"text_zh\": \"你爸爸也在医院工作吗？\", \"pinyin\": \"Nǐ bàba yě zài yīyuàn gōngzuò ma?\", \"text_vi\": \"Bố của bạn cũng làm việc ở bệnh viện phải không?\"}, {\"speaker\": \"B\", \"text_zh\": \"不，我爸爸不在医院工作，他在北京的商店工作。\", \"pinyin\": \"Bù, wǒ bàba bú zài yīyuàn gōngzuò, tā zài Běijīng de shāngdiàn gōngzuò.\", \"text_vi\": \"Không, bố mình không làm ở bệnh viện, ông làm ở một cửa hàng tại Bắc Kinh.\"}, {\"speaker\": \"A\", \"text_zh\": \"那家饭馆在这儿吗？\", \"pinyin\": \"Nà jiā fànguǎn zài zhèr ma?\", \"text_vi\": \"Nhà hàng đó có ở gần đây không?\"}, {\"speaker\": \"B\", \"text_zh\": \"在那儿，医院前面就是饭馆。\", \"pinyin\": \"Zài nàr, yīyuàn qiánmiàn jiù shì fànguǎn.\", \"text_vi\": \"Ở đằng kia kìa, ngay phía trước bệnh viện chính là nhà hàng đó.\"}]}",
       "objectives": [
         "Luyện đọc diễn cảm và nắm bắt ngữ cảnh hội thoại"
       ],
-      "source_reference": "HSK 2.0 Standard Course Dialogue 9"
+      "source_reference": "HSK Standard Course 1 (Giáo trình Chuẩn HSK 1) - Bài 9"
     },
     {
       "content_id": "PRACTICE_L9",
@@ -1483,11 +1483,11 @@
       "hsk_level": 1,
       "knowledge_type": "dialogue",
       "title": "Hội thoại ứng dụng Bài 10",
-      "content_json": "{\"context\":\"Hội thoại giao tiếp hàng ngày tại trường học hoặc công sở\",\"lines\":[{\"speaker\":\"A\",\"text_zh\":\"A: 桌子，我能坐这儿吗！\",\"pinyin\":\"A: zhuōzi, Wǒ néng zuò zhèr ma!\",\"text_vi\":\"A: Xin chào bạn!\"},{\"speaker\":\"B\",\"text_zh\":\"B: 我能坐这儿吗！学校后面。 (Phía sau trường học.)\",\"pinyin\":\"B: Wǒ néng zuò zhèr ma! ...\",\"text_vi\":\"B: Chào bạn! Cảm ơn bạn!\"}]}",
+      "content_json": "{\"context\": \"Hỏi vị trí đồ vật trên bàn học và xin phép ngồi trong thư viện (HSK Standard Course 1 - Bài 10)\", \"lines\": [{\"speaker\": \"A\", \"text_zh\": \"请问，桌子上面有什么？\", \"pinyin\": \"Qǐngwèn, zhuōzi shàngmiàn yǒu shénme?\", \"text_vi\": \"Xin hỏi trên mặt bàn có những gì vậy?\"}, {\"speaker\": \"B\", \"text_zh\": \"桌子上面有一台电脑和一本书。\", \"pinyin\": \"Zhuōzi shàngmiàn yǒu yì tái diànnǎo hé yì běn shū.\", \"text_vi\": \"Trên mặt bàn có một chiếc máy tính và một quyển sách.\"}, {\"speaker\": \"A\", \"text_zh\": \"我的杯子在哪儿呢？\", \"pinyin\": \"Wǒ de bēizi zài nǎr ne?\", \"text_vi\": \"Thế chiếc cốc của mình ở đâu rồi nhỉ?\"}, {\"speaker\": \"B\", \"text_zh\": \"你的杯子在桌子里面，书的后面。\", \"pinyin\": \"Nǐ de bēizi zài zhuōzi lǐmiàn, shū de hòumiàn.\", \"text_vi\": \"Cốc của bạn ở trong ngăn bàn, phía sau quyển sách ấy.\"}, {\"speaker\": \"A\", \"text_zh\": \"这把椅子有人坐吗？我能坐这儿吗？\", \"pinyin\": \"Zhè bǎ yǐzi yǒu rén zuò ma? Wǒ néng zuò zhèr ma?\", \"text_vi\": \"Chiếc ghế này có ai ngồi chưa? Mình ngồi ở đây được không?\"}, {\"speaker\": \"B\", \"text_zh\": \"前面和后面都没人，请坐！\", \"pinyin\": \"Qiánmiàn hé hòumiàn dōu méi rén, qǐng zuò!\", \"text_vi\": \"Phía trước và phía sau đều chưa có ai ngồi cả, mời bạn ngồi!\"}]}",
       "objectives": [
         "Luyện đọc diễn cảm và nắm bắt ngữ cảnh hội thoại"
       ],
-      "source_reference": "HSK 2.0 Standard Course Dialogue 10"
+      "source_reference": "HSK Standard Course 1 (Giáo trình Chuẩn HSK 1) - Bài 10"
     },
     {
       "content_id": "PRACTICE_L10",
@@ -1543,11 +1543,11 @@
       "hsk_level": 1,
       "knowledge_type": "dialogue",
       "title": "Hội thoại ứng dụng Bài 11",
-      "content_json": "{\"context\":\"Hội thoại giao tiếp hàng ngày tại trường học hoặc công sở\",\"lines\":[{\"speaker\":\"A\",\"text_zh\":\"A: 猫，现在几点！\",\"pinyin\":\"A: māo, Xiànzài jǐ diǎn!\",\"text_vi\":\"A: Xin chào bạn!\"},{\"speaker\":\"B\",\"text_zh\":\"B: 现在几点！我没钱。 (Tôi không có tiền.)\",\"pinyin\":\"B: Xiànzài jǐ diǎn! ...\",\"text_vi\":\"B: Chào bạn! Cảm ơn bạn!\"}]}",
+      "content_json": "{\"context\": \"Tìm thú cưng trong nhà và trò chuyện cùng bạn bè (HSK Standard Course 1 - Bài 9 & 10)\", \"lines\": [{\"speaker\": \"A\", \"text_zh\": \"你看，椅子下面那只小猫是谁的？\", \"pinyin\": \"Nǐ kàn, yǐzi xiàmiàn nà zhī xiǎo māo shì shéi de?\", \"text_vi\": \"Cậu nhìn kìa, chú mèo nhỏ dưới gầm ghế kia là của ai thế?\"}, {\"speaker\": \"B\", \"text_zh\": \"那是我女儿的小猫，它今年一岁了。\", \"pinyin\": \"Nà shì wǒ nǚ'ér de xiǎo māo, tā jīnnián yí suì le.\", \"text_vi\": \"Đó là chú mèo nhỏ của con gái mình, năm nay nó được một tuổi rồi.\"}, {\"speaker\": \"A\", \"text_zh\": \"你家还有小狗吗？\", \"pinyin\": \"Nǐ jiā hái yǒu xiǎo gǒu ma?\", \"text_vi\": \"Nhà cậu còn nuôi cả cún con nữa phải không?\"}, {\"speaker\": \"B\", \"text_zh\": \"是啊，那只小狗在门后面呢。\", \"pinyin\": \"Shì a, nà zhī xiǎo gǒu zài mén hòumiàn ne.\", \"text_vi\": \"Đúng rồi, chú cún con đang ở phía sau cánh cửa kìa.\"}, {\"speaker\": \"A\", \"text_zh\": \"桌子上那些书是你的吗？我能看看吗？\", \"pinyin\": \"Zhuōzi shàng nàxiē shū shì nǐ de ma? Wǒ néng kànkan ma?\", \"text_vi\": \"Mấy quyển sách trên bàn kia là của cậu hả? Mình xem thử một chút được không?\"}, {\"speaker\": \"B\", \"text_zh\": \"当然能，你坐这儿看吧。\", \"pinyin\": \"Dāngrán néng, nǐ zuò zhèr kàn ba.\", \"text_vi\": \"Tất nhiên là được chứ, cậu ngồi đây mà xem nhé.\"}]}",
       "objectives": [
         "Luyện đọc diễn cảm và nắm bắt ngữ cảnh hội thoại"
       ],
-      "source_reference": "HSK 2.0 Standard Course Dialogue 11"
+      "source_reference": "HSK Standard Course 1 (Giáo trình Chuẩn HSK 1) & Boya Sơ cấp"
     },
     {
       "content_id": "PRACTICE_L11",
@@ -1603,11 +1603,11 @@
       "hsk_level": 1,
       "knowledge_type": "dialogue",
       "title": "Hội thoại ứng dụng Bài 12",
-      "content_json": "{\"context\":\"Hội thoại giao tiếp hàng ngày tại trường học hoặc công sở\",\"lines\":[{\"speaker\":\"A\",\"text_zh\":\"A: 现在，明天天气怎么样！\",\"pinyin\":\"A: xiànzài, Míngtiān tiānqì zěnmeyàng!\",\"text_vi\":\"A: Xin chào bạn!\"},{\"speaker\":\"B\",\"text_zh\":\"B: 明天天气怎么样！下午三点去学校。 (3 giờ chiều đi trường.)\",\"pinyin\":\"B: Míngtiān tiānqì zěnmeyàng! ...\",\"text_vi\":\"B: Chào bạn! Cảm ơn bạn!\"}]}",
+      "content_json": "{\"context\": \"Hỏi giờ giấc hiện tại và lịch trình sinh hoạt, đi lại trong ngày (HSK Standard Course 1 - Bài 11)\", \"lines\": [{\"speaker\": \"A\", \"text_zh\": \"请问，现在几点？\", \"pinyin\": \"Qǐngwèn, xiànzài jǐ diǎn?\", \"text_vi\": \"Xin hỏi, bây giờ là mấy giờ rồi?\"}, {\"speaker\": \"B\", \"text_zh\": \"现在上午十点十分。\", \"pinyin\": \"Xiànzài shàngwǔ shí diǎn shí fēn.\", \"text_vi\": \"Bây giờ là 10 giờ 10 phút sáng.\"}, {\"speaker\": \"A\", \"text_zh\": \"中午我们几点吃饭？\", \"pinyin\": \"Zhōngwǔ wǒmen jǐ diǎn chīfàn?\", \"text_vi\": \"Buổi trưa chúng mình ăn cơm lúc mấy giờ?\"}, {\"speaker\": \"B\", \"text_zh\": \"十二点吃饭。你下午什么时候回家？\", \"pinyin\": \"Shí'èr diǎn chīfàn. Nǐ xiàwǔ shénme shíhou huí jiā?\", \"text_vi\": \"12 giờ ăn cơm nhé. Chiều nay khi nào bạn về nhà?\"}, {\"speaker\": \"A\", \"text_zh\": \"我下午五点半回家。你在北京住几天？\", \"pinyin\": \"Wǒ xiàwǔ wǔ diǎn bàn huí jiā. Nǐ zài Běijīng zhù jǐ tiān?\", \"text_vi\": \"5 rưỡi chiều mình về nhà. Bạn ở lại Bắc Kinh mấy ngày?\"}, {\"speaker\": \"B\", \"text_zh\": \"我在北京住三天，星期五回学校。\", \"pinyin\": \"Wǒ zài Běijīng zhù sān tiān, xīngqīwǔ huí xuéxiào.\", \"text_vi\": \"Mình ở Bắc Kinh ba ngày, thứ Sáu sẽ quay về trường.\"}]}",
       "objectives": [
         "Luyện đọc diễn cảm và nắm bắt ngữ cảnh hội thoại"
       ],
-      "source_reference": "HSK 2.0 Standard Course Dialogue 12"
+      "source_reference": "HSK Standard Course 1 (Giáo trình Chuẩn HSK 1) - Bài 11"
     },
     {
       "content_id": "PRACTICE_L12",
@@ -1663,11 +1663,11 @@
       "hsk_level": 1,
       "knowledge_type": "dialogue",
       "title": "Hội thoại ứng dụng Bài 13",
-      "content_json": "{\"context\":\"Hội thoại giao tiếp hàng ngày tại trường học hoặc công sở\",\"lines\":[{\"speaker\":\"A\",\"text_zh\":\"A: 天气，他在做什么呢！\",\"pinyin\":\"A: tiānqì, Tā zài zuò shénme ne!\",\"text_vi\":\"A: Xin chào bạn!\"},{\"speaker\":\"B\",\"text_zh\":\"B: 他在做什么呢！外面下雨了。 (Bên ngoài trời mưa rồi.)\",\"pinyin\":\"B: Tā zài zuò shénme ne! ...\",\"text_vi\":\"B: Chào bạn! Cảm ơn bạn!\"}]}",
+      "content_json": "{\"context\": \"Trò chuyện về thời tiết mưa lạnh và nhắc nhở giữ gìn sức khỏe (HSK Standard Course 1 - Bài 12)\", \"lines\": [{\"speaker\": \"A\", \"text_zh\": \"昨天北京的天气怎么样？\", \"pinyin\": \"Zuótiān Běijīng de tiānqì zěnmeyàng?\", \"text_vi\": \"Hôm qua thời tiết ở Bắc Kinh thế nào?\"}, {\"speaker\": \"B\", \"text_zh\": \"昨天太冷了，今天天气很好，不冷也不热。\", \"pinyin\": \"Zuótiān tài lěng le, jīntiān tiānqì hěn hǎo, bù lěng yě bú rè.\", \"text_vi\": \"Hôm qua lạnh lắm, hôm nay thời tiết rất đẹp, không lạnh cũng không nóng.\"}, {\"speaker\": \"A\", \"text_zh\": \"明天会下雨吗？\", \"pinyin\": \"Míngtiān huì xià yǔ ma?\", \"text_vi\": \"Ngày mai trời có mưa không nhỉ?\"}, {\"speaker\": \"B\", \"text_zh\": \"明天下午会下雨。你身体怎么样？\", \"pinyin\": \"Míngtiān xiàwǔ huì xià yǔ. Nǐ shēntǐ zěnmeyàng?\", \"text_vi\": \"Chiều mai trời sẽ mưa đấy. Sức khỏe của bạn dạo này thế nào?\"}, {\"speaker\": \"A\", \"text_zh\": \"我身体不太好，今天不想出去。\", \"pinyin\": \"Wǒ shēntǐ bú tài hǎo, jīntiān bù xiǎng chūqù.\", \"text_vi\": \"Cơ thể mình không được khỏe lắm, hôm nay chẳng muốn ra ngoài.\"}, {\"speaker\": \"B\", \"text_zh\": \"那你在家多喝些水，多吃些水果吧。\", \"pinyin\": \"Nà nǐ zài jiā duō hē xiē shuǐ, duō chī xiē shuǐguǒ ba.\", \"text_vi\": \"Vậy bạn ở nhà nhớ uống nhiều nước và ăn nhiều trái cây vào nhé.\"}]}",
       "objectives": [
         "Luyện đọc diễn cảm và nắm bắt ngữ cảnh hội thoại"
       ],
-      "source_reference": "HSK 2.0 Standard Course Dialogue 13"
+      "source_reference": "HSK Standard Course 1 (Giáo trình Chuẩn HSK 1) - Bài 12"
     },
     {
       "content_id": "PRACTICE_L13",
@@ -1723,11 +1723,11 @@
       "hsk_level": 1,
       "knowledge_type": "dialogue",
       "title": "Hội thoại ứng dụng Bài 14",
-      "content_json": "{\"context\":\"Hội thoại giao tiếp hàng ngày tại trường học hoặc công sở\",\"lines\":[{\"speaker\":\"A\",\"text_zh\":\"A: 喂，她买了不少衣服！\",\"pinyin\":\"A: wèi, Tā mǎi le bù shǎo yīfu!\",\"text_vi\":\"A: Xin chào bạn!\"},{\"speaker\":\"B\",\"text_zh\":\"B: 她买了不少衣服！我想睡觉。 (Tôi muốn đi ngủ.)\",\"pinyin\":\"B: Tā mǎi le bù shǎo yīfu! ...\",\"text_vi\":\"B: Chào bạn! Cảm ơn bạn!\"}]}",
+      "content_json": "{\"context\": \"Gọi điện thoại hỏi thăm bạn bè đang làm gì vào buổi tối (HSK Standard Course 1 - Bài 13)\", \"lines\": [{\"speaker\": \"A\", \"text_zh\": \"喂，大卫，你在做什么呢？\", \"pinyin\": \"Wèi, Dàwèi, nǐ zài zuò shénme ne?\", \"text_vi\": \"Alo, David đấy à, cậu đang làm gì thế?\"}, {\"speaker\": \"B\", \"text_zh\": \"我在家学习汉语呢。你呢？\", \"pinyin\": \"Wǒ zài jiā xuéxí Hànyǔ ne. Nǐ ne?\", \"text_vi\": \"Mình đang học tiếng Trung ở nhà thôi. Còn cậu?\"}, {\"speaker\": \"A\", \"text_zh\": \"我在看电视。你也喜欢看中国电影吗？\", \"pinyin\": \"Wǒ zài kàn diànshì. Nǐ yě xǐhuan kàn Zhōngguó diànyǐng ma?\", \"text_vi\": \"Mình đang xem tivi. Cậu cũng thích xem phim điện ảnh Trung Quốc phải không?\"}, {\"speaker\": \"B\", \"text_zh\": \"我很喜欢看中国电影，李明和我都喜欢看。\", \"pinyin\": \"Wǒ hěn xǐhuan kàn Zhōngguó diànyǐng, Lǐ Míng hé wǒ dōu xǐhuan kàn.\", \"text_vi\": \"Mình rất thích xem phim Trung Quốc, cả Lý Minh và mình đều thích xem.\"}, {\"speaker\": \"A\", \"text_zh\": \"现在十点了，我们明天一起去看电影吧。\", \"pinyin\": \"Xiànzài shí diǎn le, wǒmen míngtiān yìqǐ qù kàn diànyǐng ba.\", \"text_vi\": \"Bây giờ mười giờ tối rồi, ngày mai tụi mình cùng đi xem phim nhé.\"}, {\"speaker\": \"B\", \"text_zh\": \"好啊，现在早点儿睡觉吧，晚安！\", \"pinyin\": \"Hǎo a, xiànzài zǎodiǎnr shuìjiào ba, wǎn'ān!\", \"text_vi\": \"Được đấy, giờ đi ngủ sớm thôi, chúc ngủ ngon nhé!\"}]}",
       "objectives": [
         "Luyện đọc diễn cảm và nắm bắt ngữ cảnh hội thoại"
       ],
-      "source_reference": "HSK 2.0 Standard Course Dialogue 14"
+      "source_reference": "HSK Standard Course 1 (Giáo trình Chuẩn HSK 1) - Bài 13"
     },
     {
       "content_id": "PRACTICE_L14",
@@ -1783,11 +1783,11 @@
       "hsk_level": 1,
       "knowledge_type": "dialogue",
       "title": "Hội thoại ứng dụng Bài 15",
-      "content_json": "{\"context\":\"Hội thoại giao tiếp hàng ngày tại trường học hoặc công sở\",\"lines\":[{\"speaker\":\"A\",\"text_zh\":\"A: 东西，我是坐飞机来的！\",\"pinyin\":\"A: dōngxi, Wǒ shì zuò fēijī lái de!\",\"text_vi\":\"A: Xin chào bạn!\"},{\"speaker\":\"B\",\"text_zh\":\"B: 我是坐飞机来的！开车。 (Lái xe.)\",\"pinyin\":\"B: Wǒ shì zuò fēijī lái de! ...\",\"text_vi\":\"B: Chào bạn! Cảm ơn bạn!\"}]}",
+      "content_json": "{\"context\": \"Mua sắm đồ đạc và hỏi thăm phương tiện di chuyển đến Bắc Kinh (HSK Standard Course 1 - Bài 14 & 15)\", \"lines\": [{\"speaker\": \"A\", \"text_zh\": \"王先生，你今天去商店买什么东西了？\", \"pinyin\": \"Wáng xiānsheng, nǐ jīntiān qù shāngdiàn mǎi shénme dōngxi le?\", \"text_vi\": \"Anh Vương ơi, hôm nay anh đi cửa hàng đã mua những đồ gì thế?\"}, {\"speaker\": \"B\", \"text_zh\": \"我买了一点儿苹果，还看见了你的同学。\", \"pinyin\": \"Wǒ mǎi le yìdiǎnr píngguǒ, hái kànjiàn le nǐ de tóngxué.\", \"text_vi\": \"Tôi mua một ít táo, và còn tình cờ gặp bạn học của cậu nữa.\"}, {\"speaker\": \"A\", \"text_zh\": \"你是开车去商店的吗？\", \"pinyin\": \"Nǐ shì kāi chē qù shāngdiàn de ma?\", \"text_vi\": \"Anh tự lái xe ô tô đến cửa hàng phải không?\"}, {\"speaker\": \"B\", \"text_zh\": \"不是，我是坐出租车去的。\", \"pinyin\": \"Bú shì, wǒ shì zuò chūzūchē qù de.\", \"text_vi\": \"Không phải, tôi đi bằng xe taxi đến đó.\"}, {\"speaker\": \"A\", \"text_zh\": \"你朋友是怎么来北京的？\", \"pinyin\": \"Nǐ péngyou shì zěnme lái Běijīng de?\", \"text_vi\": \"Bạn của anh đã đến Bắc Kinh bằng phương tiện gì vậy?\"}, {\"speaker\": \"B\", \"text_zh\": \"他是坐飞机来的，我们都很高兴。\", \"pinyin\": \"Tā shì zuò fēijī lái de, wǒmen dōu hěn gāoxìng.\", \"text_vi\": \"Anh ấy đi máy bay tới đây, chúng tôi đều rất vui mừng.\"}]}",
       "objectives": [
         "Luyện đọc diễn cảm và nắm bắt ngữ cảnh hội thoại"
       ],
-      "source_reference": "HSK 2.0 Standard Course Dialogue 15"
+      "source_reference": "HSK Standard Course 1 (Giáo trình Chuẩn HSK 1) - Bài 14 & 15"
     },
     {
       "content_id": "PRACTICE_L15",
@@ -1805,7 +1805,7 @@
       "content_id": "MASTERY_L1",
       "curriculum_id": "curr_hsk1",
       "hsk_level": 1,
-      "knowledge_type": "mastery_check",
+      "knowledge_type": "mastery",
       "title": "Đánh giá hoàn thành Xin chào",
       "content_json": "{\"exercises\": [{\"id\": \"m_ex_1_1_1\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Từ \\\"你\\\" (nǐ) có nghĩa là gì?\", \"options\": [\"xin, mời\", \"bạn, anh, chị (đại từ ngôi 2)\", \"tốt, đẹp, hay\"], \"correct_answer\": \"bạn, anh, chị (đại từ ngôi 2)\", \"explanation\": \"\\\"你\\\" có nghĩa là \\\"bạn, anh, chị (đại từ ngôi 2)\\\".\"}, {\"id\": \"m_ex_1_1_2\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Nghĩa của từ \\\"好\\\" (hǎo) là gì?\", \"options\": [\"xin, mời\", \"bạn, anh, chị (đại từ ngôi 2)\", \"tốt, đẹp, hay\"], \"correct_answer\": \"tốt, đẹp, hay\", \"explanation\": \"\\\"好\\\" có nghĩa là \\\"tốt, đẹp, hay\\\".\"}, {\"id\": \"m_ex_1_1_3\", \"type\": \"multiple_choice\", \"skill_type\": \"grammar\", \"prompt\": \"Dịch câu sau sang tiếng Việt: \\\"你好！\\\"\", \"options\": [\"Chào buổi sáng\", \"Tôi không hiểu\", \"Chào bạn!\"], \"correct_answer\": \"Chào bạn!\", \"explanation\": \"Câu \\\"你好！\\\" dịch nghĩa là: \\\"Chào bạn!\\\".\"}, {\"id\": \"m_ex_1_1_4\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Đánh giá] Chọn từ thích hợp điền vào chỗ trống: [ ____ ]！ (xin, mời)\", \"options\": [\"请\", \"谢谢\", \"再见\"], \"correct_answer\": \"请\", \"explanation\": \"Dùng từ \\\"请\\\" (xin, mời) phù hợp nhất với ngữ cảnh.\"}, {\"id\": \"m_ex_1_1_5\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Tổng hợp] Phiên âm Pinyin đúng của chữ \\\"没关系\\\" là gì?\", \"options\": [\"dǎ\", \"máng\", \"méiguānxi\"], \"correct_answer\": \"méiguānxi\", \"explanation\": \"Chữ \\\"没关系\\\" có phiên âm chuẩn là méiguānxi.\"}]}",
       "objectives": [
@@ -1817,7 +1817,7 @@
       "content_id": "MASTERY_L2",
       "curriculum_id": "curr_hsk1",
       "hsk_level": 1,
-      "knowledge_type": "mastery_check",
+      "knowledge_type": "mastery",
       "title": "Đánh giá hoàn thành Cảm ơn bạn",
       "content_json": "{\"exercises\": [{\"id\": \"m_ex_1_2_1\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Từ \\\"我\\\" (wǒ) có nghĩa là gì?\", \"options\": [\"tôi, mình (ngôi 1)\", \"là, đúng\", \"giáo viên, thầy cô giáo\"], \"correct_answer\": \"tôi, mình (ngôi 1)\", \"explanation\": \"\\\"我\\\" có nghĩa là \\\"tôi, mình (ngôi 1)\\\".\"}, {\"id\": \"m_ex_1_2_2\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Nghĩa của từ \\\"是\\\" (shì) là gì?\", \"options\": [\"tôi, mình (ngôi 1)\", \"giáo viên, thầy cô giáo\", \"là, đúng\"], \"correct_answer\": \"là, đúng\", \"explanation\": \"\\\"是\\\" có nghĩa là \\\"là, đúng\\\".\"}, {\"id\": \"m_ex_1_2_3\", \"type\": \"multiple_choice\", \"skill_type\": \"grammar\", \"prompt\": \"Dịch câu sau sang tiếng Việt: \\\"我是学生。\\\"\", \"options\": [\"Tôi là học sinh.\", \"Chào buổi sáng\", \"Tôi không hiểu\"], \"correct_answer\": \"Tôi là học sinh.\", \"explanation\": \"Câu \\\"我是学生。\\\" dịch nghĩa là: \\\"Tôi là học sinh.\\\".\"}, {\"id\": \"m_ex_1_2_4\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Đánh giá] Chọn từ thích hợp điền vào chỗ trống: [ ____ ]！ (giáo viên, thầy cô giáo)\", \"options\": [\"谢谢\", \"再见\", \"老师\"], \"correct_answer\": \"老师\", \"explanation\": \"Dùng từ \\\"老师\\\" (giáo viên, thầy cô giáo) phù hợp nhất với ngữ cảnh.\"}, {\"id\": \"m_ex_1_2_5\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Tổng hợp] Phiên âm Pinyin đúng của chữ \\\"什么\\\" là gì?\", \"options\": [\"máng\", \"dǎ\", \"shénme\"], \"correct_answer\": \"shénme\", \"explanation\": \"Chữ \\\"什么\\\" có phiên âm chuẩn là shénme.\"}]}",
       "objectives": [
@@ -1829,7 +1829,7 @@
       "content_id": "MASTERY_L3",
       "curriculum_id": "curr_hsk1",
       "hsk_level": 1,
-      "knowledge_type": "mastery_check",
+      "knowledge_type": "mastery",
       "title": "Đánh giá hoàn thành Anh ấy là ai?",
       "content_json": "{\"exercises\": [{\"id\": \"m_ex_1_3_1\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Từ \\\"他\\\" (tā) có nghĩa là gì?\", \"options\": [\"ai\", \"anh ấy, ông ấy\", \"cô ấy, bà ấy\"], \"correct_answer\": \"anh ấy, ông ấy\", \"explanation\": \"\\\"他\\\" có nghĩa là \\\"anh ấy, ông ấy\\\".\"}, {\"id\": \"m_ex_1_3_2\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Nghĩa của từ \\\"她\\\" (tā) là gì?\", \"options\": [\"anh ấy, ông ấy\", \"ai\", \"cô ấy, bà ấy\"], \"correct_answer\": \"cô ấy, bà ấy\", \"explanation\": \"\\\"她\\\" có nghĩa là \\\"cô ấy, bà ấy\\\".\"}, {\"id\": \"m_ex_1_3_3\", \"type\": \"multiple_choice\", \"skill_type\": \"grammar\", \"prompt\": \"Dịch câu sau sang tiếng Việt: \\\"他是谁？\\\"\", \"options\": [\"Chào buổi sáng\", \"Tôi không hiểu\", \"Anh ấy là ai?\"], \"correct_answer\": \"Anh ấy là ai?\", \"explanation\": \"Câu \\\"他是谁？\\\" dịch nghĩa là: \\\"Anh ấy là ai?\\\".\"}, {\"id\": \"m_ex_1_3_4\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Đánh giá] Chọn từ thích hợp điền vào chỗ trống: [ ____ ]！ (ai)\", \"options\": [\"再见\", \"谢谢\", \"谁\"], \"correct_answer\": \"谁\", \"explanation\": \"Dùng từ \\\"谁\\\" (ai) phù hợp nhất với ngữ cảnh.\"}, {\"id\": \"m_ex_1_3_5\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Tổng hợp] Phiên âm Pinyin đúng của chữ \\\"朋友\\\" là gì?\", \"options\": [\"dǎ\", \"máng\", \"péngyou\"], \"correct_answer\": \"péngyou\", \"explanation\": \"Chữ \\\"朋友\\\" có phiên âm chuẩn là péngyou.\"}]}",
       "objectives": [
@@ -1841,7 +1841,7 @@
       "content_id": "MASTERY_L4",
       "curriculum_id": "curr_hsk1",
       "hsk_level": 1,
-      "knowledge_type": "mastery_check",
+      "knowledge_type": "mastery",
       "title": "Đánh giá hoàn thành Cô ấy là người Trung Quốc",
       "content_json": "{\"exercises\": [{\"id\": \"m_ex_1_4_1\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Từ \\\"家\\\" (jiā) có nghĩa là gì?\", \"options\": [\"miệng; người (lượng từ gia đình)\", \"nhà, gia đình\", \"mấy (hỏi số lượng < 10)\"], \"correct_answer\": \"nhà, gia đình\", \"explanation\": \"\\\"家\\\" có nghĩa là \\\"nhà, gia đình\\\".\"}, {\"id\": \"m_ex_1_4_2\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Nghĩa của từ \\\"几\\\" (jǐ) là gì?\", \"options\": [\"nhà, gia đình\", \"miệng; người (lượng từ gia đình)\", \"mấy (hỏi số lượng < 10)\"], \"correct_answer\": \"mấy (hỏi số lượng < 10)\", \"explanation\": \"\\\"几\\\" có nghĩa là \\\"mấy (hỏi số lượng < 10)\\\".\"}, {\"id\": \"m_ex_1_4_3\", \"type\": \"multiple_choice\", \"skill_type\": \"grammar\", \"prompt\": \"Dịch câu sau sang tiếng Việt: \\\"我家在北京。\\\"\", \"options\": [\"Tôi không hiểu\", \"Nhà tôi ở Bắc Kinh.\", \"Chào buổi sáng\"], \"correct_answer\": \"Nhà tôi ở Bắc Kinh.\", \"explanation\": \"Câu \\\"我家在北京。\\\" dịch nghĩa là: \\\"Nhà tôi ở Bắc Kinh.\\\".\"}, {\"id\": \"m_ex_1_4_4\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Đánh giá] Chọn từ thích hợp điền vào chỗ trống: [ ____ ]！ (miệng; người (lượng từ gia đình))\", \"options\": [\"再见\", \"谢谢\", \"口\"], \"correct_answer\": \"口\", \"explanation\": \"Dùng từ \\\"口\\\" (miệng; người (lượng từ gia đình)) phù hợp nhất với ngữ cảnh.\"}, {\"id\": \"m_ex_1_4_5\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Tổng hợp] Phiên âm Pinyin đúng của chữ \\\"多\\\" là gì?\", \"options\": [\"duō\", \"máng\", \"dǎ\"], \"correct_answer\": \"duō\", \"explanation\": \"Chữ \\\"多\\\" có phiên âm chuẩn là duō.\"}]}",
       "objectives": [
@@ -1853,7 +1853,7 @@
       "content_id": "MASTERY_L5",
       "curriculum_id": "curr_hsk1",
       "hsk_level": 1,
-      "knowledge_type": "mastery_check",
+      "knowledge_type": "mastery",
       "title": "Đánh giá hoàn thành Gia đình bạn có mấy người?",
       "content_json": "{\"exercises\": [{\"id\": \"m_ex_1_5_1\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Từ \\\"一\\\" (yī) có nghĩa là gì?\", \"options\": [\"số 3\", \"số 1\", \"số 2\"], \"correct_answer\": \"số 1\", \"explanation\": \"\\\"一\\\" có nghĩa là \\\"số 1\\\".\"}, {\"id\": \"m_ex_1_5_2\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Nghĩa của từ \\\"二\\\" (èr) là gì?\", \"options\": [\"số 3\", \"số 1\", \"số 2\"], \"correct_answer\": \"số 2\", \"explanation\": \"\\\"二\\\" có nghĩa là \\\"số 2\\\".\"}, {\"id\": \"m_ex_1_5_3\", \"type\": \"multiple_choice\", \"skill_type\": \"grammar\", \"prompt\": \"Dịch câu sau sang tiếng Việt: \\\"一个人。\\\"\", \"options\": [\"Một người.\", \"Tôi không hiểu\", \"Chào buổi sáng\"], \"correct_answer\": \"Một người.\", \"explanation\": \"Câu \\\"一个人。\\\" dịch nghĩa là: \\\"Một người.\\\".\"}, {\"id\": \"m_ex_1_5_4\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Đánh giá] Chọn từ thích hợp điền vào chỗ trống: [ ____ ]！ (số 3)\", \"options\": [\"三\", \"再见\", \"谢谢\"], \"correct_answer\": \"三\", \"explanation\": \"Dùng từ \\\"三\\\" (số 3) phù hợp nhất với ngữ cảnh.\"}, {\"id\": \"m_ex_1_5_5\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Tổng hợp] Phiên âm Pinyin đúng của chữ \\\"五\\\" là gì?\", \"options\": [\"wǔ\", \"dǎ\", \"máng\"], \"correct_answer\": \"wǔ\", \"explanation\": \"Chữ \\\"五\\\" có phiên âm chuẩn là wǔ.\"}]}",
       "objectives": [
@@ -1865,7 +1865,7 @@
       "content_id": "MASTERY_L6",
       "curriculum_id": "curr_hsk1",
       "hsk_level": 1,
-      "knowledge_type": "mastery_check",
+      "knowledge_type": "mastery",
       "title": "Đánh giá hoàn thành Hôm nay là ngày mấy?",
       "content_json": "{\"exercises\": [{\"id\": \"m_ex_1_6_1\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Từ \\\"今天\\\" (jīntiān) có nghĩa là gì?\", \"options\": [\"hôm nay\", \"hôm qua\", \"ngày mai\"], \"correct_answer\": \"hôm nay\", \"explanation\": \"\\\"今天\\\" có nghĩa là \\\"hôm nay\\\".\"}, {\"id\": \"m_ex_1_6_2\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Nghĩa của từ \\\"明天\\\" (míngtiān) là gì?\", \"options\": [\"hôm nay\", \"ngày mai\", \"hôm qua\"], \"correct_answer\": \"ngày mai\", \"explanation\": \"\\\"明天\\\" có nghĩa là \\\"ngày mai\\\".\"}, {\"id\": \"m_ex_1_6_3\", \"type\": \"multiple_choice\", \"skill_type\": \"grammar\", \"prompt\": \"Dịch câu sau sang tiếng Việt: \\\"今天是星期一。\\\"\", \"options\": [\"Hôm nay là thứ hai.\", \"Tôi không hiểu\", \"Chào buổi sáng\"], \"correct_answer\": \"Hôm nay là thứ hai.\", \"explanation\": \"Câu \\\"今天是星期一。\\\" dịch nghĩa là: \\\"Hôm nay là thứ hai.\\\".\"}, {\"id\": \"m_ex_1_6_4\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Đánh giá] Chọn từ thích hợp điền vào chỗ trống: [ ____ ]！ (hôm qua)\", \"options\": [\"昨天\", \"再见\", \"谢谢\"], \"correct_answer\": \"昨天\", \"explanation\": \"Dùng từ \\\"昨天\\\" (hôm qua) phù hợp nhất với ngữ cảnh.\"}, {\"id\": \"m_ex_1_6_5\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Tổng hợp] Phiên âm Pinyin đúng của chữ \\\"号\\\" là gì?\", \"options\": [\"dǎ\", \"máng\", \"hào\"], \"correct_answer\": \"hào\", \"explanation\": \"Chữ \\\"号\\\" có phiên âm chuẩn là hào.\"}]}",
       "objectives": [
@@ -1877,7 +1877,7 @@
       "content_id": "MASTERY_L7",
       "curriculum_id": "curr_hsk1",
       "hsk_level": 1,
-      "knowledge_type": "mastery_check",
+      "knowledge_type": "mastery",
       "title": "Đánh giá hoàn thành Tôi biết nói tiếng Trung",
       "content_json": "{\"exercises\": [{\"id\": \"m_ex_1_7_1\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Từ \\\"会\\\" (huì) có nghĩa là gì?\", \"options\": [\"nói chuyện\", \"biết, có thể (qua học tập)\", \"nói\"], \"correct_answer\": \"biết, có thể (qua học tập)\", \"explanation\": \"\\\"会\\\" có nghĩa là \\\"biết, có thể (qua học tập)\\\".\"}, {\"id\": \"m_ex_1_7_2\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Nghĩa của từ \\\"说\\\" (shuō) là gì?\", \"options\": [\"biết, có thể (qua học tập)\", \"nói\", \"nói chuyện\"], \"correct_answer\": \"nói\", \"explanation\": \"\\\"说\\\" có nghĩa là \\\"nói\\\".\"}, {\"id\": \"m_ex_1_7_3\", \"type\": \"multiple_choice\", \"skill_type\": \"grammar\", \"prompt\": \"Dịch câu sau sang tiếng Việt: \\\"我会说汉语。\\\"\", \"options\": [\"Chào buổi sáng\", \"Tôi không hiểu\", \"Tôi biết nói tiếng Trung.\"], \"correct_answer\": \"Tôi biết nói tiếng Trung.\", \"explanation\": \"Câu \\\"我会说汉语。\\\" dịch nghĩa là: \\\"Tôi biết nói tiếng Trung.\\\".\"}, {\"id\": \"m_ex_1_7_4\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Đánh giá] Chọn từ thích hợp điền vào chỗ trống: [ ____ ]！ (nói chuyện)\", \"options\": [\"谢谢\", \"说话\", \"再见\"], \"correct_answer\": \"说话\", \"explanation\": \"Dùng từ \\\"说话\\\" (nói chuyện) phù hợp nhất với ngữ cảnh.\"}, {\"id\": \"m_ex_1_7_5\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Tổng hợp] Phiên âm Pinyin đúng của chữ \\\"很\\\" là gì?\", \"options\": [\"máng\", \"hěn\", \"dǎ\"], \"correct_answer\": \"hěn\", \"explanation\": \"Chữ \\\"很\\\" có phiên âm chuẩn là hěn.\"}]}",
       "objectives": [
@@ -1889,7 +1889,7 @@
       "content_id": "MASTERY_L8",
       "curriculum_id": "curr_hsk1",
       "hsk_level": 1,
-      "knowledge_type": "mastery_check",
+      "knowledge_type": "mastery",
       "title": "Đánh giá hoàn thành Tôi muốn uống trà",
       "content_json": "{\"exercises\": [{\"id\": \"m_ex_1_8_1\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Từ \\\"想\\\" (xiǎng) có nghĩa là gì?\", \"options\": [\"uống\", \"trà, chè\", \"muốn, nghĩ, nhớ\"], \"correct_answer\": \"muốn, nghĩ, nhớ\", \"explanation\": \"\\\"想\\\" có nghĩa là \\\"muốn, nghĩ, nhớ\\\".\"}, {\"id\": \"m_ex_1_8_2\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Nghĩa của từ \\\"喝\\\" (hē) là gì?\", \"options\": [\"uống\", \"muốn, nghĩ, nhớ\", \"trà, chè\"], \"correct_answer\": \"uống\", \"explanation\": \"\\\"喝\\\" có nghĩa là \\\"uống\\\".\"}, {\"id\": \"m_ex_1_8_3\", \"type\": \"multiple_choice\", \"skill_type\": \"grammar\", \"prompt\": \"Dịch câu sau sang tiếng Việt: \\\"我想喝茶。\\\"\", \"options\": [\"Tôi muốn uống trà.\", \"Chào buổi sáng\", \"Tôi không hiểu\"], \"correct_answer\": \"Tôi muốn uống trà.\", \"explanation\": \"Câu \\\"我想喝茶。\\\" dịch nghĩa là: \\\"Tôi muốn uống trà.\\\".\"}, {\"id\": \"m_ex_1_8_4\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Đánh giá] Chọn từ thích hợp điền vào chỗ trống: [ ____ ]！ (trà, chè)\", \"options\": [\"谢谢\", \"再见\", \"茶\"], \"correct_answer\": \"茶\", \"explanation\": \"Dùng từ \\\"茶\\\" (trà, chè) phù hợp nhất với ngữ cảnh.\"}, {\"id\": \"m_ex_1_8_5\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Tổng hợp] Phiên âm Pinyin đúng của chữ \\\"米饭\\\" là gì?\", \"options\": [\"dǎ\", \"máng\", \"mǐfàn\"], \"correct_answer\": \"mǐfàn\", \"explanation\": \"Chữ \\\"米饭\\\" có phiên âm chuẩn là mǐfàn.\"}]}",
       "objectives": [
@@ -1901,7 +1901,7 @@
       "content_id": "MASTERY_L9",
       "curriculum_id": "curr_hsk1",
       "hsk_level": 1,
-      "knowledge_type": "mastery_check",
+      "knowledge_type": "mastery",
       "title": "Đánh giá hoàn thành Con trai bạn làm việc ở đâu?",
       "content_json": "{\"exercises\": [{\"id\": \"m_ex_1_9_1\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Từ \\\"在\\\" (zài) có nghĩa là gì?\", \"options\": [\"ở, tại, đang\", \"ở đó, chỗ đó\", \"ở đây, chỗ này\"], \"correct_answer\": \"ở, tại, đang\", \"explanation\": \"\\\"在\\\" có nghĩa là \\\"ở, tại, đang\\\".\"}, {\"id\": \"m_ex_1_9_2\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Nghĩa của từ \\\"这儿\\\" (zhèr) là gì?\", \"options\": [\"ở đó, chỗ đó\", \"ở, tại, đang\", \"ở đây, chỗ này\"], \"correct_answer\": \"ở đây, chỗ này\", \"explanation\": \"\\\"这儿\\\" có nghĩa là \\\"ở đây, chỗ này\\\".\"}, {\"id\": \"m_ex_1_9_3\", \"type\": \"multiple_choice\", \"skill_type\": \"grammar\", \"prompt\": \"Dịch câu sau sang tiếng Việt: \\\"我在家。\\\"\", \"options\": [\"Chào buổi sáng\", \"Tôi không hiểu\", \"Tôi ở nhà.\"], \"correct_answer\": \"Tôi ở nhà.\", \"explanation\": \"Câu \\\"我在家。\\\" dịch nghĩa là: \\\"Tôi ở nhà.\\\".\"}, {\"id\": \"m_ex_1_9_4\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Đánh giá] Chọn từ thích hợp điền vào chỗ trống: [ ____ ]！ (ở đó, chỗ đó)\", \"options\": [\"再见\", \"谢谢\", \"那儿\"], \"correct_answer\": \"那儿\", \"explanation\": \"Dùng từ \\\"那儿\\\" (ở đó, chỗ đó) phù hợp nhất với ngữ cảnh.\"}, {\"id\": \"m_ex_1_9_5\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Tổng hợp] Phiên âm Pinyin đúng của chữ \\\"医院\\\" là gì?\", \"options\": [\"dǎ\", \"yīyuàn\", \"máng\"], \"correct_answer\": \"yīyuàn\", \"explanation\": \"Chữ \\\"医院\\\" có phiên âm chuẩn là yīyuàn.\"}]}",
       "objectives": [
@@ -1913,7 +1913,7 @@
       "content_id": "MASTERY_L10",
       "curriculum_id": "curr_hsk1",
       "hsk_level": 1,
-      "knowledge_type": "mastery_check",
+      "knowledge_type": "mastery",
       "title": "Đánh giá hoàn thành Tôi có thể ngồi đây không?",
       "content_json": "{\"exercises\": [{\"id\": \"m_ex_1_10_1\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Từ \\\"桌子\\\" (zhuōzi) có nghĩa là gì?\", \"options\": [\"cái ghế\", \"cái bàn\", \"trên, lên trên\"], \"correct_answer\": \"cái bàn\", \"explanation\": \"\\\"桌子\\\" có nghĩa là \\\"cái bàn\\\".\"}, {\"id\": \"m_ex_1_10_2\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Nghĩa của từ \\\"上\\\" (shàng) là gì?\", \"options\": [\"cái bàn\", \"trên, lên trên\", \"cái ghế\"], \"correct_answer\": \"trên, lên trên\", \"explanation\": \"\\\"上\\\" có nghĩa là \\\"trên, lên trên\\\".\"}, {\"id\": \"m_ex_1_10_3\", \"type\": \"multiple_choice\", \"skill_type\": \"grammar\", \"prompt\": \"Dịch câu sau sang tiếng Việt: \\\"桌子上有一本书。\\\"\", \"options\": [\"Chào buổi sáng\", \"Tôi không hiểu\", \"Trên bàn có một cuốn sách.\"], \"correct_answer\": \"Trên bàn có một cuốn sách.\", \"explanation\": \"Câu \\\"桌子上有一本书。\\\" dịch nghĩa là: \\\"Trên bàn có một cuốn sách.\\\".\"}, {\"id\": \"m_ex_1_10_4\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Đánh giá] Chọn từ thích hợp điền vào chỗ trống: [ ____ ]！ (cái ghế)\", \"options\": [\"椅子\", \"再见\", \"谢谢\"], \"correct_answer\": \"椅子\", \"explanation\": \"Dùng từ \\\"椅子\\\" (cái ghế) phù hợp nhất với ngữ cảnh.\"}, {\"id\": \"m_ex_1_10_5\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Tổng hợp] Phiên âm Pinyin đúng của chữ \\\"前面\\\" là gì?\", \"options\": [\"dǎ\", \"qiánmian\", \"máng\"], \"correct_answer\": \"qiánmian\", \"explanation\": \"Chữ \\\"前面\\\" có phiên âm chuẩn là qiánmian.\"}]}",
       "objectives": [
@@ -1925,7 +1925,7 @@
       "content_id": "MASTERY_L11",
       "curriculum_id": "curr_hsk1",
       "hsk_level": 1,
-      "knowledge_type": "mastery_check",
+      "knowledge_type": "mastery",
       "title": "Đánh giá hoàn thành Bây giờ là mấy giờ?",
       "content_json": "{\"exercises\": [{\"id\": \"m_ex_1_11_1\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Từ \\\"猫\\\" (māo) có nghĩa là gì?\", \"options\": [\"con mèo\", \"nhỏ, bé\", \"con chó\"], \"correct_answer\": \"con mèo\", \"explanation\": \"\\\"猫\\\" có nghĩa là \\\"con mèo\\\".\"}, {\"id\": \"m_ex_1_11_2\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Nghĩa của từ \\\"狗\\\" (gǒu) là gì?\", \"options\": [\"con chó\", \"nhỏ, bé\", \"con mèo\"], \"correct_answer\": \"con chó\", \"explanation\": \"\\\"狗\\\" có nghĩa là \\\"con chó\\\".\"}, {\"id\": \"m_ex_1_11_3\", \"type\": \"multiple_choice\", \"skill_type\": \"grammar\", \"prompt\": \"Dịch câu sau sang tiếng Việt: \\\"小猫在睡觉。\\\"\", \"options\": [\"Mèo con đang ngủ.\", \"Chào buổi sáng\", \"Tôi không hiểu\"], \"correct_answer\": \"Mèo con đang ngủ.\", \"explanation\": \"Câu \\\"小猫在睡觉。\\\" dịch nghĩa là: \\\"Mèo con đang ngủ.\\\".\"}, {\"id\": \"m_ex_1_11_4\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Đánh giá] Chọn từ thích hợp điền vào chỗ trống: [ ____ ]！ (nhỏ, bé)\", \"options\": [\"再见\", \"小\", \"谢谢\"], \"correct_answer\": \"小\", \"explanation\": \"Dùng từ \\\"小\\\" (nhỏ, bé) phù hợp nhất với ngữ cảnh.\"}, {\"id\": \"m_ex_1_11_5\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Tổng hợp] Phiên âm Pinyin đúng của chữ \\\"坐\\\" là gì?\", \"options\": [\"máng\", \"zuò\", \"dǎ\"], \"correct_answer\": \"zuò\", \"explanation\": \"Chữ \\\"坐\\\" có phiên âm chuẩn là zuò.\"}]}",
       "objectives": [
@@ -1937,7 +1937,7 @@
       "content_id": "MASTERY_L12",
       "curriculum_id": "curr_hsk1",
       "hsk_level": 1,
-      "knowledge_type": "mastery_check",
+      "knowledge_type": "mastery",
       "title": "Đánh giá hoàn thành Thời tiết ngày mai thế nào?",
       "content_json": "{\"exercises\": [{\"id\": \"m_ex_1_12_1\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Từ \\\"现在\\\" (xiànzài) có nghĩa là gì?\", \"options\": [\"giờ (chỉ thời khắc)\", \"phút\", \"bây giờ, hiện tại\"], \"correct_answer\": \"bây giờ, hiện tại\", \"explanation\": \"\\\"现在\\\" có nghĩa là \\\"bây giờ, hiện tại\\\".\"}, {\"id\": \"m_ex_1_12_2\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Nghĩa của từ \\\"点\\\" (diǎn) là gì?\", \"options\": [\"bây giờ, hiện tại\", \"phút\", \"giờ (chỉ thời khắc)\"], \"correct_answer\": \"giờ (chỉ thời khắc)\", \"explanation\": \"\\\"点\\\" có nghĩa là \\\"giờ (chỉ thời khắc)\\\".\"}, {\"id\": \"m_ex_1_12_3\", \"type\": \"multiple_choice\", \"skill_type\": \"grammar\", \"prompt\": \"Dịch câu sau sang tiếng Việt: \\\"现在几点？\\\"\", \"options\": [\"Bây giờ mấy giờ?\", \"Tôi không hiểu\", \"Chào buổi sáng\"], \"correct_answer\": \"Bây giờ mấy giờ?\", \"explanation\": \"Câu \\\"现在几点？\\\" dịch nghĩa là: \\\"Bây giờ mấy giờ?\\\".\"}, {\"id\": \"m_ex_1_12_4\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Đánh giá] Chọn từ thích hợp điền vào chỗ trống: [ ____ ]！ (phút)\", \"options\": [\"分\", \"谢谢\", \"再见\"], \"correct_answer\": \"分\", \"explanation\": \"Dùng từ \\\"分\\\" (phút) phù hợp nhất với ngữ cảnh.\"}, {\"id\": \"m_ex_1_12_5\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Tổng hợp] Phiên âm Pinyin đúng của chữ \\\"中午\\\" là gì?\", \"options\": [\"máng\", \"dǎ\", \"zhōngwǔ\"], \"correct_answer\": \"zhōngwǔ\", \"explanation\": \"Chữ \\\"中午\\\" có phiên âm chuẩn là zhōngwǔ.\"}]}",
       "objectives": [
@@ -1949,7 +1949,7 @@
       "content_id": "MASTERY_L13",
       "curriculum_id": "curr_hsk1",
       "hsk_level": 1,
-      "knowledge_type": "mastery_check",
+      "knowledge_type": "mastery",
       "title": "Đánh giá hoàn thành Anh ấy đang làm gì đấy?",
       "content_json": "{\"exercises\": [{\"id\": \"m_ex_1_13_1\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Từ \\\"天气\\\" (tiānqì) có nghĩa là gì?\", \"options\": [\"thời tiết\", \"quá, lắm\", \"như thế nào, ra sao\"], \"correct_answer\": \"thời tiết\", \"explanation\": \"\\\"天气\\\" có nghĩa là \\\"thời tiết\\\".\"}, {\"id\": \"m_ex_1_13_2\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Nghĩa của từ \\\"怎么样\\\" (zěnmeyàng) là gì?\", \"options\": [\"thời tiết\", \"quá, lắm\", \"như thế nào, ra sao\"], \"correct_answer\": \"như thế nào, ra sao\", \"explanation\": \"\\\"怎么样\\\" có nghĩa là \\\"như thế nào, ra sao\\\".\"}, {\"id\": \"m_ex_1_13_3\", \"type\": \"multiple_choice\", \"skill_type\": \"grammar\", \"prompt\": \"Dịch câu sau sang tiếng Việt: \\\"今天天气怎么样？\\\"\", \"options\": [\"Thời tiết hôm nay thế nào?\", \"Chào buổi sáng\", \"Tôi không hiểu\"], \"correct_answer\": \"Thời tiết hôm nay thế nào?\", \"explanation\": \"Câu \\\"今天天气怎么样？\\\" dịch nghĩa là: \\\"Thời tiết hôm nay thế nào?\\\".\"}, {\"id\": \"m_ex_1_13_4\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Đánh giá] Chọn từ thích hợp điền vào chỗ trống: [ ____ ]！ (quá, lắm)\", \"options\": [\"太\", \"谢谢\", \"再见\"], \"correct_answer\": \"太\", \"explanation\": \"Dùng từ \\\"太\\\" (quá, lắm) phù hợp nhất với ngữ cảnh.\"}, {\"id\": \"m_ex_1_13_5\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Tổng hợp] Phiên âm Pinyin đúng của chữ \\\"冷\\\" là gì?\", \"options\": [\"máng\", \"lěng\", \"dǎ\"], \"correct_answer\": \"lěng\", \"explanation\": \"Chữ \\\"冷\\\" có phiên âm chuẩn là lěng.\"}]}",
       "objectives": [
@@ -1961,7 +1961,7 @@
       "content_id": "MASTERY_L14",
       "curriculum_id": "curr_hsk1",
       "hsk_level": 1,
-      "knowledge_type": "mastery_check",
+      "knowledge_type": "mastery",
       "title": "Đánh giá hoàn thành Cô ấy đã mua không ít quần áo",
       "content_json": "{\"exercises\": [{\"id\": \"m_ex_1_14_1\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Từ \\\"喂\\\" (wèi) có nghĩa là gì?\", \"options\": [\"thích, yêu thích\", \"alo (khi nghe máy)\", \"tivi, truyền hình\"], \"correct_answer\": \"alo (khi nghe máy)\", \"explanation\": \"\\\"喂\\\" có nghĩa là \\\"alo (khi nghe máy)\\\".\"}, {\"id\": \"m_ex_1_14_2\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Nghĩa của từ \\\"电视\\\" (diànshì) là gì?\", \"options\": [\"alo (khi nghe máy)\", \"tivi, truyền hình\", \"thích, yêu thích\"], \"correct_answer\": \"tivi, truyền hình\", \"explanation\": \"\\\"电视\\\" có nghĩa là \\\"tivi, truyền hình\\\".\"}, {\"id\": \"m_ex_1_14_3\", \"type\": \"multiple_choice\", \"skill_type\": \"grammar\", \"prompt\": \"Dịch câu sau sang tiếng Việt: \\\"喂，你好！\\\"\", \"options\": [\"Chào buổi sáng\", \"Alo, xin chào!\", \"Tôi không hiểu\"], \"correct_answer\": \"Alo, xin chào!\", \"explanation\": \"Câu \\\"喂，你好！\\\" dịch nghĩa là: \\\"Alo, xin chào!\\\".\"}, {\"id\": \"m_ex_1_14_4\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Đánh giá] Chọn từ thích hợp điền vào chỗ trống: [ ____ ]！ (thích, yêu thích)\", \"options\": [\"喜欢\", \"谢谢\", \"再见\"], \"correct_answer\": \"喜欢\", \"explanation\": \"Dùng từ \\\"喜欢\\\" (thích, yêu thích) phù hợp nhất với ngữ cảnh.\"}, {\"id\": \"m_ex_1_14_5\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Tổng hợp] Phiên âm Pinyin đúng của chữ \\\"吧\\\" là gì?\", \"options\": [\"ba\", \"máng\", \"dǎ\"], \"correct_answer\": \"ba\", \"explanation\": \"Chữ \\\"吧\\\" có phiên âm chuẩn là ba.\"}]}",
       "objectives": [
@@ -1973,7 +1973,7 @@
       "content_id": "MASTERY_L15",
       "curriculum_id": "curr_hsk1",
       "hsk_level": 1,
-      "knowledge_type": "mastery_check",
+      "knowledge_type": "mastery",
       "title": "Đánh giá hoàn thành Tôi đi máy bay đến",
       "content_json": "{\"exercises\": [{\"id\": \"m_ex_1_15_1\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Từ \\\"东西\\\" (dōngxi) có nghĩa là gì?\", \"options\": [\"quả táo\", \"đồ đạc, vật phẩm\", \"một chút, một ít\"], \"correct_answer\": \"đồ đạc, vật phẩm\", \"explanation\": \"\\\"东西\\\" có nghĩa là \\\"đồ đạc, vật phẩm\\\".\"}, {\"id\": \"m_ex_1_15_2\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"Nghĩa của từ \\\"一点儿\\\" (yìdiǎnr) là gì?\", \"options\": [\"một chút, một ít\", \"quả táo\", \"đồ đạc, vật phẩm\"], \"correct_answer\": \"một chút, một ít\", \"explanation\": \"\\\"一点儿\\\" có nghĩa là \\\"một chút, một ít\\\".\"}, {\"id\": \"m_ex_1_15_3\", \"type\": \"multiple_choice\", \"skill_type\": \"grammar\", \"prompt\": \"Dịch câu sau sang tiếng Việt: \\\"买东西。\\\"\", \"options\": [\"Chào buổi sáng\", \"Mua đồ.\", \"Tôi không hiểu\"], \"correct_answer\": \"Mua đồ.\", \"explanation\": \"Câu \\\"买东西。\\\" dịch nghĩa là: \\\"Mua đồ.\\\".\"}, {\"id\": \"m_ex_1_15_4\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Đánh giá] Chọn từ thích hợp điền vào chỗ trống: [ ____ ]！ (quả táo)\", \"options\": [\"谢谢\", \"再见\", \"苹果\"], \"correct_answer\": \"苹果\", \"explanation\": \"Dùng từ \\\"苹果\\\" (quả táo) phù hợp nhất với ngữ cảnh.\"}, {\"id\": \"m_ex_1_15_5\", \"type\": \"multiple_choice\", \"skill_type\": \"reading\", \"prompt\": \"[Tổng hợp] Phiên âm Pinyin đúng của chữ \\\"先生\\\" là gì?\", \"options\": [\"xiānsheng\", \"máng\", \"dǎ\"], \"correct_answer\": \"xiānsheng\", \"explanation\": \"Chữ \\\"先生\\\" có phiên âm chuẩn là xiānsheng.\"}]}",
       "objectives": [

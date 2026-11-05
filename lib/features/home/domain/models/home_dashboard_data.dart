@@ -225,6 +225,7 @@ class HomeDashboardData {
   final int dailyGoalWords;
   final int dailyGoalMinutes;
   final StudyTimeStats studyStats;
+  final bool hasCompletedLessons;
 
   const HomeDashboardData({
     required this.learnerName,
@@ -236,6 +237,7 @@ class HomeDashboardData {
     this.dailyGoalWords = 15,
     this.dailyGoalMinutes = 15,
     this.studyStats = const StudyTimeStats(),
+    this.hasCompletedLessons = false,
   });
 
   /// Progress ratio towards today's word goal (0.0 to 1.0)
@@ -257,5 +259,6 @@ class HomeDashboardData {
         roadmap: RoadmapProgress.initial(),
         recentActivities: const [],
         studyStats: const StudyTimeStats(),
+        hasCompletedLessons: false,
       );
 }

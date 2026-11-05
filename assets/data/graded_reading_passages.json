@@ -1,5 +1,639 @@
 [
   {
+    "id": "RDG_1_reading_hsk1_friend",
+    "hskLevel": 1,
+    "topic": "Đời sống & Gia đình",
+    "estimatedMinutes": 2,
+    "source": "HSK Standard Reading & C3 Beginner Corpus",
+    "title": "我的中国朋友",
+    "titleCn": "我的中国朋友",
+    "contentZh": "我有一个好朋友，他叫李明。他是中国人，今年二十岁。李明很喜欢学习英语，我也喜欢学习汉语。他家有四口人：爸爸、妈妈、哥哥和他。星期六上午，我们常常一起去学校看书，下午一起喝茶、吃中国菜。",
+    "contentCn": "我有一个好朋友，他叫李明。他是中国人，今年二十岁。李明很喜欢学习英语，我也喜欢学习汉语。他家有四口人：爸爸、妈妈、哥哥和他。星期六上午，我们常常一起去学校看书，下午一起喝茶、吃中国菜。",
+    "pinyin": "Wǒ yǒu yí gè hǎo péngyou, tā jiào Lǐ Míng. Tā shì Zhōngguó rén, jīnnián èrshí suì. Lǐ Míng hěn xǐhuan xuéxí Yīngyǔ, wǒ yě xǐhuan xuéxí Hànyǔ. Tā jiā yǒu sì kǒu rén: bàba, māma, gēge hé tā. Xīngqīliù shàngwǔ, wǒmen chángcháng yìqǐ qù xuéxiào kàn shū, xiàwǔ yìqǐ hē chá, chī Zhōngguó cài.",
+    "translationVi": "Tôi có một người bạn tốt, anh ấy tên là Lý Minh. Anh ấy là người Trung Quốc, năm nay hai mươi tuổi. Lý Minh rất thích học tiếng Anh, tôi cũng thích học tiếng Trung. Gia đình anh ấy có bốn người: bố, mẹ, anh trai và anh ấy. Sáng thứ Bảy, chúng tôi thường cùng nhau đến trường đọc sách, buổi chiều cùng uống trà và ăn món Trung Quốc.",
+    "questions": [
+      {
+        "id": "q_hsk1_friend_1",
+        "type": "single_choice",
+        "question": "李明今年多大？(Lý Minh năm nay bao nhiêu tuổi?)",
+        "options": [
+          "十八岁 (18 tuổi)",
+          "二十岁 (20 tuổi)",
+          "二十二岁 (22 tuổi)",
+          "二十四岁 (24 tuổi)"
+        ],
+        "answer": 1,
+        "explanationVi": "Trong bài nêu rõ: \"他是中国人，今年二十岁。\" (Anh ấy là người Trung Quốc, năm nay 20 tuổi). [Chú thích từ vựng: 李明 (Lǐ Míng): Lý Minh - tên riêng; 英语 (Yīngyǔ): tiếng Anh].",
+        "citationText": "他是中国人，今年二十岁。"
+      },
+      {
+        "id": "q_hsk1_friend_2",
+        "type": "true_false",
+        "question": "李明不喜欢学习英语。(Lý Minh không thích học tiếng Anh.)",
+        "options": [
+          "Đúng (正确)",
+          "Sai (错误)"
+        ],
+        "answer": 1,
+        "explanationVi": "Bài đọc viết: \"李明很喜欢学习英语\" (Lý Minh rất thích học tiếng Anh), vì vậy nhận định trên là Sai. [Chú thích từ vựng: 常常 (chángcháng): thường xuyên].",
+        "citationText": "李明很喜欢学习英语"
+      },
+      {
+        "id": "q_hsk1_friend_3",
+        "type": "single_choice",
+        "question": "星期六上午他们一起去哪儿看书？(Sáng thứ Bảy họ cùng nhau đi đâu đọc sách?)",
+        "options": [
+          "去医院 (Đến bệnh viện)",
+          "去商店 (Đến cửa hàng)",
+          "去学校 (Đến trường học)",
+          "去饭馆 (Đến nhà hàng)"
+        ],
+        "answer": 2,
+        "explanationVi": "Căn cứ câu trong bài: \"星期六上午，我们常常一起去学校看书\" (Sáng thứ Bảy, chúng tôi thường cùng nhau đến trường đọc sách).",
+        "citationText": "星期六上午，我们常常一起去学校看书"
+      }
+    ],
+    "audio_uri": "assets/audio/reading/rdg_hsk1_friend.mp3",
+    "audioUri": "assets/audio/reading/rdg_hsk1_friend.mp3",
+    "hsk_level": 1,
+    "title_cn": "我的中国朋友",
+    "content_cn": "我有一个好朋友，他叫李明。他是中国人，今年二十岁。李明很喜欢学习英语，我也喜欢学习汉语。他家有四口人：爸爸、妈妈、哥哥和他。星期六上午，我们常常一起去学校看书，下午一起喝茶、吃中国菜。",
+    "translation_vi": "Tôi có một người bạn tốt, anh ấy tên là Lý Minh. Anh ấy là người Trung Quốc, năm nay hai mươi tuổi. Lý Minh rất thích học tiếng Anh, tôi cũng thích học tiếng Trung. Gia đình anh ấy có bốn người: bố, mẹ, anh trai và anh ấy. Sáng thứ Bảy, chúng tôi thường cùng nhau đến trường đọc sách, buổi chiều cùng uống trà và ăn món Trung Quốc.",
+    "questions_json": "[{\"id\":\"q_hsk1_friend_1\",\"type\":\"single_choice\",\"question\":\"李明今年多大？(Lý Minh năm nay bao nhiêu tuổi?)\",\"options\":[\"十八岁 (18 tuổi)\",\"二十岁 (20 tuổi)\",\"二十二岁 (22 tuổi)\",\"二十四岁 (24 tuổi)\"],\"answer\":1,\"explanationVi\":\"Trong bài nêu rõ: \\\"他是中国人，今年二十岁。\\\" (Anh ấy là người Trung Quốc, năm nay 20 tuổi). [Chú thích từ vựng: 李明 (Lǐ Míng): Lý Minh - tên riêng; 英语 (Yīngyǔ): tiếng Anh].\",\"citationText\":\"他是中国人，今年二十岁。\"},{\"id\":\"q_hsk1_friend_2\",\"type\":\"true_false\",\"question\":\"李明不喜欢学习英语。(Lý Minh không thích học tiếng Anh.)\",\"options\":[\"Đúng (正确)\",\"Sai (错误)\"],\"answer\":1,\"explanationVi\":\"Bài đọc viết: \\\"李明很喜欢学习英语\\\" (Lý Minh rất thích học tiếng Anh), vì vậy nhận định trên là Sai. [Chú thích từ vựng: 常常 (chángcháng): thường xuyên].\",\"citationText\":\"李明很喜欢学习英语\"},{\"id\":\"q_hsk1_friend_3\",\"type\":\"single_choice\",\"question\":\"星期六上午他们一起去哪儿看书？(Sáng thứ Bảy họ cùng nhau đi đâu đọc sách?)\",\"options\":[\"去医院 (Đến bệnh viện)\",\"去商店 (Đến cửa hàng)\",\"去学校 (Đến trường học)\",\"去饭馆 (Đến nhà hàng)\"],\"answer\":2,\"explanationVi\":\"Căn cứ câu trong bài: \\\"星期六上午，我们常常一起去学校看书\\\" (Sáng thứ Bảy, chúng tôi thường cùng nhau đến trường đọc sách).\",\"citationText\":\"星期六上午，我们常常一起去学校看书\"}]"
+  },
+  {
+    "id": "RDG_2_reading_hsk1_weekend_family",
+    "hskLevel": 1,
+    "topic": "Đời sống & Gia đình",
+    "estimatedMinutes": 2,
+    "source": "StoryWeaver Level 1 & HSK 1 Standard Reading",
+    "title": "星期天的一家人",
+    "titleCn": "星期天的一家人",
+    "contentZh": "今天是星期天，天气很好，不冷也不热。爸爸和妈妈今天不去工作，我们都在家。上午九点，妈妈去商店买了一点儿苹果、鸡蛋和茶。中午妈妈做了很好吃的中国菜和米饭。下午我们一起看电视、喝茶，大家都很高兴。",
+    "contentCn": "今天是星期天，天气很好，不冷也不热。爸爸和妈妈今天不去工作，我们都在家。上午九点，妈妈去商店买了一点儿苹果、鸡蛋和茶。中午妈妈做了很好吃的中国菜和米饭。下午我们一起看电视、喝茶，大家都很高兴。",
+    "pinyin": "Jīntiān shì xīngqītiān, tiānqì hěn hǎo, bù lěng yě bú rè. Bàba hé māma jīntiān bú qù gōngzuò, wǒmen dōu zài jiā. Shàngwǔ jiǔ diǎn, māma qù shāngdiàn mǎi le yìdiǎnr píngguǒ, jīdàn hé chá. Zhōngwǔ māma zuò le hěn hǎochī de Zhōngguó cài hé mǐfàn. Xiàwǔ wǒmen yìqǐ kàn diànshì, hē chá, dàjiā dōu hěn gāoxìng.",
+    "translationVi": "Hôm nay là Chủ nhật, thời tiết rất đẹp, không lạnh cũng không nóng. Hôm nay bố và mẹ không đi làm, chúng tôi đều ở nhà. Chín giờ sáng, mẹ đi cửa hàng mua một ít táo, trứng gà và trà. Buổi trưa mẹ nấu món ăn Trung Quốc rất ngon và cơm trắng. Buổi chiều chúng tôi cùng nhau xem tivi và uống trà, mọi người đều rất vui vẻ.",
+    "questions": [
+      {
+        "id": "q_hsk1_fam_1",
+        "type": "single_choice",
+        "question": "今天星期几，天气怎么样？(Hôm nay là thứ mấy và thời tiết thế nào?)",
+        "options": [
+          "星期六，很热 (Thứ Bảy, rất nóng)",
+          "星期天，不冷也不热 (Chủ nhật, không lạnh cũng không nóng)",
+          "星期五，下雨了 (Thứ Sáu, trời mưa)",
+          "星期一，太冷了 (Thứ Hai, quá lạnh)"
+        ],
+        "answer": 1,
+        "explanationVi": "Câu đầu tiên trong bài nêu rõ: \"今天是星期天，天气很好，不冷也不热。\" [Chú thích từ vựng: 大家 (dàjiā): mọi người, cả nhà].",
+        "citationText": "今天是星期天，天气很好，不冷也不热。"
+      },
+      {
+        "id": "q_hsk1_fam_2",
+        "type": "single_choice",
+        "question": "上午九点妈妈去商店买了什么？(9 giờ sáng mẹ đi cửa hàng mua gì?)",
+        "options": [
+          "衣服和杯子 (Quần áo và cốc)",
+          "电脑和书 (Máy tính và sách)",
+          "苹果、鸡蛋和茶 (Táo, trứng gà và trà)",
+          "牛奶和咖啡 (Sữa tươi và cà phê)"
+        ],
+        "answer": 2,
+        "explanationVi": "Bài viết ghi rõ: \"上午九点，妈妈去商店买了一点儿苹果、鸡蛋和茶。\" [Chú thích từ vựng: 鸡蛋 (jīdàn): trứng gà - từ vựng HSK 2].",
+        "citationText": "上午九点，妈妈去商店买了一点儿苹果、鸡蛋和茶。"
+      },
+      {
+        "id": "q_hsk1_fam_3",
+        "type": "true_false",
+        "question": "爸爸今天上午去医院工作了。(Sáng nay bố đã đi làm ở bệnh viện.)",
+        "options": [
+          "Đúng (正确)",
+          "Sai (错误)"
+        ],
+        "answer": 1,
+        "explanationVi": "Bài đọc nêu rõ: \"爸爸和妈妈今天不去工作，我们都在家。\" nên nhận định bố đi làm là Sai.",
+        "citationText": "爸爸和妈妈今天不去工作，我们都在家。"
+      }
+    ],
+    "hsk_level": 1,
+    "title_cn": "星期天的一家人",
+    "content_cn": "今天是星期天，天气很好，不冷也不热。爸爸和妈妈今天不去工作，我们都在家。上午九点，妈妈去商店买了一点儿苹果、鸡蛋和茶。中午妈妈做了很好吃的中国菜和米饭。下午我们一起看电视、喝茶，大家都很高兴。",
+    "translation_vi": "Hôm nay là Chủ nhật, thời tiết rất đẹp, không lạnh cũng không nóng. Hôm nay bố và mẹ không đi làm, chúng tôi đều ở nhà. Chín giờ sáng, mẹ đi cửa hàng mua một ít táo, trứng gà và trà. Buổi trưa mẹ nấu món ăn Trung Quốc rất ngon và cơm trắng. Buổi chiều chúng tôi cùng nhau xem tivi và uống trà, mọi người đều rất vui vẻ.",
+    "questions_json": "[{\"id\":\"q_hsk1_fam_1\",\"type\":\"single_choice\",\"question\":\"今天星期几，天气怎么样？(Hôm nay là thứ mấy và thời tiết thế nào?)\",\"options\":[\"星期六，很热 (Thứ Bảy, rất nóng)\",\"星期天，不冷也不热 (Chủ nhật, không lạnh cũng không nóng)\",\"星期五，下雨了 (Thứ Sáu, trời mưa)\",\"星期一，太冷了 (Thứ Hai, quá lạnh)\"],\"answer\":1,\"explanationVi\":\"Câu đầu tiên trong bài nêu rõ: \\\"今天是星期天，天气很好，不冷也不热。\\\" [Chú thích từ vựng: 大家 (dàjiā): mọi người, cả nhà].\",\"citationText\":\"今天是星期天，天气很好，不冷也不热。\"},{\"id\":\"q_hsk1_fam_2\",\"type\":\"single_choice\",\"question\":\"上午九点妈妈去商店买了什么？(9 giờ sáng mẹ đi cửa hàng mua gì?)\",\"options\":[\"衣服和杯子 (Quần áo và cốc)\",\"电脑和书 (Máy tính và sách)\",\"苹果、鸡蛋和茶 (Táo, trứng gà và trà)\",\"牛奶和咖啡 (Sữa tươi và cà phê)\"],\"answer\":2,\"explanationVi\":\"Bài viết ghi rõ: \\\"上午九点，妈妈去商店买了一点儿苹果、鸡蛋和茶。\\\" [Chú thích từ vựng: 鸡蛋 (jīdàn): trứng gà - từ vựng HSK 2].\",\"citationText\":\"上午九点，妈妈去商店买了一点儿苹果、鸡蛋和茶。\"},{\"id\":\"q_hsk1_fam_3\",\"type\":\"true_false\",\"question\":\"爸爸今天上午去医院工作了。(Sáng nay bố đã đi làm ở bệnh viện.)\",\"options\":[\"Đúng (正确)\",\"Sai (错误)\"],\"answer\":1,\"explanationVi\":\"Bài đọc nêu rõ: \\\"爸爸和妈妈今天不去工作，我们都在家。\\\" nên nhận định bố đi làm là Sai.\",\"citationText\":\"爸爸和妈妈今天不去工作，我们都在家。\"}]"
+  },
+  {
+    "id": "RDG_2_reading_hsk2_restaurant",
+    "hskLevel": 2,
+    "topic": "Ẩm thực Trung Hoa",
+    "estimatedMinutes": 3,
+    "source": "C3 Chinese Reading Comprehension & HSK 2 Course",
+    "title": "在饭馆点菜",
+    "titleCn": "在饭馆点菜",
+    "contentZh": "今天晚上我和家人一起去学校旁边的中国饭馆吃饭。服务员很客气，给我们介绍了好吃的菜。因为爸爸喜欢吃鱼，哥哥喜欢吃羊肉，所以我们点了一条鱼、一盘羊肉、三个鸡蛋和两碗米饭。这里的菜不仅好吃，而且很便宜，我们吃得非常高兴。",
+    "contentCn": "今天晚上我和家人一起去学校旁边的中国饭馆吃饭。服务员很客气，给我们介绍了好吃的菜。因为爸爸喜欢吃鱼，哥哥喜欢吃羊肉，所以我们点了一条鱼、一盘羊肉、三个鸡蛋和两碗米饭。这里的菜不仅好吃，而且很便宜，我们吃得非常高兴。",
+    "pinyin": "Jīntiān wǎnshang wǒ hé jiārén yìqǐ qù xuéxiào pángbiān de Zhōngguó fànguǎn chīfàn. Fúwùyuán hěn kèqi, gěi wǒmen jièshào le hǎochī de cài. Yīnwèi bàba xǐhuan chī yú, gēge xǐhuan chī yángròu, suǒyǐ wǒmen diǎn le yì tiáo yú, yì pán yángròu, sān gè jīdàn hé liǎng wǎn mǐfàn. Zhèlǐ de cài bùjǐn hǎochī, érqiě hěn piányi, wǒmen chī de fēicháng gāoxìng.",
+    "translationVi": "Tối nay tôi cùng gia đình đến nhà hàng Trung Quốc bên cạnh trường học để ăn tối. Nhân viên phục vụ rất lịch sự, giới thiệu cho chúng tôi những món ăn ngon. Vì bố thích ăn cá, anh trai thích ăn thịt cừu nên chúng tôi đã gọi một con cá, một đĩa thịt cừu, ba quả trứng gà và hai bát cơm trắng. Món ăn ở đây không những ngon mà còn rất rẻ, chúng tôi ăn uống vô cùng vui vẻ.",
+    "questions": [
+      {
+        "id": "q_hsk2_rest_1",
+        "type": "single_choice",
+        "question": "这家中国饭馆在哪儿？(Nhà hàng Trung Quốc này nằm ở đâu?)",
+        "options": [
+          "医院前面 (Phía trước bệnh viện)",
+          "学校旁边 (Bên cạnh trường học)",
+          "火车站左边 (Bên trái nhà ga)",
+          "机场里面 (Bên trong sân bay)"
+        ],
+        "answer": 1,
+        "explanationVi": "Câu đầu tiên nêu rõ: \"今天晚上我和家人一起去学校旁边的中国饭馆吃饭。\" [Chú thích từ vựng: 点菜 (diǎncài): gọi món; 盘 (pán): đĩa; 碗 (wǎn): bát].",
+        "citationText": "今天晚上我和家人一起去学校旁边的中国饭馆吃饭。"
+      },
+      {
+        "id": "q_hsk2_rest_2",
+        "type": "single_choice",
+        "question": "他们今天晚上点了什么菜？(Tối nay họ đã gọi những món gì?)",
+        "options": [
+          "咖啡、牛奶和苹果 (Cà phê, sữa tươi và táo)",
+          "鱼、羊肉、鸡蛋和米饭 (Cá, thịt cừu, trứng gà và cơm trắng)",
+          "面条、西瓜和茶 (Mì sợi, dưa hấu và trà)",
+          "面包和牛肉 (Bánh mì và thịt bò)"
+        ],
+        "answer": 1,
+        "explanationVi": "Bài đọc viết: \"所以我们点了一条鱼、一盘羊肉、三个鸡蛋和两碗米饭。\" [Chú thích từ vựng: 不仅...而且... (bùjǐn... érqiě...): không những... mà còn...].",
+        "citationText": "所以我们点了一条鱼、一盘羊肉、三个鸡蛋和两碗米饭。"
+      },
+      {
+        "id": "q_hsk2_rest_3",
+        "type": "true_false",
+        "question": "这家饭馆的菜很好吃，但是太贵了。(Món ăn ở nhà hàng này rất ngon nhưng quá đắt.)",
+        "options": [
+          "Đúng (正确)",
+          "Sai (错误)"
+        ],
+        "answer": 1,
+        "explanationVi": "Trong bài viết: \"这里的菜不仅好吃，而且很便宜\" (Món ăn ở đây không những ngon mà còn rất rẻ), nên nói quá đắt là Sai.",
+        "citationText": "这里的菜不仅好吃，而且很便宜"
+      }
+    ],
+    "audio_uri": "assets/audio/reading/rdg_hsk2_restaurant.mp3",
+    "audioUri": "assets/audio/reading/rdg_hsk2_restaurant.mp3",
+    "hsk_level": 2,
+    "title_cn": "在饭馆点菜",
+    "content_cn": "今天晚上我和家人一起去学校旁边的中国饭馆吃饭。服务员很客气，给我们介绍了好吃的菜。因为爸爸喜欢吃鱼，哥哥喜欢吃羊肉，所以我们点了一条鱼、一盘羊肉、三个鸡蛋和两碗米饭。这里的菜不仅好吃，而且很便宜，我们吃得非常高兴。",
+    "translation_vi": "Tối nay tôi cùng gia đình đến nhà hàng Trung Quốc bên cạnh trường học để ăn tối. Nhân viên phục vụ rất lịch sự, giới thiệu cho chúng tôi những món ăn ngon. Vì bố thích ăn cá, anh trai thích ăn thịt cừu nên chúng tôi đã gọi một con cá, một đĩa thịt cừu, ba quả trứng gà và hai bát cơm trắng. Món ăn ở đây không những ngon mà còn rất rẻ, chúng tôi ăn uống vô cùng vui vẻ.",
+    "questions_json": "[{\"id\":\"q_hsk2_rest_1\",\"type\":\"single_choice\",\"question\":\"这家中国饭馆在哪儿？(Nhà hàng Trung Quốc này nằm ở đâu?)\",\"options\":[\"医院前面 (Phía trước bệnh viện)\",\"学校旁边 (Bên cạnh trường học)\",\"火车站左边 (Bên trái nhà ga)\",\"机场里面 (Bên trong sân bay)\"],\"answer\":1,\"explanationVi\":\"Câu đầu tiên nêu rõ: \\\"今天晚上我和家人一起去学校旁边的中国饭馆吃饭。\\\" [Chú thích từ vựng: 点菜 (diǎncài): gọi món; 盘 (pán): đĩa; 碗 (wǎn): bát].\",\"citationText\":\"今天晚上我和家人一起去学校旁边的中国饭馆吃饭。\"},{\"id\":\"q_hsk2_rest_2\",\"type\":\"single_choice\",\"question\":\"他们今天晚上点了什么菜？(Tối nay họ đã gọi những món gì?)\",\"options\":[\"咖啡、牛奶和苹果 (Cà phê, sữa tươi và táo)\",\"鱼、羊肉、鸡蛋和米饭 (Cá, thịt cừu, trứng gà và cơm trắng)\",\"面条、西瓜和茶 (Mì sợi, dưa hấu và trà)\",\"面包和牛肉 (Bánh mì và thịt bò)\"],\"answer\":1,\"explanationVi\":\"Bài đọc viết: \\\"所以我们点了一条鱼、一盘羊肉、三个鸡蛋和两碗米饭。\\\" [Chú thích từ vựng: 不仅...而且... (bùjǐn... érqiě...): không những... mà còn...].\",\"citationText\":\"所以我们点了一条鱼、一盘羊肉、三个鸡蛋和两碗米饭。\"},{\"id\":\"q_hsk2_rest_3\",\"type\":\"true_false\",\"question\":\"这家饭馆的菜很好吃，但是太贵了。(Món ăn ở nhà hàng này rất ngon nhưng quá đắt.)\",\"options\":[\"Đúng (正确)\",\"Sai (错误)\"],\"answer\":1,\"explanationVi\":\"Trong bài viết: \\\"这里的菜不仅好吃，而且很便宜\\\" (Món ăn ở đây không những ngon mà còn rất rẻ), nên nói quá đắt là Sai.\",\"citationText\":\"这里的菜不仅好吃，而且很便宜\"}]"
+  },
+  {
+    "id": "RDG_4_reading_hsk2_breakfast",
+    "hskLevel": 2,
+    "topic": "Ẩm thực Trung Hoa",
+    "estimatedMinutes": 2,
+    "source": "StoryWeaver Graded Chinese & Boya Elementary",
+    "title": "早上的热牛奶和鸡蛋",
+    "titleCn": "早上的热牛奶和鸡蛋",
+    "contentZh": "每天早上七点，我和妹妹一起起床。去学校以前，妈妈都会在家给我们做早饭。我最喜欢吃两个鸡蛋，还要喝一杯热牛奶。妹妹喜欢吃米饭和鱼，爸爸喜欢一边喝咖啡一边看报纸。吃好早饭去学校上课，我们的身体都很好。",
+    "contentCn": "每天早上七点，我和妹妹一起起床。去学校以前，妈妈都会在家给我们做早饭。我最喜欢吃两个鸡蛋，还要喝一杯热牛奶。妹妹喜欢吃米饭和鱼，爸爸喜欢一边喝咖啡一边看报纸。吃好早饭去学校上课，我们的身体都很好。",
+    "pinyin": "Měi tiān zǎoshang qī diǎn, wǒ hé mèimei yìqǐ qǐchuáng. Qù xuéxiào yǐqián, māma dōu huì zài jiā gěi wǒmen zuò zǎofàn. Wǒ zuì xǐhuan chī liǎng gè jīdàn, hái yào hē yì bēi rè niúnǎi. Mèimei xǐhuan chī mǐfàn hé yú, bàba xǐhuan yìbiān hē kāfēi yìbiān kàn bàozhǐ. Chī hǎo zǎofàn qù xuéxiào shàngkè, wǒmen de shēntǐ dōu hěn hǎo.",
+    "translationVi": "Bảy giờ sáng mỗi ngày, tôi và em gái cùng nhau thức dậy. Trước khi đến trường, mẹ đều ở nhà nấu bữa sáng cho chúng tôi. Tôi thích nhất là ăn hai quả trứng gà và uống một cốc sữa nóng. Em gái thích ăn cơm và cá, còn bố thích vừa uống cà phê vừa đọc báo. Ăn sáng đầy đủ rồi đến trường học bài, sức khỏe của chúng tôi đều rất tốt.",
+    "questions": [
+      {
+        "id": "q_hsk2_bf_1",
+        "type": "single_choice",
+        "question": "“我”早上最喜欢吃什么、喝什么？(Buổi sáng nhân vật \"tôi\" thích ăn gì, uống gì nhất?)",
+        "options": [
+          "吃羊肉、喝茶 (Ăn thịt cừu, uống trà)",
+          "吃两个鸡蛋、喝一杯热牛奶 (Ăn 2 quả trứng gà, uống 1 cốc sữa nóng)",
+          "吃苹果、喝咖啡 (Ăn táo, uống cà phê)",
+          "吃米饭、喝冷水 (Ăn cơm, uống nước lạnh)"
+        ],
+        "answer": 1,
+        "explanationVi": "Căn cứ câu trong bài: \"我最喜欢吃两个鸡蛋，还要喝一杯热牛奶。\" [Chú thích từ vựng: 早饭 (zǎofàn): bữa sáng; 一边...一边... (yìbiān... yìbiān...): vừa... vừa...].",
+        "citationText": "我最喜欢吃两个鸡蛋，还要喝一杯热牛奶。"
+      },
+      {
+        "id": "q_hsk2_bf_2",
+        "type": "single_choice",
+        "question": "爸爸早上喜欢做什么？(Buổi sáng bố thích làm gì?)",
+        "options": [
+          "去公园跑步 (Đi công viên chạy bộ)",
+          "在房间看电视 (Xem tivi trong phòng)",
+          "一边喝咖啡一边看报纸 (Vừa uống cà phê vừa đọc báo)",
+          "去商店买水果 (Đi cửa hàng mua hoa quả)"
+        ],
+        "answer": 2,
+        "explanationVi": "Bài đọc nêu rõ: \"爸爸喜欢一边喝咖啡一边看报纸。\"",
+        "citationText": "爸爸喜欢一边喝咖啡一边看报纸。"
+      }
+    ],
+    "hsk_level": 2,
+    "title_cn": "早上的热牛奶和鸡蛋",
+    "content_cn": "每天早上七点，我和妹妹一起起床。去学校以前，妈妈都会在家给我们做早饭。我最喜欢吃两个鸡蛋，还要喝一杯热牛奶。妹妹喜欢吃米饭和鱼，爸爸喜欢一边喝咖啡一边看报纸。吃好早饭去学校上课，我们的身体都很好。",
+    "translation_vi": "Bảy giờ sáng mỗi ngày, tôi và em gái cùng nhau thức dậy. Trước khi đến trường, mẹ đều ở nhà nấu bữa sáng cho chúng tôi. Tôi thích nhất là ăn hai quả trứng gà và uống một cốc sữa nóng. Em gái thích ăn cơm và cá, còn bố thích vừa uống cà phê vừa đọc báo. Ăn sáng đầy đủ rồi đến trường học bài, sức khỏe của chúng tôi đều rất tốt.",
+    "questions_json": "[{\"id\":\"q_hsk2_bf_1\",\"type\":\"single_choice\",\"question\":\"“我”早上最喜欢吃什么、喝什么？(Buổi sáng nhân vật \\\"tôi\\\" thích ăn gì, uống gì nhất?)\",\"options\":[\"吃羊肉、喝茶 (Ăn thịt cừu, uống trà)\",\"吃两个鸡蛋、喝一杯热牛奶 (Ăn 2 quả trứng gà, uống 1 cốc sữa nóng)\",\"吃苹果、喝咖啡 (Ăn táo, uống cà phê)\",\"吃米饭、喝冷水 (Ăn cơm, uống nước lạnh)\"],\"answer\":1,\"explanationVi\":\"Căn cứ câu trong bài: \\\"我最喜欢吃两个鸡蛋，还要喝一杯热牛奶。\\\" [Chú thích từ vựng: 早饭 (zǎofàn): bữa sáng; 一边...一边... (yìbiān... yìbiān...): vừa... vừa...].\",\"citationText\":\"我最喜欢吃两个鸡蛋，还要喝一杯热牛奶。\"},{\"id\":\"q_hsk2_bf_2\",\"type\":\"single_choice\",\"question\":\"爸爸早上喜欢做什么？(Buổi sáng bố thích làm gì?)\",\"options\":[\"去公园跑步 (Đi công viên chạy bộ)\",\"在房间看电视 (Xem tivi trong phòng)\",\"一边喝咖啡一边看报纸 (Vừa uống cà phê vừa đọc báo)\",\"去商店买水果 (Đi cửa hàng mua hoa quả)\"],\"answer\":2,\"explanationVi\":\"Bài đọc nêu rõ: \\\"爸爸喜欢一边喝咖啡一边看报纸。\\\"\",\"citationText\":\"爸爸喜欢一边喝咖啡一边看报纸。\"}]"
+  },
+  {
+    "id": "RDG_5_reading_hsk2_train_trip",
+    "hskLevel": 2,
+    "topic": "Du lịch & Khám phá",
+    "estimatedMinutes": 3,
+    "source": "HSK 2 Standard Course & C3 Dialogue Reading",
+    "title": "坐火车去旅游",
+    "titleCn": "坐火车去旅游",
+    "contentZh": "上个星期六，天气晴朗，我和同学一起去北京旅游。早上六点我们就起床了，坐出租车去火车站。虽然火车票比公共汽车票贵一点儿，但是坐火车非常快，三个小时就到了。我们在北京玩儿了两天，看了很多漂亮的地方，大家都觉得这次旅游很有意思。",
+    "contentCn": "上个星期六，天气晴朗，我和同学一起去北京旅游。早上六点我们就起床了，坐出租车去火车站。虽然火车票比公共汽车票贵一点儿，但是坐火车非常快，三个小时就到了。我们在北京玩儿了两天，看了很多漂亮的地方，大家都觉得这次旅游很有意思。",
+    "pinyin": "Shàng gè xīngqīliù, tiānqì qínglǎng, wǒ hé tóngxué yìqǐ qù Běijīng lǚyóu. Zǎoshang liù diǎn wǒmen jiù qǐchuáng le, zuò chūzūchē qù huǒchēzhàn. Suīrán huǒchēpiào bǐ gōnggòng qìchē piào guì yìdiǎnr, dànshì zuò huǒchē fēicháng kuài, sān gè xiǎoshí jiù dào le. Wǒmen zài Běijīng wánr le liǎng tiān, kàn le hěn duō piàoliang de dìfang, dàjiā dōu juéde zhè cì lǚyóu hěn yǒu yìsi.",
+    "translationVi": "Thứ Bảy tuần trước, trời nắng đẹp, tôi cùng bạn học đi du lịch Bắc Kinh. Sáu giờ sáng chúng tôi đã thức dậy, bắt taxi ra ga tàu hỏa. Mặc dù vé tàu hỏa đắt hơn vé xe buýt một chút, nhưng đi tàu hỏa rất nhanh, chỉ ba tiếng đồng hồ là tới nơi. Chúng tôi chơi ở Bắc Kinh hai ngày, ngắm nhìn rất nhiều danh lam thắng cảnh đẹp, ai cũng thấy chuyến du lịch lần này thật thú vị.",
+    "questions": [
+      {
+        "id": "q_hsk2_trip_1",
+        "type": "single_choice",
+        "question": "他们是怎么去火车站的？(Họ đã đi ra ga tàu hỏa bằng phương tiện gì?)",
+        "options": [
+          "坐公共汽车 (Đi xe buýt)",
+          "骑自行车 (Đạp xe đạp)",
+          "坐出租车 (Đi xe taxi)",
+          "走路去 (Đi bộ)"
+        ],
+        "answer": 2,
+        "explanationVi": "Trong bài viết: \"早上六点我们就起床了，坐出租车去火车站。\" [Chú thích từ vựng: 晴朗 (qínglǎng): nắng ráo, quang đãng; 地方 (dìfang): nơi, địa điểm].",
+        "citationText": "早上六点我们就起床了，坐出租车去火车站。"
+      },
+      {
+        "id": "q_hsk2_trip_2",
+        "type": "single_choice",
+        "question": "坐火车去北京用了多长时间？(Đi tàu hỏa đến Bắc Kinh mất bao lâu?)",
+        "options": [
+          "一个小时 (1 tiếng đồng hồ)",
+          "两个小时 (2 tiếng đồng hồ)",
+          "三个小时 (3 tiếng đồng hồ)",
+          "六个小时 (6 tiếng đồng hồ)"
+        ],
+        "answer": 2,
+        "explanationVi": "Bài đọc nêu rõ: \"但是坐火车非常快，三个小时就到了。\"",
+        "citationText": "但是坐火车非常快，三个小时就到了。"
+      }
+    ],
+    "hsk_level": 2,
+    "title_cn": "坐火车去旅游",
+    "content_cn": "上个星期六，天气晴朗，我和同学一起去北京旅游。早上六点我们就起床了，坐出租车去火车站。虽然火车票比公共汽车票贵一点儿，但是坐火车非常快，三个小时就到了。我们在北京玩儿了两天，看了很多漂亮的地方，大家都觉得这次旅游很有意思。",
+    "translation_vi": "Thứ Bảy tuần trước, trời nắng đẹp, tôi cùng bạn học đi du lịch Bắc Kinh. Sáu giờ sáng chúng tôi đã thức dậy, bắt taxi ra ga tàu hỏa. Mặc dù vé tàu hỏa đắt hơn vé xe buýt một chút, nhưng đi tàu hỏa rất nhanh, chỉ ba tiếng đồng hồ là tới nơi. Chúng tôi chơi ở Bắc Kinh hai ngày, ngắm nhìn rất nhiều danh lam thắng cảnh đẹp, ai cũng thấy chuyến du lịch lần này thật thú vị.",
+    "questions_json": "[{\"id\":\"q_hsk2_trip_1\",\"type\":\"single_choice\",\"question\":\"他们是怎么去火车站的？(Họ đã đi ra ga tàu hỏa bằng phương tiện gì?)\",\"options\":[\"坐公共汽车 (Đi xe buýt)\",\"骑自行车 (Đạp xe đạp)\",\"坐出租车 (Đi xe taxi)\",\"走路去 (Đi bộ)\"],\"answer\":2,\"explanationVi\":\"Trong bài viết: \\\"早上六点我们就起床了，坐出租车去火车站。\\\" [Chú thích từ vựng: 晴朗 (qínglǎng): nắng ráo, quang đãng; 地方 (dìfang): nơi, địa điểm].\",\"citationText\":\"早上六点我们就起床了，坐出租车去火车站。\"},{\"id\":\"q_hsk2_trip_2\",\"type\":\"single_choice\",\"question\":\"坐火车去北京用了多长时间？(Đi tàu hỏa đến Bắc Kinh mất bao lâu?)\",\"options\":[\"一个小时 (1 tiếng đồng hồ)\",\"两个小时 (2 tiếng đồng hồ)\",\"三个小时 (3 tiếng đồng hồ)\",\"六个小时 (6 tiếng đồng hồ)\"],\"answer\":2,\"explanationVi\":\"Bài đọc nêu rõ: \\\"但是坐火车非常快，三个小时就到了。\\\"\",\"citationText\":\"但是坐火车非常快，三个小时就到了。\"}]"
+  },
+  {
+    "id": "RDG_3_reading_hsk3_travel_beijing",
+    "hskLevel": 3,
+    "topic": "Du lịch & Khám phá",
+    "estimatedMinutes": 4,
+    "source": "C3 Chinese Reading Comprehension Dataset",
+    "title": "我的北京旅行日记",
+    "titleCn": "我的北京旅行日记",
+    "contentZh": "上个周末，我和同学坐高铁去北京旅行。北京的天气非常晴朗，空气也很新鲜。第一天，我们去了故宫。故宫以前是皇帝住的地方，红色的墙和黄色的瓦非常壮观。我们在里面走了整整四个小时，拍了很多漂亮的照片。虽然脚有点儿累，但是我们心里非常高兴。晚上，我们在王府井大街品尝了正宗的老北京炸酱面，味道特别棒！",
+    "contentCn": "上个周末，我和同学坐高铁去北京旅行。北京的天气非常晴朗，空气也很新鲜。第一天，我们去了故宫。故宫以前是皇帝住的地方，红色的墙和黄色的瓦非常壮观。我们在里面走了整整四个小时，拍了很多漂亮的照片。虽然脚有点儿累，但是我们心里非常高兴。晚上，我们在王府井大街品尝了正宗的老北京炸酱面，味道特别棒！",
+    "pinyin": "Shàng gè zhōumò, wǒ hé tóngxué zuò gāotiě qù Běijīng lǚxíng. Běijīng de tiānqì fēicháng qínglǎng, kōngqì yě hěn xīnxiān. Dì-yī tiān, wǒmen qù le Gùgōng. Gùgōng yǐqián shì huángdì zhù de dìfang, hóngsè de qiáng hé huángsè de wǎ fēicháng zhuàngguān. Wǒmen zài lǐmiàn zǒu le zhěngzhěng sì gè xiǎoshí, pāi le hěn duō piàoliang de zhàopiàn. Suīrán jiǎo yǒudiǎnr lèi, dànshì wǒmen xīnlǐ fēicháng gāoxìng. Wǎnshang, wǒmen zài Wángfǔjǐng Dàjiē pǐncháng le zhèngzōng de lǎo Běijīng zhájiàngmiàn, wèidao tèbié bàng!",
+    "translationVi": "Cuối tuần trước, tôi và bạn học đi tàu cao tốc đến Bắc Kinh du lịch. Thời tiết Bắc Kinh vô cùng nắng ráo, không khí cũng rất trong lành. Ngày đầu tiên, chúng tôi đến Cố Cung. Cố Cung trước đây là nơi hoàng đế ở, những bức tường đỏ và mái ngói vàng vô cùng tráng lệ. Chúng tôi đi bộ bên trong suốt bốn tiếng đồng hồ, chụp được rất nhiều bức ảnh đẹp. Tuy chân hơi mỏi nhưng trong lòng chúng tôi rất vui. Buổi tối, chúng tôi thưởng thức món mì tương đen Bắc Kinh chính gốc ở phố Vương Phủ Tỉnh, hương vị tuyệt vời!",
+    "questions": [
+      {
+        "id": "q_hsk3_bj_1",
+        "type": "single_choice",
+        "question": "作者和同学是怎么去北京旅行的？(Tác giả và bạn học đi du lịch Bắc Kinh bằng phương tiện gì?)",
+        "options": [
+          "坐飞机 (Đi máy bay)",
+          "坐高铁 (Đi tàu cao tốc)",
+          "自己开车 (Tự lái xe)",
+          "坐公共汽车 (Đi xe buýt)"
+        ],
+        "answer": 1,
+        "explanationVi": "Câu mở đầu ghi rõ: \"上个周末，我和同学坐高铁去北京旅行。\" [Chú thích từ vựng: 高铁 (gāotiě): tàu cao tốc; 壮观 (zhuàngguān): hùng vĩ, tráng lệ].",
+        "citationText": "上个周末，我和同学坐高铁去北京旅行。"
+      },
+      {
+        "id": "q_hsk3_bj_2",
+        "type": "single_choice",
+        "question": "他们在故宫里面走了多长时间？(Họ đã đi bộ trong Cố Cung bao lâu?)",
+        "options": [
+          "两个小时 (2 tiếng)",
+          "三个小时 (3 tiếng)",
+          "整整四个小时 (Suốt 4 tiếng đồng hồ)",
+          "一整天 (Cả một ngày)"
+        ],
+        "answer": 2,
+        "explanationVi": "Bài đọc nêu rõ: \"我们在里面走了整整四个小时，拍了很多漂亮的照片。\"",
+        "citationText": "我们在里面走了整整四个小时，拍了很多漂亮的照片。"
+      },
+      {
+        "id": "q_hsk3_bj_3",
+        "type": "single_choice",
+        "question": "晚上他们在王府井大街吃了什么？(Buổi tối họ đã ăn món gì ở phố Vương Phủ Tỉnh?)",
+        "options": [
+          "北京烤鸭 (Vịt quay Bắc Kinh)",
+          "老北京炸酱面 (Mì tương đen Bắc Kinh truyền thống)",
+          "四川火锅 (Lẩu Tứ Xuyên)",
+          "牛肉汤面 (Mì bò nước)"
+        ],
+        "answer": 1,
+        "explanationVi": "Câu cuối bài viết: \"晚上，我们在王府井大街品尝了正宗的老北京炸酱面，味道特别棒！\" [Chú thích từ vựng: 品尝 (pǐncháng): thưởng thức; 炸酱面 (zhájiàngmiàn): mì tương đen].",
+        "citationText": "晚上，我们在王府井大街品尝了正宗的老北京炸酱面，味道特别棒！"
+      }
+    ],
+    "audio_uri": "assets/audio/reading/rdg_hsk3_travel_beijing.mp3",
+    "audioUri": "assets/audio/reading/rdg_hsk3_travel_beijing.mp3",
+    "hsk_level": 3,
+    "title_cn": "我的北京旅行日记",
+    "content_cn": "上个周末，我和同学坐高铁去北京旅行。北京的天气非常晴朗，空气也很新鲜。第一天，我们去了故宫。故宫以前是皇帝住的地方，红色的墙和黄色的瓦非常壮观。我们在里面走了整整四个小时，拍了很多漂亮的照片。虽然脚有点儿累，但是我们心里非常高兴。晚上，我们在王府井大街品尝了正宗的老北京炸酱面，味道特别棒！",
+    "translation_vi": "Cuối tuần trước, tôi và bạn học đi tàu cao tốc đến Bắc Kinh du lịch. Thời tiết Bắc Kinh vô cùng nắng ráo, không khí cũng rất trong lành. Ngày đầu tiên, chúng tôi đến Cố Cung. Cố Cung trước đây là nơi hoàng đế ở, những bức tường đỏ và mái ngói vàng vô cùng tráng lệ. Chúng tôi đi bộ bên trong suốt bốn tiếng đồng hồ, chụp được rất nhiều bức ảnh đẹp. Tuy chân hơi mỏi nhưng trong lòng chúng tôi rất vui. Buổi tối, chúng tôi thưởng thức món mì tương đen Bắc Kinh chính gốc ở phố Vương Phủ Tỉnh, hương vị tuyệt vời!",
+    "questions_json": "[{\"id\":\"q_hsk3_bj_1\",\"type\":\"single_choice\",\"question\":\"作者和同学是怎么去北京旅行的？(Tác giả và bạn học đi du lịch Bắc Kinh bằng phương tiện gì?)\",\"options\":[\"坐飞机 (Đi máy bay)\",\"坐高铁 (Đi tàu cao tốc)\",\"自己开车 (Tự lái xe)\",\"坐公共汽车 (Đi xe buýt)\"],\"answer\":1,\"explanationVi\":\"Câu mở đầu ghi rõ: \\\"上个周末，我和同学坐高铁去北京旅行。\\\" [Chú thích từ vựng: 高铁 (gāotiě): tàu cao tốc; 壮观 (zhuàngguān): hùng vĩ, tráng lệ].\",\"citationText\":\"上个周末，我和同学坐高铁去北京旅行。\"},{\"id\":\"q_hsk3_bj_2\",\"type\":\"single_choice\",\"question\":\"他们在故宫里面走了多长时间？(Họ đã đi bộ trong Cố Cung bao lâu?)\",\"options\":[\"两个小时 (2 tiếng)\",\"三个小时 (3 tiếng)\",\"整整四个小时 (Suốt 4 tiếng đồng hồ)\",\"一整天 (Cả một ngày)\"],\"answer\":2,\"explanationVi\":\"Bài đọc nêu rõ: \\\"我们在里面走了整整四个小时，拍了很多漂亮的照片。\\\"\",\"citationText\":\"我们在里面走了整整四个小时，拍了很多漂亮的照片。\"},{\"id\":\"q_hsk3_bj_3\",\"type\":\"single_choice\",\"question\":\"晚上他们在王府井大街吃了什么？(Buổi tối họ đã ăn món gì ở phố Vương Phủ Tỉnh?)\",\"options\":[\"北京烤鸭 (Vịt quay Bắc Kinh)\",\"老北京炸酱面 (Mì tương đen Bắc Kinh truyền thống)\",\"四川火锅 (Lẩu Tứ Xuyên)\",\"牛肉汤面 (Mì bò nước)\"],\"answer\":1,\"explanationVi\":\"Câu cuối bài viết: \\\"晚上，我们在王府井大街品尝了正宗的老北京炸酱面，味道特别棒！\\\" [Chú thích từ vựng: 品尝 (pǐncháng): thưởng thức; 炸酱面 (zhájiàngmiàn): mì tương đen].\",\"citationText\":\"晚上，我们在王府井大街品尝了正宗的老北京炸酱面，味道特别棒！\"}]"
+  },
+  {
+    "id": "RDG_7_reading_hsk2_nature_seasons",
+    "hskLevel": 2,
+    "topic": "Khoa học & Tự nhiên",
+    "estimatedMinutes": 3,
+    "source": "StoryWeaver Science & Nature Graded Reader (HSK 2)",
+    "title": "一年四季的天气与自然",
+    "titleCn": "一年四季的天气与自然",
+    "contentZh": "一年有十二个月。春天天气不冷也不热，树绿了，红花也开了，小鸟在树上唱歌。夏天天气很热，常常下雨，我们最喜欢去游泳、吃西瓜。秋天天气晴朗，树上的苹果红了，非常好吃。冬天天气很冷，下雪的时候，外面都是白色的，孩子们喜欢在雪地里玩儿。",
+    "contentCn": "一年有十二个月。春天天气不冷也不热，树绿了，红花也开了，小鸟在树上唱歌。夏天天气很热，常常下雨，我们最喜欢去游泳、吃西瓜。秋天天气晴朗，树上的苹果红了，非常好吃。冬天天气很冷，下雪的时候，外面都是白色的，孩子们喜欢在雪地里玩儿。",
+    "pinyin": "Yì nián yǒu shí'èr gè yuè. Chūntiān tiānqì bù lěng yě bú rè, shù lǜ le, hóng huā yě kāi le, xiǎo niǎo zài shù shàng chànggē. Xiàtiān tiānqì hěn rè, chángcháng xià yǔ, wǒmen zuì xǐhuan qù yóuyǒng, chī xīguā. Qiūtiān tiānqì qínglǎng, shù shàng de píngguǒ hóng le, fēicháng hǎochī. Dōngtiān tiānqì hěn lěng, xià xuě de shíhou, wàimiàn dōu shì báisè de, háizimen xǐhuan zài xuědì lǐ wánr.",
+    "translationVi": "Một năm có mười hai tháng. Mùa xuân thời tiết không lạnh cũng không nóng, cây cối xanh tươi, hoa đỏ nở rộ, chim nhỏ hót trên cành cây. Mùa hè trời rất nóng và thường mưa, chúng tôi thích nhất là đi bơi và ăn dưa hấu. Mùa thu trời nắng ráo, táo trên cây chín đỏ, vô cùng ngon miệng. Mùa đông trời rất lạnh, khi tuyết rơi, bên ngoài đều phủ một màu trắng xóa, các em nhỏ thích nô đùa trên mặt đất phủ tuyết.",
+    "questions": [
+      {
+        "id": "q_hsk2_nat_1",
+        "type": "single_choice",
+        "question": "春天的时候，自然界有什么变化？(Vào mùa xuân, thiên nhiên có sự thay đổi gì?)",
+        "options": [
+          "常常下大雪，外面是白色的 (Thường có tuyết lớn, bên ngoài màu trắng)",
+          "树绿了，红花开了，小鸟在树上唱歌 (Cây xanh, hoa đỏ nở, chim nhỏ hót trên cây)",
+          "树上的苹果红了 (Táo trên cây chín đỏ)",
+          "天气太热，常常下雨 (Trời quá nóng và thường mưa)"
+        ],
+        "answer": 1,
+        "explanationVi": "Trong bài viết: \"春天天气不冷也不热，树绿了，红花也开了，小鸟在树上唱歌。\" [Chú thích từ vựng: 春天/夏天/秋天/冬天 (chūntiān/xiàtiān/qiūtiān/dōngtiān): mùa xuân/hạ/thu/đông; 绿 (lǜ): màu xanh lá].",
+        "citationText": "春天天气不冷也不热，树绿了，红花也开了，小鸟在树上唱歌。"
+      },
+      {
+        "id": "q_hsk2_nat_2",
+        "type": "single_choice",
+        "question": "人们在夏天最喜欢做什么？(Mọi người thích làm gì nhất vào mùa hè?)",
+        "options": [
+          "在雪地里玩儿 (Chơi trên mặt tuyết)",
+          "去游泳、吃西瓜 (Đi bơi và ăn dưa hấu)",
+          "穿很多厚衣服 (Mặc nhiều quần áo dày)",
+          "在房间里喝热茶 (Uống trà nóng trong phòng)"
+        ],
+        "answer": 1,
+        "explanationVi": "Bài đọc nêu rõ: \"夏天天气很热，常常下雨，我们最喜欢去游泳、吃西瓜。\" [Chú thích từ vựng: 西瓜 (xīguā): dưa hấu].",
+        "citationText": "夏天天气很热，常常下雨，我们最喜欢去游泳、吃西瓜。"
+      }
+    ],
+    "hsk_level": 2,
+    "title_cn": "一年四季的天气与自然",
+    "content_cn": "一年有十二个月。春天天气不冷也不热，树绿了，红花也开了，小鸟在树上唱歌。夏天天气很热，常常下雨，我们最喜欢去游泳、吃西瓜。秋天天气晴朗，树上的苹果红了，非常好吃。冬天天气很冷，下雪的时候，外面都是白色的，孩子们喜欢在雪地里玩儿。",
+    "translation_vi": "Một năm có mười hai tháng. Mùa xuân thời tiết không lạnh cũng không nóng, cây cối xanh tươi, hoa đỏ nở rộ, chim nhỏ hót trên cành cây. Mùa hè trời rất nóng và thường mưa, chúng tôi thích nhất là đi bơi và ăn dưa hấu. Mùa thu trời nắng ráo, táo trên cây chín đỏ, vô cùng ngon miệng. Mùa đông trời rất lạnh, khi tuyết rơi, bên ngoài đều phủ một màu trắng xóa, các em nhỏ thích nô đùa trên mặt đất phủ tuyết.",
+    "questions_json": "[{\"id\":\"q_hsk2_nat_1\",\"type\":\"single_choice\",\"question\":\"春天的时候，自然界有什么变化？(Vào mùa xuân, thiên nhiên có sự thay đổi gì?)\",\"options\":[\"常常下大雪，外面是白色的 (Thường có tuyết lớn, bên ngoài màu trắng)\",\"树绿了，红花开了，小鸟在树上唱歌 (Cây xanh, hoa đỏ nở, chim nhỏ hót trên cây)\",\"树上的苹果红了 (Táo trên cây chín đỏ)\",\"天气太热，常常下雨 (Trời quá nóng và thường mưa)\"],\"answer\":1,\"explanationVi\":\"Trong bài viết: \\\"春天天气不冷也不热，树绿了，红花也开了，小鸟在树上唱歌。\\\" [Chú thích từ vựng: 春天/夏天/秋天/冬天 (chūntiān/xiàtiān/qiūtiān/dōngtiān): mùa xuân/hạ/thu/đông; 绿 (lǜ): màu xanh lá].\",\"citationText\":\"春天天气不冷也不热，树绿了，红花也开了，小鸟在树上唱歌。\"},{\"id\":\"q_hsk2_nat_2\",\"type\":\"single_choice\",\"question\":\"人们在夏天最喜欢做什么？(Mọi người thích làm gì nhất vào mùa hè?)\",\"options\":[\"在雪地里玩儿 (Chơi trên mặt tuyết)\",\"去游泳、吃西瓜 (Đi bơi và ăn dưa hấu)\",\"穿很多厚衣服 (Mặc nhiều quần áo dày)\",\"在房间里喝热茶 (Uống trà nóng trong phòng)\"],\"answer\":1,\"explanationVi\":\"Bài đọc nêu rõ: \\\"夏天天气很热，常常下雨，我们最喜欢去游泳、吃西瓜。\\\" [Chú thích từ vựng: 西瓜 (xīguā): dưa hấu].\",\"citationText\":\"夏天天气很热，常常下雨，我们最喜欢去游泳、吃西瓜。\"}]"
+  },
+  {
+    "id": "RDG_8_reading_hsk3_panda_science",
+    "hskLevel": 3,
+    "topic": "Khoa học & Tự nhiên",
+    "estimatedMinutes": 4,
+    "source": "StoryWeaver Science & Nature / C3 Reading Corpus",
+    "title": "可爱的国宝——大熊猫",
+    "titleCn": "可爱的国宝——大熊猫",
+    "contentZh": "大熊猫是中国最著名的野生动物之一，被人们亲切地称为“国宝”。它们主要生活在四川的高山树林里。大熊猫的身体胖胖的，身上的毛只有黑色和白色两种颜色，看起来非常可爱。大熊猫最喜欢的食物是新鲜的竹子，一只成年大熊猫每天要花十几个小时吃竹子。为了保护大熊猫和自然环境，中国建立了大熊猫国家公园。",
+    "contentCn": "大熊猫是中国最著名的野生动物之一，被人们亲切地称为“国宝”。它们主要生活在四川的高山树林里。大熊猫的身体胖胖的，身上的毛只有黑色和白色两种颜色，看起来非常可爱。大熊猫最喜欢的食物是新鲜的竹子，一只成年大熊猫每天要花十几个小时吃竹子。为了保护大熊猫和自然环境，中国建立了大熊猫国家公园。",
+    "pinyin": "Dàxióngmāo shì Zhōngguó zuì zhùmíng de yěshēng dòngwù zhī yī, bèi rénmen qīnqiè de chēngwéi \"guóbǎo\". Tāmen zhǔyào shēnghuó zài Sìchuān de gāoshān shùlín lǐ. Dàxióngmāo de shēntǐ pàngpàng de, shēnshang de máo zhǐ yǒu hēisè hé báisè liǎng zhǒng yánsè, kàn qǐlái fēicháng kě'ài. Dàxióngmāo zuì xǐhuan de shíwù shì xīnxiān de zhúzi, yì zhī chéngnián dàxióngmāo měi tiān yào huā shí jǐ gè xiǎoshí chī zhúzi. Wèile bǎohù dàxióngmāo hé zìrán huánjìng, Zhōngguó jiànlì le Dàxióngmāo Guójiā Gōngyuán.",
+    "translationVi": "Gấu trúc lớn là một trong những loài động vật hoang dã nổi tiếng nhất của Trung Quốc, được mọi người trìu mến gọi là \"Quốc bảo\". Chúng chủ yếu sinh sống trong các khu rừng núi cao ở Tứ Xuyên. Cơ thể gấu trúc mũm mĩm, bộ lông trên người chỉ có hai màu đen và trắng, trông vô cùng đáng yêu. Thức ăn yêu thích nhất của gấu trúc là trúc tươi, một cá thể gấu trúc trưởng thành mỗi ngày dành hơn mười tiếng đồng hồ để ăn trúc. Để bảo vệ gấu trúc và môi trường tự nhiên, Trung Quốc đã thành lập Vườn Quốc gia Gấu trúc.",
+    "questions": [
+      {
+        "id": "q_hsk3_panda_1",
+        "type": "single_choice",
+        "question": "大熊猫最喜欢的食物是什么？(Thức ăn yêu thích nhất của gấu trúc lớn là gì?)",
+        "options": [
+          "新鲜的苹果和香蕉 (Táo và chuối tươi)",
+          "河里的小鱼 (Cá nhỏ dưới sông)",
+          "新鲜的竹子 (Cây trúc tươi)",
+          "树上的小鸟 (Chim nhỏ trên cây)"
+        ],
+        "answer": 2,
+        "explanationVi": "Trong bài viết: \"大熊猫最喜欢的食物是新鲜的竹子，一只成年大熊猫每天要花十几个小时吃竹子。\" [Chú thích từ vựng: 大熊猫 (dàxióngmāo): gấu trúc lớn; 竹子 (zhúzi): cây trúc, tre].",
+        "citationText": "大熊猫最喜欢的食物是新鲜的竹子，一只成年大熊猫每天要花十几个小时吃竹子。"
+      },
+      {
+        "id": "q_hsk3_panda_2",
+        "type": "true_false",
+        "question": "大熊猫身上的毛有红色、黑色和白色三种颜色。(Lông của gấu trúc có 3 màu: đỏ, đen và trắng.)",
+        "options": [
+          "Đúng (正确)",
+          "Sai (错误)"
+        ],
+        "answer": 1,
+        "explanationVi": "Bài đọc nêu rõ: \"身上的毛只有黑色和白色两种颜色\" (chỉ có 2 màu đen và trắng), nên nhận định 3 màu là Sai.",
+        "citationText": "大熊猫的身体胖胖的，身上的毛只有黑色和白色两种颜色，看起来非常可爱。"
+      }
+    ],
+    "hsk_level": 3,
+    "title_cn": "可爱的国宝——大熊猫",
+    "content_cn": "大熊猫是中国最著名的野生动物之一，被人们亲切地称为“国宝”。它们主要生活在四川的高山树林里。大熊猫的身体胖胖的，身上的毛只有黑色和白色两种颜色，看起来非常可爱。大熊猫最喜欢的食物是新鲜的竹子，一只成年大熊猫每天要花十几个小时吃竹子。为了保护大熊猫和自然环境，中国建立了大熊猫国家公园。",
+    "translation_vi": "Gấu trúc lớn là một trong những loài động vật hoang dã nổi tiếng nhất của Trung Quốc, được mọi người trìu mến gọi là \"Quốc bảo\". Chúng chủ yếu sinh sống trong các khu rừng núi cao ở Tứ Xuyên. Cơ thể gấu trúc mũm mĩm, bộ lông trên người chỉ có hai màu đen và trắng, trông vô cùng đáng yêu. Thức ăn yêu thích nhất của gấu trúc là trúc tươi, một cá thể gấu trúc trưởng thành mỗi ngày dành hơn mười tiếng đồng hồ để ăn trúc. Để bảo vệ gấu trúc và môi trường tự nhiên, Trung Quốc đã thành lập Vườn Quốc gia Gấu trúc.",
+    "questions_json": "[{\"id\":\"q_hsk3_panda_1\",\"type\":\"single_choice\",\"question\":\"大熊猫最喜欢的食物是什么？(Thức ăn yêu thích nhất của gấu trúc lớn là gì?)\",\"options\":[\"新鲜的苹果和香蕉 (Táo và chuối tươi)\",\"河里的小鱼 (Cá nhỏ dưới sông)\",\"新鲜的竹子 (Cây trúc tươi)\",\"树上的小鸟 (Chim nhỏ trên cây)\"],\"answer\":2,\"explanationVi\":\"Trong bài viết: \\\"大熊猫最喜欢的食物是新鲜的竹子，一只成年大熊猫每天要花十几个小时吃竹子。\\\" [Chú thích từ vựng: 大熊猫 (dàxióngmāo): gấu trúc lớn; 竹子 (zhúzi): cây trúc, tre].\",\"citationText\":\"大熊猫最喜欢的食物是新鲜的竹子，一只成年大熊猫每天要花十几个小时吃竹子。\"},{\"id\":\"q_hsk3_panda_2\",\"type\":\"true_false\",\"question\":\"大熊猫身上的毛有红色、黑色和白色三种颜色。(Lông của gấu trúc có 3 màu: đỏ, đen và trắng.)\",\"options\":[\"Đúng (正确)\",\"Sai (错误)\"],\"answer\":1,\"explanationVi\":\"Bài đọc nêu rõ: \\\"身上的毛只有黑色和白色两种颜色\\\" (chỉ có 2 màu đen và trắng), nên nhận định 3 màu là Sai.\",\"citationText\":\"大熊猫的身体胖胖的，身上的毛只有黑色和白色两种颜色，看起来非常可爱。\"}]"
+  },
+  {
+    "id": "RDG_9_reading_hsk2_spring_festival",
+    "hskLevel": 2,
+    "topic": "Văn hóa & Lễ hội",
+    "estimatedMinutes": 3,
+    "source": "HSK 2 Standard Course & Cultural Reader",
+    "title": "快乐的中国新年",
+    "titleCn": "快乐的中国新年",
+    "contentZh": "新年快到了，这是中国人最重要的日子。新年前几天，爸爸和妈妈去商店买了很多新衣服和好吃的东西。我们一起把房间洗得干干净净，还在门上贴了红色的字。晚上，全家人坐在一起吃鱼和米饭，一起看电视。孩子们最高兴，因为爸爸妈妈会给他们钱，祝大家新年快乐！",
+    "contentCn": "新年快到了，这是中国人最重要的日子。新年前几天，爸爸和妈妈去商店买了很多新衣服和好吃的东西。我们一起把房间洗得干干净净，还在门上贴了红色的字。晚上，全家人坐在一起吃鱼和米饭，一起看电视。孩子们最高兴，因为爸爸妈妈会给他们钱，祝大家新年快乐！",
+    "pinyin": "Xīnnián kuài dào le, zhè shì Zhōngguó rén zuì zhòngyào de rìzi. Xīnnián qián jǐ tiān, bàba hé māma qù shāngdiàn mǎi le hěn duō xīn yīfu hé hǎochī de dōngxi. Wǒmen yìqǐ bǎ fángjiān xǐ de gāngānjìngjìng, hái zài mén shàng tiē le hóngsè de zì. Wǎnshang, quán jiārén zuò zài yìqǐ chī yú hé mǐfàn, yìqǐ kàn diànshì. Háizimen zuì gāoxìng, yīnwèi bàba māma huì gěi tāmen qián, zhù dàjiā xīnnián kuàilè!",
+    "translationVi": "Năm mới sắp đến rồi, đây là dịp quan trọng nhất của người Trung Quốc. Mấy ngày trước Tết, bố và mẹ đi cửa hàng mua rất nhiều quần áo mới và đồ ăn ngon. Chúng tôi cùng nhau dọn rửa căn phòng thật sạch sẽ, và dán chữ màu đỏ lên cánh cửa. Buổi tối, cả gia đình ngồi quây quần ăn cá và cơm, cùng nhau xem tivi. Các em nhỏ là vui nhất vì được bố mẹ mừng tuổi, chúc mọi người năm mới vui vẻ!",
+    "questions": [
+      {
+        "id": "q_hsk2_ny_1",
+        "type": "single_choice",
+        "question": "新年前几天，爸爸和妈妈去商店买了什么？(Mấy ngày trước năm mới, bố và mẹ đi cửa hàng mua gì?)",
+        "options": [
+          "电脑和手机 (Máy tính và điện thoại)",
+          "新衣服和好吃的东西 (Quần áo mới và đồ ăn ngon)",
+          "桌子、椅子和床 (Bàn, ghế và giường)",
+          "火车票和飞机票 (Vé tàu hỏa và vé máy bay)"
+        ],
+        "answer": 1,
+        "explanationVi": "Bài đọc nêu rõ: \"新年前几天，爸爸和妈妈去商店买了很多新衣服和好吃的东西。\" [Chú thích từ vựng: 重要 (zhòngyào): quan trọng; 干干净净 (gāngānjìngjìng): sạch sẽ tinh tươm; 贴 (tiē): dán].",
+        "citationText": "新年前几天，爸爸和妈妈去商店买了很多新衣服和好吃的东西。"
+      },
+      {
+        "id": "q_hsk2_ny_2",
+        "type": "single_choice",
+        "question": "他们在门上贴了什么颜色的字？(Họ đã dán chữ màu gì lên trên cửa?)",
+        "options": [
+          "白色的字 (Chữ màu trắng)",
+          "黑色的字 (Chữ màu đen)",
+          "红色的字 (Chữ màu đỏ)",
+          "黄色的字 (Chữ màu vàng)"
+        ],
+        "answer": 2,
+        "explanationVi": "Căn cứ câu trong bài: \"我们一起把房间洗得干干净净，还在门上贴了红色的字。\"",
+        "citationText": "我们一起把房间洗得干干净净，还在门上贴了红色的字。"
+      }
+    ],
+    "hsk_level": 2,
+    "title_cn": "快乐的中国新年",
+    "content_cn": "新年快到了，这是中国人最重要的日子。新年前几天，爸爸和妈妈去商店买了很多新衣服和好吃的东西。我们一起把房间洗得干干净净，还在门上贴了红色的字。晚上，全家人坐在一起吃鱼和米饭，一起看电视。孩子们最高兴，因为爸爸妈妈会给他们钱，祝大家新年快乐！",
+    "translation_vi": "Năm mới sắp đến rồi, đây là dịp quan trọng nhất của người Trung Quốc. Mấy ngày trước Tết, bố và mẹ đi cửa hàng mua rất nhiều quần áo mới và đồ ăn ngon. Chúng tôi cùng nhau dọn rửa căn phòng thật sạch sẽ, và dán chữ màu đỏ lên cánh cửa. Buổi tối, cả gia đình ngồi quây quần ăn cá và cơm, cùng nhau xem tivi. Các em nhỏ là vui nhất vì được bố mẹ mừng tuổi, chúc mọi người năm mới vui vẻ!",
+    "questions_json": "[{\"id\":\"q_hsk2_ny_1\",\"type\":\"single_choice\",\"question\":\"新年前几天，爸爸和妈妈去商店买了什么？(Mấy ngày trước năm mới, bố và mẹ đi cửa hàng mua gì?)\",\"options\":[\"电脑和手机 (Máy tính và điện thoại)\",\"新衣服和好吃的东西 (Quần áo mới và đồ ăn ngon)\",\"桌子、椅子和床 (Bàn, ghế và giường)\",\"火车票和飞机票 (Vé tàu hỏa và vé máy bay)\"],\"answer\":1,\"explanationVi\":\"Bài đọc nêu rõ: \\\"新年前几天，爸爸和妈妈去商店买了很多新衣服和好吃的东西。\\\" [Chú thích từ vựng: 重要 (zhòngyào): quan trọng; 干干净净 (gāngānjìngjìng): sạch sẽ tinh tươm; 贴 (tiē): dán].\",\"citationText\":\"新年前几天，爸爸和妈妈去商店买了很多新衣服和好吃的东西。\"},{\"id\":\"q_hsk2_ny_2\",\"type\":\"single_choice\",\"question\":\"他们在门上贴了什么颜色的字？(Họ đã dán chữ màu gì lên trên cửa?)\",\"options\":[\"白色的字 (Chữ màu trắng)\",\"黑色的字 (Chữ màu đen)\",\"红色的字 (Chữ màu đỏ)\",\"黄色的字 (Chữ màu vàng)\"],\"answer\":2,\"explanationVi\":\"Căn cứ câu trong bài: \\\"我们一起把房间洗得干干净净，还在门上贴了红色的字。\\\"\",\"citationText\":\"我们一起把房间洗得干干净净，还在门上贴了红色的字。\"}]"
+  },
+  {
+    "id": "RDG_4_reading_hsk4_mid_autumn",
+    "hskLevel": 4,
+    "topic": "Văn hóa & Lễ hội",
+    "estimatedMinutes": 4,
+    "source": "C3 Cultural Reading & HSK 4 Standard Course",
+    "title": "中秋节与月饼的文化意义",
+    "titleCn": "中秋节与月饼的文化意义",
+    "contentZh": "农历八月十五是中国传统的节日——中秋节。因为这一天的月亮最圆、最明亮，所以中国人把圆月看作是团圆的象征。无论人们在多远的地方工作或学习，到了中秋节，大家都会尽量赶回家里与亲人团聚。吃月饼是中秋节最重要的习俗之一。月饼通常是圆形的，亲朋好友之间互相赠送月饼，表达美好的祝福。",
+    "contentCn": "农历八月十五是中国传统的节日——中秋节。因为这一天的月亮最圆、最明亮，所以中国人把圆月看作是团圆的象征。无论人们在多远的地方工作或学习，到了中秋节，大家都会尽量赶回家里与亲人团聚。吃月饼是中秋节最重要的习俗之一。月饼通常是圆形的，亲朋好友之间互相赠送月饼，表达美好的祝福。",
+    "pinyin": "Nónglì bā yuè shíwǔ shì Zhōngguó chuántǒng de jiérì — Zhōngqiūjié. Yīnwèi zhè yì tiān de yuèliang zuì yuán, zuì míngliàng, suǒyǐ Zhōngguó rén bǎ yuányuè kànzuò shì tuányuán de xiàngzhēng. Wúlùn rénmen zài duō yuǎn de dìfang gōngzuò huò xuéxí, dào le Zhōngqiūjié, dàjiā dōu huì jǐnliàng gǎnhuí jiālǐ yǔ qīnrén tuánjù. Chī yuèbǐng shì Zhōngqiūjié zuì zhòngyào de xísú zhī yī. Yuèbǐng tōngcháng shì yuánxíng de, qīnpéng hǎoyǒu zhījiān hùxiāng zèngsòng yuèbǐng, biǎodá měihǎo de zhùfú.",
+    "translationVi": "Ngày rằm tháng Tám âm lịch là ngày lễ truyền thống của Trung Quốc — Tết Trung Thu. Bởi vì mặt trăng vào ngày này tròn và sáng nhất, nên người Trung Quốc xem trăng tròn là biểu tượng của sự đoàn viên. Dù mọi người làm việc hay học tập ở nơi xa xôi đến đâu, khi đến Tết Trung Thu, ai nấy đều cố gắng trở về nhà sum họp cùng người thân. Ăn bánh trung thu là một trong những phong tục quan trọng nhất của dịp lễ này. Bánh trung thu thường có hình tròn, bạn bè và người thân tặng bánh cho nhau để gửi gắm những lời chúc tốt đẹp.",
+    "questions": [
+      {
+        "id": "q_hsk4_ma_1",
+        "type": "single_choice",
+        "question": "中国人为什么把中秋节的圆月看作是团圆的象征？(Tại sao người Trung Quốc coi trăng tròn Tết Trung Thu là biểu tượng của sự đoàn viên?)",
+        "options": [
+          "因为这一天天气最暖和 (Vì ngày này thời tiết ấm áp nhất)",
+          "因为这一天的月亮最圆、最明亮 (Vì mặt trăng ngày này tròn và sáng nhất)",
+          "因为这一天是一年的开始 (Vì ngày này là khởi đầu của một năm)",
+          "因为这一天大家都不用上班 (Vì ngày này mọi người không phải đi làm)"
+        ],
+        "answer": 1,
+        "explanationVi": "Bài đọc nêu rõ: \"因为这一天的月亮最圆、最明亮，所以中国人把圆月看作是团圆的象征。\" [Chú thích từ vựng: 农历 (nónglì): âm lịch; 团圆 (tuányuán): đoàn viên; 象征 (xiàngzhēng): biểu tượng].",
+        "citationText": "因为这一天的月亮最圆、最明亮，所以中国人把圆月看作是团圆的象征。"
+      },
+      {
+        "id": "q_hsk4_ma_2",
+        "type": "single_choice",
+        "question": "亲朋好友之间互相赠送月饼是为了什么？(Bạn bè người thân tặng bánh trung thu cho nhau nhằm mục đích gì?)",
+        "options": [
+          "为了比赛谁做的月饼最好吃 (Để thi xem ai làm bánh ngon nhất)",
+          "为了表达美好的祝福 (Để bày tỏ những lời chúc tốt đẹp)",
+          "为了庆祝新年的到来 (Để chào mừng năm mới đến)",
+          "为了感谢老师的帮助 (Để cảm ơn sự giúp đỡ của thầy cô)"
+        ],
+        "answer": 1,
+        "explanationVi": "Câu cuối bài khẳng định: \"亲朋好友之间互相赠送月饼，表达美好的祝福。\" [Chú thích từ vựng: 赠送 (zèngsòng): biếu, tặng; 祝福 (zhùfú): lời chúc phúc].",
+        "citationText": "亲朋好友之间互相赠送月饼，表达美好的祝福。"
+      }
+    ],
+    "audio_uri": "assets/audio/reading/rdg_hsk4_mid_autumn.mp3",
+    "audioUri": "assets/audio/reading/rdg_hsk4_mid_autumn.mp3",
+    "hsk_level": 4,
+    "title_cn": "中秋节与月饼的文化意义",
+    "content_cn": "农历八月十五是中国传统的节日——中秋节。因为这一天的月亮最圆、最明亮，所以中国人把圆月看作是团圆的象征。无论人们在多远的地方工作或学习，到了中秋节，大家都会尽量赶回家里与亲人团聚。吃月饼是中秋节最重要的习俗之一。月饼通常是圆形的，亲朋好友之间互相赠送月饼，表达美好的祝福。",
+    "translation_vi": "Ngày rằm tháng Tám âm lịch là ngày lễ truyền thống của Trung Quốc — Tết Trung Thu. Bởi vì mặt trăng vào ngày này tròn và sáng nhất, nên người Trung Quốc xem trăng tròn là biểu tượng của sự đoàn viên. Dù mọi người làm việc hay học tập ở nơi xa xôi đến đâu, khi đến Tết Trung Thu, ai nấy đều cố gắng trở về nhà sum họp cùng người thân. Ăn bánh trung thu là một trong những phong tục quan trọng nhất của dịp lễ này. Bánh trung thu thường có hình tròn, bạn bè và người thân tặng bánh cho nhau để gửi gắm những lời chúc tốt đẹp.",
+    "questions_json": "[{\"id\":\"q_hsk4_ma_1\",\"type\":\"single_choice\",\"question\":\"中国人为什么把中秋节的圆月看作是团圆的象征？(Tại sao người Trung Quốc coi trăng tròn Tết Trung Thu là biểu tượng của sự đoàn viên?)\",\"options\":[\"因为这一天天气最暖和 (Vì ngày này thời tiết ấm áp nhất)\",\"因为这一天的月亮最圆、最明亮 (Vì mặt trăng ngày này tròn và sáng nhất)\",\"因为这一天是一年的开始 (Vì ngày này là khởi đầu của một năm)\",\"因为这一天大家都不用上班 (Vì ngày này mọi người không phải đi làm)\"],\"answer\":1,\"explanationVi\":\"Bài đọc nêu rõ: \\\"因为这一天的月亮最圆、最明亮，所以中国人把圆月看作是团圆的象征。\\\" [Chú thích từ vựng: 农历 (nónglì): âm lịch; 团圆 (tuányuán): đoàn viên; 象征 (xiàngzhēng): biểu tượng].\",\"citationText\":\"因为这一天的月亮最圆、最明亮，所以中国人把圆月看作是团圆的象征。\"},{\"id\":\"q_hsk4_ma_2\",\"type\":\"single_choice\",\"question\":\"亲朋好友之间互相赠送月饼是为了什么？(Bạn bè người thân tặng bánh trung thu cho nhau nhằm mục đích gì?)\",\"options\":[\"为了比赛谁做的月饼最好吃 (Để thi xem ai làm bánh ngon nhất)\",\"为了表达美好的祝福 (Để bày tỏ những lời chúc tốt đẹp)\",\"为了庆祝新年的到来 (Để chào mừng năm mới đến)\",\"为了感谢老师的帮助 (Để cảm ơn sự giúp đỡ của thầy cô)\"],\"answer\":1,\"explanationVi\":\"Câu cuối bài khẳng định: \\\"亲朋好友之间互相赠送月饼，表达美好的祝福。\\\" [Chú thích từ vựng: 赠送 (zèngsòng): biếu, tặng; 祝福 (zhùfú): lời chúc phúc].\",\"citationText\":\"亲朋好友之间互相赠送月饼，表达美好的祝福。\"}]"
+  },
+  {
+    "id": "RDG_11_reading_hsk2_fable_frog",
+    "hskLevel": 2,
+    "topic": "Truyện ngụ ngôn & Thành ngữ",
+    "estimatedMinutes": 3,
+    "source": "StoryWeaver Chinese Fables & C3 Graded Stories",
+    "title": "井里的小青蛙（坐井观天）",
+    "titleCn": "井里的小青蛙（坐井观天）",
+    "contentZh": "以前有一只小青蛙，它天天住在一口水井里，从来没有出去过。有一天，一只小鸟从很远的地方来，坐在旁边休息。它问小鸟：“你从哪儿来？为什么这么累？”小鸟回答说：“我从很远的地方来，走了一百多里路，现在很累，想找一点儿水喝。”它笑着说：“朋友，天只有井口那么大，不用走那么远！”小鸟说：“你错了，天非常大，你出来看看就知道了。”",
+    "contentCn": "以前有一只小青蛙，它天天住在一口水井里，从来没有出去过。有一天，一只小鸟从很远的地方来，坐在旁边休息。它问小鸟：“你从哪儿来？为什么这么累？”小鸟回答说：“我从很远的地方来，走了一百多里路，现在很累，想找一点儿水喝。”它笑着说：“朋友，天只有井口那么大，不用走那么远！”小鸟说：“你错了，天非常大，你出来看看就知道了。”",
+    "pinyin": "Yǐqián yǒu yì zhī xiǎo qīngwā, tā tiāntiān zhù zài yì kǒu shuǐjǐng lǐ, cónglái méiyǒu chūqù guo. Yǒu yì tiān, yì zhī xiǎo niǎo cóng hěn yuǎn de dìfang lái, zuò zài pángbiān xiūxi. Tā wèn xiǎo niǎo: \"Nǐ cóng nǎr lái? Wèishénme zhème lèi?\" Xiǎo niǎo huídá shuō: \"Wǒ cóng hěn yuǎn de dìfang lái, zǒu le yìbǎi duō lǐ lù, xiànzài hěn lèi, xiǎng zhǎo yìdiǎnr shuǐ hē.\" Tā xiào zhe shuō: \"Péngyou, tiān zhǐ yǒu jǐngkǒu nàme dà, búyòng zǒu nàme yuǎn!\" Xiǎo niǎo shuō: \"Nǐ cuò le, tiān fēicháng dà, nǐ chūlái kànkan jiù zhīdào le.\"",
+    "translationVi": "Ngày xưa có một chú ếch nhỏ, ngày nào nó cũng sống dưới một cái giếng nước, chưa từng ra ngoài bao giờ. Một hôm, có chú chim nhỏ từ nơi rất xa tới, ngồi nghỉ ngơi ở bên cạnh. Nó hỏi chim nhỏ: \"Bạn từ đâu tới? Sao lại mệt thế?\" Chim nhỏ trả lời: \"Mình từ nơi rất xa tới, đã đi hơn một trăm dặm đường, bây giờ rất mệt nên muốn tìm chút nước uống.\" Nó cười nói: \"Bạn ơi, bầu trời chỉ to bằng miệng giếng thôi, đâu cần đi xa đến thế!\" Chim nhỏ đáp: \"Bạn nhầm rồi, bầu trời rộng lớn lắm, bạn cứ ra ngoài nhìn xem là sẽ biết ngay.\"",
+    "questions": [
+      {
+        "id": "q_hsk2_frog_1",
+        "type": "single_choice",
+        "question": "小鸟为什么坐在旁边休息？(Tại sao chú chim nhỏ lại ngồi nghỉ ngơi ở bên cạnh?)",
+        "options": [
+          "因为它想和小青蛙一起唱歌 (Vì nó muốn hát cùng ếch nhỏ)",
+          "因为它走了一百多里路，现在很累，想找一点儿水喝 (Vì nó đã đi hơn 100 dặm đường, đang rất mệt và muốn tìm chút nước uống)",
+          "因为天太冷，外面下雪了 (Vì trời quá lạnh, bên ngoài có tuyết rơi)",
+          "因为它找不到回家的路了 (Vì nó không tìm thấy đường về nhà)"
+        ],
+        "answer": 1,
+        "explanationVi": "Chim nhỏ trả lời rõ trong bài: \"我从很远的地方来，走了一百多里路，现在很累，想找一点儿水喝。\" [Chú thích từ vựng vượt cấp: 青蛙 (qīngwā): con ếch; 水井 (shuǐjǐng): giếng nước; 井口 (jǐngkǒu): miệng giếng].",
+        "citationText": "我从很远的地方来，走了一百多里路，现在很累，想找一点儿水喝。"
+      },
+      {
+        "id": "q_hsk2_frog_2",
+        "type": "single_choice",
+        "question": "小青蛙觉得天有多大？(Chú ếch nhỏ nghĩ rằng bầu trời rộng bằng chừng nào?)",
+        "options": [
+          "比大海还要大 (Rộng hơn cả biển lớn)",
+          "只有井口那么大 (Chỉ to bằng miệng giếng)",
+          "有一百多里那么远 (Rộng hơn một trăm dặm)",
+          "和房间一样大 (To bằng căn phòng)"
+        ],
+        "answer": 1,
+        "explanationVi": "Ếch nhỏ nói: \"朋友，天只有井口那么大，不用走那么远！\" [Chú thích thành ngữ: 坐井观天 (zuò jǐng guān tiān): ếch ngồi đáy giếng - chỉ tầm nhìn hạn hẹp].",
+        "citationText": "朋友，天只有井口那么大，不用走那么远！"
+      }
+    ],
+    "hsk_level": 2,
+    "title_cn": "井里的小青蛙（坐井观天）",
+    "content_cn": "以前有一只小青蛙，它天天住在一口水井里，从来没有出去过。有一天，一只小鸟从很远的地方来，坐在旁边休息。它问小鸟：“你从哪儿来？为什么这么累？”小鸟回答说：“我从很远的地方来，走了一百多里路，现在很累，想找一点儿水喝。”它笑着说：“朋友，天只有井口那么大，不用走那么远！”小鸟说：“你错了，天非常大，你出来看看就知道了。”",
+    "translation_vi": "Ngày xưa có một chú ếch nhỏ, ngày nào nó cũng sống dưới một cái giếng nước, chưa từng ra ngoài bao giờ. Một hôm, có chú chim nhỏ từ nơi rất xa tới, ngồi nghỉ ngơi ở bên cạnh. Nó hỏi chim nhỏ: \"Bạn từ đâu tới? Sao lại mệt thế?\" Chim nhỏ trả lời: \"Mình từ nơi rất xa tới, đã đi hơn một trăm dặm đường, bây giờ rất mệt nên muốn tìm chút nước uống.\" Nó cười nói: \"Bạn ơi, bầu trời chỉ to bằng miệng giếng thôi, đâu cần đi xa đến thế!\" Chim nhỏ đáp: \"Bạn nhầm rồi, bầu trời rộng lớn lắm, bạn cứ ra ngoài nhìn xem là sẽ biết ngay.\"",
+    "questions_json": "[{\"id\":\"q_hsk2_frog_1\",\"type\":\"single_choice\",\"question\":\"小鸟为什么坐在旁边休息？(Tại sao chú chim nhỏ lại ngồi nghỉ ngơi ở bên cạnh?)\",\"options\":[\"因为它想和小青蛙一起唱歌 (Vì nó muốn hát cùng ếch nhỏ)\",\"因为它走了一百多里路，现在很累，想找一点儿水喝 (Vì nó đã đi hơn 100 dặm đường, đang rất mệt và muốn tìm chút nước uống)\",\"因为天太冷，外面下雪了 (Vì trời quá lạnh, bên ngoài có tuyết rơi)\",\"因为它找不到回家的路了 (Vì nó không tìm thấy đường về nhà)\"],\"answer\":1,\"explanationVi\":\"Chim nhỏ trả lời rõ trong bài: \\\"我从很远的地方来，走了一百多里路，现在很累，想找一点儿水喝。\\\" [Chú thích từ vựng vượt cấp: 青蛙 (qīngwā): con ếch; 水井 (shuǐjǐng): giếng nước; 井口 (jǐngkǒu): miệng giếng].\",\"citationText\":\"我从很远的地方来，走了一百多里路，现在很累，想找一点儿水喝。\"},{\"id\":\"q_hsk2_frog_2\",\"type\":\"single_choice\",\"question\":\"小青蛙觉得天有多大？(Chú ếch nhỏ nghĩ rằng bầu trời rộng bằng chừng nào?)\",\"options\":[\"比大海还要大 (Rộng hơn cả biển lớn)\",\"只有井口那么大 (Chỉ to bằng miệng giếng)\",\"有一百多里那么远 (Rộng hơn một trăm dặm)\",\"和房间一样大 (To bằng căn phòng)\"],\"answer\":1,\"explanationVi\":\"Ếch nhỏ nói: \\\"朋友，天只有井口那么大，不用走那么远！\\\" [Chú thích thành ngữ: 坐井观天 (zuò jǐng guān tiān): ếch ngồi đáy giếng - chỉ tầm nhìn hạn hẹp].\",\"citationText\":\"朋友，天只有井口那么大，不用走那么远！\"}]"
+  },
+  {
+    "id": "RDG_5_reading_hsk5_idiom_rabbit",
+    "hskLevel": 5,
+    "topic": "Truyện ngụ ngôn & Thành ngữ",
+    "estimatedMinutes": 5,
+    "source": "C3 Classical Idiom Stories (守株待兔)",
+    "title": "成语故事：守株待兔",
+    "titleCn": "成语故事：守株待兔",
+    "contentZh": "战国时期，宋国有一个农夫。有一天，他正在田里辛勤地耕地，忽然看见一只飞奔的野兔惊慌失措地跑过来。野兔一不小心，重重地撞在田边的一棵大树桩上，当场折断了脖子死去了。农夫急忙跑过去，毫不费力地捡起这只又肥又大的野兔。从此以后，这个农夫放下了手里的农具，不再耕作。他整天坐在树桩旁边痴痴地守着，满心希望还能有兔子撞死在这里。结果，田地荒芜了，他再也没有等到第二只兔子，反而成了别人的笑话。这个成语告诫人们：切不可心存侥幸，企图不劳而获；更不能把偶然事件当成必然规律。",
+    "contentCn": "战国时期，宋国有一个农夫。有一天，他正在田里辛勤地耕地，忽然看见一只飞奔的野兔惊慌失措地跑过来。野兔一不小心，重重地撞在田边的一棵大树桩上，当场折断了脖子死去了。农夫急忙跑过去，毫不费力地捡起这只又肥又大的野兔。从此以后，这个农夫放下了手里的农具，不再耕作。他整天坐在树桩旁边痴痴地守着，满心希望还能有兔子撞死在这里。结果，田地荒芜了，他再也没有等到第二只兔子，反而成了别人的笑话。这个成语告诫人们：切不可心存侥幸，企图不劳而获；更不能把偶然事件当成必然规律。",
+    "pinyin": "Zhànguó shíqī, Sòngguó yǒu yí gè nóngfū. Yǒu yì tiān, tā zhèngzài tián lǐ xīnqín de gēngdì, hūrán kànjiàn yì zhī fēibēn de yětù jīnghuāng-shīcuò de pǎo guòlái. Yětù yì bù xiǎoxīn, zhòngzhòng de zhuàng zài tián biān de yì kē dà shùzhuāng shàng, dāngchǎng zhéduàn le bózi sǐqù le. Nóngfū jímáng pǎo guòqù, háo bú fèilì de jiǎnqǐ zhè zhī yòu féi yòu dà de yětù. Cóngcǐ yǐhòu, zhège nóngfū fàngxià le shǒulǐ de nóngjù, bú zài gēngzuò. Tā zhěngtiān zuò zài shùzhuāng pángbiān chīchī de shǒu zhe, mǎnxīn xīwàng hái néng yǒu tùzi zhuàngsǐ zài zhèlǐ. Jiéguǒ, tiándì huāngwú le, tā zài yě méiyǒu děngdào dì-èr zhī tùzi, fǎn'ér chéng le biérén de xiàohua. Zhège chéngyǔ gàojiè rénmen: qiè bùkě xīncún jiǎoxìng, qǐtú bùláo'érhuò; gèng bùnéng bǎ ǒurán shìjiàn dàngchéng bìrán guīlǜ.",
+    "translationVi": "Thời Chiến Quốc, ở nước Tống có một người nông dân. Một hôm, khi đang chăm chỉ cày ruộng, anh ta bỗng nhìn thấy một con thỏ rừng hoảng hốt chạy lao tới. Con thỏ sơ ý đâm sầm vào gốc cây to bên bờ ruộng, gãy cổ chết ngay tại chỗ. Người nông dân vội chạy lại, chẳng tốn chút sức lực nào đã nhặt được con thỏ béo mập. Từ đó trở đi, anh ta bỏ hẳn nông cụ xuống, không cày cấy nữa mà suốt ngày ngồi đợi cạnh gốc cây, hy vọng lại có con thỏ khác đâm vào đó. Kết quả là ruộng đồng hoang phế, anh ta chẳng bao giờ đợi được con thỏ thứ hai mà còn trở thành trò cười cho thiên hạ. Câu thành ngữ này khuyên răn con người: tuyệt đối không được ôm tâm lý cầu may, mong hưởng thành quả mà không chịu lao động; càng không thể coi sự việc ngẫu nhiên là quy luật tất yếu.",
+    "questions": [
+      {
+        "id": "q_hsk5_rab_1",
+        "type": "single_choice",
+        "question": "捡到第一只野兔之后，农夫是怎么做的？(Sau khi nhặt được con thỏ rừng đầu tiên, người nông dân đã làm gì?)",
+        "options": [
+          "把野兔放回了森林里 (Thả con thỏ về lại trong rừng)",
+          "放下农具不再耕作，整天坐在树桩旁守着 (Bỏ nông cụ không cày cấy nữa, suốt ngày ngồi canh bên gốc cây)",
+          "请村里的朋友一起来种庄稼 (Mời bạn bè trong làng cùng đến trồng trọt)",
+          "去山上买了很多猎狗来抓兔子 (Lên núi mua nhiều chó săn để bắt thỏ)"
+        ],
+        "answer": 1,
+        "explanationVi": "Trong bài nêu rõ: \"从此以后，这个农夫放下了手里的农具，不再耕作。他整天坐在树桩旁边痴痴地守着\" [Chú thích từ vựng: 树桩 (shùzhuāng): gốc cây; 荒芜 (huāngwú): hoang vu, bỏ hoang].",
+        "citationText": "从此以后，这个农夫放下了手里的农具，不再耕作。"
+      },
+      {
+        "id": "q_hsk5_rab_2",
+        "type": "single_choice",
+        "question": "“守株待兔”这个成语主要想告诉我们什么道理？(Thành ngữ \"Ôm cây đợi thỏ\" chủ yếu muốn nhắn nhủ đạo lý gì?)",
+        "options": [
+          "保护野生动物非常重要 (Bảo vệ động vật hoang dã rất quan trọng)",
+          "不能心存侥幸、企图不劳而获，也不能把偶然当成必然 (Không được cầu may, muốn hưởng lợi mà không làm, hay coi cái ngẫu nhiên là tất yếu)",
+          "种庄稼的时候要注意休息 (Khi trồng trọt cần chú ý nghỉ ngơi)",
+          "遇到困难应该找朋友帮忙 (Khi gặp khó khăn nên tìm bạn bè giúp đỡ)"
+        ],
+        "answer": 1,
+        "explanationVi": "Câu kết của bài: \"这个成语告诫人们：切不可心存侥幸，企图不劳而获；更不能把偶然事件当成必然规律。\" [Chú thích từ vựng: 不劳而获 (bù láo ér huò): không làm mà hưởng].",
+        "citationText": "这个成语告诫人们：切不可心存侥幸，企图不劳而获；更不能把偶然事件当成必然规律。"
+      }
+    ],
+    "audio_uri": "assets/audio/reading/rdg_hsk5_idiom_rabbit.mp3",
+    "audioUri": "assets/audio/reading/rdg_hsk5_idiom_rabbit.mp3",
+    "hsk_level": 5,
+    "title_cn": "成语故事：守株待兔",
+    "content_cn": "战国时期，宋国有一个农夫。有一天，他正在田里辛勤地耕地，忽然看见一只飞奔的野兔惊慌失措地跑过来。野兔一不小心，重重地撞在田边的一棵大树桩上，当场折断了脖子死去了。农夫急忙跑过去，毫不费力地捡起这只又肥又大的野兔。从此以后，这个农夫放下了手里的农具，不再耕作。他整天坐在树桩旁边痴痴地守着，满心希望还能有兔子撞死在这里。结果，田地荒芜了，他再也没有等到第二只兔子，反而成了别人的笑话。这个成语告诫人们：切不可心存侥幸，企图不劳而获；更不能把偶然事件当成必然规律。",
+    "translation_vi": "Thời Chiến Quốc, ở nước Tống có một người nông dân. Một hôm, khi đang chăm chỉ cày ruộng, anh ta bỗng nhìn thấy một con thỏ rừng hoảng hốt chạy lao tới. Con thỏ sơ ý đâm sầm vào gốc cây to bên bờ ruộng, gãy cổ chết ngay tại chỗ. Người nông dân vội chạy lại, chẳng tốn chút sức lực nào đã nhặt được con thỏ béo mập. Từ đó trở đi, anh ta bỏ hẳn nông cụ xuống, không cày cấy nữa mà suốt ngày ngồi đợi cạnh gốc cây, hy vọng lại có con thỏ khác đâm vào đó. Kết quả là ruộng đồng hoang phế, anh ta chẳng bao giờ đợi được con thỏ thứ hai mà còn trở thành trò cười cho thiên hạ. Câu thành ngữ này khuyên răn con người: tuyệt đối không được ôm tâm lý cầu may, mong hưởng thành quả mà không chịu lao động; càng không thể coi sự việc ngẫu nhiên là quy luật tất yếu.",
+    "questions_json": "[{\"id\":\"q_hsk5_rab_1\",\"type\":\"single_choice\",\"question\":\"捡到第一只野兔之后，农夫是怎么做的？(Sau khi nhặt được con thỏ rừng đầu tiên, người nông dân đã làm gì?)\",\"options\":[\"把野兔放回了森林里 (Thả con thỏ về lại trong rừng)\",\"放下农具不再耕作，整天坐在树桩旁守着 (Bỏ nông cụ không cày cấy nữa, suốt ngày ngồi canh bên gốc cây)\",\"请村里的朋友一起来种庄稼 (Mời bạn bè trong làng cùng đến trồng trọt)\",\"去山上买了很多猎狗来抓兔子 (Lên núi mua nhiều chó săn để bắt thỏ)\"],\"answer\":1,\"explanationVi\":\"Trong bài nêu rõ: \\\"从此以后，这个农夫放下了手里的农具，不再耕作。他整天坐在树桩旁边痴痴地守着\\\" [Chú thích từ vựng: 树桩 (shùzhuāng): gốc cây; 荒芜 (huāngwú): hoang vu, bỏ hoang].\",\"citationText\":\"从此以后，这个农夫放下了手里的农具，不再耕作。\"},{\"id\":\"q_hsk5_rab_2\",\"type\":\"single_choice\",\"question\":\"“守株待兔”这个成语主要想告诉我们什么道理？(Thành ngữ \\\"Ôm cây đợi thỏ\\\" chủ yếu muốn nhắn nhủ đạo lý gì?)\",\"options\":[\"保护野生动物非常重要 (Bảo vệ động vật hoang dã rất quan trọng)\",\"不能心存侥幸、企图不劳而获，也不能把偶然当成必然 (Không được cầu may, muốn hưởng lợi mà không làm, hay coi cái ngẫu nhiên là tất yếu)\",\"种庄稼的时候要注意休息 (Khi trồng trọt cần chú ý nghỉ ngơi)\",\"遇到困难应该找朋友帮忙 (Khi gặp khó khăn nên tìm bạn bè giúp đỡ)\"],\"answer\":1,\"explanationVi\":\"Câu kết của bài: \\\"这个成语告诫人们：切不可心存侥幸，企图不劳而获；更不能把偶然事件当成必然规律。\\\" [Chú thích từ vựng: 不劳而获 (bù láo ér huò): không làm mà hưởng].\",\"citationText\":\"这个成语告诫人们：切不可心存侥幸，企图不劳而获；更不能把偶然事件当成必然规律。\"}]"
+  },
+  {
     "id": "RDG_C3_001",
     "hsk_level": 1,
     "hskLevel": 1,
@@ -40,7 +674,8 @@
         "explanationVi": "Dựa vào câu: \"不过，这种每天两次聚精会神操纵“死亡机器”几十分钟的紧张生活，却很严重地影响了人类精神的健康\", đáp án chính xác là: 开车严重影响精神的健康."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_001_1\", \"type\": \"single_choice\", \"question\": \"从这段话中可以知道美国人怎么样?\", \"options\": [\"上班都开车\", \"开车上班很正常\", \"工作的地方都很远\", \"每天至少要开四十英里的车\"], \"answer\": 1, \"citationText\": \"美国人每天开汽车到四十英里以外的地方去上班，是一件普普通通的事情\", \"explanationVi\": \"Dựa vào câu: \\\"美国人每天开汽车到四十英里以外的地方去上班，是一件普普通通的事情\\\", đáp án chính xác là: 开车上班很正常.\"}, {\"id\": \"q_c3_001_2\", \"type\": \"single_choice\", \"question\": \"这段话最想告诉我们的是什么?\", \"options\": [\"开车是很普通的事\", \"开车时处于紧张状态\", \"每次开车都要聚精会神\", \"开车严重影响精神的健康\"], \"answer\": 3, \"citationText\": \"不过，这种每天两次聚精会神操纵“死亡机器”几十分钟的紧张生活，却很严重地影响了人类精神的健康\", \"explanationVi\": \"Dựa vào câu: \\\"不过，这种每天两次聚精会神操纵“死亡机器”几十分钟的紧张生活，却很严重地影响了人类精神的健康\\\", đáp án chính xác là: 开车严重影响精神的健康.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_001_1\", \"type\": \"single_choice\", \"question\": \"从这段话中可以知道美国人怎么样?\", \"options\": [\"上班都开车\", \"开车上班很正常\", \"工作的地方都很远\", \"每天至少要开四十英里的车\"], \"answer\": 1, \"citationText\": \"美国人每天开汽车到四十英里以外的地方去上班，是一件普普通通的事情\", \"explanationVi\": \"Dựa vào câu: \\\"美国人每天开汽车到四十英里以外的地方去上班，是一件普普通通的事情\\\", đáp án chính xác là: 开车上班很正常.\"}, {\"id\": \"q_c3_001_2\", \"type\": \"single_choice\", \"question\": \"这段话最想告诉我们的是什么?\", \"options\": [\"开车是很普通的事\", \"开车时处于紧张状态\", \"每次开车都要聚精会神\", \"开车严重影响精神的健康\"], \"answer\": 3, \"citationText\": \"不过，这种每天两次聚精会神操纵“死亡机器”几十分钟的紧张生活，却很严重地影响了人类精神的健康\", \"explanationVi\": \"Dựa vào câu: \\\"不过，这种每天两次聚精会神操纵“死亡机器”几十分钟的紧张生活，却很严重地影响了人类精神的健康\\\", đáp án chính xác là: 开车严重影响精神的健康.\"}]",
+    "topic": "Đời sống & Gia đình"
   },
   {
     "id": "RDG_C3_002",
@@ -83,7 +718,8 @@
         "explanationVi": "Dựa vào câu: \"父亲正和五岁的儿子一起看篮球比赛，突然，儿子问道：“爸爸，篮球肯定很贵，是吗?”父亲吃惊地问：“你怎么会这样想呢?”儿子说：“他们都非常想要那个球，要是不贵，为什么不每人买一个呢?”\", đáp án chính xác là: 很吃惊."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_002_1\", \"type\": \"single_choice\", \"question\": \"看比赛时，儿子是怎么想的?\", \"options\": [\"篮球很贵\", \"想要个篮球\", \"打球能赚钱\", \"想举办比赛\"], \"answer\": 0, \"citationText\": \"父亲正和五岁的儿子一起看篮球比赛，突然，儿子问道：“爸爸，篮球肯定很贵，是吗?”父亲吃惊地问：“你怎么会这样想呢?”儿子说：“他们都非常想要那个球，要是不贵，为什么不每人买一个呢?”\", \"explanationVi\": \"Dựa vào câu: \\\"父亲正和五岁的儿子一起看篮球比赛，突然，儿子问道：“爸爸，篮球肯定很贵，是吗?”父亲吃惊地问：“你怎么会这样想呢?”儿子说：“他们都非常想要那个球，要是不贵，为什么不每人买一个呢?”\\\", đáp án chính xác là: 篮球很贵.\"}, {\"id\": \"q_c3_002_2\", \"type\": \"single_choice\", \"question\": \"父亲听到儿子的问题后，觉得怎么样?\", \"options\": [\"很吃惊\", \"很愉快\", \"很失望\", \"很伤心\"], \"answer\": 0, \"citationText\": \"父亲正和五岁的儿子一起看篮球比赛，突然，儿子问道：“爸爸，篮球肯定很贵，是吗?”父亲吃惊地问：“你怎么会这样想呢?”儿子说：“他们都非常想要那个球，要是不贵，为什么不每人买一个呢?”\", \"explanationVi\": \"Dựa vào câu: \\\"父亲正和五岁的儿子一起看篮球比赛，突然，儿子问道：“爸爸，篮球肯定很贵，是吗?”父亲吃惊地问：“你怎么会这样想呢?”儿子说：“他们都非常想要那个球，要是不贵，为什么不每人买一个呢?”\\\", đáp án chính xác là: 很吃惊.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_002_1\", \"type\": \"single_choice\", \"question\": \"看比赛时，儿子是怎么想的?\", \"options\": [\"篮球很贵\", \"想要个篮球\", \"打球能赚钱\", \"想举办比赛\"], \"answer\": 0, \"citationText\": \"父亲正和五岁的儿子一起看篮球比赛，突然，儿子问道：“爸爸，篮球肯定很贵，是吗?”父亲吃惊地问：“你怎么会这样想呢?”儿子说：“他们都非常想要那个球，要是不贵，为什么不每人买一个呢?”\", \"explanationVi\": \"Dựa vào câu: \\\"父亲正和五岁的儿子一起看篮球比赛，突然，儿子问道：“爸爸，篮球肯定很贵，是吗?”父亲吃惊地问：“你怎么会这样想呢?”儿子说：“他们都非常想要那个球，要是不贵，为什么不每人买一个呢?”\\\", đáp án chính xác là: 篮球很贵.\"}, {\"id\": \"q_c3_002_2\", \"type\": \"single_choice\", \"question\": \"父亲听到儿子的问题后，觉得怎么样?\", \"options\": [\"很吃惊\", \"很愉快\", \"很失望\", \"很伤心\"], \"answer\": 0, \"citationText\": \"父亲正和五岁的儿子一起看篮球比赛，突然，儿子问道：“爸爸，篮球肯定很贵，是吗?”父亲吃惊地问：“你怎么会这样想呢?”儿子说：“他们都非常想要那个球，要是不贵，为什么不每人买一个呢?”\", \"explanationVi\": \"Dựa vào câu: \\\"父亲正和五岁的儿子一起看篮球比赛，突然，儿子问道：“爸爸，篮球肯定很贵，是吗?”父亲吃惊地问：“你怎么会这样想呢?”儿子说：“他们都非常想要那个球，要是不贵，为什么不每人买一个呢?”\\\", đáp án chính xác là: 很吃惊.\"}]",
+    "topic": "Đời sống & Gia đình"
   },
   {
     "id": "RDG_C3_003",
@@ -126,7 +762,8 @@
         "explanationVi": "Dựa vào câu: \"这个节目我一直在看，它介绍了很多生活中的小知识，包括怎样选择牙膏， 擦脸应该用什么毛巾，怎样远离皮肤病等等\", đáp án chính xác là: 生活."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_003_1\", \"type\": \"single_choice\", \"question\": \"说话人在介绍什么？\", \"options\": [\"一本书\", \"一个报道\", \"一个广告\", \"一个电视节目\"], \"answer\": 3, \"citationText\": \"这个节目我一直在看，它介绍了很多生活中的小知识，包括怎样选择牙膏， 擦脸应该用什么毛巾，怎样远离皮肤病等等\", \"explanationVi\": \"Dựa vào câu: \\\"这个节目我一直在看，它介绍了很多生活中的小知识，包括怎样选择牙膏， 擦脸应该用什么毛巾，怎样远离皮肤病等等\\\", đáp án chính xác là: 一个电视节目.\"}, {\"id\": \"q_c3_003_2\", \"type\": \"single_choice\", \"question\": \"说话人了解了哪方面的知识？\", \"options\": [\"艺术\", \"生活\", \"国际\", \"法律\"], \"answer\": 1, \"citationText\": \"这个节目我一直在看，它介绍了很多生活中的小知识，包括怎样选择牙膏， 擦脸应该用什么毛巾，怎样远离皮肤病等等\", \"explanationVi\": \"Dựa vào câu: \\\"这个节目我一直在看，它介绍了很多生活中的小知识，包括怎样选择牙膏， 擦脸应该用什么毛巾，怎样远离皮肤病等等\\\", đáp án chính xác là: 生活.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_003_1\", \"type\": \"single_choice\", \"question\": \"说话人在介绍什么？\", \"options\": [\"一本书\", \"一个报道\", \"一个广告\", \"一个电视节目\"], \"answer\": 3, \"citationText\": \"这个节目我一直在看，它介绍了很多生活中的小知识，包括怎样选择牙膏， 擦脸应该用什么毛巾，怎样远离皮肤病等等\", \"explanationVi\": \"Dựa vào câu: \\\"这个节目我一直在看，它介绍了很多生活中的小知识，包括怎样选择牙膏， 擦脸应该用什么毛巾，怎样远离皮肤病等等\\\", đáp án chính xác là: 一个电视节目.\"}, {\"id\": \"q_c3_003_2\", \"type\": \"single_choice\", \"question\": \"说话人了解了哪方面的知识？\", \"options\": [\"艺术\", \"生活\", \"国际\", \"法律\"], \"answer\": 1, \"citationText\": \"这个节目我一直在看，它介绍了很多生活中的小知识，包括怎样选择牙膏， 擦脸应该用什么毛巾，怎样远离皮肤病等等\", \"explanationVi\": \"Dựa vào câu: \\\"这个节目我一直在看，它介绍了很多生活中的小知识，包括怎样选择牙膏， 擦脸应该用什么毛巾，怎样远离皮肤病等等\\\", đáp án chính xác là: 生活.\"}]",
+    "topic": "Đời sống & Gia đình"
   },
   {
     "id": "RDG_C3_004",
@@ -169,7 +806,8 @@
         "explanationVi": "Dựa vào câu: \"两个女人在聊天儿，一个问：“你儿子还好吧?”另一个说：“他很可怜，他妻子太懒，不做饭，不洗衣服，连孩子也不带\", đáp án chính xác là: 结婚了."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_004_1\", \"type\": \"single_choice\", \"question\": \"那个女人为什么觉得儿子可怜?\", \"options\": [\"工资低\", \"缺少力气\", \"经常感冒\", \"妻子很懒\"], \"answer\": 3, \"citationText\": \"两个女人在聊天儿，一个问：“你儿子还好吧?”另一个说：“他很可怜，他妻子太懒，不做饭，不洗衣服，连孩子也不带\", \"explanationVi\": \"Dựa vào câu: \\\"两个女人在聊天儿，一个问：“你儿子还好吧?”另一个说：“他很可怜，他妻子太懒，不做饭，不洗衣服，连孩子也不带\\\", đáp án chính xác là: 妻子很懒.\"}, {\"id\": \"q_c3_004_2\", \"type\": \"single_choice\", \"question\": \"关于女儿，可以知道什么?\", \"options\": [\"结婚了\", \"很美丽\", \"是警察\", \"喜欢做生意\"], \"answer\": 0, \"citationText\": \"两个女人在聊天儿，一个问：“你儿子还好吧?”另一个说：“他很可怜，他妻子太懒，不做饭，不洗衣服，连孩子也不带\", \"explanationVi\": \"Dựa vào câu: \\\"两个女人在聊天儿，一个问：“你儿子还好吧?”另一个说：“他很可怜，他妻子太懒，不做饭，不洗衣服，连孩子也不带\\\", đáp án chính xác là: 结婚了.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_004_1\", \"type\": \"single_choice\", \"question\": \"那个女人为什么觉得儿子可怜?\", \"options\": [\"工资低\", \"缺少力气\", \"经常感冒\", \"妻子很懒\"], \"answer\": 3, \"citationText\": \"两个女人在聊天儿，一个问：“你儿子还好吧?”另一个说：“他很可怜，他妻子太懒，不做饭，不洗衣服，连孩子也不带\", \"explanationVi\": \"Dựa vào câu: \\\"两个女人在聊天儿，一个问：“你儿子还好吧?”另一个说：“他很可怜，他妻子太懒，不做饭，不洗衣服，连孩子也不带\\\", đáp án chính xác là: 妻子很懒.\"}, {\"id\": \"q_c3_004_2\", \"type\": \"single_choice\", \"question\": \"关于女儿，可以知道什么?\", \"options\": [\"结婚了\", \"很美丽\", \"是警察\", \"喜欢做生意\"], \"answer\": 0, \"citationText\": \"两个女人在聊天儿，一个问：“你儿子还好吧?”另一个说：“他很可怜，他妻子太懒，不做饭，不洗衣服，连孩子也不带\", \"explanationVi\": \"Dựa vào câu: \\\"两个女人在聊天儿，一个问：“你儿子还好吧?”另一个说：“他很可怜，他妻子太懒，不做饭，不洗衣服，连孩子也不带\\\", đáp án chính xác là: 结婚了.\"}]",
+    "topic": "Đời sống & Gia đình"
   },
   {
     "id": "RDG_C3_005",
@@ -212,7 +850,8 @@
         "explanationVi": "Dựa vào câu: \"本商场现有顾客捡到黑色皮包一只，内有手机一部，身份证一张，钱包一个，银行卡五张\", đáp án chính xác là: 皮包和里边的东西."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_005_1\", \"type\": \"single_choice\", \"question\": \"现在是什么时间?\", \"options\": [\"上午\", \"中午\", \"下午\", \"晚上\"], \"answer\": 2, \"citationText\": \"亲爱的顾客，下午好!欢迎光临大华商场\", \"explanationVi\": \"Dựa vào câu: \\\"亲爱的顾客，下午好!欢迎光临大华商场\\\", đáp án chính xác là: 下午.\"}, {\"id\": \"q_c3_005_2\", \"type\": \"single_choice\", \"question\": \"这位失主丢了什么?\", \"options\": [\"钱包\", \"银行卡\", \"身份证\", \"皮包和里边的东西\"], \"answer\": 3, \"citationText\": \"本商场现有顾客捡到黑色皮包一只，内有手机一部，身份证一张，钱包一个，银行卡五张\", \"explanationVi\": \"Dựa vào câu: \\\"本商场现有顾客捡到黑色皮包一只，内有手机一部，身份证一张，钱包一个，银行卡五张\\\", đáp án chính xác là: 皮包和里边的东西.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_005_1\", \"type\": \"single_choice\", \"question\": \"现在是什么时间?\", \"options\": [\"上午\", \"中午\", \"下午\", \"晚上\"], \"answer\": 2, \"citationText\": \"亲爱的顾客，下午好!欢迎光临大华商场\", \"explanationVi\": \"Dựa vào câu: \\\"亲爱的顾客，下午好!欢迎光临大华商场\\\", đáp án chính xác là: 下午.\"}, {\"id\": \"q_c3_005_2\", \"type\": \"single_choice\", \"question\": \"这位失主丢了什么?\", \"options\": [\"钱包\", \"银行卡\", \"身份证\", \"皮包和里边的东西\"], \"answer\": 3, \"citationText\": \"本商场现有顾客捡到黑色皮包一只，内有手机一部，身份证一张，钱包一个，银行卡五张\", \"explanationVi\": \"Dựa vào câu: \\\"本商场现有顾客捡到黑色皮包一只，内有手机一部，身份证一张，钱包一个，银行卡五张\\\", đáp án chính xác là: 皮包和里边的东西.\"}]",
+    "topic": "Đời sống & Gia đình"
   },
   {
     "id": "RDG_C3_006",
@@ -255,7 +894,8 @@
         "explanationVi": "Dựa vào câu: \"哭不一定是坏事\", đáp án chính xác là: 哭不一定不好."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_006_1\", \"type\": \"single_choice\", \"question\": \"伤心时哭一哭会怎么样？\", \"options\": [\"更难过\", \"更紧张\", \"轻松许多\", \"觉得无聊\"], \"answer\": 2, \"citationText\": \"遇到伤心事，哭一场就会感觉心里舒服多了\", \"explanationVi\": \"Dựa vào câu: \\\"遇到伤心事，哭一场就会感觉心里舒服多了\\\", đáp án chính xác là: 轻松许多.\"}, {\"id\": \"q_c3_006_2\", \"type\": \"single_choice\", \"question\": \"这段话主要想告诉我们什么？\", \"options\": [\"要懂礼貌\", \"要有同情心\", \"要互相理解\", \"哭不一定不好\"], \"answer\": 3, \"citationText\": \"哭不一定是坏事\", \"explanationVi\": \"Dựa vào câu: \\\"哭不一定是坏事\\\", đáp án chính xác là: 哭不一定不好.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_006_1\", \"type\": \"single_choice\", \"question\": \"伤心时哭一哭会怎么样？\", \"options\": [\"更难过\", \"更紧张\", \"轻松许多\", \"觉得无聊\"], \"answer\": 2, \"citationText\": \"遇到伤心事，哭一场就会感觉心里舒服多了\", \"explanationVi\": \"Dựa vào câu: \\\"遇到伤心事，哭一场就会感觉心里舒服多了\\\", đáp án chính xác là: 轻松许多.\"}, {\"id\": \"q_c3_006_2\", \"type\": \"single_choice\", \"question\": \"这段话主要想告诉我们什么？\", \"options\": [\"要懂礼貌\", \"要有同情心\", \"要互相理解\", \"哭不一定不好\"], \"answer\": 3, \"citationText\": \"哭不一定是坏事\", \"explanationVi\": \"Dựa vào câu: \\\"哭不一定是坏事\\\", đáp án chính xác là: 哭不一定不好.\"}]",
+    "topic": "Đời sống & Gia đình"
   },
   {
     "id": "RDG_C3_007",
@@ -298,7 +938,8 @@
         "explanationVi": "Dựa vào câu: \"阳光能给我们带来好的心情\", đáp án chính xác là: 阳光影响心情."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_007_1\", \"type\": \"single_choice\", \"question\": \"阳光能给我们带来什么？\", \"options\": [\"爱情\", \"烦恼\", \"友谊\", \"好心情\"], \"answer\": 3, \"citationText\": \"阳光能给我们带来好的心情\", \"explanationVi\": \"Dựa vào câu: \\\"阳光能给我们带来好的心情\\\", đáp án chính xác là: 好心情.\"}, {\"id\": \"q_c3_007_2\", \"type\": \"single_choice\", \"question\": \"这段话主要谈什么？\", \"options\": [\"环境污染\", \"天气情况\", \"身体健康\", \"阳光影响心情\"], \"answer\": 3, \"citationText\": \"阳光能给我们带来好的心情\", \"explanationVi\": \"Dựa vào câu: \\\"阳光能给我们带来好的心情\\\", đáp án chính xác là: 阳光影响心情.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_007_1\", \"type\": \"single_choice\", \"question\": \"阳光能给我们带来什么？\", \"options\": [\"爱情\", \"烦恼\", \"友谊\", \"好心情\"], \"answer\": 3, \"citationText\": \"阳光能给我们带来好的心情\", \"explanationVi\": \"Dựa vào câu: \\\"阳光能给我们带来好的心情\\\", đáp án chính xác là: 好心情.\"}, {\"id\": \"q_c3_007_2\", \"type\": \"single_choice\", \"question\": \"这段话主要谈什么？\", \"options\": [\"环境污染\", \"天气情况\", \"身体健康\", \"阳光影响心情\"], \"answer\": 3, \"citationText\": \"阳光能给我们带来好的心情\", \"explanationVi\": \"Dựa vào câu: \\\"阳光能给我们带来好的心情\\\", đáp án chính xác là: 阳光影响心情.\"}]",
+    "topic": "Đời sống & Gia đình"
   },
   {
     "id": "RDG_C3_008",
@@ -341,7 +982,8 @@
         "explanationVi": "Dựa vào câu: \"每次运动完，我都觉得特别轻松，好像汗水把烦恼全带走了，心情也好了很多\", đáp án chính xác là: 汗水."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_008_1\", \"type\": \"single_choice\", \"question\": \"有压力时，说话人会怎么做?\", \"options\": [\"购物\", \"运动\", \"旅游\", \"讲笑话\"], \"answer\": 1, \"citationText\": \"有压力时，你会怎么办?我的方法是运动\", \"explanationVi\": \"Dựa vào câu: \\\"有压力时，你会怎么办?我的方法是运动\\\", đáp án chính xác là: 运动.\"}, {\"id\": \"q_c3_008_2\", \"type\": \"single_choice\", \"question\": \"说话人觉得什么能把烦恼都带走?\", \"options\": [\"美景\", \"阳光\", \"美梦\", \"汗水\"], \"answer\": 3, \"citationText\": \"每次运动完，我都觉得特别轻松，好像汗水把烦恼全带走了，心情也好了很多\", \"explanationVi\": \"Dựa vào câu: \\\"每次运动完，我都觉得特别轻松，好像汗水把烦恼全带走了，心情也好了很多\\\", đáp án chính xác là: 汗水.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_008_1\", \"type\": \"single_choice\", \"question\": \"有压力时，说话人会怎么做?\", \"options\": [\"购物\", \"运动\", \"旅游\", \"讲笑话\"], \"answer\": 1, \"citationText\": \"有压力时，你会怎么办?我的方法是运动\", \"explanationVi\": \"Dựa vào câu: \\\"有压力时，你会怎么办?我的方法是运动\\\", đáp án chính xác là: 运动.\"}, {\"id\": \"q_c3_008_2\", \"type\": \"single_choice\", \"question\": \"说话人觉得什么能把烦恼都带走?\", \"options\": [\"美景\", \"阳光\", \"美梦\", \"汗水\"], \"answer\": 3, \"citationText\": \"每次运动完，我都觉得特别轻松，好像汗水把烦恼全带走了，心情也好了很多\", \"explanationVi\": \"Dựa vào câu: \\\"每次运动完，我都觉得特别轻松，好像汗水把烦恼全带走了，心情也好了很多\\\", đáp án chính xác là: 汗水.\"}]",
+    "topic": "Đời sống & Gia đình"
   },
   {
     "id": "RDG_C3_009",
@@ -384,7 +1026,8 @@
         "explanationVi": "Dựa vào câu: \"他三十岁时放弃了当时一份工资很高的工作，跟朋友从零开始，做起了家具生意\", đáp án chính xác là: 生意很成功."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_009_1\", \"type\": \"single_choice\", \"question\": \"小张放弃了一份什么样的工作?\", \"options\": [\"无聊\", \"工资高\", \"无奖金\", \"常出差\"], \"answer\": 1, \"citationText\": \"他三十岁时放弃了当时一份工资很高的工作，跟朋友从零开始，做起了家具生意\", \"explanationVi\": \"Dựa vào câu: \\\"他三十岁时放弃了当时一份工资很高的工作，跟朋友从零开始，做起了家具生意\\\", đáp án chính xác là: 工资高.\"}, {\"id\": \"q_c3_009_2\", \"type\": \"single_choice\", \"question\": \"小张现在怎么样?\", \"options\": [\"很后海\", \"很失望\", \"在卖表\", \"生意很成功\"], \"answer\": 3, \"citationText\": \"他三十岁时放弃了当时一份工资很高的工作，跟朋友从零开始，做起了家具生意\", \"explanationVi\": \"Dựa vào câu: \\\"他三十岁时放弃了当时一份工资很高的工作，跟朋友从零开始，做起了家具生意\\\", đáp án chính xác là: 生意很成功.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_009_1\", \"type\": \"single_choice\", \"question\": \"小张放弃了一份什么样的工作?\", \"options\": [\"无聊\", \"工资高\", \"无奖金\", \"常出差\"], \"answer\": 1, \"citationText\": \"他三十岁时放弃了当时一份工资很高的工作，跟朋友从零开始，做起了家具生意\", \"explanationVi\": \"Dựa vào câu: \\\"他三十岁时放弃了当时一份工资很高的工作，跟朋友从零开始，做起了家具生意\\\", đáp án chính xác là: 工资高.\"}, {\"id\": \"q_c3_009_2\", \"type\": \"single_choice\", \"question\": \"小张现在怎么样?\", \"options\": [\"很后海\", \"很失望\", \"在卖表\", \"生意很成功\"], \"answer\": 3, \"citationText\": \"他三十岁时放弃了当时一份工资很高的工作，跟朋友从零开始，做起了家具生意\", \"explanationVi\": \"Dựa vào câu: \\\"他三十岁时放弃了当时一份工资很高的工作，跟朋友从零开始，做起了家具生意\\\", đáp án chính xác là: 生意很成功.\"}]",
+    "topic": "Đời sống & Gia đình"
   },
   {
     "id": "RDG_C3_010",
@@ -427,7 +1070,8 @@
         "explanationVi": "Dựa vào câu: \"每个人在工作、学习、经济上都或多或少会有压力\", đáp án chính xác là: 要学会减压."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_010_1\", \"type\": \"single_choice\", \"question\": \"根据这段话，压力：\", \"options\": [\"有很多种\", \"让人成熟\", \"与年龄无关\", \"会带来失败\"], \"answer\": 0, \"citationText\": \"每个人在工作、学习、经济上都或多或少会有压力\", \"explanationVi\": \"Dựa vào câu: \\\"每个人在工作、学习、经济上都或多或少会有压力\\\", đáp án chính xác là: 有很多种.\"}, {\"id\": \"q_c3_010_2\", \"type\": \"single_choice\", \"question\": \"这段话主要想告诉我们：\", \"options\": [\"要勇敢\", \"要有礼貌\", \"要学会减压\", \"工作要积极\"], \"answer\": 2, \"citationText\": \"每个人在工作、学习、经济上都或多或少会有压力\", \"explanationVi\": \"Dựa vào câu: \\\"每个人在工作、学习、经济上都或多或少会有压力\\\", đáp án chính xác là: 要学会减压.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_010_1\", \"type\": \"single_choice\", \"question\": \"根据这段话，压力：\", \"options\": [\"有很多种\", \"让人成熟\", \"与年龄无关\", \"会带来失败\"], \"answer\": 0, \"citationText\": \"每个人在工作、学习、经济上都或多或少会有压力\", \"explanationVi\": \"Dựa vào câu: \\\"每个人在工作、学习、经济上都或多或少会有压力\\\", đáp án chính xác là: 有很多种.\"}, {\"id\": \"q_c3_010_2\", \"type\": \"single_choice\", \"question\": \"这段话主要想告诉我们：\", \"options\": [\"要勇敢\", \"要有礼貌\", \"要学会减压\", \"工作要积极\"], \"answer\": 2, \"citationText\": \"每个人在工作、学习、经济上都或多或少会有压力\", \"explanationVi\": \"Dựa vào câu: \\\"每个人在工作、学习、经济上都或多或少会有压力\\\", đáp án chính xác là: 要学会减压.\"}]",
+    "topic": "Đời sống & Gia đình"
   },
   {
     "id": "RDG_C3_011",
@@ -470,7 +1114,8 @@
         "explanationVi": "Dựa vào câu: \"人们喜欢养狗，是因为在孤单的时候，狗会陪着他们，互相信任，互相照顾\", đáp án chính xác là: 有时会孤单."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_011_1\", \"type\": \"single_choice\", \"question\": \"根据这段话，狗有什么特点？\", \"options\": [\"干净\", \"聪明\", \"有趣\", \"有耐心\"], \"answer\": 3, \"citationText\": \"狗是一种聪明的动物，它能听懂人的话， 明白人的心情，会和人产生感情\", \"explanationVi\": \"Dựa vào câu: \\\"狗是一种聪明的动物，它能听懂人的话， 明白人的心情，会和人产生感情\\\", đáp án chính xác là: 有耐心.\"}, {\"id\": \"q_c3_011_2\", \"type\": \"single_choice\", \"question\": \"人们为什么喜欢狗？\", \"options\": [\"可以更勇敢\", \"想减少危险\", \"会感到安全\", \"有时会孤单\"], \"answer\": 3, \"citationText\": \"人们喜欢养狗，是因为在孤单的时候，狗会陪着他们，互相信任，互相照顾\", \"explanationVi\": \"Dựa vào câu: \\\"人们喜欢养狗，是因为在孤单的时候，狗会陪着他们，互相信任，互相照顾\\\", đáp án chính xác là: 有时会孤单.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_011_1\", \"type\": \"single_choice\", \"question\": \"根据这段话，狗有什么特点？\", \"options\": [\"干净\", \"聪明\", \"有趣\", \"有耐心\"], \"answer\": 3, \"citationText\": \"狗是一种聪明的动物，它能听懂人的话， 明白人的心情，会和人产生感情\", \"explanationVi\": \"Dựa vào câu: \\\"狗是一种聪明的动物，它能听懂人的话， 明白人的心情，会和人产生感情\\\", đáp án chính xác là: 有耐心.\"}, {\"id\": \"q_c3_011_2\", \"type\": \"single_choice\", \"question\": \"人们为什么喜欢狗？\", \"options\": [\"可以更勇敢\", \"想减少危险\", \"会感到安全\", \"有时会孤单\"], \"answer\": 3, \"citationText\": \"人们喜欢养狗，是因为在孤单的时候，狗会陪着他们，互相信任，互相照顾\", \"explanationVi\": \"Dựa vào câu: \\\"人们喜欢养狗，是因为在孤单的时候，狗会陪着他们，互相信任，互相照顾\\\", đáp án chính xác là: 有时会孤单.\"}]",
+    "topic": "Đời sống & Gia đình"
   },
   {
     "id": "RDG_C3_012",
@@ -513,7 +1158,8 @@
         "explanationVi": "Dựa vào câu: \"其实，更值得我们重视和尊重的，正是实际生活中简单的爱情\", đáp án chính xác là: 简单的."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_012_1\", \"type\": \"single_choice\", \"question\": \"女孩子为什么喜欢小说里的爱情？\", \"options\": [\"很浪漫\", \"值得同情\", \"特别有趣\", \"内容丰富\"], \"answer\": 0, \"citationText\": \"很多女孩子羡慕小说里浪漫、复杂的爱情，认为经历了酸甜苦辣的爱情才算是深厚的\", \"explanationVi\": \"Dựa vào câu: \\\"很多女孩子羡慕小说里浪漫、复杂的爱情，认为经历了酸甜苦辣的爱情才算是深厚的\\\", đáp án chính xác là: 很浪漫.\"}, {\"id\": \"q_c3_012_2\", \"type\": \"single_choice\", \"question\": \"说话人认为什么样的爱情才是幸福的？\", \"options\": [\"精彩的\", \"简单的\", \"相互信任的\", \"勇敢去爱的\"], \"answer\": 1, \"citationText\": \"其实，更值得我们重视和尊重的，正是实际生活中简单的爱情\", \"explanationVi\": \"Dựa vào câu: \\\"其实，更值得我们重视和尊重的，正是实际生活中简单的爱情\\\", đáp án chính xác là: 简单的.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_012_1\", \"type\": \"single_choice\", \"question\": \"女孩子为什么喜欢小说里的爱情？\", \"options\": [\"很浪漫\", \"值得同情\", \"特别有趣\", \"内容丰富\"], \"answer\": 0, \"citationText\": \"很多女孩子羡慕小说里浪漫、复杂的爱情，认为经历了酸甜苦辣的爱情才算是深厚的\", \"explanationVi\": \"Dựa vào câu: \\\"很多女孩子羡慕小说里浪漫、复杂的爱情，认为经历了酸甜苦辣的爱情才算是深厚的\\\", đáp án chính xác là: 很浪漫.\"}, {\"id\": \"q_c3_012_2\", \"type\": \"single_choice\", \"question\": \"说话人认为什么样的爱情才是幸福的？\", \"options\": [\"精彩的\", \"简单的\", \"相互信任的\", \"勇敢去爱的\"], \"answer\": 1, \"citationText\": \"其实，更值得我们重视和尊重的，正是实际生活中简单的爱情\", \"explanationVi\": \"Dựa vào câu: \\\"其实，更值得我们重视和尊重的，正是实际生活中简单的爱情\\\", đáp án chính xác là: 简单的.\"}]",
+    "topic": "Đời sống & Gia đình"
   },
   {
     "id": "RDG_C3_013",
@@ -556,7 +1202,8 @@
         "explanationVi": "Dựa vào câu: \"”女儿听后开心地说：“够了够了，妈妈真好\", đáp án chính xác là: 以为时间增加了."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_013_1\", \"type\": \"single_choice\", \"question\": \"她让女儿\", \"options\": [\"洗澡\", \"快去睡\", \"早点儿起床\", \"弹会儿钢琴\"], \"answer\": 1, \"citationText\": \"我对她说：“再看 10 分钟就去洗脸睡觉\", \"explanationVi\": \"Dựa vào câu: \\\"我对她说：“再看 10 分钟就去洗脸睡觉\\\", đáp án chính xác là: 快去睡.\"}, {\"id\": \"q_c3_013_2\", \"type\": \"single_choice\", \"question\": \"女儿为什么后来又高兴了？\", \"options\": [\"鱼做好了\", \"收到礼物了\", \"受到表扬了\", \"以为时间增加了\"], \"answer\": 3, \"citationText\": \"”女儿听后开心地说：“够了够了，妈妈真好\", \"explanationVi\": \"Dựa vào câu: \\\"”女儿听后开心地说：“够了够了，妈妈真好\\\", đáp án chính xác là: 以为时间增加了.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_013_1\", \"type\": \"single_choice\", \"question\": \"她让女儿\", \"options\": [\"洗澡\", \"快去睡\", \"早点儿起床\", \"弹会儿钢琴\"], \"answer\": 1, \"citationText\": \"我对她说：“再看 10 分钟就去洗脸睡觉\", \"explanationVi\": \"Dựa vào câu: \\\"我对她说：“再看 10 分钟就去洗脸睡觉\\\", đáp án chính xác là: 快去睡.\"}, {\"id\": \"q_c3_013_2\", \"type\": \"single_choice\", \"question\": \"女儿为什么后来又高兴了？\", \"options\": [\"鱼做好了\", \"收到礼物了\", \"受到表扬了\", \"以为时间增加了\"], \"answer\": 3, \"citationText\": \"”女儿听后开心地说：“够了够了，妈妈真好\", \"explanationVi\": \"Dựa vào câu: \\\"”女儿听后开心地说：“够了够了，妈妈真好\\\", đáp án chính xác là: 以为时间增加了.\"}]",
+    "topic": "Đời sống & Gia đình"
   },
   {
     "id": "RDG_C3_014",
@@ -599,7 +1246,8 @@
         "explanationVi": "Dựa vào câu: \"男：那我为什么经常感觉累啊?女：应该是你工作太辛苦，多休息就好了\", đáp án chính xác là: 工作太辛苦."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_014_1\", \"type\": \"single_choice\", \"question\": \"女的是做什么的?\", \"options\": [\"司机\", \"警察\", \"医生\", \"工人\"], \"answer\": 2, \"citationText\": \"男：那我为什么经常感觉累啊?女：应该是你工作太辛苦，多休息就好了\", \"explanationVi\": \"Dựa vào câu: \\\"男：那我为什么经常感觉累啊?女：应该是你工作太辛苦，多休息就好了\\\", đáp án chính xác là: 医生.\"}, {\"id\": \"q_c3_014_2\", \"type\": \"single_choice\", \"question\": \"男的为什么会感觉累?\", \"options\": [\"生病了\", \"工作太辛苦\", \"做了太多运动\", \"检查的时间太长\"], \"answer\": 1, \"citationText\": \"男：那我为什么经常感觉累啊?女：应该是你工作太辛苦，多休息就好了\", \"explanationVi\": \"Dựa vào câu: \\\"男：那我为什么经常感觉累啊?女：应该是你工作太辛苦，多休息就好了\\\", đáp án chính xác là: 工作太辛苦.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_014_1\", \"type\": \"single_choice\", \"question\": \"女的是做什么的?\", \"options\": [\"司机\", \"警察\", \"医生\", \"工人\"], \"answer\": 2, \"citationText\": \"男：那我为什么经常感觉累啊?女：应该是你工作太辛苦，多休息就好了\", \"explanationVi\": \"Dựa vào câu: \\\"男：那我为什么经常感觉累啊?女：应该是你工作太辛苦，多休息就好了\\\", đáp án chính xác là: 医生.\"}, {\"id\": \"q_c3_014_2\", \"type\": \"single_choice\", \"question\": \"男的为什么会感觉累?\", \"options\": [\"生病了\", \"工作太辛苦\", \"做了太多运动\", \"检查的时间太长\"], \"answer\": 1, \"citationText\": \"男：那我为什么经常感觉累啊?女：应该是你工作太辛苦，多休息就好了\", \"explanationVi\": \"Dựa vào câu: \\\"男：那我为什么经常感觉累啊?女：应该是你工作太辛苦，多休息就好了\\\", đáp án chính xác là: 工作太辛苦.\"}]",
+    "topic": "Đời sống & Gia đình"
   },
   {
     "id": "RDG_C3_015",
@@ -642,7 +1290,8 @@
         "explanationVi": "Dựa vào câu: \"女：她写在黑板上了，你没看到吗?\", đáp án chính xác là: 黑板上."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_015_1\", \"type\": \"single_choice\", \"question\": \"男的为什么不知道作业?\", \"options\": [\"忘了\", \"没听见\", \"没上学\", \"没看见\"], \"answer\": 3, \"citationText\": \"男：不是我忘了，是我没看到老师布置了什么作业\", \"explanationVi\": \"Dựa vào câu: \\\"男：不是我忘了，是我没看到老师布置了什么作业\\\", đáp án chính xác là: 没看见.\"}, {\"id\": \"q_c3_015_2\", \"type\": \"single_choice\", \"question\": \"老师把作业写在哪儿了?\", \"options\": [\"黑板上\", \"课本上\", \"笔记本上\", \"作业本上\"], \"answer\": 0, \"citationText\": \"女：她写在黑板上了，你没看到吗?\", \"explanationVi\": \"Dựa vào câu: \\\"女：她写在黑板上了，你没看到吗?\\\", đáp án chính xác là: 黑板上.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_015_1\", \"type\": \"single_choice\", \"question\": \"男的为什么不知道作业?\", \"options\": [\"忘了\", \"没听见\", \"没上学\", \"没看见\"], \"answer\": 3, \"citationText\": \"男：不是我忘了，是我没看到老师布置了什么作业\", \"explanationVi\": \"Dựa vào câu: \\\"男：不是我忘了，是我没看到老师布置了什么作业\\\", đáp án chính xác là: 没看见.\"}, {\"id\": \"q_c3_015_2\", \"type\": \"single_choice\", \"question\": \"老师把作业写在哪儿了?\", \"options\": [\"黑板上\", \"课本上\", \"笔记本上\", \"作业本上\"], \"answer\": 0, \"citationText\": \"女：她写在黑板上了，你没看到吗?\", \"explanationVi\": \"Dựa vào câu: \\\"女：她写在黑板上了，你没看到吗?\\\", đáp án chính xác là: 黑板上.\"}]",
+    "topic": "Đời sống & Gia đình"
   },
   {
     "id": "RDG_C3_016",
@@ -685,7 +1334,8 @@
         "explanationVi": "Dựa vào câu: \"女：小心\", đáp án chính xác là: 怕出车祸."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_016_1\", \"type\": \"single_choice\", \"question\": \"两个谈话人之间是什么关系？\", \"options\": [\"朋友\", \"母子\", \"师生\", \"夫妻\"], \"answer\": 3, \"citationText\": \"男：不就是一宿麻将吗\", \"explanationVi\": \"Dựa vào câu: \\\"男：不就是一宿麻将吗\\\", đáp án chính xác là: 夫妻.\"}, {\"id\": \"q_c3_016_2\", \"type\": \"single_choice\", \"question\": \"女的为什么让男的“小心”？\", \"options\": [\"怕他累着\", \"怕他再去打麻将\", \"怕出车祸\", \"怕孩子着急\"], \"answer\": 2, \"citationText\": \"女：小心\", \"explanationVi\": \"Dựa vào câu: \\\"女：小心\\\", đáp án chính xác là: 怕出车祸.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_016_1\", \"type\": \"single_choice\", \"question\": \"两个谈话人之间是什么关系？\", \"options\": [\"朋友\", \"母子\", \"师生\", \"夫妻\"], \"answer\": 3, \"citationText\": \"男：不就是一宿麻将吗\", \"explanationVi\": \"Dựa vào câu: \\\"男：不就是一宿麻将吗\\\", đáp án chính xác là: 夫妻.\"}, {\"id\": \"q_c3_016_2\", \"type\": \"single_choice\", \"question\": \"女的为什么让男的“小心”？\", \"options\": [\"怕他累着\", \"怕他再去打麻将\", \"怕出车祸\", \"怕孩子着急\"], \"answer\": 2, \"citationText\": \"女：小心\", \"explanationVi\": \"Dựa vào câu: \\\"女：小心\\\", đáp án chính xác là: 怕出车祸.\"}]",
+    "topic": "Đời sống & Gia đình"
   },
   {
     "id": "RDG_C3_017",
@@ -728,7 +1378,8 @@
         "explanationVi": "Dựa vào câu: \"努力把事情做到最好，这无疑是对的\", đáp án chính xác là: 要学会说“不”."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_017_1\", \"type\": \"single_choice\", \"question\": \"别人请你做的事情太难时，你该怎么办?\", \"options\": [\"道歉\", \"找人商量\", \"直接拒绝\", \"要考虑一下\"], \"answer\": 3, \"citationText\": \"不过，当别人请你帮忙时，对那些超出自己能力范围的事情，最好还是先考虑考虑\", \"explanationVi\": \"Dựa vào câu: \\\"不过，当别人请你帮忙时，对那些超出自己能力范围的事情，最好还是先考虑考虑\\\", đáp án chính xác là: 要考虑一下.\"}, {\"id\": \"q_c3_017_2\", \"type\": \"single_choice\", \"question\": \"这段话主要想告诉我们什么?\", \"options\": [\"别太粗心\", \"不要激动\", \"对人要友好\", \"要学会说“不”\"], \"answer\": 3, \"citationText\": \"努力把事情做到最好，这无疑是对的\", \"explanationVi\": \"Dựa vào câu: \\\"努力把事情做到最好，这无疑是对的\\\", đáp án chính xác là: 要学会说“不”.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_017_1\", \"type\": \"single_choice\", \"question\": \"别人请你做的事情太难时，你该怎么办?\", \"options\": [\"道歉\", \"找人商量\", \"直接拒绝\", \"要考虑一下\"], \"answer\": 3, \"citationText\": \"不过，当别人请你帮忙时，对那些超出自己能力范围的事情，最好还是先考虑考虑\", \"explanationVi\": \"Dựa vào câu: \\\"不过，当别人请你帮忙时，对那些超出自己能力范围的事情，最好还是先考虑考虑\\\", đáp án chính xác là: 要考虑一下.\"}, {\"id\": \"q_c3_017_2\", \"type\": \"single_choice\", \"question\": \"这段话主要想告诉我们什么?\", \"options\": [\"别太粗心\", \"不要激动\", \"对人要友好\", \"要学会说“不”\"], \"answer\": 3, \"citationText\": \"努力把事情做到最好，这无疑是对的\", \"explanationVi\": \"Dựa vào câu: \\\"努力把事情做到最好，这无疑是对的\\\", đáp án chính xác là: 要学会说“不”.\"}]",
+    "topic": "Ẩm thực Trung Hoa"
   },
   {
     "id": "RDG_C3_018",
@@ -771,7 +1422,8 @@
         "explanationVi": "Dựa vào câu: \"在杨振宁离开中国的那天，邓告诉他中国“两弹”的制造全靠自己，没有任何外国人参与\", đáp án chính xác là: 控制不住自己."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_018_1\", \"type\": \"single_choice\", \"question\": \"文中句子“中国‘两弹’的制造全靠自己”的意思是：\", \"options\": [\"中国“两弹”的制造全靠邓稼先一个人\", \"中国“两弹”的制造全靠杨振宁一个人\", \"中国“两弹”的制造全靠中国人自己\", \"中国“两弹”的制造全靠“我”\"], \"answer\": 2, \"citationText\": \"在杨振宁离开中国的那天，邓告诉他中国“两弹”的制造全靠自己，没有任何外国人参与\", \"explanationVi\": \"Dựa vào câu: \\\"在杨振宁离开中国的那天，邓告诉他中国“两弹”的制造全靠自己，没有任何外国人参与\\\", đáp án chính xác là: 中国“两弹”的制造全靠中国人自己.\"}, {\"id\": \"q_c3_018_2\", \"type\": \"single_choice\", \"question\": \"文中“不能自已”的意思是：\", \"options\": [\"不能自己回国\", \"不能自己激动\", \"不能成为自己\", \"控制不住自己\"], \"answer\": 3, \"citationText\": \"在杨振宁离开中国的那天，邓告诉他中国“两弹”的制造全靠自己，没有任何外国人参与\", \"explanationVi\": \"Dựa vào câu: \\\"在杨振宁离开中国的那天，邓告诉他中国“两弹”的制造全靠自己，没有任何外国人参与\\\", đáp án chính xác là: 控制不住自己.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_018_1\", \"type\": \"single_choice\", \"question\": \"文中句子“中国‘两弹’的制造全靠自己”的意思是：\", \"options\": [\"中国“两弹”的制造全靠邓稼先一个人\", \"中国“两弹”的制造全靠杨振宁一个人\", \"中国“两弹”的制造全靠中国人自己\", \"中国“两弹”的制造全靠“我”\"], \"answer\": 2, \"citationText\": \"在杨振宁离开中国的那天，邓告诉他中国“两弹”的制造全靠自己，没有任何外国人参与\", \"explanationVi\": \"Dựa vào câu: \\\"在杨振宁离开中国的那天，邓告诉他中国“两弹”的制造全靠自己，没有任何外国人参与\\\", đáp án chính xác là: 中国“两弹”的制造全靠中国人自己.\"}, {\"id\": \"q_c3_018_2\", \"type\": \"single_choice\", \"question\": \"文中“不能自已”的意思是：\", \"options\": [\"不能自己回国\", \"不能自己激动\", \"不能成为自己\", \"控制不住自己\"], \"answer\": 3, \"citationText\": \"在杨振宁离开中国的那天，邓告诉他中国“两弹”的制造全靠自己，没有任何外国人参与\", \"explanationVi\": \"Dựa vào câu: \\\"在杨振宁离开中国的那天，邓告诉他中国“两弹”的制造全靠自己，没有任何外国人参与\\\", đáp án chính xác là: 控制不住自己.\"}]",
+    "topic": "Ẩm thực Trung Hoa"
   },
   {
     "id": "RDG_C3_019",
@@ -814,7 +1466,8 @@
         "explanationVi": "Dựa vào câu: \"以前的人以胖为美，现在的人以瘦为美\", đáp án chính xác là: 健康最关键."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_019_1\", \"type\": \"single_choice\", \"question\": \"以前人们觉得什么样的女孩子更美?\", \"options\": [\"胖的\", \"成熟的\", \"爱笑的\", \"安静的\"], \"answer\": 0, \"citationText\": \"所以，女孩子们在减肥的时候要记得，健康才是第一位的\", \"explanationVi\": \"Dựa vào câu: \\\"所以，女孩子们在减肥的时候要记得，健康才是第一位的\\\", đáp án chính xác là: 胖的.\"}, {\"id\": \"q_c3_019_2\", \"type\": \"single_choice\", \"question\": \"说话人认为：\", \"options\": [\"哭很正常\", \"健康最关键\", \"散步好处多\", \"不要羡慕富人\"], \"answer\": 1, \"citationText\": \"以前的人以胖为美，现在的人以瘦为美\", \"explanationVi\": \"Dựa vào câu: \\\"以前的人以胖为美，现在的人以瘦为美\\\", đáp án chính xác là: 健康最关键.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_019_1\", \"type\": \"single_choice\", \"question\": \"以前人们觉得什么样的女孩子更美?\", \"options\": [\"胖的\", \"成熟的\", \"爱笑的\", \"安静的\"], \"answer\": 0, \"citationText\": \"所以，女孩子们在减肥的时候要记得，健康才是第一位的\", \"explanationVi\": \"Dựa vào câu: \\\"所以，女孩子们在减肥的时候要记得，健康才是第一位的\\\", đáp án chính xác là: 胖的.\"}, {\"id\": \"q_c3_019_2\", \"type\": \"single_choice\", \"question\": \"说话人认为：\", \"options\": [\"哭很正常\", \"健康最关键\", \"散步好处多\", \"不要羡慕富人\"], \"answer\": 1, \"citationText\": \"以前的人以胖为美，现在的人以瘦为美\", \"explanationVi\": \"Dựa vào câu: \\\"以前的人以胖为美，现在的人以瘦为美\\\", đáp án chính xác là: 健康最关键.\"}]",
+    "topic": "Ẩm thực Trung Hoa"
   },
   {
     "id": "RDG_C3_020",
@@ -857,7 +1510,8 @@
         "explanationVi": "Dựa vào câu: \"它提醒我们，当“规定”和“经验”不能解决问题时，应该改变自己的态度和想法，试着走走以前从来没走过的路，也许这样就能找到解决问题的方法了\", đáp án chính xác là: 可以被打破."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_020_1\", \"type\": \"single_choice\", \"question\": \"“人是活的”这里“活”指的是：\", \"options\": [\"富有热情\", \"懂得改变\", \"有同情心\", \"感情丰富\"], \"answer\": 1, \"citationText\": \"虽然我们常说要按规定做事，但有句话叫“规定是死的，人是活的”\", \"explanationVi\": \"Dựa vào câu: \\\"虽然我们常说要按规定做事，但有句话叫“规定是死的，人是活的”\\\", đáp án chính xác là: 懂得改变.\"}, {\"id\": \"q_c3_020_2\", \"type\": \"single_choice\", \"question\": \"根据这段话，规定：\", \"options\": [\"可以被打破\", \"越详细越好\", \"要符合法律\", \"不能太复杂\"], \"answer\": 0, \"citationText\": \"它提醒我们，当“规定”和“经验”不能解决问题时，应该改变自己的态度和想法，试着走走以前从来没走过的路，也许这样就能找到解决问题的方法了\", \"explanationVi\": \"Dựa vào câu: \\\"它提醒我们，当“规定”和“经验”不能解决问题时，应该改变自己的态度和想法，试着走走以前从来没走过的路，也许这样就能找到解决问题的方法了\\\", đáp án chính xác là: 可以被打破.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_020_1\", \"type\": \"single_choice\", \"question\": \"“人是活的”这里“活”指的是：\", \"options\": [\"富有热情\", \"懂得改变\", \"有同情心\", \"感情丰富\"], \"answer\": 1, \"citationText\": \"虽然我们常说要按规定做事，但有句话叫“规定是死的，人是活的”\", \"explanationVi\": \"Dựa vào câu: \\\"虽然我们常说要按规定做事，但有句话叫“规定是死的，人是活的”\\\", đáp án chính xác là: 懂得改变.\"}, {\"id\": \"q_c3_020_2\", \"type\": \"single_choice\", \"question\": \"根据这段话，规定：\", \"options\": [\"可以被打破\", \"越详细越好\", \"要符合法律\", \"不能太复杂\"], \"answer\": 0, \"citationText\": \"它提醒我们，当“规定”和“经验”不能解决问题时，应该改变自己的态度和想法，试着走走以前从来没走过的路，也许这样就能找到解决问题的方法了\", \"explanationVi\": \"Dựa vào câu: \\\"它提醒我们，当“规定”和“经验”不能解决问题时，应该改变自己的态度和想法，试着走走以前从来没走过的路，也许这样就能找到解决问题的方法了\\\", đáp án chính xác là: 可以被打破.\"}]",
+    "topic": "Ẩm thực Trung Hoa"
   },
   {
     "id": "RDG_C3_021",
@@ -914,7 +1568,8 @@
         "explanationVi": "Dựa vào câu: \"主要历史古迹有郑国渠、蓝田猿人遗址、半坡遗址、西安碑林、钟楼、阿房宫遗址等\", đáp án chính xác là: 历史."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_021_1\", \"type\": \"single_choice\", \"question\": \"西安曾是我国多少个王朝的首都?\", \"options\": [\"7个\", \"10个\", \"12个\", \"1个\"], \"answer\": 2, \"citationText\": \"西安古称长安，从周代到唐代有12个王朝建都西安地区，历经1180多年，是我国七大古都之一\", \"explanationVi\": \"Dựa vào câu: \\\"西安古称长安，从周代到唐代有12个王朝建都西安地区，历经1180多年，是我国七大古都之一\\\", đáp án chính xác là: 12个.\"}, {\"id\": \"q_c3_021_2\", \"type\": \"single_choice\", \"question\": \"我国有几大古都?\", \"options\": [\"5\", \"7\", \"9\", \"10\"], \"answer\": 1, \"citationText\": \"西安古称长安，从周代到唐代有12个王朝建都西安地区，历经1180多年，是我国七大古都之一\", \"explanationVi\": \"Dựa vào câu: \\\"西安古称长安，从周代到唐代有12个王朝建都西安地区，历经1180多年，是我国七大古都之一\\\", đáp án chính xác là: 7.\"}, {\"id\": \"q_c3_021_3\", \"type\": \"single_choice\", \"question\": \"这段话主要介绍了西安哪方面的情况?\", \"options\": [\"地理位置\", \"城市建筑\", \"风土人情\", \"历史\"], \"answer\": 3, \"citationText\": \"主要历史古迹有郑国渠、蓝田猿人遗址、半坡遗址、西安碑林、钟楼、阿房宫遗址等\", \"explanationVi\": \"Dựa vào câu: \\\"主要历史古迹有郑国渠、蓝田猿人遗址、半坡遗址、西安碑林、钟楼、阿房宫遗址等\\\", đáp án chính xác là: 历史.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_021_1\", \"type\": \"single_choice\", \"question\": \"西安曾是我国多少个王朝的首都?\", \"options\": [\"7个\", \"10个\", \"12个\", \"1个\"], \"answer\": 2, \"citationText\": \"西安古称长安，从周代到唐代有12个王朝建都西安地区，历经1180多年，是我国七大古都之一\", \"explanationVi\": \"Dựa vào câu: \\\"西安古称长安，从周代到唐代有12个王朝建都西安地区，历经1180多年，是我国七大古都之一\\\", đáp án chính xác là: 12个.\"}, {\"id\": \"q_c3_021_2\", \"type\": \"single_choice\", \"question\": \"我国有几大古都?\", \"options\": [\"5\", \"7\", \"9\", \"10\"], \"answer\": 1, \"citationText\": \"西安古称长安，从周代到唐代有12个王朝建都西安地区，历经1180多年，是我国七大古都之一\", \"explanationVi\": \"Dựa vào câu: \\\"西安古称长安，从周代到唐代有12个王朝建都西安地区，历经1180多年，是我国七大古都之一\\\", đáp án chính xác là: 7.\"}, {\"id\": \"q_c3_021_3\", \"type\": \"single_choice\", \"question\": \"这段话主要介绍了西安哪方面的情况?\", \"options\": [\"地理位置\", \"城市建筑\", \"风土人情\", \"历史\"], \"answer\": 3, \"citationText\": \"主要历史古迹有郑国渠、蓝田猿人遗址、半坡遗址、西安碑林、钟楼、阿房宫遗址等\", \"explanationVi\": \"Dựa vào câu: \\\"主要历史古迹有郑国渠、蓝田猿人遗址、半坡遗址、西安碑林、钟楼、阿房宫遗址等\\\", đáp án chính xác là: 历史.\"}]",
+    "topic": "Ẩm thực Trung Hoa"
   },
   {
     "id": "RDG_C3_022",
@@ -957,7 +1612,8 @@
         "explanationVi": "Dựa vào câu: \"觅端庄大方、身体健康、善理家务、重情爱家、懂生活、有工作的28岁以下的未婚女士为伴\", đáp án chính xác là: 经济收入."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_022_1\", \"type\": \"single_choice\", \"question\": \"这段话是一则：\", \"options\": [\"招聘广告\", \"人物介绍\", \"征婚启事\", \"寻人启事\"], \"answer\": 2, \"citationText\": \"他，未婚，28岁，大学文化，事业单位工作，性情随和，风趣幽默，胸怀宽广，豁达大度，身体健康，爱看书，喜欢听音乐\", \"explanationVi\": \"Dựa vào câu: \\\"他，未婚，28岁，大学文化，事业单位工作，性情随和，风趣幽默，胸怀宽广，豁达大度，身体健康，爱看书，喜欢听音乐\\\", đáp án chính xác là: 征婚启事.\"}, {\"id\": \"q_c3_022_2\", \"type\": \"single_choice\", \"question\": \"有关“他”的情况，下面哪一项文中没有提到：\", \"options\": [\"婚姻状况\", \"文化程度\", \"经济收入\", \"联系方式\"], \"answer\": 2, \"citationText\": \"觅端庄大方、身体健康、善理家务、重情爱家、懂生活、有工作的28岁以下的未婚女士为伴\", \"explanationVi\": \"Dựa vào câu: \\\"觅端庄大方、身体健康、善理家务、重情爱家、懂生活、有工作的28岁以下的未婚女士为伴\\\", đáp án chính xác là: 经济收入.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_022_1\", \"type\": \"single_choice\", \"question\": \"这段话是一则：\", \"options\": [\"招聘广告\", \"人物介绍\", \"征婚启事\", \"寻人启事\"], \"answer\": 2, \"citationText\": \"他，未婚，28岁，大学文化，事业单位工作，性情随和，风趣幽默，胸怀宽广，豁达大度，身体健康，爱看书，喜欢听音乐\", \"explanationVi\": \"Dựa vào câu: \\\"他，未婚，28岁，大学文化，事业单位工作，性情随和，风趣幽默，胸怀宽广，豁达大度，身体健康，爱看书，喜欢听音乐\\\", đáp án chính xác là: 征婚启事.\"}, {\"id\": \"q_c3_022_2\", \"type\": \"single_choice\", \"question\": \"有关“他”的情况，下面哪一项文中没有提到：\", \"options\": [\"婚姻状况\", \"文化程度\", \"经济收入\", \"联系方式\"], \"answer\": 2, \"citationText\": \"觅端庄大方、身体健康、善理家务、重情爱家、懂生活、有工作的28岁以下的未婚女士为伴\", \"explanationVi\": \"Dựa vào câu: \\\"觅端庄大方、身体健康、善理家务、重情爱家、懂生活、有工作的28岁以下的未婚女士为伴\\\", đáp án chính xác là: 经济收入.\"}]",
+    "topic": "Ẩm thực Trung Hoa"
   },
   {
     "id": "RDG_C3_023",
@@ -1000,7 +1656,8 @@
         "explanationVi": "Dựa vào câu: \"有些东西是你天生就有的，比如长相，但有些则需要你通过学习去获得，比如知识、能力、经验等等\", đáp án chính xác là: 要不断地学习."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_023_1\", \"type\": \"single_choice\", \"question\": \"根据这段话，下列哪项正确?\", \"options\": [\"要比对手更强\", \"付出才有收获\", \"经验有时并不可靠\", \"要重视自己的形象\"], \"answer\": 1, \"citationText\": \"后天学到比天生得到更为重要，只有通过自身的努力才能有最大的收获\", \"explanationVi\": \"Dựa vào câu: \\\"后天学到比天生得到更为重要，只有通过自身的努力才能有最大的收获\\\", đáp án chính xác là: 付出才有收获.\"}, {\"id\": \"q_c3_023_2\", \"type\": \"single_choice\", \"question\": \"这段话主要谈什么?\", \"options\": [\"人要有勇气\", \"要不断地学习\", \"骄傲使人落后\", \"学会享受人生\"], \"answer\": 1, \"citationText\": \"有些东西是你天生就有的，比如长相，但有些则需要你通过学习去获得，比如知识、能力、经验等等\", \"explanationVi\": \"Dựa vào câu: \\\"有些东西是你天生就有的，比如长相，但有些则需要你通过学习去获得，比如知识、能力、经验等等\\\", đáp án chính xác là: 要不断地学习.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_023_1\", \"type\": \"single_choice\", \"question\": \"根据这段话，下列哪项正确?\", \"options\": [\"要比对手更强\", \"付出才有收获\", \"经验有时并不可靠\", \"要重视自己的形象\"], \"answer\": 1, \"citationText\": \"后天学到比天生得到更为重要，只有通过自身的努力才能有最大的收获\", \"explanationVi\": \"Dựa vào câu: \\\"后天学到比天生得到更为重要，只有通过自身的努力才能有最大的收获\\\", đáp án chính xác là: 付出才有收获.\"}, {\"id\": \"q_c3_023_2\", \"type\": \"single_choice\", \"question\": \"这段话主要谈什么?\", \"options\": [\"人要有勇气\", \"要不断地学习\", \"骄傲使人落后\", \"学会享受人生\"], \"answer\": 1, \"citationText\": \"有些东西是你天生就有的，比如长相，但有些则需要你通过学习去获得，比如知识、能力、经验等等\", \"explanationVi\": \"Dựa vào câu: \\\"有些东西是你天生就有的，比如长相，但有些则需要你通过学习去获得，比如知识、能力、经验等等\\\", đáp án chính xác là: 要不断地学习.\"}]",
+    "topic": "Ẩm thực Trung Hoa"
   },
   {
     "id": "RDG_C3_024",
@@ -1043,7 +1700,8 @@
         "explanationVi": "Dựa vào câu: \"300 天后，医生接到那个人的电话，说他已经减了 34 公斤，但他因此也有了个难题，“什么难题\", đáp án chính xác là: 离家太远."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_024_1\", \"type\": \"single_choice\", \"question\": \"那个人每天跑步是因为：\", \"options\": [\"太胖了\", \"想赢比赛\", \"想赚更多的钱\", \"想引起别人注意\"], \"answer\": 0, \"citationText\": \"医生对一个很胖的人说如果他每天跑 8 公里，跑 300 天，差不多就能减 34公斤\", \"explanationVi\": \"Dựa vào câu: \\\"医生对一个很胖的人说如果他每天跑 8 公里，跑 300 天，差不多就能减 34公斤\\\", đáp án chính xác là: 太胖了.\"}, {\"id\": \"q_c3_024_2\", \"type\": \"single_choice\", \"question\": \"300天后，那个人的难题是什么？\", \"options\": [\"没成功\", \"太瘦了\", \"离家太远\", \"不适应家里的生活\"], \"answer\": 2, \"citationText\": \"300 天后，医生接到那个人的电话，说他已经减了 34 公斤，但他因此也有了个难题，“什么难题\", \"explanationVi\": \"Dựa vào câu: \\\"300 天后，医生接到那个人的电话，说他已经减了 34 公斤，但他因此也有了个难题，“什么难题\\\", đáp án chính xác là: 离家太远.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_024_1\", \"type\": \"single_choice\", \"question\": \"那个人每天跑步是因为：\", \"options\": [\"太胖了\", \"想赢比赛\", \"想赚更多的钱\", \"想引起别人注意\"], \"answer\": 0, \"citationText\": \"医生对一个很胖的人说如果他每天跑 8 公里，跑 300 天，差不多就能减 34公斤\", \"explanationVi\": \"Dựa vào câu: \\\"医生对一个很胖的人说如果他每天跑 8 公里，跑 300 天，差不多就能减 34公斤\\\", đáp án chính xác là: 太胖了.\"}, {\"id\": \"q_c3_024_2\", \"type\": \"single_choice\", \"question\": \"300天后，那个人的难题是什么？\", \"options\": [\"没成功\", \"太瘦了\", \"离家太远\", \"不适应家里的生活\"], \"answer\": 2, \"citationText\": \"300 天后，医生接到那个人的电话，说他已经减了 34 公斤，但他因此也有了个难题，“什么难题\", \"explanationVi\": \"Dựa vào câu: \\\"300 天后，医生接到那个人的电话，说他已经减了 34 公斤，但他因此也有了个难题，“什么难题\\\", đáp án chính xác là: 离家太远.\"}]",
+    "topic": "Ẩm thực Trung Hoa"
   },
   {
     "id": "RDG_C3_025",
@@ -1086,7 +1744,8 @@
         "explanationVi": "Dựa vào câu: \"请乘坐特157次列车去往上海方向的旅客带好行李物品到5号候车室检票进站\", đáp án chính xác là: 5号."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_025_1\", \"type\": \"single_choice\", \"question\": \"根据独白，这个车的终点站是哪儿?\", \"options\": [\"上海\", \"沈阳\", \"本站\", \"哈尔滨\"], \"answer\": 0, \"citationText\": \"各位旅客，由哈尔滨始发、途径本站、终到上海站的特157次列车现在已经开始检票了\", \"explanationVi\": \"Dựa vào câu: \\\"各位旅客，由哈尔滨始发、途径本站、终到上海站的特157次列车现在已经开始检票了\\\", đáp án chính xác là: 上海.\"}, {\"id\": \"q_c3_025_2\", \"type\": \"single_choice\", \"question\": \"根据独白，在几号候车室检票?\", \"options\": [\"5号\", \"7号\", \"155号\", \"157号\"], \"answer\": 0, \"citationText\": \"请乘坐特157次列车去往上海方向的旅客带好行李物品到5号候车室检票进站\", \"explanationVi\": \"Dựa vào câu: \\\"请乘坐特157次列车去往上海方向的旅客带好行李物品到5号候车室检票进站\\\", đáp án chính xác là: 5号.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_025_1\", \"type\": \"single_choice\", \"question\": \"根据独白，这个车的终点站是哪儿?\", \"options\": [\"上海\", \"沈阳\", \"本站\", \"哈尔滨\"], \"answer\": 0, \"citationText\": \"各位旅客，由哈尔滨始发、途径本站、终到上海站的特157次列车现在已经开始检票了\", \"explanationVi\": \"Dựa vào câu: \\\"各位旅客，由哈尔滨始发、途径本站、终到上海站的特157次列车现在已经开始检票了\\\", đáp án chính xác là: 上海.\"}, {\"id\": \"q_c3_025_2\", \"type\": \"single_choice\", \"question\": \"根据独白，在几号候车室检票?\", \"options\": [\"5号\", \"7号\", \"155号\", \"157号\"], \"answer\": 0, \"citationText\": \"请乘坐特157次列车去往上海方向的旅客带好行李物品到5号候车室检票进站\", \"explanationVi\": \"Dựa vào câu: \\\"请乘坐特157次列车去往上海方向的旅客带好行李物品到5号候车室检票进站\\\", đáp án chính xác là: 5号.\"}]",
+    "topic": "Ẩm thực Trung Hoa"
   },
   {
     "id": "RDG_C3_026",
@@ -1129,7 +1788,8 @@
         "explanationVi": "Dựa vào câu: \"参加的人有三四十个，他自己也报名参加了， 但没有告诉任何人，结果他得的竟是第三名\", đáp án chính xác là: 他没得第一名."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_026_1\", \"type\": \"single_choice\", \"question\": \"他参加的是什么比赛？\", \"options\": [\"游泳\", \"骑马\", \"表演\", \"画画儿\"], \"answer\": 2, \"citationText\": \"有一次， 一个地方举行一个比赛，看谁表演得更像他\", \"explanationVi\": \"Dựa vào câu: \\\"有一次， 一个地方举行一个比赛，看谁表演得更像他\\\", đáp án chính xác là: 表演.\"}, {\"id\": \"q_c3_026_2\", \"type\": \"single_choice\", \"question\": \"他为什么觉得很好笑？\", \"options\": [\"比赛很乱\", \"大家都很笨\", \"他们都很胖\", \"他没得第一名\"], \"answer\": 3, \"citationText\": \"参加的人有三四十个，他自己也报名参加了， 但没有告诉任何人，结果他得的竟是第三名\", \"explanationVi\": \"Dựa vào câu: \\\"参加的人有三四十个，他自己也报名参加了， 但没有告诉任何人，结果他得的竟是第三名\\\", đáp án chính xác là: 他没得第一名.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_026_1\", \"type\": \"single_choice\", \"question\": \"他参加的是什么比赛？\", \"options\": [\"游泳\", \"骑马\", \"表演\", \"画画儿\"], \"answer\": 2, \"citationText\": \"有一次， 一个地方举行一个比赛，看谁表演得更像他\", \"explanationVi\": \"Dựa vào câu: \\\"有一次， 一个地方举行一个比赛，看谁表演得更像他\\\", đáp án chính xác là: 表演.\"}, {\"id\": \"q_c3_026_2\", \"type\": \"single_choice\", \"question\": \"他为什么觉得很好笑？\", \"options\": [\"比赛很乱\", \"大家都很笨\", \"他们都很胖\", \"他没得第一名\"], \"answer\": 3, \"citationText\": \"参加的人有三四十个，他自己也报名参加了， 但没有告诉任何人，结果他得的竟是第三名\", \"explanationVi\": \"Dựa vào câu: \\\"参加的人有三四十个，他自己也报名参加了， 但没有告诉任何人，结果他得的竟是第三名\\\", đáp án chính xác là: 他没得第一名.\"}]",
+    "topic": "Ẩm thực Trung Hoa"
   },
   {
     "id": "RDG_C3_027",
@@ -1172,7 +1832,8 @@
         "explanationVi": "Dựa vào câu: \"昨天，妻子让我陪她去买一双袜子\", đáp án chính xác là: 丈夫."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_027_1\", \"type\": \"single_choice\", \"question\": \"他们计划买什么？\", \"options\": [\"袜子\", \"食品\", \"饮料\", \"洗衣机\"], \"answer\": 0, \"citationText\": \"昨天，妻子让我陪她去买一双袜子\", \"explanationVi\": \"Dựa vào câu: \\\"昨天，妻子让我陪她去买一双袜子\\\", đáp án chính xác là: 袜子.\"}, {\"id\": \"q_c3_027_2\", \"type\": \"single_choice\", \"question\": \"说话人是谁？\", \"options\": [\"丈夫\", \"导游\", \"司机\", \"售货员\"], \"answer\": 0, \"citationText\": \"昨天，妻子让我陪她去买一双袜子\", \"explanationVi\": \"Dựa vào câu: \\\"昨天，妻子让我陪她去买一双袜子\\\", đáp án chính xác là: 丈夫.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_027_1\", \"type\": \"single_choice\", \"question\": \"他们计划买什么？\", \"options\": [\"袜子\", \"食品\", \"饮料\", \"洗衣机\"], \"answer\": 0, \"citationText\": \"昨天，妻子让我陪她去买一双袜子\", \"explanationVi\": \"Dựa vào câu: \\\"昨天，妻子让我陪她去买一双袜子\\\", đáp án chính xác là: 袜子.\"}, {\"id\": \"q_c3_027_2\", \"type\": \"single_choice\", \"question\": \"说话人是谁？\", \"options\": [\"丈夫\", \"导游\", \"司机\", \"售货员\"], \"answer\": 0, \"citationText\": \"昨天，妻子让我陪她去买一双袜子\", \"explanationVi\": \"Dựa vào câu: \\\"昨天，妻子让我陪她去买一双袜子\\\", đáp án chính xác là: 丈夫.\"}]",
+    "topic": "Ẩm thực Trung Hoa"
   },
   {
     "id": "RDG_C3_028",
@@ -1215,7 +1876,8 @@
         "explanationVi": "Dựa vào câu: \"这个时候，我们必须及时改变原计划，以适应新的变化\", đáp án chính xác là: 及时改变计划."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_028_1\", \"type\": \"single_choice\", \"question\": \"如果不适应新情况，会使：\", \"options\": [\"压力减小\", \"心情变差\", \"收入增加\", \"结果不理想\"], \"answer\": 3, \"citationText\": \"人们常说“计划赶不上变化”，它的意思是即使计划安排得再详细再好，也可能被新出现的情况打乱\", \"explanationVi\": \"Dựa vào câu: \\\"人们常说“计划赶不上变化”，它的意思是即使计划安排得再详细再好，也可能被新出现的情况打乱\\\", đáp án chính xác là: 结果不理想.\"}, {\"id\": \"q_c3_028_2\", \"type\": \"single_choice\", \"question\": \"这段话主要想告诉我们，要：\", \"options\": [\"接受批评\", \"有责任心\", \"及时改变计划\", \"多与他人商量\"], \"answer\": 2, \"citationText\": \"这个时候，我们必须及时改变原计划，以适应新的变化\", \"explanationVi\": \"Dựa vào câu: \\\"这个时候，我们必须及时改变原计划，以适应新的变化\\\", đáp án chính xác là: 及时改变计划.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_028_1\", \"type\": \"single_choice\", \"question\": \"如果不适应新情况，会使：\", \"options\": [\"压力减小\", \"心情变差\", \"收入增加\", \"结果不理想\"], \"answer\": 3, \"citationText\": \"人们常说“计划赶不上变化”，它的意思是即使计划安排得再详细再好，也可能被新出现的情况打乱\", \"explanationVi\": \"Dựa vào câu: \\\"人们常说“计划赶不上变化”，它的意思是即使计划安排得再详细再好，也可能被新出现的情况打乱\\\", đáp án chính xác là: 结果不理想.\"}, {\"id\": \"q_c3_028_2\", \"type\": \"single_choice\", \"question\": \"这段话主要想告诉我们，要：\", \"options\": [\"接受批评\", \"有责任心\", \"及时改变计划\", \"多与他人商量\"], \"answer\": 2, \"citationText\": \"这个时候，我们必须及时改变原计划，以适应新的变化\", \"explanationVi\": \"Dựa vào câu: \\\"这个时候，我们必须及时改变原计划，以适应新的变化\\\", đáp án chính xác là: 及时改变计划.\"}]",
+    "topic": "Ẩm thực Trung Hoa"
   },
   {
     "id": "RDG_C3_029",
@@ -1258,7 +1920,8 @@
         "explanationVi": "Dựa vào câu: \"离火车站也很近，交通方便，离您公司也不远， 您可以坐公共汽车甚至可以骑自行车上班， 把身体也锻炼了\", đáp án chính xác là: 交通方便."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_029_1\", \"type\": \"single_choice\", \"question\": \"说话人最可能是做什么的？\", \"options\": [\"记者\", \"租房的\", \"买房的\", \"卖房的\"], \"answer\": 3, \"citationText\": \"这房子家具全，电视、空调、冰箱都有并且都很新\", \"explanationVi\": \"Dựa vào câu: \\\"这房子家具全，电视、空调、冰箱都有并且都很新\\\", đáp án chính xác là: 卖房的.\"}, {\"id\": \"q_c3_029_2\", \"type\": \"single_choice\", \"question\": \"关于这房子，下列哪个正确？\", \"options\": [\"很贵\", \"离机场近\", \"交通方便\", \"周围风景不错\"], \"answer\": 2, \"citationText\": \"离火车站也很近，交通方便，离您公司也不远， 您可以坐公共汽车甚至可以骑自行车上班， 把身体也锻炼了\", \"explanationVi\": \"Dựa vào câu: \\\"离火车站也很近，交通方便，离您公司也不远， 您可以坐公共汽车甚至可以骑自行车上班， 把身体也锻炼了\\\", đáp án chính xác là: 交通方便.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_029_1\", \"type\": \"single_choice\", \"question\": \"说话人最可能是做什么的？\", \"options\": [\"记者\", \"租房的\", \"买房的\", \"卖房的\"], \"answer\": 3, \"citationText\": \"这房子家具全，电视、空调、冰箱都有并且都很新\", \"explanationVi\": \"Dựa vào câu: \\\"这房子家具全，电视、空调、冰箱都有并且都很新\\\", đáp án chính xác là: 卖房的.\"}, {\"id\": \"q_c3_029_2\", \"type\": \"single_choice\", \"question\": \"关于这房子，下列哪个正确？\", \"options\": [\"很贵\", \"离机场近\", \"交通方便\", \"周围风景不错\"], \"answer\": 2, \"citationText\": \"离火车站也很近，交通方便，离您公司也不远， 您可以坐公共汽车甚至可以骑自行车上班， 把身体也锻炼了\", \"explanationVi\": \"Dựa vào câu: \\\"离火车站也很近，交通方便，离您公司也不远， 您可以坐公共汽车甚至可以骑自行车上班， 把身体也锻炼了\\\", đáp án chính xác là: 交通方便.\"}]",
+    "topic": "Ẩm thực Trung Hoa"
   },
   {
     "id": "RDG_C3_030",
@@ -1301,7 +1964,8 @@
         "explanationVi": "Dựa vào câu: \"散步是最简单、也是人们最熟悉的一种运动，对身体大有好处\", đáp án chính xác là: 人们最熟悉."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_030_1\", \"type\": \"single_choice\", \"question\": \"人们越来越关心什么问题?\", \"options\": [\"健康\", \"教育\", \"节日\", \"爱好\"], \"answer\": 0, \"citationText\": \"随着社会的发展，人们越来越关心健康问题，散步也更加受到人们的重视\", \"explanationVi\": \"Dựa vào câu: \\\"随着社会的发展，人们越来越关心健康问题，散步也更加受到人们的重视\\\", đáp án chính xác là: 健康.\"}, {\"id\": \"q_c3_030_2\", \"type\": \"single_choice\", \"question\": \"关于散步这种运动，下列哪个选项正确?\", \"options\": [\"很辛苦\", \"不被重视\", \"不太科学\", \"人们最熟悉\"], \"answer\": 3, \"citationText\": \"散步是最简单、也是人们最熟悉的一种运动，对身体大有好处\", \"explanationVi\": \"Dựa vào câu: \\\"散步是最简单、也是人们最熟悉的一种运动，对身体大有好处\\\", đáp án chính xác là: 人们最熟悉.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_030_1\", \"type\": \"single_choice\", \"question\": \"人们越来越关心什么问题?\", \"options\": [\"健康\", \"教育\", \"节日\", \"爱好\"], \"answer\": 0, \"citationText\": \"随着社会的发展，人们越来越关心健康问题，散步也更加受到人们的重视\", \"explanationVi\": \"Dựa vào câu: \\\"随着社会的发展，人们越来越关心健康问题，散步也更加受到人们的重视\\\", đáp án chính xác là: 健康.\"}, {\"id\": \"q_c3_030_2\", \"type\": \"single_choice\", \"question\": \"关于散步这种运动，下列哪个选项正确?\", \"options\": [\"很辛苦\", \"不被重视\", \"不太科学\", \"人们最熟悉\"], \"answer\": 3, \"citationText\": \"散步是最简单、也是人们最熟悉的一种运动，对身体大有好处\", \"explanationVi\": \"Dựa vào câu: \\\"散步是最简单、也是人们最熟悉的一种运动，对身体大有好处\\\", đáp án chính xác là: 人们最熟悉.\"}]",
+    "topic": "Ẩm thực Trung Hoa"
   },
   {
     "id": "RDG_C3_031",
@@ -1344,7 +2008,8 @@
         "explanationVi": "Dựa vào câu: \"赵老师：您好!毕业班的所有老师们是我们最可信赖的依靠\", đáp án chính xác là: 学生写给赵老师的."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_031_1\", \"type\": \"single_choice\", \"question\": \"学生此时要表达的心情是：\", \"options\": [\"思念老师\", \"担心并祝福老师\", \"感谢老师\", \"保重自己\"], \"answer\": 1, \"citationText\": \"你们的身体健康是毕业班的福气，你们放心不下学生，学生们也不忍心看着老师们累垮\", \"explanationVi\": \"Dựa vào câu: \\\"你们的身体健康是毕业班的福气，你们放心不下学生，学生们也不忍心看着老师们累垮\\\", đáp án chính xác là: 担心并祝福老师.\"}, {\"id\": \"q_c3_031_2\", \"type\": \"single_choice\", \"question\": \"这封信是谁写给谁的?\", \"options\": [\"学生写给赵老师的\", \"学生写给所有老师的\", \"赵老师写给学生的\", \"所有老师写给学生的\"], \"answer\": 0, \"citationText\": \"赵老师：您好!毕业班的所有老师们是我们最可信赖的依靠\", \"explanationVi\": \"Dựa vào câu: \\\"赵老师：您好!毕业班的所有老师们是我们最可信赖的依靠\\\", đáp án chính xác là: 学生写给赵老师的.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_031_1\", \"type\": \"single_choice\", \"question\": \"学生此时要表达的心情是：\", \"options\": [\"思念老师\", \"担心并祝福老师\", \"感谢老师\", \"保重自己\"], \"answer\": 1, \"citationText\": \"你们的身体健康是毕业班的福气，你们放心不下学生，学生们也不忍心看着老师们累垮\", \"explanationVi\": \"Dựa vào câu: \\\"你们的身体健康是毕业班的福气，你们放心不下学生，学生们也不忍心看着老师们累垮\\\", đáp án chính xác là: 担心并祝福老师.\"}, {\"id\": \"q_c3_031_2\", \"type\": \"single_choice\", \"question\": \"这封信是谁写给谁的?\", \"options\": [\"学生写给赵老师的\", \"学生写给所有老师的\", \"赵老师写给学生的\", \"所有老师写给学生的\"], \"answer\": 0, \"citationText\": \"赵老师：您好!毕业班的所有老师们是我们最可信赖的依靠\", \"explanationVi\": \"Dựa vào câu: \\\"赵老师：您好!毕业班的所有老师们是我们最可信赖的依靠\\\", đáp án chính xác là: 学生写给赵老师的.\"}]",
+    "topic": "Ẩm thực Trung Hoa"
   },
   {
     "id": "RDG_C3_032",
@@ -1387,7 +2052,8 @@
         "explanationVi": "Dựa vào câu: \"我们现在正举办免费试用活动，很多人用过之后，都说效果非常好，您还在等什么\", đáp án chính xác là: 免费试用."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_032_1\", \"type\": \"single_choice\", \"question\": \"“水之印象”有什么作用？\", \"options\": [\"让人更成熟\", \"让皮肤湿润\", \"让空气湿润\", \"让人很凉快\"], \"answer\": 1, \"citationText\": \"我们的 “水之印象” 可以让您的皮肤在干燥的冬季喝饱水\", \"explanationVi\": \"Dựa vào câu: \\\"我们的 “水之印象” 可以让您的皮肤在干燥的冬季喝饱水\\\", đáp án chính xác là: 让皮肤湿润.\"}, {\"id\": \"q_c3_032_2\", \"type\": \"single_choice\", \"question\": \"他们正在举办什么活动？\", \"options\": [\"免费试用\", \"买一送一\", \"半价出售\", \"九折出售\"], \"answer\": 0, \"citationText\": \"我们现在正举办免费试用活动，很多人用过之后，都说效果非常好，您还在等什么\", \"explanationVi\": \"Dựa vào câu: \\\"我们现在正举办免费试用活动，很多人用过之后，都说效果非常好，您还在等什么\\\", đáp án chính xác là: 免费试用.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_032_1\", \"type\": \"single_choice\", \"question\": \"“水之印象”有什么作用？\", \"options\": [\"让人更成熟\", \"让皮肤湿润\", \"让空气湿润\", \"让人很凉快\"], \"answer\": 1, \"citationText\": \"我们的 “水之印象” 可以让您的皮肤在干燥的冬季喝饱水\", \"explanationVi\": \"Dựa vào câu: \\\"我们的 “水之印象” 可以让您的皮肤在干燥的冬季喝饱水\\\", đáp án chính xác là: 让皮肤湿润.\"}, {\"id\": \"q_c3_032_2\", \"type\": \"single_choice\", \"question\": \"他们正在举办什么活动？\", \"options\": [\"免费试用\", \"买一送一\", \"半价出售\", \"九折出售\"], \"answer\": 0, \"citationText\": \"我们现在正举办免费试用活动，很多人用过之后，都说效果非常好，您还在等什么\", \"explanationVi\": \"Dựa vào câu: \\\"我们现在正举办免费试用活动，很多人用过之后，都说效果非常好，您还在等什么\\\", đáp án chính xác là: 免费试用.\"}]",
+    "topic": "Ẩm thực Trung Hoa"
   },
   {
     "id": "RDG_C3_033",
@@ -1430,7 +2096,8 @@
         "explanationVi": "Dựa vào câu: \"有个人出名之前，穿得很随便\", đáp án chính xác là: 成为了名人."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_033_1\", \"type\": \"single_choice\", \"question\": \"朋友对他说什么了？\", \"options\": [\"不要骄傲\", \"买件大衣\", \"要努力工作\", \"别忘了过去\"], \"answer\": 1, \"citationText\": \"朋友对他说，应该买件漂亮的大衣\", \"explanationVi\": \"Dựa vào câu: \\\"朋友对他说，应该买件漂亮的大衣\\\", đáp án chính xác là: 买件大衣.\"}, {\"id\": \"q_c3_033_2\", \"type\": \"single_choice\", \"question\": \"关于那个人，可以知道什么？\", \"options\": [\"很活泼\", \"后来很穷\", \"喜欢弹钢琴\", \"成为了名人\"], \"answer\": 3, \"citationText\": \"有个人出名之前，穿得很随便\", \"explanationVi\": \"Dựa vào câu: \\\"有个人出名之前，穿得很随便\\\", đáp án chính xác là: 成为了名人.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_033_1\", \"type\": \"single_choice\", \"question\": \"朋友对他说什么了？\", \"options\": [\"不要骄傲\", \"买件大衣\", \"要努力工作\", \"别忘了过去\"], \"answer\": 1, \"citationText\": \"朋友对他说，应该买件漂亮的大衣\", \"explanationVi\": \"Dựa vào câu: \\\"朋友对他说，应该买件漂亮的大衣\\\", đáp án chính xác là: 买件大衣.\"}, {\"id\": \"q_c3_033_2\", \"type\": \"single_choice\", \"question\": \"关于那个人，可以知道什么？\", \"options\": [\"很活泼\", \"后来很穷\", \"喜欢弹钢琴\", \"成为了名人\"], \"answer\": 3, \"citationText\": \"有个人出名之前，穿得很随便\", \"explanationVi\": \"Dựa vào câu: \\\"有个人出名之前，穿得很随便\\\", đáp án chính xác là: 成为了名人.\"}]",
+    "topic": "Du lịch & Khám phá"
   },
   {
     "id": "RDG_C3_034",
@@ -1473,7 +2140,8 @@
         "explanationVi": "Dựa vào câu: \"今天是国庆长假第一天，全国各主要旅游城市和景区游客明显增多，节日气氛很浓\", đáp án chính xác là: 以上三项."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_034_1\", \"type\": \"single_choice\", \"question\": \"这则报道主要讲了什么事?\", \"options\": [\"“十一”期间收入情况\", \"“十一”期间台风情况\", \"“十一”期间各地旅游情况\", \"“十一”期间人口流动情况\"], \"answer\": 2, \"citationText\": \"今天是国庆长假第一天，全国各主要旅游城市和景区游客明显增多，节日气氛很浓\", \"explanationVi\": \"Dựa vào câu: \\\"今天是国庆长假第一天，全国各主要旅游城市和景区游客明显增多，节日气氛很浓\\\", đáp án chính xác là: “十一”期间各地旅游情况.\"}, {\"id\": \"q_c3_034_2\", \"type\": \"single_choice\", \"question\": \"国庆第一天哪些旅游项目明显多起来?\", \"options\": [\"短途旅游\", \"自驾车游\", \"乡村旅游\", \"以上三项\"], \"answer\": 3, \"citationText\": \"今天是国庆长假第一天，全国各主要旅游城市和景区游客明显增多，节日气氛很浓\", \"explanationVi\": \"Dựa vào câu: \\\"今天是国庆长假第一天，全国各主要旅游城市和景区游客明显增多，节日气氛很浓\\\", đáp án chính xác là: 以上三项.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_034_1\", \"type\": \"single_choice\", \"question\": \"这则报道主要讲了什么事?\", \"options\": [\"“十一”期间收入情况\", \"“十一”期间台风情况\", \"“十一”期间各地旅游情况\", \"“十一”期间人口流动情况\"], \"answer\": 2, \"citationText\": \"今天是国庆长假第一天，全国各主要旅游城市和景区游客明显增多，节日气氛很浓\", \"explanationVi\": \"Dựa vào câu: \\\"今天是国庆长假第一天，全国各主要旅游城市和景区游客明显增多，节日气氛很浓\\\", đáp án chính xác là: “十一”期间各地旅游情况.\"}, {\"id\": \"q_c3_034_2\", \"type\": \"single_choice\", \"question\": \"国庆第一天哪些旅游项目明显多起来?\", \"options\": [\"短途旅游\", \"自驾车游\", \"乡村旅游\", \"以上三项\"], \"answer\": 3, \"citationText\": \"今天是国庆长假第一天，全国各主要旅游城市和景区游客明显增多，节日气氛很浓\", \"explanationVi\": \"Dựa vào câu: \\\"今天是国庆长假第一天，全国各主要旅游城市和景区游客明显增多，节日气氛很浓\\\", đáp án chính xác là: 以上三项.\"}]",
+    "topic": "Du lịch & Khám phá"
   },
   {
     "id": "RDG_C3_035",
@@ -1516,7 +2184,8 @@
         "explanationVi": "Dựa vào câu: \"大家都说，学功夫不但可以锻炼身体，还能在学习的过程中了解中国文化\", đáp án chính xác là: 了解中国文化."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_035_1\", \"type\": \"single_choice\", \"question\": \"根据这段话，中国功夫：\", \"options\": [\"很难学\", \"越来越流行\", \"动作较简单\", \"多是年轻人学\"], \"answer\": 1, \"citationText\": \"近年来，中国功夫慢慢流行起来了，连很多外国人也开始对其感兴趣\", \"explanationVi\": \"Dựa vào câu: \\\"近年来，中国功夫慢慢流行起来了，连很多外国人也开始对其感兴趣\\\", đáp án chính xác là: 越来越流行.\"}, {\"id\": \"q_c3_035_2\", \"type\": \"single_choice\", \"question\": \"根据这段话，学习中国功夫对什么有帮助?\", \"options\": [\"说普通话\", \"保护别人\", \"了解中国文化\", \"提高科学技术\"], \"answer\": 2, \"citationText\": \"大家都说，学功夫不但可以锻炼身体，还能在学习的过程中了解中国文化\", \"explanationVi\": \"Dựa vào câu: \\\"大家都说，学功夫不但可以锻炼身体，还能在学习的过程中了解中国文化\\\", đáp án chính xác là: 了解中国文化.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_035_1\", \"type\": \"single_choice\", \"question\": \"根据这段话，中国功夫：\", \"options\": [\"很难学\", \"越来越流行\", \"动作较简单\", \"多是年轻人学\"], \"answer\": 1, \"citationText\": \"近年来，中国功夫慢慢流行起来了，连很多外国人也开始对其感兴趣\", \"explanationVi\": \"Dựa vào câu: \\\"近年来，中国功夫慢慢流行起来了，连很多外国人也开始对其感兴趣\\\", đáp án chính xác là: 越来越流行.\"}, {\"id\": \"q_c3_035_2\", \"type\": \"single_choice\", \"question\": \"根据这段话，学习中国功夫对什么有帮助?\", \"options\": [\"说普通话\", \"保护别人\", \"了解中国文化\", \"提高科学技术\"], \"answer\": 2, \"citationText\": \"大家都说，学功夫不但可以锻炼身体，还能在学习的过程中了解中国文化\", \"explanationVi\": \"Dựa vào câu: \\\"大家都说，学功夫不但可以锻炼身体，还能在学习的过程中了解中国文化\\\", đáp án chính xác là: 了解中国文化.\"}]",
+    "topic": "Du lịch & Khám phá"
   },
   {
     "id": "RDG_C3_036",
@@ -1573,7 +2242,8 @@
         "explanationVi": "Dựa vào câu: \"我的用途也非常广泛，可以管理工厂、控制机器，可以用来写文章，还可以当医生……如果没有我，现代科技、社会进步就不会这么大\", đáp án chính xác là: 写文章."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_036_1\", \"type\": \"single_choice\", \"question\": \"电脑由几部分组成?\", \"options\": [\"两部分\", \"三部分\", \"四部分\", \"五部分\"], \"answer\": 1, \"citationText\": \"我叫电脑，是个电子机器，我由显示器、键盘、主机组成，我的本领可大了，而且具有其他机器所不具备的三件法宝，那就是：高速、高精确的运算能力，高超的记忆能力和准确的逻辑判断能力\", \"explanationVi\": \"Dựa vào câu: \\\"我叫电脑，是个电子机器，我由显示器、键盘、主机组成，我的本领可大了，而且具有其他机器所不具备的三件法宝，那就是：高速、高精确的运算能力，高超的记忆能力和准确的逻辑判断能力\\\", đáp án chính xác là: 三部分.\"}, {\"id\": \"q_c3_036_2\", \"type\": \"single_choice\", \"question\": \"这段话中没提到电脑的哪种能力?\", \"options\": [\"运算能力\", \"记忆能力\", \"判断能力\", \"识别能力\"], \"answer\": 3, \"citationText\": \"我叫电脑，是个电子机器，我由显示器、键盘、主机组成，我的本领可大了，而且具有其他机器所不具备的三件法宝，那就是：高速、高精确的运算能力，高超的记忆能力和准确的逻辑判断能力\", \"explanationVi\": \"Dựa vào câu: \\\"我叫电脑，是个电子机器，我由显示器、键盘、主机组成，我的本领可大了，而且具有其他机器所不具备的三件法宝，那就是：高速、高精确的运算能力，高超的记忆能力和准确的逻辑判断能力\\\", đáp án chính xác là: 识别能力.\"}, {\"id\": \"q_c3_036_3\", \"type\": \"single_choice\", \"question\": \"关于电脑的用途上文提到的是哪个?\", \"options\": [\"画画儿\", \"写文章\", \"售票员\", \"当教师\"], \"answer\": 1, \"citationText\": \"我的用途也非常广泛，可以管理工厂、控制机器，可以用来写文章，还可以当医生……如果没有我，现代科技、社会进步就不会这么大\", \"explanationVi\": \"Dựa vào câu: \\\"我的用途也非常广泛，可以管理工厂、控制机器，可以用来写文章，还可以当医生……如果没有我，现代科技、社会进步就不会这么大\\\", đáp án chính xác là: 写文章.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_036_1\", \"type\": \"single_choice\", \"question\": \"电脑由几部分组成?\", \"options\": [\"两部分\", \"三部分\", \"四部分\", \"五部分\"], \"answer\": 1, \"citationText\": \"我叫电脑，是个电子机器，我由显示器、键盘、主机组成，我的本领可大了，而且具有其他机器所不具备的三件法宝，那就是：高速、高精确的运算能力，高超的记忆能力和准确的逻辑判断能力\", \"explanationVi\": \"Dựa vào câu: \\\"我叫电脑，是个电子机器，我由显示器、键盘、主机组成，我的本领可大了，而且具有其他机器所不具备的三件法宝，那就是：高速、高精确的运算能力，高超的记忆能力和准确的逻辑判断能力\\\", đáp án chính xác là: 三部分.\"}, {\"id\": \"q_c3_036_2\", \"type\": \"single_choice\", \"question\": \"这段话中没提到电脑的哪种能力?\", \"options\": [\"运算能力\", \"记忆能力\", \"判断能力\", \"识别能力\"], \"answer\": 3, \"citationText\": \"我叫电脑，是个电子机器，我由显示器、键盘、主机组成，我的本领可大了，而且具有其他机器所不具备的三件法宝，那就是：高速、高精确的运算能力，高超的记忆能力和准确的逻辑判断能力\", \"explanationVi\": \"Dựa vào câu: \\\"我叫电脑，是个电子机器，我由显示器、键盘、主机组成，我的本领可大了，而且具有其他机器所不具备的三件法宝，那就是：高速、高精确的运算能力，高超的记忆能力和准确的逻辑判断能力\\\", đáp án chính xác là: 识别能力.\"}, {\"id\": \"q_c3_036_3\", \"type\": \"single_choice\", \"question\": \"关于电脑的用途上文提到的是哪个?\", \"options\": [\"画画儿\", \"写文章\", \"售票员\", \"当教师\"], \"answer\": 1, \"citationText\": \"我的用途也非常广泛，可以管理工厂、控制机器，可以用来写文章，还可以当医生……如果没有我，现代科技、社会进步就不会这么大\", \"explanationVi\": \"Dựa vào câu: \\\"我的用途也非常广泛，可以管理工厂、控制机器，可以用来写文章，还可以当医生……如果没有我，现代科技、社会进步就不会这么大\\\", đáp án chính xác là: 写文章.\"}]",
+    "topic": "Du lịch & Khám phá"
   },
   {
     "id": "RDG_C3_037",
@@ -1616,7 +2286,8 @@
         "explanationVi": "Dựa vào câu: \"在地铁或公共汽车上，总有很多人低着头玩手机，这些人就是人们口中的“低头族”\", đáp án chính xác là: 影响人们的关系."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_037_1\", \"type\": \"single_choice\", \"question\": \"作者对“低头族”的态度最可能是：\", \"options\": [\"反对\", \"鼓励\", \"怀疑\", \"不关心\"], \"answer\": 0, \"citationText\": \"在地铁或公共汽车上，总有很多人低着头玩手机，这些人就是人们口中的“低头族”\", \"explanationVi\": \"Dựa vào câu: \\\"在地铁或公共汽车上，总有很多人低着头玩手机，这些人就是人们口中的“低头族”\\\", đáp án chính xác là: 反对.\"}, {\"id\": \"q_c3_037_2\", \"type\": \"single_choice\", \"question\": \"网友那句话说明总是低头玩手机会：\", \"options\": [\"使人变懒\", \"让人变笨\", \"对身体不好\", \"影响人们的关系\"], \"answer\": 3, \"citationText\": \"在地铁或公共汽车上，总有很多人低着头玩手机，这些人就是人们口中的“低头族”\", \"explanationVi\": \"Dựa vào câu: \\\"在地铁或公共汽车上，总有很多人低着头玩手机，这些人就是人们口中的“低头族”\\\", đáp án chính xác là: 影响人们的关系.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_037_1\", \"type\": \"single_choice\", \"question\": \"作者对“低头族”的态度最可能是：\", \"options\": [\"反对\", \"鼓励\", \"怀疑\", \"不关心\"], \"answer\": 0, \"citationText\": \"在地铁或公共汽车上，总有很多人低着头玩手机，这些人就是人们口中的“低头族”\", \"explanationVi\": \"Dựa vào câu: \\\"在地铁或公共汽车上，总有很多人低着头玩手机，这些人就是人们口中的“低头族”\\\", đáp án chính xác là: 反对.\"}, {\"id\": \"q_c3_037_2\", \"type\": \"single_choice\", \"question\": \"网友那句话说明总是低头玩手机会：\", \"options\": [\"使人变懒\", \"让人变笨\", \"对身体不好\", \"影响人们的关系\"], \"answer\": 3, \"citationText\": \"在地铁或公共汽车上，总有很多人低着头玩手机，这些人就是人们口中的“低头族”\", \"explanationVi\": \"Dựa vào câu: \\\"在地铁或公共汽车上，总有很多人低着头玩手机，这些人就是人们口中的“低头族”\\\", đáp án chính xác là: 影响人们的关系.\"}]",
+    "topic": "Du lịch & Khám phá"
   },
   {
     "id": "RDG_C3_038",
@@ -1673,7 +2344,8 @@
         "explanationVi": "Dựa vào câu: \"至于第三种人，要以礼相待、和平共处\", đáp án chính xác là: 和平相处."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_038_1\", \"type\": \"single_choice\", \"question\": \"关于第一种人，可以知道什么?\", \"options\": [\"非常骄傲\", \"很容易遇到\", \"可以成为师友\", \"喜欢回忆过去\"], \"answer\": 2, \"citationText\": \"第一种人对自己有很大帮助，应当尊为师友，尽力报答\", \"explanationVi\": \"Dựa vào câu: \\\"第一种人对自己有很大帮助，应当尊为师友，尽力报答\\\", đáp án chính xác là: 可以成为师友.\"}, {\"id\": \"q_c3_038_2\", \"type\": \"single_choice\", \"question\": \"我们为什么要远离第二种人?\", \"options\": [\"他们喜欢骗人\", \"他们脾气不好\", \"他们要求太多\", \"他们会伤害我们\"], \"answer\": 3, \"citationText\": \"第二种人会对自己造成深深的伤害，需要远离，而不是为之烦恼\", \"explanationVi\": \"Dựa vào câu: \\\"第二种人会对自己造成深深的伤害，需要远离，而不是为之烦恼\\\", đáp án chính xác là: 他们会伤害我们.\"}, {\"id\": \"q_c3_038_3\", \"type\": \"single_choice\", \"question\": \"怎样对待第三种人?\", \"options\": [\"多接触\", \"和平相处\", \"保持距离\", \"公平竞争\"], \"answer\": 1, \"citationText\": \"至于第三种人，要以礼相待、和平共处\", \"explanationVi\": \"Dựa vào câu: \\\"至于第三种人，要以礼相待、和平共处\\\", đáp án chính xác là: 和平相处.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_038_1\", \"type\": \"single_choice\", \"question\": \"关于第一种人，可以知道什么?\", \"options\": [\"非常骄傲\", \"很容易遇到\", \"可以成为师友\", \"喜欢回忆过去\"], \"answer\": 2, \"citationText\": \"第一种人对自己有很大帮助，应当尊为师友，尽力报答\", \"explanationVi\": \"Dựa vào câu: \\\"第一种人对自己有很大帮助，应当尊为师友，尽力报答\\\", đáp án chính xác là: 可以成为师友.\"}, {\"id\": \"q_c3_038_2\", \"type\": \"single_choice\", \"question\": \"我们为什么要远离第二种人?\", \"options\": [\"他们喜欢骗人\", \"他们脾气不好\", \"他们要求太多\", \"他们会伤害我们\"], \"answer\": 3, \"citationText\": \"第二种人会对自己造成深深的伤害，需要远离，而不是为之烦恼\", \"explanationVi\": \"Dựa vào câu: \\\"第二种人会对自己造成深深的伤害，需要远离，而不是为之烦恼\\\", đáp án chính xác là: 他们会伤害我们.\"}, {\"id\": \"q_c3_038_3\", \"type\": \"single_choice\", \"question\": \"怎样对待第三种人?\", \"options\": [\"多接触\", \"和平相处\", \"保持距离\", \"公平竞争\"], \"answer\": 1, \"citationText\": \"至于第三种人，要以礼相待、和平共处\", \"explanationVi\": \"Dựa vào câu: \\\"至于第三种人，要以礼相待、和平共处\\\", đáp án chính xác là: 和平相处.\"}]",
+    "topic": "Du lịch & Khám phá"
   },
   {
     "id": "RDG_C3_039",
@@ -1716,7 +2388,8 @@
         "explanationVi": "Dựa vào câu: \"“习惯成自然”这句话是说，一件事我们做的次数越多，就会越熟悉，习惯就会慢慢地养成\", đáp án chính xác là: 贵在坚持."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_039_1\", \"type\": \"single_choice\", \"question\": \"刚开始运动时，很多人会觉得：\", \"options\": [\"很紧张\", \"没意思\", \"很孤单\", \"极其简单\"], \"answer\": 1, \"citationText\": \"就拿运动来说，不少人刚开始运动时，会感觉十分无聊，于是很快就放弃了\", \"explanationVi\": \"Dựa vào câu: \\\"就拿运动来说，不少人刚开始运动时，会感觉十分无聊，于是很快就放弃了\\\", đáp án chính xác là: 没意思.\"}, {\"id\": \"q_c3_039_2\", \"type\": \"single_choice\", \"question\": \"根据这段话，养成好习惯：\", \"options\": [\"贵在坚持\", \"仍然无聊\", \"要多听意见\", \"需要别人帮忙\"], \"answer\": 0, \"citationText\": \"“习惯成自然”这句话是说，一件事我们做的次数越多，就会越熟悉，习惯就会慢慢地养成\", \"explanationVi\": \"Dựa vào câu: \\\"“习惯成自然”这句话是说，一件事我们做的次数越多，就会越熟悉，习惯就会慢慢地养成\\\", đáp án chính xác là: 贵在坚持.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_039_1\", \"type\": \"single_choice\", \"question\": \"刚开始运动时，很多人会觉得：\", \"options\": [\"很紧张\", \"没意思\", \"很孤单\", \"极其简单\"], \"answer\": 1, \"citationText\": \"就拿运动来说，不少人刚开始运动时，会感觉十分无聊，于是很快就放弃了\", \"explanationVi\": \"Dựa vào câu: \\\"就拿运动来说，不少人刚开始运动时，会感觉十分无聊，于是很快就放弃了\\\", đáp án chính xác là: 没意思.\"}, {\"id\": \"q_c3_039_2\", \"type\": \"single_choice\", \"question\": \"根据这段话，养成好习惯：\", \"options\": [\"贵在坚持\", \"仍然无聊\", \"要多听意见\", \"需要别人帮忙\"], \"answer\": 0, \"citationText\": \"“习惯成自然”这句话是说，一件事我们做的次数越多，就会越熟悉，习惯就会慢慢地养成\", \"explanationVi\": \"Dựa vào câu: \\\"“习惯成自然”这句话是说，一件事我们做的次数越多，就会越熟悉，习惯就会慢慢地养成\\\", đáp án chính xác là: 贵在坚持.\"}]",
+    "topic": "Du lịch & Khám phá"
   },
   {
     "id": "RDG_C3_040",
@@ -1759,7 +2432,8 @@
         "explanationVi": "Dựa vào câu: \"科学技术的发展确实给生活带来了许多方便，但也给我们增加了不少烦恼\", đáp án chính xác là: 科学技术."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_040_1\", \"type\": \"single_choice\", \"question\": \"人们需要记住什么？\", \"options\": [\"友谊\", \"答案\", \"密码\", \"号码\"], \"answer\": 2, \"citationText\": \"最普遍的是，每个现代人头脑中都要记住很多密码：信用卡需要密码，电脑需要密码，电子信箱需要密码，有时候甚至连开门都需要密码\", \"explanationVi\": \"Dựa vào câu: \\\"最普遍的是，每个现代人头脑中都要记住很多密码：信用卡需要密码，电脑需要密码，电子信箱需要密码，有时候甚至连开门都需要密码\\\", đáp án chính xác là: 密码.\"}, {\"id\": \"q_c3_040_2\", \"type\": \"single_choice\", \"question\": \"给人们带来烦恼的是：\", \"options\": [\"科学技术\", \"电子信箱\", \"工作压力\", \"环境污染\"], \"answer\": 0, \"citationText\": \"科学技术的发展确实给生活带来了许多方便，但也给我们增加了不少烦恼\", \"explanationVi\": \"Dựa vào câu: \\\"科学技术的发展确实给生活带来了许多方便，但也给我们增加了不少烦恼\\\", đáp án chính xác là: 科学技术.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_040_1\", \"type\": \"single_choice\", \"question\": \"人们需要记住什么？\", \"options\": [\"友谊\", \"答案\", \"密码\", \"号码\"], \"answer\": 2, \"citationText\": \"最普遍的是，每个现代人头脑中都要记住很多密码：信用卡需要密码，电脑需要密码，电子信箱需要密码，有时候甚至连开门都需要密码\", \"explanationVi\": \"Dựa vào câu: \\\"最普遍的是，每个现代人头脑中都要记住很多密码：信用卡需要密码，电脑需要密码，电子信箱需要密码，有时候甚至连开门都需要密码\\\", đáp án chính xác là: 密码.\"}, {\"id\": \"q_c3_040_2\", \"type\": \"single_choice\", \"question\": \"给人们带来烦恼的是：\", \"options\": [\"科学技术\", \"电子信箱\", \"工作压力\", \"环境污染\"], \"answer\": 0, \"citationText\": \"科学技术的发展确实给生活带来了许多方便，但也给我们增加了不少烦恼\", \"explanationVi\": \"Dựa vào câu: \\\"科学技术的发展确实给生活带来了许多方便，但也给我们增加了不少烦恼\\\", đáp án chính xác là: 科学技术.\"}]",
+    "topic": "Du lịch & Khám phá"
   },
   {
     "id": "RDG_C3_041",
@@ -1802,7 +2476,8 @@
         "explanationVi": "Dựa vào câu: \"各位旅客，你们好!现在广播紧急通知，第12号车厢有一位老人突然生病，呼吸困难\", đáp án chính xác là: 有一位老人突然病了."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_041_1\", \"type\": \"single_choice\", \"question\": \"这段话可能是在什么地方说的?\", \"options\": [\"汽车上\", \"火车上\", \"地铁上\", \"飞机上\"], \"answer\": 1, \"citationText\": \"另外，下站将到达苏州站，我们已联系了苏州当地的医院，120救护车将在站台迎接病人\", \"explanationVi\": \"Dựa vào câu: \\\"另外，下站将到达苏州站，我们已联系了苏州当地的医院，120救护车将在站台迎接病人\\\", đáp án chính xác là: 火车上.\"}, {\"id\": \"q_c3_041_2\", \"type\": \"single_choice\", \"question\": \"根据这段话，可以知道什么?\", \"options\": [\"医生要下车帮助病人\", \"在苏州站只停15分钟\", \"有一位老人突然病了\", \"有一位老人要去苏州\"], \"answer\": 2, \"citationText\": \"各位旅客，你们好!现在广播紧急通知，第12号车厢有一位老人突然生病，呼吸困难\", \"explanationVi\": \"Dựa vào câu: \\\"各位旅客，你们好!现在广播紧急通知，第12号车厢有一位老人突然生病，呼吸困难\\\", đáp án chính xác là: 有一位老人突然病了.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_041_1\", \"type\": \"single_choice\", \"question\": \"这段话可能是在什么地方说的?\", \"options\": [\"汽车上\", \"火车上\", \"地铁上\", \"飞机上\"], \"answer\": 1, \"citationText\": \"另外，下站将到达苏州站，我们已联系了苏州当地的医院，120救护车将在站台迎接病人\", \"explanationVi\": \"Dựa vào câu: \\\"另外，下站将到达苏州站，我们已联系了苏州当地的医院，120救护车将在站台迎接病人\\\", đáp án chính xác là: 火车上.\"}, {\"id\": \"q_c3_041_2\", \"type\": \"single_choice\", \"question\": \"根据这段话，可以知道什么?\", \"options\": [\"医生要下车帮助病人\", \"在苏州站只停15分钟\", \"有一位老人突然病了\", \"有一位老人要去苏州\"], \"answer\": 2, \"citationText\": \"各位旅客，你们好!现在广播紧急通知，第12号车厢有一位老人突然生病，呼吸困难\", \"explanationVi\": \"Dựa vào câu: \\\"各位旅客，你们好!现在广播紧急通知，第12号车厢有一位老人突然生病，呼吸困难\\\", đáp án chính xác là: 有一位老人突然病了.\"}]",
+    "topic": "Du lịch & Khám phá"
   },
   {
     "id": "RDG_C3_042",
@@ -1845,7 +2520,8 @@
         "explanationVi": "Dựa vào câu: \"北京市地税局昨天表示，虽然根据今年1月1日实施的《中华人民共和国车船税暂行条例》的规定，车船税将由保险机构代收代缴，但鉴于本市车船税实施办法刚刚出台，大部分纳税人已办理了机动车交强险手续，为方便纳税人缴纳税款，暂不实施由保险机构代收代缴税款，因此，新车仍然需要去税务机关窗口申报缴纳\", đáp án chính xác là: 税务机关."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_042_1\", \"type\": \"single_choice\", \"question\": \"根据文章意思，可以替换“鉴于”的词语是：\", \"options\": [\"由于\", \"关于\", \"对于\", \"便于\"], \"answer\": 0, \"citationText\": \"北京市地税局昨天表示，虽然根据今年1月1日实施的《中华人民共和国车船税暂行条例》的规定，车船税将由保险机构代收代缴，但鉴于本市车船税实施办法刚刚出台，大部分纳税人已办理了机动车交强险手续，为方便纳税人缴纳税款，暂不实施由保险机构代收代缴税款，因此，新车仍然需要去税务机关窗口申报缴纳\", \"explanationVi\": \"Dựa vào câu: \\\"北京市地税局昨天表示，虽然根据今年1月1日实施的《中华人民共和国车船税暂行条例》的规定，车船税将由保险机构代收代缴，但鉴于本市车船税实施办法刚刚出台，大部分纳税人已办理了机动车交强险手续，为方便纳税人缴纳税款，暂不实施由保险机构代收代缴税款，因此，新车仍然需要去税务机关窗口申报缴纳\\\", đáp án chính xác là: 由于.\"}, {\"id\": \"q_c3_042_2\", \"type\": \"single_choice\", \"question\": \"根据短文内容，现在应该去哪儿缴纳车船税?\", \"options\": [\"交通部门\", \"保险机构\", \"税务机关\", \"汽车销售部门\"], \"answer\": 2, \"citationText\": \"北京市地税局昨天表示，虽然根据今年1月1日实施的《中华人民共和国车船税暂行条例》的规定，车船税将由保险机构代收代缴，但鉴于本市车船税实施办法刚刚出台，大部分纳税人已办理了机动车交强险手续，为方便纳税人缴纳税款，暂不实施由保险机构代收代缴税款，因此，新车仍然需要去税务机关窗口申报缴纳\", \"explanationVi\": \"Dựa vào câu: \\\"北京市地税局昨天表示，虽然根据今年1月1日实施的《中华人民共和国车船税暂行条例》的规定，车船税将由保险机构代收代缴，但鉴于本市车船税实施办法刚刚出台，大部分纳税人已办理了机动车交强险手续，为方便纳税人缴纳税款，暂不实施由保险机构代收代缴税款，因此，新车仍然需要去税务机关窗口申报缴纳\\\", đáp án chính xác là: 税务机关.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_042_1\", \"type\": \"single_choice\", \"question\": \"根据文章意思，可以替换“鉴于”的词语是：\", \"options\": [\"由于\", \"关于\", \"对于\", \"便于\"], \"answer\": 0, \"citationText\": \"北京市地税局昨天表示，虽然根据今年1月1日实施的《中华人民共和国车船税暂行条例》的规定，车船税将由保险机构代收代缴，但鉴于本市车船税实施办法刚刚出台，大部分纳税人已办理了机动车交强险手续，为方便纳税人缴纳税款，暂不实施由保险机构代收代缴税款，因此，新车仍然需要去税务机关窗口申报缴纳\", \"explanationVi\": \"Dựa vào câu: \\\"北京市地税局昨天表示，虽然根据今年1月1日实施的《中华人民共和国车船税暂行条例》的规定，车船税将由保险机构代收代缴，但鉴于本市车船税实施办法刚刚出台，大部分纳税人已办理了机动车交强险手续，为方便纳税人缴纳税款，暂不实施由保险机构代收代缴税款，因此，新车仍然需要去税务机关窗口申报缴纳\\\", đáp án chính xác là: 由于.\"}, {\"id\": \"q_c3_042_2\", \"type\": \"single_choice\", \"question\": \"根据短文内容，现在应该去哪儿缴纳车船税?\", \"options\": [\"交通部门\", \"保险机构\", \"税务机关\", \"汽车销售部门\"], \"answer\": 2, \"citationText\": \"北京市地税局昨天表示，虽然根据今年1月1日实施的《中华人民共和国车船税暂行条例》的规定，车船税将由保险机构代收代缴，但鉴于本市车船税实施办法刚刚出台，大部分纳税人已办理了机动车交强险手续，为方便纳税人缴纳税款，暂不实施由保险机构代收代缴税款，因此，新车仍然需要去税务机关窗口申报缴纳\", \"explanationVi\": \"Dựa vào câu: \\\"北京市地税局昨天表示，虽然根据今年1月1日实施的《中华人民共和国车船税暂行条例》的规定，车船税将由保险机构代收代缴，但鉴于本市车船税实施办法刚刚出台，大部分纳税人已办理了机动车交强险手续，为方便纳税人缴纳税款，暂不实施由保险机构代收代缴税款，因此，新车仍然需要去税务机关窗口申报缴纳\\\", đáp án chính xác là: 税务机关.\"}]",
+    "topic": "Du lịch & Khám phá"
   },
   {
     "id": "RDG_C3_043",
@@ -1888,7 +2564,8 @@
         "explanationVi": "Dựa vào câu: \"所以，夜晚天空中如果有许多星星，就表示当时空气比较干燥，而且第二天很可能会是晴天\", đáp án chính xác là: 第二天可能是晴天."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_043_1\", \"type\": \"single_choice\", \"question\": \"星星的多少和什么有关?\", \"options\": [\"气温\", \"天气状况\", \"星星的体积\", \"星星与地球的距离\"], \"answer\": 1, \"citationText\": \"夜晚星星的多少和当时的天气状况有十分密切的关系\", \"explanationVi\": \"Dựa vào câu: \\\"夜晚星星的多少和当时的天气状况有十分密切的关系\\\", đáp án chính xác là: 天气状况.\"}, {\"id\": \"q_c3_043_2\", \"type\": \"single_choice\", \"question\": \"如果晚上星星多，能说明什么?\", \"options\": [\"马上要下雨\", \"夜里会打雷\", \"第二天有彩虹\", \"第二天可能是晴天\"], \"answer\": 3, \"citationText\": \"所以，夜晚天空中如果有许多星星，就表示当时空气比较干燥，而且第二天很可能会是晴天\", \"explanationVi\": \"Dựa vào câu: \\\"所以，夜晚天空中如果有许多星星，就表示当时空气比较干燥，而且第二天很可能会是晴天\\\", đáp án chính xác là: 第二天可能是晴天.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_043_1\", \"type\": \"single_choice\", \"question\": \"星星的多少和什么有关?\", \"options\": [\"气温\", \"天气状况\", \"星星的体积\", \"星星与地球的距离\"], \"answer\": 1, \"citationText\": \"夜晚星星的多少和当时的天气状况有十分密切的关系\", \"explanationVi\": \"Dựa vào câu: \\\"夜晚星星的多少和当时的天气状况有十分密切的关系\\\", đáp án chính xác là: 天气状况.\"}, {\"id\": \"q_c3_043_2\", \"type\": \"single_choice\", \"question\": \"如果晚上星星多，能说明什么?\", \"options\": [\"马上要下雨\", \"夜里会打雷\", \"第二天有彩虹\", \"第二天可能是晴天\"], \"answer\": 3, \"citationText\": \"所以，夜晚天空中如果有许多星星，就表示当时空气比较干燥，而且第二天很可能会是晴天\", \"explanationVi\": \"Dựa vào câu: \\\"所以，夜晚天空中如果有许多星星，就表示当时空气比较干燥，而且第二天很可能会是晴天\\\", đáp án chính xác là: 第二天可能是晴天.\"}]",
+    "topic": "Du lịch & Khám phá"
   },
   {
     "id": "RDG_C3_044",
@@ -1945,7 +2622,8 @@
         "explanationVi": "Dựa vào câu: \"中国人有自己传统的情人节，叫做“七夕节”， 就在七月初七这一天\", đáp án chính xác là: 中国的情人节."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_044_1\", \"type\": \"single_choice\", \"question\": \"中国的情人节是哪天？\", \"options\": [\"五月初七\", \"七月初五\", \"七月初七\", \"七月十五\"], \"answer\": 2, \"citationText\": \"中国人有自己传统的情人节，叫做“七夕节”， 就在七月初七这一天\", \"explanationVi\": \"Dựa vào câu: \\\"中国人有自己传统的情人节，叫做“七夕节”， 就在七月初七这一天\\\", đáp án chính xác là: 七月初七.\"}, {\"id\": \"q_c3_044_2\", \"type\": \"single_choice\", \"question\": \"“七夕”的“夕”是什么意思？\", \"options\": [\"晚上\", \"祝福\", \"太阳\", \"宇宙\"], \"answer\": 0, \"citationText\": \"七夕的“夕”是“晚上”的意思， 所以“七夕”说的就是七月初七的晚上\", \"explanationVi\": \"Dựa vào câu: \\\"七夕的“夕”是“晚上”的意思， 所以“七夕”说的就是七月初七的晚上\\\", đáp án chính xác là: 晚上.\"}, {\"id\": \"q_c3_044_3\", \"type\": \"single_choice\", \"question\": \"这段话主要谈什么？\", \"options\": [\"中国的情人节\", \"传统节日的意义\", \"中国人怎么过情人节\", \"东西方情人节的不同\"], \"answer\": 0, \"citationText\": \"中国人有自己传统的情人节，叫做“七夕节”， 就在七月初七这一天\", \"explanationVi\": \"Dựa vào câu: \\\"中国人有自己传统的情人节，叫做“七夕节”， 就在七月初七这一天\\\", đáp án chính xác là: 中国的情人节.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_044_1\", \"type\": \"single_choice\", \"question\": \"中国的情人节是哪天？\", \"options\": [\"五月初七\", \"七月初五\", \"七月初七\", \"七月十五\"], \"answer\": 2, \"citationText\": \"中国人有自己传统的情人节，叫做“七夕节”， 就在七月初七这一天\", \"explanationVi\": \"Dựa vào câu: \\\"中国人有自己传统的情人节，叫做“七夕节”， 就在七月初七这一天\\\", đáp án chính xác là: 七月初七.\"}, {\"id\": \"q_c3_044_2\", \"type\": \"single_choice\", \"question\": \"“七夕”的“夕”是什么意思？\", \"options\": [\"晚上\", \"祝福\", \"太阳\", \"宇宙\"], \"answer\": 0, \"citationText\": \"七夕的“夕”是“晚上”的意思， 所以“七夕”说的就是七月初七的晚上\", \"explanationVi\": \"Dựa vào câu: \\\"七夕的“夕”是“晚上”的意思， 所以“七夕”说的就是七月初七的晚上\\\", đáp án chính xác là: 晚上.\"}, {\"id\": \"q_c3_044_3\", \"type\": \"single_choice\", \"question\": \"这段话主要谈什么？\", \"options\": [\"中国的情人节\", \"传统节日的意义\", \"中国人怎么过情人节\", \"东西方情人节的不同\"], \"answer\": 0, \"citationText\": \"中国人有自己传统的情人节，叫做“七夕节”， 就在七月初七这一天\", \"explanationVi\": \"Dựa vào câu: \\\"中国人有自己传统的情人节，叫做“七夕节”， 就在七月初七这一天\\\", đáp án chính xác là: 中国的情人节.\"}]",
+    "topic": "Du lịch & Khám phá"
   },
   {
     "id": "RDG_C3_045",
@@ -2002,7 +2680,8 @@
         "explanationVi": "Dựa vào câu: \"智能手机的快速增长是带动手机市场成长的主要动力，2013年全球智能手机出货量首次突破10亿部，同比增长38.4%\", đáp án chính xác là: 智能手机的快速发展."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_045_1\", \"type\": \"single_choice\", \"question\": \"未来手机发展的情况怎样?\", \"options\": [\"快速增长\", \"明显回落\", \"保持不变\", \"都有可能\"], \"answer\": 1, \"citationText\": \"针对2013年全球手机市场的快速增长，摩根大通对2014年全球手机市场形势做出预测，其报告显示，2014年，全球智能手机的出货量增速将比2013年有较为明显的回落\", \"explanationVi\": \"Dựa vào câu: \\\"针对2013年全球手机市场的快速增长，摩根大通对2014年全球手机市场形势做出预测，其报告显示，2014年，全球智能手机的出货量增速将比2013年有较为明显的回落\\\", đáp án chính xác là: 明显回落.\"}, {\"id\": \"q_c3_045_2\", \"type\": \"single_choice\", \"question\": \"2013年，全球智能手机的出货量是：\", \"options\": [\"少于18亿部\", \"不少于18亿部\", \"少于10亿部\", \"不少于10亿部\"], \"answer\": 1, \"citationText\": \"智能手机的快速增长是带动手机市场成长的主要动力，2013年全球智能手机出货量首次突破10亿部，同比增长38.4%\", \"explanationVi\": \"Dựa vào câu: \\\"智能手机的快速增长是带动手机市场成长的主要动力，2013年全球智能手机出货量首次突破10亿部，同比增长38.4%\\\", đáp án chính xác là: 不少于18亿部.\"}, {\"id\": \"q_c3_045_3\", \"type\": \"single_choice\", \"question\": \"手机出货量增加的最重要原因是：\", \"options\": [\"消费者购买量增加\", \"智能手机的快速发展\", \"手机质量的提高\", \"手机价格的下降\"], \"answer\": 1, \"citationText\": \"智能手机的快速增长是带动手机市场成长的主要动力，2013年全球智能手机出货量首次突破10亿部，同比增长38.4%\", \"explanationVi\": \"Dựa vào câu: \\\"智能手机的快速增长是带动手机市场成长的主要动力，2013年全球智能手机出货量首次突破10亿部，同比增长38.4%\\\", đáp án chính xác là: 智能手机的快速发展.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_045_1\", \"type\": \"single_choice\", \"question\": \"未来手机发展的情况怎样?\", \"options\": [\"快速增长\", \"明显回落\", \"保持不变\", \"都有可能\"], \"answer\": 1, \"citationText\": \"针对2013年全球手机市场的快速增长，摩根大通对2014年全球手机市场形势做出预测，其报告显示，2014年，全球智能手机的出货量增速将比2013年有较为明显的回落\", \"explanationVi\": \"Dựa vào câu: \\\"针对2013年全球手机市场的快速增长，摩根大通对2014年全球手机市场形势做出预测，其报告显示，2014年，全球智能手机的出货量增速将比2013年有较为明显的回落\\\", đáp án chính xác là: 明显回落.\"}, {\"id\": \"q_c3_045_2\", \"type\": \"single_choice\", \"question\": \"2013年，全球智能手机的出货量是：\", \"options\": [\"少于18亿部\", \"不少于18亿部\", \"少于10亿部\", \"不少于10亿部\"], \"answer\": 1, \"citationText\": \"智能手机的快速增长是带动手机市场成长的主要动力，2013年全球智能手机出货量首次突破10亿部，同比增长38.4%\", \"explanationVi\": \"Dựa vào câu: \\\"智能手机的快速增长是带动手机市场成长的主要动力，2013年全球智能手机出货量首次突破10亿部，同比增长38.4%\\\", đáp án chính xác là: 不少于18亿部.\"}, {\"id\": \"q_c3_045_3\", \"type\": \"single_choice\", \"question\": \"手机出货量增加的最重要原因是：\", \"options\": [\"消费者购买量增加\", \"智能手机的快速发展\", \"手机质量的提高\", \"手机价格的下降\"], \"answer\": 1, \"citationText\": \"智能手机的快速增长是带动手机市场成长的主要动力，2013年全球智能手机出货量首次突破10亿部，同比增长38.4%\", \"explanationVi\": \"Dựa vào câu: \\\"智能手机的快速增长是带动手机市场成长的主要动力，2013年全球智能手机出货量首次突破10亿部，同比增长38.4%\\\", đáp án chính xác là: 智能手机的快速发展.\"}]",
+    "topic": "Du lịch & Khám phá"
   },
   {
     "id": "RDG_C3_046",
@@ -2045,7 +2724,8 @@
         "explanationVi": "Dựa vào câu: \"这个人回信说：“谢谢你的来信，我现在心中很平静，虽然小偷拿走了我的钱，但没有伤害我的生命\", đáp án chính xác là: 乐观."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_046_1\", \"type\": \"single_choice\", \"question\": \"朋友是怎么安慰他的?\", \"options\": [\"写信\", \"请他吃饭\", \"给他送钱\", \"帮他报警\"], \"answer\": 0, \"citationText\": \"有个人一天回家之后发现家里被偷了，朋友写信安慰他\", \"explanationVi\": \"Dựa vào câu: \\\"有个人一天回家之后发现家里被偷了，朋友写信安慰他\\\", đáp án chính xác là: 写信.\"}, {\"id\": \"q_c3_046_2\", \"type\": \"single_choice\", \"question\": \"这个人是个什么样的人?\", \"options\": [\"严肃\", \"乐观\", \"谦虚\", \"勇敢\"], \"answer\": 1, \"citationText\": \"这个人回信说：“谢谢你的来信，我现在心中很平静，虽然小偷拿走了我的钱，但没有伤害我的生命\", \"explanationVi\": \"Dựa vào câu: \\\"这个人回信说：“谢谢你的来信，我现在心中很平静，虽然小偷拿走了我的钱，但没有伤害我的生命\\\", đáp án chính xác là: 乐观.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_046_1\", \"type\": \"single_choice\", \"question\": \"朋友是怎么安慰他的?\", \"options\": [\"写信\", \"请他吃饭\", \"给他送钱\", \"帮他报警\"], \"answer\": 0, \"citationText\": \"有个人一天回家之后发现家里被偷了，朋友写信安慰他\", \"explanationVi\": \"Dựa vào câu: \\\"有个人一天回家之后发现家里被偷了，朋友写信安慰他\\\", đáp án chính xác là: 写信.\"}, {\"id\": \"q_c3_046_2\", \"type\": \"single_choice\", \"question\": \"这个人是个什么样的人?\", \"options\": [\"严肃\", \"乐观\", \"谦虚\", \"勇敢\"], \"answer\": 1, \"citationText\": \"这个人回信说：“谢谢你的来信，我现在心中很平静，虽然小偷拿走了我的钱，但没有伤害我的生命\", \"explanationVi\": \"Dựa vào câu: \\\"这个人回信说：“谢谢你的来信，我现在心中很平静，虽然小偷拿走了我的钱，但没有伤害我的生命\\\", đáp án chính xác là: 乐观.\"}]",
+    "topic": "Du lịch & Khám phá"
   },
   {
     "id": "RDG_C3_047",
@@ -2088,7 +2768,8 @@
         "explanationVi": "Dựa vào câu: \"有个女观众看到电影中有一辆马车向自己跑过来， 害怕得离开了座位，跑得远远的，直到那辆马车在画面中不见了， 她才回到座位上\", đáp án chính xác là: 误会了."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_047_1\", \"type\": \"single_choice\", \"question\": \"世界上第一部无声电影：\", \"options\": [\"很幽默\", \"不成功\", \"观众很多\", \"内容复杂\"], \"answer\": 2, \"citationText\": \"世界上第一部无声电影出现的时候，吸引了成千上万的观众\", \"explanationVi\": \"Dựa vào câu: \\\"世界上第一部无声电影出现的时候，吸引了成千上万的观众\\\", đáp án chính xác là: 观众很多.\"}, {\"id\": \"q_c3_047_2\", \"type\": \"single_choice\", \"question\": \"那个观众为什么要打伞？\", \"options\": [\"误会了\", \"下雨了\", \"风太大\", \"害怕马车\"], \"answer\": 0, \"citationText\": \"有个女观众看到电影中有一辆马车向自己跑过来， 害怕得离开了座位，跑得远远的，直到那辆马车在画面中不见了， 她才回到座位上\", \"explanationVi\": \"Dựa vào câu: \\\"有个女观众看到电影中有一辆马车向自己跑过来， 害怕得离开了座位，跑得远远的，直到那辆马车在画面中不见了， 她才回到座位上\\\", đáp án chính xác là: 误会了.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_047_1\", \"type\": \"single_choice\", \"question\": \"世界上第一部无声电影：\", \"options\": [\"很幽默\", \"不成功\", \"观众很多\", \"内容复杂\"], \"answer\": 2, \"citationText\": \"世界上第一部无声电影出现的时候，吸引了成千上万的观众\", \"explanationVi\": \"Dựa vào câu: \\\"世界上第一部无声电影出现的时候，吸引了成千上万的观众\\\", đáp án chính xác là: 观众很多.\"}, {\"id\": \"q_c3_047_2\", \"type\": \"single_choice\", \"question\": \"那个观众为什么要打伞？\", \"options\": [\"误会了\", \"下雨了\", \"风太大\", \"害怕马车\"], \"answer\": 0, \"citationText\": \"有个女观众看到电影中有一辆马车向自己跑过来， 害怕得离开了座位，跑得远远的，直到那辆马车在画面中不见了， 她才回到座位上\", \"explanationVi\": \"Dựa vào câu: \\\"有个女观众看到电影中有一辆马车向自己跑过来， 害怕得离开了座位，跑得远远的，直到那辆马车在画面中不见了， 她才回到座位上\\\", đáp án chính xác là: 误会了.\"}]",
+    "topic": "Du lịch & Khám phá"
   },
   {
     "id": "RDG_C3_048",
@@ -2131,7 +2812,8 @@
         "explanationVi": "Dựa vào câu: \"参赛作品可以是单幅作品，也可以是多幅组照，但是组照作品不能超过6张\", đáp án chính xác là: 6张."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_048_1\", \"type\": \"single_choice\", \"question\": \"本次摄影比赛的主题与什么有关?\", \"options\": [\"自然风光\", \"生活场景\", \"人物故事\", \"乡村生活\"], \"answer\": 1, \"citationText\": \"本次摄影大赛参赛作品的主题需与生活场景有关，可以是人与自然的和谐相处，也可以是温馨的一家人、父母对子女的关爱、孩子对世界的好奇心等等，只要是生活中温馨欢乐的一幕，都可以参赛\", \"explanationVi\": \"Dựa vào câu: \\\"本次摄影大赛参赛作品的主题需与生活场景有关，可以是人与自然的和谐相处，也可以是温馨的一家人、父母对子女的关爱、孩子对世界的好奇心等等，只要是生活中温馨欢乐的一幕，都可以参赛\\\", đáp án chính xác là: 生活场景.\"}, {\"id\": \"q_c3_048_2\", \"type\": \"single_choice\", \"question\": \"组照作品最多可以有几张?\", \"options\": [\"6张\", \"5张\", \"4张\", \"7张\"], \"answer\": 0, \"citationText\": \"参赛作品可以是单幅作品，也可以是多幅组照，但是组照作品不能超过6张\", \"explanationVi\": \"Dựa vào câu: \\\"参赛作品可以是单幅作品，也可以是多幅组照，但是组照作品不能超过6张\\\", đáp án chính xác là: 6张.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_048_1\", \"type\": \"single_choice\", \"question\": \"本次摄影比赛的主题与什么有关?\", \"options\": [\"自然风光\", \"生活场景\", \"人物故事\", \"乡村生活\"], \"answer\": 1, \"citationText\": \"本次摄影大赛参赛作品的主题需与生活场景有关，可以是人与自然的和谐相处，也可以是温馨的一家人、父母对子女的关爱、孩子对世界的好奇心等等，只要是生活中温馨欢乐的一幕，都可以参赛\", \"explanationVi\": \"Dựa vào câu: \\\"本次摄影大赛参赛作品的主题需与生活场景有关，可以是人与自然的和谐相处，也可以是温馨的一家人、父母对子女的关爱、孩子对世界的好奇心等等，只要是生活中温馨欢乐的一幕，都可以参赛\\\", đáp án chính xác là: 生活场景.\"}, {\"id\": \"q_c3_048_2\", \"type\": \"single_choice\", \"question\": \"组照作品最多可以有几张?\", \"options\": [\"6张\", \"5张\", \"4张\", \"7张\"], \"answer\": 0, \"citationText\": \"参赛作品可以是单幅作品，也可以是多幅组照，但是组照作品不能超过6张\", \"explanationVi\": \"Dựa vào câu: \\\"参赛作品可以是单幅作品，也可以是多幅组照，但是组照作品不能超过6张\\\", đáp án chính xác là: 6张.\"}]",
+    "topic": "Du lịch & Khám phá"
   },
   {
     "id": "RDG_C3_049",
@@ -2188,7 +2870,8 @@
         "explanationVi": "Dựa vào câu: \"有人习惯把八小时睡眠看成是一个成年人的正常睡眠时间，睡不足八小时，便会产生心理负担：是不是病了?其实，医学研究已经表明，对于大多数人来说，五个或六个小时的睡眠就足以使他们精神饱满、健康地生活下去了\", đáp án chính xác là: 睡眠时间与健康."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_049_1\", \"type\": \"single_choice\", \"question\": \"根据这段话，一般人对睡眠有什么看法?\", \"options\": [\"每个人的睡眠时间都一样长\", \"睡眠不足会增大工作的压力\", \"成人每天必须睡够8个小时\", \"能应付日常生活就是睡够了\"], \"answer\": 2, \"citationText\": \"有人习惯把八小时睡眠看成是一个成年人的正常睡眠时间，睡不足八小时，便会产生心理负担：是不是病了?其实，医学研究已经表明，对于大多数人来说，五个或六个小时的睡眠就足以使他们精神饱满、健康地生活下去了\", \"explanationVi\": \"Dựa vào câu: \\\"有人习惯把八小时睡眠看成是一个成年人的正常睡眠时间，睡不足八小时，便会产生心理负担：是不是病了?其实，医学研究已经表明，对于大多数人来说，五个或六个小时的睡眠就足以使他们精神饱满、健康地生活下去了\\\", đáp án chính xác là: 成人每天必须睡够8个小时.\"}, {\"id\": \"q_c3_049_2\", \"type\": \"single_choice\", \"question\": \"医学研究表明，大多数人睡几个小时就可以健康地生活下去了?\", \"options\": [\"3～4个小时\", \"5～6个小时\", \"7～8个小时\", \"9～10个小时\"], \"answer\": 1, \"citationText\": \"有人习惯把八小时睡眠看成是一个成年人的正常睡眠时间，睡不足八小时，便会产生心理负担：是不是病了?其实，医学研究已经表明，对于大多数人来说，五个或六个小时的睡眠就足以使他们精神饱满、健康地生活下去了\", \"explanationVi\": \"Dựa vào câu: \\\"有人习惯把八小时睡眠看成是一个成年人的正常睡眠时间，睡不足八小时，便会产生心理负担：是不是病了?其实，医学研究已经表明，对于大多数人来说，五个或六个小时的睡眠就足以使他们精神饱满、健康地生活下去了\\\", đáp án chính xác là: 5～6个小时.\"}, {\"id\": \"q_c3_049_3\", \"type\": \"single_choice\", \"question\": \"这段话主要谈了什么?\", \"options\": [\"健康的标准\", \"心理健康与睡眠\", \"睡眠时间与健康\", \"成人睡眠时间的长短\"], \"answer\": 2, \"citationText\": \"有人习惯把八小时睡眠看成是一个成年人的正常睡眠时间，睡不足八小时，便会产生心理负担：是不是病了?其实，医学研究已经表明，对于大多数人来说，五个或六个小时的睡眠就足以使他们精神饱满、健康地生活下去了\", \"explanationVi\": \"Dựa vào câu: \\\"有人习惯把八小时睡眠看成是一个成年人的正常睡眠时间，睡不足八小时，便会产生心理负担：是不是病了?其实，医学研究已经表明，对于大多数人来说，五个或六个小时的睡眠就足以使他们精神饱满、健康地生活下去了\\\", đáp án chính xác là: 睡眠时间与健康.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_049_1\", \"type\": \"single_choice\", \"question\": \"根据这段话，一般人对睡眠有什么看法?\", \"options\": [\"每个人的睡眠时间都一样长\", \"睡眠不足会增大工作的压力\", \"成人每天必须睡够8个小时\", \"能应付日常生活就是睡够了\"], \"answer\": 2, \"citationText\": \"有人习惯把八小时睡眠看成是一个成年人的正常睡眠时间，睡不足八小时，便会产生心理负担：是不是病了?其实，医学研究已经表明，对于大多数人来说，五个或六个小时的睡眠就足以使他们精神饱满、健康地生活下去了\", \"explanationVi\": \"Dựa vào câu: \\\"有人习惯把八小时睡眠看成是一个成年人的正常睡眠时间，睡不足八小时，便会产生心理负担：是不是病了?其实，医学研究已经表明，对于大多数人来说，五个或六个小时的睡眠就足以使他们精神饱满、健康地生活下去了\\\", đáp án chính xác là: 成人每天必须睡够8个小时.\"}, {\"id\": \"q_c3_049_2\", \"type\": \"single_choice\", \"question\": \"医学研究表明，大多数人睡几个小时就可以健康地生活下去了?\", \"options\": [\"3～4个小时\", \"5～6个小时\", \"7～8个小时\", \"9～10个小时\"], \"answer\": 1, \"citationText\": \"有人习惯把八小时睡眠看成是一个成年人的正常睡眠时间，睡不足八小时，便会产生心理负担：是不是病了?其实，医学研究已经表明，对于大多数人来说，五个或六个小时的睡眠就足以使他们精神饱满、健康地生活下去了\", \"explanationVi\": \"Dựa vào câu: \\\"有人习惯把八小时睡眠看成是一个成年人的正常睡眠时间，睡不足八小时，便会产生心理负担：是不是病了?其实，医学研究已经表明，对于大多数人来说，五个或六个小时的睡眠就足以使他们精神饱满、健康地生活下去了\\\", đáp án chính xác là: 5～6个小时.\"}, {\"id\": \"q_c3_049_3\", \"type\": \"single_choice\", \"question\": \"这段话主要谈了什么?\", \"options\": [\"健康的标准\", \"心理健康与睡眠\", \"睡眠时间与健康\", \"成人睡眠时间的长短\"], \"answer\": 2, \"citationText\": \"有人习惯把八小时睡眠看成是一个成年人的正常睡眠时间，睡不足八小时，便会产生心理负担：是不是病了?其实，医学研究已经表明，对于大多数人来说，五个或六个小时的睡眠就足以使他们精神饱满、健康地生活下去了\", \"explanationVi\": \"Dựa vào câu: \\\"有人习惯把八小时睡眠看成是一个成年人的正常睡眠时间，睡不足八小时，便会产生心理负担：是不是病了?其实，医学研究已经表明，对于大多数人来说，五个或六个小时的睡眠就足以使他们精神饱满、健康地生活下去了\\\", đáp án chính xác là: 睡眠时间与健康.\"}]",
+    "topic": "Văn hóa & Lễ hội"
   },
   {
     "id": "RDG_C3_050",
@@ -2245,7 +2928,8 @@
         "explanationVi": "Dựa vào câu: \"另外，冬季天气寒冷，上了年纪的人洗澡时浴室要暖和些，但水温不要过高，洗的时间也不宜过长，最好旁边有家人照看，以免发生意外\", đáp án chính xác là: 要有家人照看."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_050_1\", \"type\": \"single_choice\", \"question\": \"根据这段话，什么时候最好不要洗澡?\", \"options\": [\"吃饭之前\", \"刚吃完饭\", \"冬季\", \"饿着肚子的时候\"], \"answer\": 1, \"citationText\": \"大家都知道洗澡有利于健康，但是有的人刚吃完饭就去洗澡，这样做是不科学的，因为这样做不仅刚吃下去的东西得不到充分消化，而且心脏也得不到很好的休息\", \"explanationVi\": \"Dựa vào câu: \\\"大家都知道洗澡有利于健康，但是有的人刚吃完饭就去洗澡，这样做是不科学的，因为这样做不仅刚吃下去的东西得不到充分消化，而且心脏也得不到很好的休息\\\", đáp án chính xác là: 刚吃完饭.\"}, {\"id\": \"q_c3_050_2\", \"type\": \"single_choice\", \"question\": \"哪类人洗澡时容易发生危险?\", \"options\": [\"消化不好的人\", \"有心脏病的人\", \"睡眠不好的人\", \"怕冷的人\"], \"answer\": 1, \"citationText\": \"众所周知，浴室的空气一般不能很好地流通，缺少氧气，这对患有心脏病的人来说是很危险的\", \"explanationVi\": \"Dựa vào câu: \\\"众所周知，浴室的空气一般不能很好地流通，缺少氧气，这对患有心脏病的人来说是很危险的\\\", đáp án chính xác là: 有心脏病的人.\"}, {\"id\": \"q_c3_050_3\", \"type\": \"single_choice\", \"question\": \"冬季老年人在洗澡时应该注意什么?\", \"options\": [\"水温要高\", \"时间要长\", \"要有家人照看\", \"浴室温度要低一些\"], \"answer\": 2, \"citationText\": \"另外，冬季天气寒冷，上了年纪的人洗澡时浴室要暖和些，但水温不要过高，洗的时间也不宜过长，最好旁边有家人照看，以免发生意外\", \"explanationVi\": \"Dựa vào câu: \\\"另外，冬季天气寒冷，上了年纪的人洗澡时浴室要暖和些，但水温不要过高，洗的时间也不宜过长，最好旁边有家人照看，以免发生意外\\\", đáp án chính xác là: 要有家人照看.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_050_1\", \"type\": \"single_choice\", \"question\": \"根据这段话，什么时候最好不要洗澡?\", \"options\": [\"吃饭之前\", \"刚吃完饭\", \"冬季\", \"饿着肚子的时候\"], \"answer\": 1, \"citationText\": \"大家都知道洗澡有利于健康，但是有的人刚吃完饭就去洗澡，这样做是不科学的，因为这样做不仅刚吃下去的东西得不到充分消化，而且心脏也得不到很好的休息\", \"explanationVi\": \"Dựa vào câu: \\\"大家都知道洗澡有利于健康，但是有的人刚吃完饭就去洗澡，这样做是不科学的，因为这样做不仅刚吃下去的东西得不到充分消化，而且心脏也得不到很好的休息\\\", đáp án chính xác là: 刚吃完饭.\"}, {\"id\": \"q_c3_050_2\", \"type\": \"single_choice\", \"question\": \"哪类人洗澡时容易发生危险?\", \"options\": [\"消化不好的人\", \"有心脏病的人\", \"睡眠不好的人\", \"怕冷的人\"], \"answer\": 1, \"citationText\": \"众所周知，浴室的空气一般不能很好地流通，缺少氧气，这对患有心脏病的人来说是很危险的\", \"explanationVi\": \"Dựa vào câu: \\\"众所周知，浴室的空气一般不能很好地流通，缺少氧气，这对患有心脏病的人来说是很危险的\\\", đáp án chính xác là: 有心脏病的人.\"}, {\"id\": \"q_c3_050_3\", \"type\": \"single_choice\", \"question\": \"冬季老年人在洗澡时应该注意什么?\", \"options\": [\"水温要高\", \"时间要长\", \"要有家人照看\", \"浴室温度要低一些\"], \"answer\": 2, \"citationText\": \"另外，冬季天气寒冷，上了年纪的人洗澡时浴室要暖和些，但水温不要过高，洗的时间也不宜过长，最好旁边有家人照看，以免发生意外\", \"explanationVi\": \"Dựa vào câu: \\\"另外，冬季天气寒冷，上了年纪的人洗澡时浴室要暖和些，但水温不要过高，洗的时间也不宜过长，最好旁边有家人照看，以免发生意外\\\", đáp án chính xác là: 要有家人照看.\"}]",
+    "topic": "Văn hóa & Lễ hội"
   },
   {
     "id": "RDG_C3_051",
@@ -2302,7 +2986,8 @@
         "explanationVi": "Dựa vào câu: \"企业家的表现使记者大感意外，不知不觉中，原来的那种挑战情绪完全消失了，甚至产生一种同情\", đáp án chính xác là: 改变记者原有的看法."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_051_1\", \"type\": \"single_choice\", \"question\": \"记者最初的采访目的是什么?\", \"options\": [\"了解企业背景\", \"为企业做宣传\", \"收集对方的丑闻\", \"了解一种咖啡新产品\"], \"answer\": 2, \"citationText\": \"一位记者去采访一位企业家，目的是获得他的一些丑闻资料\", \"explanationVi\": \"Dựa vào câu: \\\"一位记者去采访一位企业家，目的是获得他的一些丑闻资料\\\", đáp án chính xác là: 收集对方的丑闻.\"}, {\"id\": \"q_c3_051_2\", \"type\": \"single_choice\", \"question\": \"企业家在记者面前表现得怎么样?\", \"options\": [\"很慌乱\", \"很严肃\", \"很亲切\", \"很热心\"], \"answer\": 0, \"citationText\": \"记者赶忙提醒他，企业家慌忙将香烟拿正，不料又将烟灰缸碰翻在地\", \"explanationVi\": \"Dựa vào câu: \\\"记者赶忙提醒他，企业家慌忙将香烟拿正，不料又将烟灰缸碰翻在地\\\", đáp án chính xác là: 很慌乱.\"}, {\"id\": \"q_c3_051_3\", \"type\": \"single_choice\", \"question\": \"企业家为什么这么做?\", \"options\": [\"他很同情记者\", \"公司建议他这样做\", \"改变记者原有的看法\", \"帮助记者形成客观的认识\"], \"answer\": 2, \"citationText\": \"企业家的表现使记者大感意外，不知不觉中，原来的那种挑战情绪完全消失了，甚至产生一种同情\", \"explanationVi\": \"Dựa vào câu: \\\"企业家的表现使记者大感意外，不知不觉中，原来的那种挑战情绪完全消失了，甚至产生一种同情\\\", đáp án chính xác là: 改变记者原有的看法.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_051_1\", \"type\": \"single_choice\", \"question\": \"记者最初的采访目的是什么?\", \"options\": [\"了解企业背景\", \"为企业做宣传\", \"收集对方的丑闻\", \"了解一种咖啡新产品\"], \"answer\": 2, \"citationText\": \"一位记者去采访一位企业家，目的是获得他的一些丑闻资料\", \"explanationVi\": \"Dựa vào câu: \\\"一位记者去采访一位企业家，目的是获得他的一些丑闻资料\\\", đáp án chính xác là: 收集对方的丑闻.\"}, {\"id\": \"q_c3_051_2\", \"type\": \"single_choice\", \"question\": \"企业家在记者面前表现得怎么样?\", \"options\": [\"很慌乱\", \"很严肃\", \"很亲切\", \"很热心\"], \"answer\": 0, \"citationText\": \"记者赶忙提醒他，企业家慌忙将香烟拿正，不料又将烟灰缸碰翻在地\", \"explanationVi\": \"Dựa vào câu: \\\"记者赶忙提醒他，企业家慌忙将香烟拿正，不料又将烟灰缸碰翻在地\\\", đáp án chính xác là: 很慌乱.\"}, {\"id\": \"q_c3_051_3\", \"type\": \"single_choice\", \"question\": \"企业家为什么这么做?\", \"options\": [\"他很同情记者\", \"公司建议他这样做\", \"改变记者原有的看法\", \"帮助记者形成客观的认识\"], \"answer\": 2, \"citationText\": \"企业家的表现使记者大感意外，不知不觉中，原来的那种挑战情绪完全消失了，甚至产生一种同情\", \"explanationVi\": \"Dựa vào câu: \\\"企业家的表现使记者大感意外，不知不觉中，原来的那种挑战情绪完全消失了，甚至产生一种同情\\\", đáp án chính xác là: 改变记者原有的看法.\"}]",
+    "topic": "Văn hóa & Lễ hội"
   },
   {
     "id": "RDG_C3_052",
@@ -2373,7 +3058,8 @@
         "explanationVi": "Dựa vào câu: \"回家以后，妈妈问小男孩为什么不要商店老板的糖，这个小男孩儿很轻松地回答说：“因为我的手小啊!”\", đáp án chính xác là: 手小，自己拿的话吃亏."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_052_1\", \"type\": \"single_choice\", \"question\": \"商店老板为什么要给小男孩糖?\", \"options\": [\"商店老板想让男孩买糖\", \"商店老板认识男孩的妈妈\", \"老板觉得男孩很可爱\", \"老板心情好\"], \"answer\": 2, \"citationText\": \"回家以后，妈妈问小男孩为什么不要商店老板的糖，这个小男孩儿很轻松地回答说：“因为我的手小啊!”\", \"explanationVi\": \"Dựa vào câu: \\\"回家以后，妈妈问小男孩为什么不要商店老板的糖，这个小男孩儿很轻松地回答说：“因为我的手小啊!”\\\", đáp án chính xác là: 老板觉得男孩很可爱.\"}, {\"id\": \"q_c3_052_2\", \"type\": \"single_choice\", \"question\": \"小男孩看着糖有什么反应?\", \"options\": [\"没有自己拿糖\", \"自己抓了一大把放进口袋里\", \"非常不喜欢\", \"希望妈妈能给他买\"], \"answer\": 0, \"citationText\": \"老板看到小男孩，觉得他实在是太可爱了，于是就打开一包糖果，让小男孩自己拿，但是这个男孩却没有动\", \"explanationVi\": \"Dựa vào câu: \\\"老板看到小男孩，觉得他实在是太可爱了，于是就打开一包糖果，让小男孩自己拿，但是这个男孩却没有动\\\", đáp án chính xác là: 没有自己拿糖.\"}, {\"id\": \"q_c3_052_3\", \"type\": \"single_choice\", \"question\": \"最后商店老板是怎么做的?\", \"options\": [\"自己抓了一大把糖给小男孩\", \"男孩不要就算了\", \"让男孩的妈妈给他买了一大包糖\", \"劝小男孩拿了一块糖\"], \"answer\": 0, \"citationText\": \"老板觉得这个小孩很有礼貌，更加喜欢他了，于是就自己抓了一大把糖塞进了男孩的口袋\", \"explanationVi\": \"Dựa vào câu: \\\"老板觉得这个小孩很有礼貌，更加喜欢他了，于是就自己抓了一大把糖塞进了男孩的口袋\\\", đáp án chính xác là: 自己抓了一大把糖给小男孩.\"}, {\"id\": \"q_c3_052_4\", \"type\": \"single_choice\", \"question\": \"小男孩最后说的话是什么意思?\", \"options\": [\"看不起那个老板\", \"不好意思拿别人的东西\", \"手小，自己拿的话吃亏\", \"不愿意自己拿\"], \"answer\": 2, \"citationText\": \"回家以后，妈妈问小男孩为什么不要商店老板的糖，这个小男孩儿很轻松地回答说：“因为我的手小啊!”\", \"explanationVi\": \"Dựa vào câu: \\\"回家以后，妈妈问小男孩为什么不要商店老板的糖，这个小男孩儿很轻松地回答说：“因为我的手小啊!”\\\", đáp án chính xác là: 手小，自己拿的话吃亏.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_052_1\", \"type\": \"single_choice\", \"question\": \"商店老板为什么要给小男孩糖?\", \"options\": [\"商店老板想让男孩买糖\", \"商店老板认识男孩的妈妈\", \"老板觉得男孩很可爱\", \"老板心情好\"], \"answer\": 2, \"citationText\": \"回家以后，妈妈问小男孩为什么不要商店老板的糖，这个小男孩儿很轻松地回答说：“因为我的手小啊!”\", \"explanationVi\": \"Dựa vào câu: \\\"回家以后，妈妈问小男孩为什么不要商店老板的糖，这个小男孩儿很轻松地回答说：“因为我的手小啊!”\\\", đáp án chính xác là: 老板觉得男孩很可爱.\"}, {\"id\": \"q_c3_052_2\", \"type\": \"single_choice\", \"question\": \"小男孩看着糖有什么反应?\", \"options\": [\"没有自己拿糖\", \"自己抓了一大把放进口袋里\", \"非常不喜欢\", \"希望妈妈能给他买\"], \"answer\": 0, \"citationText\": \"老板看到小男孩，觉得他实在是太可爱了，于是就打开一包糖果，让小男孩自己拿，但是这个男孩却没有动\", \"explanationVi\": \"Dựa vào câu: \\\"老板看到小男孩，觉得他实在是太可爱了，于是就打开一包糖果，让小男孩自己拿，但是这个男孩却没有动\\\", đáp án chính xác là: 没有自己拿糖.\"}, {\"id\": \"q_c3_052_3\", \"type\": \"single_choice\", \"question\": \"最后商店老板是怎么做的?\", \"options\": [\"自己抓了一大把糖给小男孩\", \"男孩不要就算了\", \"让男孩的妈妈给他买了一大包糖\", \"劝小男孩拿了一块糖\"], \"answer\": 0, \"citationText\": \"老板觉得这个小孩很有礼貌，更加喜欢他了，于是就自己抓了一大把糖塞进了男孩的口袋\", \"explanationVi\": \"Dựa vào câu: \\\"老板觉得这个小孩很有礼貌，更加喜欢他了，于是就自己抓了一大把糖塞进了男孩的口袋\\\", đáp án chính xác là: 自己抓了一大把糖给小男孩.\"}, {\"id\": \"q_c3_052_4\", \"type\": \"single_choice\", \"question\": \"小男孩最后说的话是什么意思?\", \"options\": [\"看不起那个老板\", \"不好意思拿别人的东西\", \"手小，自己拿的话吃亏\", \"不愿意自己拿\"], \"answer\": 2, \"citationText\": \"回家以后，妈妈问小男孩为什么不要商店老板的糖，这个小男孩儿很轻松地回答说：“因为我的手小啊!”\", \"explanationVi\": \"Dựa vào câu: \\\"回家以后，妈妈问小男孩为什么不要商店老板的糖，这个小男孩儿很轻松地回答说：“因为我的手小啊!”\\\", đáp án chính xác là: 手小，自己拿的话吃亏.\"}]",
+    "topic": "Văn hóa & Lễ hội"
   },
   {
     "id": "RDG_C3_053",
@@ -2430,7 +3116,8 @@
         "explanationVi": "Dựa vào câu: \"一次吃饭的时候，沈周让唐伯虎去开窗户，他发现自己眼前的窗户竟是老师沈周画的一幅画，唐伯虎非常惭愧，知道自己的技艺和老师相比还差得很远\", đáp án chính xác là: 是老师的作品."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_053_1\", \"type\": \"single_choice\", \"question\": \"唐伯虎小时候在哪方面很有才能?\", \"options\": [\"文学\", \"画画\", \"计算\", \"手工\"], \"answer\": 1, \"citationText\": \"唐伯虎是明朝著名的画家和文学家，他小的时候就在画画方面显示出了非常出色的才能\", \"explanationVi\": \"Dựa vào câu: \\\"唐伯虎是明朝著名的画家和文学家，他小的时候就在画画方面显示出了非常出色的才能\\\", đáp án chính xác là: 画画.\"}, {\"id\": \"q_c3_053_2\", \"type\": \"single_choice\", \"question\": \"唐伯虎得到老师的称赞后，感觉怎么样?\", \"options\": [\"不好意思\", \"骄傲自满\", \"心情平静\", \"非常谦虚\"], \"answer\": 1, \"citationText\": \"不料，由于沈周的称赞，一向谦虚的唐伯虎慢慢地产生了骄傲自满的情绪，沈周看在眼中，记在心里\", \"explanationVi\": \"Dựa vào câu: \\\"不料，由于沈周的称赞，一向谦虚的唐伯虎慢慢地产生了骄傲自满的情绪，沈周看在眼中，记在心里\\\", đáp án chính xác là: 骄傲自满.\"}, {\"id\": \"q_c3_053_3\", \"type\": \"single_choice\", \"question\": \"唐伯虎眼前的窗户是什么?\", \"options\": [\"是自己制作的\", \"是已经打开的\", \"是老师的作品\", \"是已经坏了的\"], \"answer\": 2, \"citationText\": \"一次吃饭的时候，沈周让唐伯虎去开窗户，他发现自己眼前的窗户竟是老师沈周画的一幅画，唐伯虎非常惭愧，知道自己的技艺和老师相比还差得很远\", \"explanationVi\": \"Dựa vào câu: \\\"一次吃饭的时候，沈周让唐伯虎去开窗户，他发现自己眼前的窗户竟是老师沈周画的一幅画，唐伯虎非常惭愧，知道自己的技艺和老师相比还差得很远\\\", đáp án chính xác là: 是老师的作品.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_053_1\", \"type\": \"single_choice\", \"question\": \"唐伯虎小时候在哪方面很有才能?\", \"options\": [\"文学\", \"画画\", \"计算\", \"手工\"], \"answer\": 1, \"citationText\": \"唐伯虎是明朝著名的画家和文学家，他小的时候就在画画方面显示出了非常出色的才能\", \"explanationVi\": \"Dựa vào câu: \\\"唐伯虎是明朝著名的画家和文学家，他小的时候就在画画方面显示出了非常出色的才能\\\", đáp án chính xác là: 画画.\"}, {\"id\": \"q_c3_053_2\", \"type\": \"single_choice\", \"question\": \"唐伯虎得到老师的称赞后，感觉怎么样?\", \"options\": [\"不好意思\", \"骄傲自满\", \"心情平静\", \"非常谦虚\"], \"answer\": 1, \"citationText\": \"不料，由于沈周的称赞，一向谦虚的唐伯虎慢慢地产生了骄傲自满的情绪，沈周看在眼中，记在心里\", \"explanationVi\": \"Dựa vào câu: \\\"不料，由于沈周的称赞，一向谦虚的唐伯虎慢慢地产生了骄傲自满的情绪，沈周看在眼中，记在心里\\\", đáp án chính xác là: 骄傲自满.\"}, {\"id\": \"q_c3_053_3\", \"type\": \"single_choice\", \"question\": \"唐伯虎眼前的窗户是什么?\", \"options\": [\"是自己制作的\", \"是已经打开的\", \"是老师的作品\", \"是已经坏了的\"], \"answer\": 2, \"citationText\": \"一次吃饭的时候，沈周让唐伯虎去开窗户，他发现自己眼前的窗户竟是老师沈周画的一幅画，唐伯虎非常惭愧，知道自己的技艺和老师相比还差得很远\", \"explanationVi\": \"Dựa vào câu: \\\"一次吃饭的时候，沈周让唐伯虎去开窗户，他发现自己眼前的窗户竟是老师沈周画的一幅画，唐伯虎非常惭愧，知道自己的技艺和老师相比还差得很远\\\", đáp án chính xác là: 是老师的作品.\"}]",
+    "topic": "Văn hóa & Lễ hội"
   },
   {
     "id": "RDG_C3_054",
@@ -2487,7 +3174,8 @@
         "explanationVi": "Dựa vào câu: \"中国是一个散文大国\", đáp án chính xác là: 中国是一个散文大国."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_054_1\", \"type\": \"single_choice\", \"question\": \"文中空白处应该填写的词语是：\", \"options\": [\"涌现\", \"表现\", \"实现\", \"显示\"], \"answer\": 0, \"citationText\": \"新时期以来，我国的散文创作出现了前所未有的好势头，散文创作持续热闹火爆，______了一批专事散文的作家，一些学者、诗人、小说家、评论家、艺术家也跻身其中，众多的大学生也喜爱读写散文\", \"explanationVi\": \"Dựa vào câu: \\\"新时期以来，我国的散文创作出现了前所未有的好势头，散文创作持续热闹火爆，______了一批专事散文的作家，一些学者、诗人、小说家、评论家、艺术家也跻身其中，众多的大学生也喜爱读写散文\\\", đáp án chính xác là: 涌现.\"}, {\"id\": \"q_c3_054_2\", \"type\": \"single_choice\", \"question\": \"不属于此时散文创作的最大意义是什么?\", \"options\": [\"树立现代美学观念\", \"企图号召整个民族\", \"走向人性解放\", \"树立科学、民主和自由的文明观念\"], \"answer\": 0, \"citationText\": \"它最为重大的意义是企图号召整个民族，彻底地走向人性的解放，树立科学、民主、平等和自由的现代文明观念\", \"explanationVi\": \"Dựa vào câu: \\\"它最为重大的意义是企图号召整个民族，彻底地走向人性的解放，树立科学、民主、平等和自由的现代文明观念\\\", đáp án chính xác là: 树立现代美学观念.\"}, {\"id\": \"q_c3_054_3\", \"type\": \"single_choice\", \"question\": \"以下说法正确的是：\", \"options\": [\"新时期，我国散文一度衰落\", \"大学生不喜欢写散文\", \"古今散文不受重视\", \"中国是一个散文大国\"], \"answer\": 3, \"citationText\": \"中国是一个散文大国\", \"explanationVi\": \"Dựa vào câu: \\\"中国是一个散文大国\\\", đáp án chính xác là: 中国是一个散文大国.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_054_1\", \"type\": \"single_choice\", \"question\": \"文中空白处应该填写的词语是：\", \"options\": [\"涌现\", \"表现\", \"实现\", \"显示\"], \"answer\": 0, \"citationText\": \"新时期以来，我国的散文创作出现了前所未有的好势头，散文创作持续热闹火爆，______了一批专事散文的作家，一些学者、诗人、小说家、评论家、艺术家也跻身其中，众多的大学生也喜爱读写散文\", \"explanationVi\": \"Dựa vào câu: \\\"新时期以来，我国的散文创作出现了前所未有的好势头，散文创作持续热闹火爆，______了一批专事散文的作家，一些学者、诗人、小说家、评论家、艺术家也跻身其中，众多的大学生也喜爱读写散文\\\", đáp án chính xác là: 涌现.\"}, {\"id\": \"q_c3_054_2\", \"type\": \"single_choice\", \"question\": \"不属于此时散文创作的最大意义是什么?\", \"options\": [\"树立现代美学观念\", \"企图号召整个民族\", \"走向人性解放\", \"树立科学、民主和自由的文明观念\"], \"answer\": 0, \"citationText\": \"它最为重大的意义是企图号召整个民族，彻底地走向人性的解放，树立科学、民主、平等和自由的现代文明观念\", \"explanationVi\": \"Dựa vào câu: \\\"它最为重大的意义是企图号召整个民族，彻底地走向人性的解放，树立科学、民主、平等和自由的现代文明观念\\\", đáp án chính xác là: 树立现代美学观念.\"}, {\"id\": \"q_c3_054_3\", \"type\": \"single_choice\", \"question\": \"以下说法正确的是：\", \"options\": [\"新时期，我国散文一度衰落\", \"大学生不喜欢写散文\", \"古今散文不受重视\", \"中国是一个散文大国\"], \"answer\": 3, \"citationText\": \"中国是一个散文大国\", \"explanationVi\": \"Dựa vào câu: \\\"中国是一个散文大国\\\", đáp án chính xác là: 中国是一个散文大国.\"}]",
+    "topic": "Văn hóa & Lễ hội"
   },
   {
     "id": "RDG_C3_055",
@@ -2544,7 +3232,8 @@
         "explanationVi": "Dựa vào câu: \"通常大一点的“哥哥”正立在上方，而身体小一点的“弟弟”紧紧贴在“哥哥”的肚皮下，尽管它必须倒立，但不用担心安全，因为“大哥”常常会保护着它，尤其是它寻找食物的时候\", đáp án chính xác là: 有哥哥保护."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_055_1\", \"type\": \"single_choice\", \"question\": \"这对鱼为什么一直在一起生活?\", \"options\": [\"年纪小\", \"品种特殊\", \"喜欢这样\", \"身体连在一起\"], \"answer\": 3, \"citationText\": \"在泰国曼谷有一对奇特的鱼，是双胞胎，当它们在水中游动时，总是一上一下、一正一倒，因为这两条鱼的腹部生来就紧紧相连\", \"explanationVi\": \"Dựa vào câu: \\\"在泰国曼谷有一对奇特的鱼，是双胞胎，当它们在水中游动时，总是一上一下、一正一倒，因为这两条鱼的腹部生来就紧紧相连\\\", đáp án chính xác là: 身体连在一起.\"}, {\"id\": \"q_c3_055_2\", \"type\": \"single_choice\", \"question\": \"这对鱼是在哪里发现的?\", \"options\": [\"泰国\", \"上海\", \"北京\", \"印度\"], \"answer\": 0, \"citationText\": \"在泰国曼谷有一对奇特的鱼，是双胞胎，当它们在水中游动时，总是一上一下、一正一倒，因为这两条鱼的腹部生来就紧紧相连\", \"explanationVi\": \"Dựa vào câu: \\\"在泰国曼谷有一对奇特的鱼，是双胞胎，当它们在水中游动时，总是一上一下、一正一倒，因为这两条鱼的腹部生来就紧紧相连\\\", đáp án chính xác là: 泰国.\"}, {\"id\": \"q_c3_055_3\", \"type\": \"single_choice\", \"question\": \"“鱼弟弟”倒立生活，但为什么还很安全?\", \"options\": [\"敌人看不见\", \"有哥哥保护\", \"它有保护色\", \"它有秘密武器\"], \"answer\": 1, \"citationText\": \"通常大一点的“哥哥”正立在上方，而身体小一点的“弟弟”紧紧贴在“哥哥”的肚皮下，尽管它必须倒立，但不用担心安全，因为“大哥”常常会保护着它，尤其是它寻找食物的时候\", \"explanationVi\": \"Dựa vào câu: \\\"通常大一点的“哥哥”正立在上方，而身体小一点的“弟弟”紧紧贴在“哥哥”的肚皮下，尽管它必须倒立，但不用担心安全，因为“大哥”常常会保护着它，尤其是它寻找食物的时候\\\", đáp án chính xác là: 有哥哥保护.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_055_1\", \"type\": \"single_choice\", \"question\": \"这对鱼为什么一直在一起生活?\", \"options\": [\"年纪小\", \"品种特殊\", \"喜欢这样\", \"身体连在一起\"], \"answer\": 3, \"citationText\": \"在泰国曼谷有一对奇特的鱼，是双胞胎，当它们在水中游动时，总是一上一下、一正一倒，因为这两条鱼的腹部生来就紧紧相连\", \"explanationVi\": \"Dựa vào câu: \\\"在泰国曼谷有一对奇特的鱼，是双胞胎，当它们在水中游动时，总是一上一下、一正一倒，因为这两条鱼的腹部生来就紧紧相连\\\", đáp án chính xác là: 身体连在一起.\"}, {\"id\": \"q_c3_055_2\", \"type\": \"single_choice\", \"question\": \"这对鱼是在哪里发现的?\", \"options\": [\"泰国\", \"上海\", \"北京\", \"印度\"], \"answer\": 0, \"citationText\": \"在泰国曼谷有一对奇特的鱼，是双胞胎，当它们在水中游动时，总是一上一下、一正一倒，因为这两条鱼的腹部生来就紧紧相连\", \"explanationVi\": \"Dựa vào câu: \\\"在泰国曼谷有一对奇特的鱼，是双胞胎，当它们在水中游动时，总是一上一下、一正一倒，因为这两条鱼的腹部生来就紧紧相连\\\", đáp án chính xác là: 泰国.\"}, {\"id\": \"q_c3_055_3\", \"type\": \"single_choice\", \"question\": \"“鱼弟弟”倒立生活，但为什么还很安全?\", \"options\": [\"敌人看不见\", \"有哥哥保护\", \"它有保护色\", \"它有秘密武器\"], \"answer\": 1, \"citationText\": \"通常大一点的“哥哥”正立在上方，而身体小一点的“弟弟”紧紧贴在“哥哥”的肚皮下，尽管它必须倒立，但不用担心安全，因为“大哥”常常会保护着它，尤其是它寻找食物的时候\", \"explanationVi\": \"Dựa vào câu: \\\"通常大一点的“哥哥”正立在上方，而身体小一点的“弟弟”紧紧贴在“哥哥”的肚皮下，尽管它必须倒立，但不用担心安全，因为“大哥”常常会保护着它，尤其是它寻找食物的时候\\\", đáp án chính xác là: 有哥哥保护.\"}]",
+    "topic": "Văn hóa & Lễ hội"
   },
   {
     "id": "RDG_C3_056",
@@ -2601,7 +3290,8 @@
         "explanationVi": "Dựa vào câu: \"文彦博自幼十分聪明，小时候与伙伴们玩球时，一不小心，球掉进一棵大树的树洞里去了\", đáp án chính xác là: 十分聪明."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_056_1\", \"type\": \"single_choice\", \"question\": \"这个故事发生在哪里?\", \"options\": [\"北京\", \"上海\", \"山东\", \"山西\"], \"answer\": 3, \"citationText\": \"文彦博幼年用水取球的故事，就发生在他的祖籍——山西省介休市\", \"explanationVi\": \"Dựa vào câu: \\\"文彦博幼年用水取球的故事，就发生在他的祖籍——山西省介休市\\\", đáp án chính xác là: 山西.\"}, {\"id\": \"q_c3_056_2\", \"type\": \"single_choice\", \"question\": \"文彦博为什么要往树洞里倒水?\", \"options\": [\"给树浇水\", \"准备划船\", \"要把球弄出来\", \"打算在里面养鱼\"], \"answer\": 2, \"citationText\": \"”随后他叫几个小朋友提来几桶水，把水一桶一桶往树洞里倒，不一会儿树洞里的水就满了，皮球也出来了\", \"explanationVi\": \"Dựa vào câu: \\\"”随后他叫几个小朋友提来几桶水，把水一桶一桶往树洞里倒，不一会儿树洞里的水就满了，皮球也出来了\\\", đáp án chính xác là: 要把球弄出来.\"}, {\"id\": \"q_c3_056_3\", \"type\": \"single_choice\", \"question\": \"关于文彦博，可以知道什么?\", \"options\": [\"喜欢游泳\", \"十分聪明\", \"力气很大\", \"是个文学家\"], \"answer\": 1, \"citationText\": \"文彦博自幼十分聪明，小时候与伙伴们玩球时，一不小心，球掉进一棵大树的树洞里去了\", \"explanationVi\": \"Dựa vào câu: \\\"文彦博自幼十分聪明，小时候与伙伴们玩球时，一不小心，球掉进一棵大树的树洞里去了\\\", đáp án chính xác là: 十分聪明.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_056_1\", \"type\": \"single_choice\", \"question\": \"这个故事发生在哪里?\", \"options\": [\"北京\", \"上海\", \"山东\", \"山西\"], \"answer\": 3, \"citationText\": \"文彦博幼年用水取球的故事，就发生在他的祖籍——山西省介休市\", \"explanationVi\": \"Dựa vào câu: \\\"文彦博幼年用水取球的故事，就发生在他的祖籍——山西省介休市\\\", đáp án chính xác là: 山西.\"}, {\"id\": \"q_c3_056_2\", \"type\": \"single_choice\", \"question\": \"文彦博为什么要往树洞里倒水?\", \"options\": [\"给树浇水\", \"准备划船\", \"要把球弄出来\", \"打算在里面养鱼\"], \"answer\": 2, \"citationText\": \"”随后他叫几个小朋友提来几桶水，把水一桶一桶往树洞里倒，不一会儿树洞里的水就满了，皮球也出来了\", \"explanationVi\": \"Dựa vào câu: \\\"”随后他叫几个小朋友提来几桶水，把水一桶一桶往树洞里倒，不一会儿树洞里的水就满了，皮球也出来了\\\", đáp án chính xác là: 要把球弄出来.\"}, {\"id\": \"q_c3_056_3\", \"type\": \"single_choice\", \"question\": \"关于文彦博，可以知道什么?\", \"options\": [\"喜欢游泳\", \"十分聪明\", \"力气很大\", \"是个文学家\"], \"answer\": 1, \"citationText\": \"文彦博自幼十分聪明，小时候与伙伴们玩球时，一不小心，球掉进一棵大树的树洞里去了\", \"explanationVi\": \"Dựa vào câu: \\\"文彦博自幼十分聪明，小时候与伙伴们玩球时，一不小心，球掉进一棵大树的树洞里去了\\\", đáp án chính xác là: 十分聪明.\"}]",
+    "topic": "Văn hóa & Lễ hội"
   },
   {
     "id": "RDG_C3_057",
@@ -2644,7 +3334,8 @@
         "explanationVi": "Dựa vào câu: \"”老师听了说：“你爷爷真是了不起!可这个故事给人的教训是什么呢?”王可说：“教训就是，我爷爷喝酒的时候最好不要打扰他!”\", đáp án chính xác là: 非常厉害."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_057_1\", \"type\": \"single_choice\", \"question\": \"关于王可的爷爷，下面哪项是正确的?\", \"options\": [\"是个军人\", \"会修飞机\", \"常喝醉酒\", \"爱教训人\"], \"answer\": 0, \"citationText\": \"王可说：“我爷爷在第二次世界战争时是开飞机的，有一次他的飞机被敌人打中，他跳出飞机降落在一个小岛上，身边只有一小瓶白酒\", \"explanationVi\": \"Dựa vào câu: \\\"王可说：“我爷爷在第二次世界战争时是开飞机的，有一次他的飞机被敌人打中，他跳出飞机降落在一个小岛上，身边只有一小瓶白酒\\\", đáp án chính xác là: 是个军人.\"}, {\"id\": \"q_c3_057_2\", \"type\": \"single_choice\", \"question\": \"老师觉得爷爷怎么样?\", \"options\": [\"没有意思\", \"十分幸运\", \"不够善良\", \"非常厉害\"], \"answer\": 3, \"citationText\": \"”老师听了说：“你爷爷真是了不起!可这个故事给人的教训是什么呢?”王可说：“教训就是，我爷爷喝酒的时候最好不要打扰他!”\", \"explanationVi\": \"Dựa vào câu: \\\"”老师听了说：“你爷爷真是了不起!可这个故事给人的教训是什么呢?”王可说：“教训就是，我爷爷喝酒的时候最好不要打扰他!”\\\", đáp án chính xác là: 非常厉害.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_057_1\", \"type\": \"single_choice\", \"question\": \"关于王可的爷爷，下面哪项是正确的?\", \"options\": [\"是个军人\", \"会修飞机\", \"常喝醉酒\", \"爱教训人\"], \"answer\": 0, \"citationText\": \"王可说：“我爷爷在第二次世界战争时是开飞机的，有一次他的飞机被敌人打中，他跳出飞机降落在一个小岛上，身边只有一小瓶白酒\", \"explanationVi\": \"Dựa vào câu: \\\"王可说：“我爷爷在第二次世界战争时是开飞机的，有一次他的飞机被敌人打中，他跳出飞机降落在一个小岛上，身边只有一小瓶白酒\\\", đáp án chính xác là: 是个军人.\"}, {\"id\": \"q_c3_057_2\", \"type\": \"single_choice\", \"question\": \"老师觉得爷爷怎么样?\", \"options\": [\"没有意思\", \"十分幸运\", \"不够善良\", \"非常厉害\"], \"answer\": 3, \"citationText\": \"”老师听了说：“你爷爷真是了不起!可这个故事给人的教训是什么呢?”王可说：“教训就是，我爷爷喝酒的时候最好不要打扰他!”\", \"explanationVi\": \"Dựa vào câu: \\\"”老师听了说：“你爷爷真是了不起!可这个故事给人的教训是什么呢?”王可说：“教训就是，我爷爷喝酒的时候最好不要打扰他!”\\\", đáp án chính xác là: 非常厉害.\"}]",
+    "topic": "Văn hóa & Lễ hội"
   },
   {
     "id": "RDG_C3_058",
@@ -2701,7 +3392,8 @@
         "explanationVi": "Dựa vào câu: \"所以，一到周末，只要我在家，通常是早早就起床，我就直接跑到菜市场\", đáp án chính xác là: 去菜市场买东西."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_058_1\", \"type\": \"single_choice\", \"question\": \"她丈夫是怎样一个人?\", \"options\": [\"职位高，工资也多\", \"善良、朴素、负责\", \"抽烟、喝酒、善良\", \"勤劳、刻苦、抽烟\"], \"answer\": 1, \"citationText\": \"我丈夫是一个善良、朴素、对家庭极为负责的人\", \"explanationVi\": \"Dựa vào câu: \\\"我丈夫是一个善良、朴素、对家庭极为负责的人\\\", đáp án chính xác là: 善良、朴素、负责.\"}, {\"id\": \"q_c3_058_2\", \"type\": \"single_choice\", \"question\": \"“我”为什么经常外出?\", \"options\": [\"因为外地有工作\", \"因为丈夫会做饭\", \"因为和丈夫吵架\", \"因为家庭不幸福\"], \"answer\": 0, \"citationText\": \"这几年，因为工作的关系，我经常外出，丈夫又当妈来又当爸，把女儿照顾得很好\", \"explanationVi\": \"Dựa vào câu: \\\"这几年，因为工作的关系，我经常外出，丈夫又当妈来又当爸，把女儿照顾得很好\\\", đáp án chính xác là: 因为外地有工作.\"}, {\"id\": \"q_c3_058_3\", \"type\": \"single_choice\", \"question\": \"周末起床以后，“我”先做什么?\", \"options\": [\"听着音乐擦桌子\", \"听着音乐洗衣服\", \"去菜市场买东西\", \"吃丈夫做的饭菜\"], \"answer\": 2, \"citationText\": \"所以，一到周末，只要我在家，通常是早早就起床，我就直接跑到菜市场\", \"explanationVi\": \"Dựa vào câu: \\\"所以，一到周末，只要我在家，通常是早早就起床，我就直接跑到菜市场\\\", đáp án chính xác là: 去菜市场买东西.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_058_1\", \"type\": \"single_choice\", \"question\": \"她丈夫是怎样一个人?\", \"options\": [\"职位高，工资也多\", \"善良、朴素、负责\", \"抽烟、喝酒、善良\", \"勤劳、刻苦、抽烟\"], \"answer\": 1, \"citationText\": \"我丈夫是一个善良、朴素、对家庭极为负责的人\", \"explanationVi\": \"Dựa vào câu: \\\"我丈夫是一个善良、朴素、对家庭极为负责的人\\\", đáp án chính xác là: 善良、朴素、负责.\"}, {\"id\": \"q_c3_058_2\", \"type\": \"single_choice\", \"question\": \"“我”为什么经常外出?\", \"options\": [\"因为外地有工作\", \"因为丈夫会做饭\", \"因为和丈夫吵架\", \"因为家庭不幸福\"], \"answer\": 0, \"citationText\": \"这几年，因为工作的关系，我经常外出，丈夫又当妈来又当爸，把女儿照顾得很好\", \"explanationVi\": \"Dựa vào câu: \\\"这几年，因为工作的关系，我经常外出，丈夫又当妈来又当爸，把女儿照顾得很好\\\", đáp án chính xác là: 因为外地有工作.\"}, {\"id\": \"q_c3_058_3\", \"type\": \"single_choice\", \"question\": \"周末起床以后，“我”先做什么?\", \"options\": [\"听着音乐擦桌子\", \"听着音乐洗衣服\", \"去菜市场买东西\", \"吃丈夫做的饭菜\"], \"answer\": 2, \"citationText\": \"所以，一到周末，只要我在家，通常是早早就起床，我就直接跑到菜市场\", \"explanationVi\": \"Dựa vào câu: \\\"所以，一到周末，只要我在家，通常是早早就起床，我就直接跑到菜市场\\\", đáp án chính xác là: 去菜市场买东西.\"}]",
+    "topic": "Văn hóa & Lễ hội"
   },
   {
     "id": "RDG_C3_059",
@@ -2744,7 +3436,8 @@
         "explanationVi": "Dựa vào câu: \"刘俊哲说，人口结构的老龄化，使得河南退休人口不断增加，工作人口日益减少，由于资金一直严重不足，社会养老体系特别是农村养老体系随之承受巨大压力，导致许多家庭陷入困顿\", đáp án chính xác là: 人口结构老龄化."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_059_1\", \"type\": \"single_choice\", \"question\": \"什么样的家庭要赡养四位老人?\", \"options\": [\"“未富先老”的家庭\", \"夫妻双方都是独生子女的家庭\", \"许多单亲家庭\", \"所有的夫妻家庭\"], \"answer\": 1, \"citationText\": \"对于许多夫妻双方都是独生子女的家庭来说，一对夫妻将要赡养四位老人\", \"explanationVi\": \"Dựa vào câu: \\\"对于许多夫妻双方都是独生子女的家庭来说，一对夫妻将要赡养四位老人\\\", đáp án chính xác là: 夫妻双方都是独生子女的家庭.\"}, {\"id\": \"q_c3_059_2\", \"type\": \"single_choice\", \"question\": \"河南退休人口不断增加的原因是什么?\", \"options\": [\"人口结构老龄化\", \"工作人口日益减少\", \"资金严重不足\", \"社会养老体系承受巨大压力\"], \"answer\": 0, \"citationText\": \"刘俊哲说，人口结构的老龄化，使得河南退休人口不断增加，工作人口日益减少，由于资金一直严重不足，社会养老体系特别是农村养老体系随之承受巨大压力，导致许多家庭陷入困顿\", \"explanationVi\": \"Dựa vào câu: \\\"刘俊哲说，人口结构的老龄化，使得河南退休人口不断增加，工作人口日益减少，由于资金一直严重不足，社会养老体系特别是农村养老体系随之承受巨大压力，导致许多家庭陷入困顿\\\", đáp án chính xác là: 人口结构老龄化.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_059_1\", \"type\": \"single_choice\", \"question\": \"什么样的家庭要赡养四位老人?\", \"options\": [\"“未富先老”的家庭\", \"夫妻双方都是独生子女的家庭\", \"许多单亲家庭\", \"所有的夫妻家庭\"], \"answer\": 1, \"citationText\": \"对于许多夫妻双方都是独生子女的家庭来说，一对夫妻将要赡养四位老人\", \"explanationVi\": \"Dựa vào câu: \\\"对于许多夫妻双方都是独生子女的家庭来说，一对夫妻将要赡养四位老人\\\", đáp án chính xác là: 夫妻双方都是独生子女的家庭.\"}, {\"id\": \"q_c3_059_2\", \"type\": \"single_choice\", \"question\": \"河南退休人口不断增加的原因是什么?\", \"options\": [\"人口结构老龄化\", \"工作人口日益减少\", \"资金严重不足\", \"社会养老体系承受巨大压力\"], \"answer\": 0, \"citationText\": \"刘俊哲说，人口结构的老龄化，使得河南退休人口不断增加，工作人口日益减少，由于资金一直严重不足，社会养老体系特别是农村养老体系随之承受巨大压力，导致许多家庭陷入困顿\", \"explanationVi\": \"Dựa vào câu: \\\"刘俊哲说，人口结构的老龄化，使得河南退休人口不断增加，工作人口日益减少，由于资金一直严重不足，社会养老体系特别是农村养老体系随之承受巨大压力，导致许多家庭陷入困顿\\\", đáp án chính xác là: 人口结构老龄化.\"}]",
+    "topic": "Văn hóa & Lễ hội"
   },
   {
     "id": "RDG_C3_060",
@@ -2801,7 +3494,8 @@
         "explanationVi": "Dựa vào câu: \"不过，“五叶草”和四叶草一样，只是因为一些三叶草发生了特殊的变化\", đáp án chính xác là: 只是三叶草发生了变化."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_060_1\", \"type\": \"single_choice\", \"question\": \"四叶草被认为是幸运的象征是因为它：\", \"options\": [\"很少见\", \"非常值钱\", \"可以帮人赚钱\", \"可以带来好运\"], \"answer\": 0, \"citationText\": \"四叶草因为很少见而被很多人认为是幸运的象征\", \"explanationVi\": \"Dựa vào câu: \\\"四叶草因为很少见而被很多人认为是幸运的象征\\\", đáp án chính xác là: 很少见.\"}, {\"id\": \"q_c3_060_2\", \"type\": \"single_choice\", \"question\": \"文章中的小女孩儿是怎么得到“五叶草”的?\", \"options\": [\"专门去找的\", \"妈妈送她的\", \"散步时发现的\", \"做标本时发现的\"], \"answer\": 2, \"citationText\": \"据报道，奥利维亚于11月20日在自己家附近散步时发现了这棵“五叶草”\", \"explanationVi\": \"Dựa vào câu: \\\"据报道，奥利维亚于11月20日在自己家附近散步时发现了这棵“五叶草”\\\", đáp án chính xác là: 散步时发现的.\"}, {\"id\": \"q_c3_060_3\", \"type\": \"single_choice\", \"question\": \"作者认为“五叶草”：\", \"options\": [\"在一些地区很常见\", \"只是三叶草发生了变化\", \"只有运气好的人才能发现\", \"没有“六叶草”或“七叶草”珍贵\"], \"answer\": 1, \"citationText\": \"不过，“五叶草”和四叶草一样，只是因为一些三叶草发生了特殊的变化\", \"explanationVi\": \"Dựa vào câu: \\\"不过，“五叶草”和四叶草一样，只是因为一些三叶草发生了特殊的变化\\\", đáp án chính xác là: 只是三叶草发生了变化.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_060_1\", \"type\": \"single_choice\", \"question\": \"四叶草被认为是幸运的象征是因为它：\", \"options\": [\"很少见\", \"非常值钱\", \"可以帮人赚钱\", \"可以带来好运\"], \"answer\": 0, \"citationText\": \"四叶草因为很少见而被很多人认为是幸运的象征\", \"explanationVi\": \"Dựa vào câu: \\\"四叶草因为很少见而被很多人认为是幸运的象征\\\", đáp án chính xác là: 很少见.\"}, {\"id\": \"q_c3_060_2\", \"type\": \"single_choice\", \"question\": \"文章中的小女孩儿是怎么得到“五叶草”的?\", \"options\": [\"专门去找的\", \"妈妈送她的\", \"散步时发现的\", \"做标本时发现的\"], \"answer\": 2, \"citationText\": \"据报道，奥利维亚于11月20日在自己家附近散步时发现了这棵“五叶草”\", \"explanationVi\": \"Dựa vào câu: \\\"据报道，奥利维亚于11月20日在自己家附近散步时发现了这棵“五叶草”\\\", đáp án chính xác là: 散步时发现的.\"}, {\"id\": \"q_c3_060_3\", \"type\": \"single_choice\", \"question\": \"作者认为“五叶草”：\", \"options\": [\"在一些地区很常见\", \"只是三叶草发生了变化\", \"只有运气好的人才能发现\", \"没有“六叶草”或“七叶草”珍贵\"], \"answer\": 1, \"citationText\": \"不过，“五叶草”和四叶草一样，只是因为一些三叶草发生了特殊的变化\", \"explanationVi\": \"Dựa vào câu: \\\"不过，“五叶草”和四叶草一样，只是因为一些三叶草发生了特殊的变化\\\", đáp án chính xác là: 只是三叶草发生了变化.\"}]",
+    "topic": "Văn hóa & Lễ hội"
   },
   {
     "id": "RDG_C3_061",
@@ -2858,7 +3552,8 @@
         "explanationVi": "Dựa vào câu: \"刘红笑着说：“在苏州这么些年了，这里早已成了我的第二故乡，城市发展、居住环境、发展机会都比老家要好很多，现在儿子也接来苏州了，进公办小学读书，还和本地人一样免除了学杂费，这让我更加安心地忙工作事业\", đáp án chính xác là: 刘红打算过几年回家乡."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_061_1\", \"type\": \"single_choice\", \"question\": \"刘红的儿子在哪里读书?\", \"options\": [\"公办学校\", \"私立学校\", \"农民工子弟学校\", \"贵族学校\"], \"answer\": 0, \"citationText\": \"昨天早晨，刘红将9岁的儿子豆豆送进平江区一所公办学校读书，自己随后赶去上班\", \"explanationVi\": \"Dựa vào câu: \\\"昨天早晨，刘红将9岁的儿子豆豆送进平江区一所公办学校读书，自己随后赶去上班\\\", đáp án chính xác là: 公办学校.\"}, {\"id\": \"q_c3_061_2\", \"type\": \"single_choice\", \"question\": \"刘红什么时间买了房子?\", \"options\": [\"1年前\", \"2年前\", \"7年前\", \"9年前\"], \"answer\": 1, \"citationText\": \"和丈夫在苏州打拼了7年的她，两年前在苏州买了一套一室一厅的小房子\", \"explanationVi\": \"Dựa vào câu: \\\"和丈夫在苏州打拼了7年的她，两年前在苏州买了一套一室一厅的小房子\\\", đáp án chính xác là: 2年前.\"}, {\"id\": \"q_c3_061_3\", \"type\": \"single_choice\", \"question\": \"下面哪一项与短文内容不符?\", \"options\": [\"苏州是刘红的第二故乡\", \"儿子读书不用交学杂费\", \"他们来苏州已经7年了\", \"刘红打算过几年回家乡\"], \"answer\": 3, \"citationText\": \"刘红笑着说：“在苏州这么些年了，这里早已成了我的第二故乡，城市发展、居住环境、发展机会都比老家要好很多，现在儿子也接来苏州了，进公办小学读书，还和本地人一样免除了学杂费，这让我更加安心地忙工作事业\", \"explanationVi\": \"Dựa vào câu: \\\"刘红笑着说：“在苏州这么些年了，这里早已成了我的第二故乡，城市发展、居住环境、发展机会都比老家要好很多，现在儿子也接来苏州了，进公办小学读书，还和本地人一样免除了学杂费，这让我更加安心地忙工作事业\\\", đáp án chính xác là: 刘红打算过几年回家乡.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_061_1\", \"type\": \"single_choice\", \"question\": \"刘红的儿子在哪里读书?\", \"options\": [\"公办学校\", \"私立学校\", \"农民工子弟学校\", \"贵族学校\"], \"answer\": 0, \"citationText\": \"昨天早晨，刘红将9岁的儿子豆豆送进平江区一所公办学校读书，自己随后赶去上班\", \"explanationVi\": \"Dựa vào câu: \\\"昨天早晨，刘红将9岁的儿子豆豆送进平江区一所公办学校读书，自己随后赶去上班\\\", đáp án chính xác là: 公办学校.\"}, {\"id\": \"q_c3_061_2\", \"type\": \"single_choice\", \"question\": \"刘红什么时间买了房子?\", \"options\": [\"1年前\", \"2年前\", \"7年前\", \"9年前\"], \"answer\": 1, \"citationText\": \"和丈夫在苏州打拼了7年的她，两年前在苏州买了一套一室一厅的小房子\", \"explanationVi\": \"Dựa vào câu: \\\"和丈夫在苏州打拼了7年的她，两年前在苏州买了一套一室一厅的小房子\\\", đáp án chính xác là: 2年前.\"}, {\"id\": \"q_c3_061_3\", \"type\": \"single_choice\", \"question\": \"下面哪一项与短文内容不符?\", \"options\": [\"苏州是刘红的第二故乡\", \"儿子读书不用交学杂费\", \"他们来苏州已经7年了\", \"刘红打算过几年回家乡\"], \"answer\": 3, \"citationText\": \"刘红笑着说：“在苏州这么些年了，这里早已成了我的第二故乡，城市发展、居住环境、发展机会都比老家要好很多，现在儿子也接来苏州了，进公办小学读书，还和本地人一样免除了学杂费，这让我更加安心地忙工作事业\", \"explanationVi\": \"Dựa vào câu: \\\"刘红笑着说：“在苏州这么些年了，这里早已成了我的第二故乡，城市发展、居住环境、发展机会都比老家要好很多，现在儿子也接来苏州了，进公办小学读书，还和本地人一样免除了学杂费，这让我更加安心地忙工作事业\\\", đáp án chính xác là: 刘红打算过几年回家乡.\"}]",
+    "topic": "Văn hóa & Lễ hội"
   },
   {
     "id": "RDG_C3_062",
@@ -2929,7 +3624,8 @@
         "explanationVi": "Dựa vào câu: \"新作品《新警察故事》于2013年12月24日年末上映\", đáp án chính xác là: 圣诞节."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_062_1\", \"type\": \"single_choice\", \"question\": \"成龙是因为哪种类型的电影出名的?\", \"options\": [\"动作片\", \"喜剧片\", \"历史片\", \"爱情片\"], \"answer\": 0, \"citationText\": \"成龙以惊险动作著称，是一位非常有名的好莱坞明星，是包括黄柳霜和李小龙在内的三位华人明星之一，并多次获得香港金像奖的最佳动作设计奖，两次获得台湾电影金马奖最佳男主角奖，其主演的电影全球票房已经超过200亿元，为华人演员之首\", \"explanationVi\": \"Dựa vào câu: \\\"成龙以惊险动作著称，是一位非常有名的好莱坞明星，是包括黄柳霜和李小龙在内的三位华人明星之一，并多次获得香港金像奖的最佳动作设计奖，两次获得台湾电影金马奖最佳男主角奖，其主演的电影全球票房已经超过200亿元，为华人演员之首\\\", đáp án chính xác là: 动作片.\"}, {\"id\": \"q_c3_062_2\", \"type\": \"single_choice\", \"question\": \"下列关于成龙说法正确的是?\", \"options\": [\"成龙只是一位国际知名的演员\", \"成龙的妻子现在是很有名的演员\", \"成龙的电影全球票房在中国演员中最高\", \"成龙是唯一一个中国好莱坞明星\"], \"answer\": 2, \"citationText\": \"成龙以惊险动作著称，是一位非常有名的好莱坞明星，是包括黄柳霜和李小龙在内的三位华人明星之一，并多次获得香港金像奖的最佳动作设计奖，两次获得台湾电影金马奖最佳男主角奖，其主演的电影全球票房已经超过200亿元，为华人演员之首\", \"explanationVi\": \"Dựa vào câu: \\\"成龙以惊险动作著称，是一位非常有名的好莱坞明星，是包括黄柳霜和李小龙在内的三位华人明星之一，并多次获得香港金像奖的最佳动作设计奖，两次获得台湾电影金马奖最佳男主角奖，其主演的电影全球票房已经超过200亿元，为华人演员之首\\\", đáp án chính xác là: 成龙的电影全球票房在中国演员中最高.\"}, {\"id\": \"q_c3_062_3\", \"type\": \"single_choice\", \"question\": \"成龙总共获过几次最佳男主角奖?\", \"options\": [\"两次\", \"三次\", \"四次\", \"多次\"], \"answer\": 0, \"citationText\": \"成龙以惊险动作著称，是一位非常有名的好莱坞明星，是包括黄柳霜和李小龙在内的三位华人明星之一，并多次获得香港金像奖的最佳动作设计奖，两次获得台湾电影金马奖最佳男主角奖，其主演的电影全球票房已经超过200亿元，为华人演员之首\", \"explanationVi\": \"Dựa vào câu: \\\"成龙以惊险动作著称，是一位非常有名的好莱坞明星，是包括黄柳霜和李小龙在内的三位华人明星之一，并多次获得香港金像奖的最佳动作设计奖，两次获得台湾电影金马奖最佳男主角奖，其主演的电影全球票房已经超过200亿元，为华人演员之首\\\", đáp án chính xác là: 两次.\"}, {\"id\": \"q_c3_062_4\", \"type\": \"single_choice\", \"question\": \"《新警察故事》会在什么时候上映?\", \"options\": [\"元旦\", \"圣诞节\", \"中秋节\", \"国庆节\"], \"answer\": 1, \"citationText\": \"新作品《新警察故事》于2013年12月24日年末上映\", \"explanationVi\": \"Dựa vào câu: \\\"新作品《新警察故事》于2013年12月24日年末上映\\\", đáp án chính xác là: 圣诞节.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_062_1\", \"type\": \"single_choice\", \"question\": \"成龙是因为哪种类型的电影出名的?\", \"options\": [\"动作片\", \"喜剧片\", \"历史片\", \"爱情片\"], \"answer\": 0, \"citationText\": \"成龙以惊险动作著称，是一位非常有名的好莱坞明星，是包括黄柳霜和李小龙在内的三位华人明星之一，并多次获得香港金像奖的最佳动作设计奖，两次获得台湾电影金马奖最佳男主角奖，其主演的电影全球票房已经超过200亿元，为华人演员之首\", \"explanationVi\": \"Dựa vào câu: \\\"成龙以惊险动作著称，是一位非常有名的好莱坞明星，是包括黄柳霜和李小龙在内的三位华人明星之一，并多次获得香港金像奖的最佳动作设计奖，两次获得台湾电影金马奖最佳男主角奖，其主演的电影全球票房已经超过200亿元，为华人演员之首\\\", đáp án chính xác là: 动作片.\"}, {\"id\": \"q_c3_062_2\", \"type\": \"single_choice\", \"question\": \"下列关于成龙说法正确的是?\", \"options\": [\"成龙只是一位国际知名的演员\", \"成龙的妻子现在是很有名的演员\", \"成龙的电影全球票房在中国演员中最高\", \"成龙是唯一一个中国好莱坞明星\"], \"answer\": 2, \"citationText\": \"成龙以惊险动作著称，是一位非常有名的好莱坞明星，是包括黄柳霜和李小龙在内的三位华人明星之一，并多次获得香港金像奖的最佳动作设计奖，两次获得台湾电影金马奖最佳男主角奖，其主演的电影全球票房已经超过200亿元，为华人演员之首\", \"explanationVi\": \"Dựa vào câu: \\\"成龙以惊险动作著称，是一位非常有名的好莱坞明星，是包括黄柳霜和李小龙在内的三位华人明星之一，并多次获得香港金像奖的最佳动作设计奖，两次获得台湾电影金马奖最佳男主角奖，其主演的电影全球票房已经超过200亿元，为华人演员之首\\\", đáp án chính xác là: 成龙的电影全球票房在中国演员中最高.\"}, {\"id\": \"q_c3_062_3\", \"type\": \"single_choice\", \"question\": \"成龙总共获过几次最佳男主角奖?\", \"options\": [\"两次\", \"三次\", \"四次\", \"多次\"], \"answer\": 0, \"citationText\": \"成龙以惊险动作著称，是一位非常有名的好莱坞明星，是包括黄柳霜和李小龙在内的三位华人明星之一，并多次获得香港金像奖的最佳动作设计奖，两次获得台湾电影金马奖最佳男主角奖，其主演的电影全球票房已经超过200亿元，为华人演员之首\", \"explanationVi\": \"Dựa vào câu: \\\"成龙以惊险动作著称，是一位非常有名的好莱坞明星，是包括黄柳霜和李小龙在内的三位华人明星之一，并多次获得香港金像奖的最佳动作设计奖，两次获得台湾电影金马奖最佳男主角奖，其主演的电影全球票房已经超过200亿元，为华人演员之首\\\", đáp án chính xác là: 两次.\"}, {\"id\": \"q_c3_062_4\", \"type\": \"single_choice\", \"question\": \"《新警察故事》会在什么时候上映?\", \"options\": [\"元旦\", \"圣诞节\", \"中秋节\", \"国庆节\"], \"answer\": 1, \"citationText\": \"新作品《新警察故事》于2013年12月24日年末上映\", \"explanationVi\": \"Dựa vào câu: \\\"新作品《新警察故事》于2013年12月24日年末上映\\\", đáp án chính xác là: 圣诞节.\"}]",
+    "topic": "Văn hóa & Lễ hội"
   },
   {
     "id": "RDG_C3_063",
@@ -2986,7 +3682,8 @@
         "explanationVi": "Dựa vào câu: \"最不方便的是，在学校里你必须和其他人共用一个房间\", đáp án chính xác là: 和别人用一个房间."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_063_1\", \"type\": \"single_choice\", \"question\": \"上文主要淡论了什么问题?\", \"options\": [\"大学生学习\", \"大学生住宿\", \"大学生洗衣服\", \"大学生相处\"], \"answer\": 1, \"citationText\": \"有人说大学生应该住在学校里才能体会到真正的大学生活\", \"explanationVi\": \"Dựa vào câu: \\\"有人说大学生应该住在学校里才能体会到真正的大学生活\\\", đáp án chính xác là: 大学生住宿.\"}, {\"id\": \"q_c3_063_2\", \"type\": \"single_choice\", \"question\": \"下列哪项不是住在学校的好处?\", \"options\": [\"能经常和同学们交流\", \"方便到教室上自习\", \"方便参加各种活动\", \"在学校住宿费用很高\"], \"answer\": 3, \"citationText\": \"但是住在学校里虽然花钱少，也有很多不方便的地方\", \"explanationVi\": \"Dựa vào câu: \\\"但是住在学校里虽然花钱少，也有很多不方便的地方\\\", đáp án chính xác là: 在学校住宿费用很高.\"}, {\"id\": \"q_c3_063_3\", \"type\": \"single_choice\", \"question\": \"下列哪项不是住在学校的不方便之处?\", \"options\": [\"和别人用一个房间\", \"宿舍里没有洗衣机\", \"宿舍里没有冰箱\", \"容易产生不愉快\"], \"answer\": 0, \"citationText\": \"最不方便的是，在学校里你必须和其他人共用一个房间\", \"explanationVi\": \"Dựa vào câu: \\\"最不方便的是，在学校里你必须和其他人共用一个房间\\\", đáp án chính xác là: 和别人用一个房间.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_063_1\", \"type\": \"single_choice\", \"question\": \"上文主要淡论了什么问题?\", \"options\": [\"大学生学习\", \"大学生住宿\", \"大学生洗衣服\", \"大学生相处\"], \"answer\": 1, \"citationText\": \"有人说大学生应该住在学校里才能体会到真正的大学生活\", \"explanationVi\": \"Dựa vào câu: \\\"有人说大学生应该住在学校里才能体会到真正的大学生活\\\", đáp án chính xác là: 大学生住宿.\"}, {\"id\": \"q_c3_063_2\", \"type\": \"single_choice\", \"question\": \"下列哪项不是住在学校的好处?\", \"options\": [\"能经常和同学们交流\", \"方便到教室上自习\", \"方便参加各种活动\", \"在学校住宿费用很高\"], \"answer\": 3, \"citationText\": \"但是住在学校里虽然花钱少，也有很多不方便的地方\", \"explanationVi\": \"Dựa vào câu: \\\"但是住在学校里虽然花钱少，也有很多不方便的地方\\\", đáp án chính xác là: 在学校住宿费用很高.\"}, {\"id\": \"q_c3_063_3\", \"type\": \"single_choice\", \"question\": \"下列哪项不是住在学校的不方便之处?\", \"options\": [\"和别人用一个房间\", \"宿舍里没有洗衣机\", \"宿舍里没有冰箱\", \"容易产生不愉快\"], \"answer\": 0, \"citationText\": \"最不方便的是，在学校里你必须和其他人共用一个房间\", \"explanationVi\": \"Dựa vào câu: \\\"最不方便的是，在学校里你必须和其他人共用一个房间\\\", đáp án chính xác là: 和别人用一个房间.\"}]",
+    "topic": "Văn hóa & Lễ hội"
   },
   {
     "id": "RDG_C3_064",
@@ -3057,6 +3754,7 @@
         "explanationVi": "Dựa vào câu: \"书中最吸引读者的主人公便是孙悟空，他非常聪明勇敢，他的能力也很强，能够分出好人和坏人，深受人们的喜欢，当然孙悟空身上也是有很多缺点的，比如说，他的耐心不够，他喜欢欺负猪八戒，他很难管理\", đáp án chính xác là: 文化."
       }
     ],
-    "questions_json": "[{\"id\": \"q_c3_064_1\", \"type\": \"single_choice\", \"question\": \"读者为什么会喜欢孙悟空?\", \"options\": [\"孙悟空聪明、勇敢、有能力\", \"孙悟空没有耐心\", \"孙悟空是《西游记》的主人公\", \"孙悟空经常欺负猪八戒\"], \"answer\": 0, \"citationText\": \"书中最吸引读者的主人公便是孙悟空，他非常聪明勇敢，他的能力也很强，能够分出好人和坏人，深受人们的喜欢，当然孙悟空身上也是有很多缺点的，比如说，他的耐心不够，他喜欢欺负猪八戒，他很难管理\", \"explanationVi\": \"Dựa vào câu: \\\"书中最吸引读者的主人公便是孙悟空，他非常聪明勇敢，他的能力也很强，能够分出好人和坏人，深受人们的喜欢，当然孙悟空身上也是有很多缺点的，比如说，他的耐心不够，他喜欢欺负猪八戒，他很难管理\\\", đáp án chính xác là: 孙悟空聪明、勇敢、有能力.\"}, {\"id\": \"q_c3_064_2\", \"type\": \"single_choice\", \"question\": \"下面选项中是孙悟空缺点的是：\", \"options\": [\"孙悟空能够分辨出好坏\", \"孙悟空很难控制\", \"孙悟空很有本领\", \"孙悟空很难被欺骗\"], \"answer\": 1, \"citationText\": \"书中最吸引读者的主人公便是孙悟空，他非常聪明勇敢，他的能力也很强，能够分出好人和坏人，深受人们的喜欢，当然孙悟空身上也是有很多缺点的，比如说，他的耐心不够，他喜欢欺负猪八戒，他很难管理\", \"explanationVi\": \"Dựa vào câu: \\\"书中最吸引读者的主人公便是孙悟空，他非常聪明勇敢，他的能力也很强，能够分出好人和坏人，深受人们的喜欢，当然孙悟空身上也是有很多缺点的，比如说，他的耐心不够，他喜欢欺负猪八戒，他很难管理\\\", đáp án chính xác là: 孙悟空很难控制.\"}, {\"id\": \"q_c3_064_3\", \"type\": \"single_choice\", \"question\": \"下面的作品中，最受小朋友欢迎的是：\", \"options\": [\"《西游记》\", \"《水浒传》、《红楼梦》\", \"《红楼梦》、《三国演义》\", \"《水浒传》、《西游记》、《红楼梦》、《三国演义》\"], \"answer\": 0, \"citationText\": \"当然最受小朋友欢迎的是《西游记》\", \"explanationVi\": \"Dựa vào câu: \\\"当然最受小朋友欢迎的是《西游记》\\\", đáp án chính xác là: 《西游记》.\"}, {\"id\": \"q_c3_064_4\", \"type\": \"single_choice\", \"question\": \"本文最有可能选自哪种素材?\", \"options\": [\"体育\", \"旅行\", \"文化\", \"健康\"], \"answer\": 2, \"citationText\": \"书中最吸引读者的主人公便是孙悟空，他非常聪明勇敢，他的能力也很强，能够分出好人和坏人，深受人们的喜欢，当然孙悟空身上也是有很多缺点的，比如说，他的耐心不够，他喜欢欺负猪八戒，他很难管理\", \"explanationVi\": \"Dựa vào câu: \\\"书中最吸引读者的主人公便是孙悟空，他非常聪明勇敢，他的能力也很强，能够分出好人和坏人，深受人们的喜欢，当然孙悟空身上也是有很多缺点的，比如说，他的耐心不够，他喜欢欺负猪八戒，他很难管理\\\", đáp án chính xác là: 文化.\"}]"
+    "questions_json": "[{\"id\": \"q_c3_064_1\", \"type\": \"single_choice\", \"question\": \"读者为什么会喜欢孙悟空?\", \"options\": [\"孙悟空聪明、勇敢、有能力\", \"孙悟空没有耐心\", \"孙悟空是《西游记》的主人公\", \"孙悟空经常欺负猪八戒\"], \"answer\": 0, \"citationText\": \"书中最吸引读者的主人公便是孙悟空，他非常聪明勇敢，他的能力也很强，能够分出好人和坏人，深受人们的喜欢，当然孙悟空身上也是有很多缺点的，比如说，他的耐心不够，他喜欢欺负猪八戒，他很难管理\", \"explanationVi\": \"Dựa vào câu: \\\"书中最吸引读者的主人公便是孙悟空，他非常聪明勇敢，他的能力也很强，能够分出好人和坏人，深受人们的喜欢，当然孙悟空身上也是有很多缺点的，比如说，他的耐心不够，他喜欢欺负猪八戒，他很难管理\\\", đáp án chính xác là: 孙悟空聪明、勇敢、有能力.\"}, {\"id\": \"q_c3_064_2\", \"type\": \"single_choice\", \"question\": \"下面选项中是孙悟空缺点的是：\", \"options\": [\"孙悟空能够分辨出好坏\", \"孙悟空很难控制\", \"孙悟空很有本领\", \"孙悟空很难被欺骗\"], \"answer\": 1, \"citationText\": \"书中最吸引读者的主人公便是孙悟空，他非常聪明勇敢，他的能力也很强，能够分出好人和坏人，深受人们的喜欢，当然孙悟空身上也是有很多缺点的，比如说，他的耐心不够，他喜欢欺负猪八戒，他很难管理\", \"explanationVi\": \"Dựa vào câu: \\\"书中最吸引读者的主人公便是孙悟空，他非常聪明勇敢，他的能力也很强，能够分出好人和坏人，深受人们的喜欢，当然孙悟空身上也是有很多缺点的，比如说，他的耐心不够，他喜欢欺负猪八戒，他很难管理\\\", đáp án chính xác là: 孙悟空很难控制.\"}, {\"id\": \"q_c3_064_3\", \"type\": \"single_choice\", \"question\": \"下面的作品中，最受小朋友欢迎的是：\", \"options\": [\"《西游记》\", \"《水浒传》、《红楼梦》\", \"《红楼梦》、《三国演义》\", \"《水浒传》、《西游记》、《红楼梦》、《三国演义》\"], \"answer\": 0, \"citationText\": \"当然最受小朋友欢迎的是《西游记》\", \"explanationVi\": \"Dựa vào câu: \\\"当然最受小朋友欢迎的是《西游记》\\\", đáp án chính xác là: 《西游记》.\"}, {\"id\": \"q_c3_064_4\", \"type\": \"single_choice\", \"question\": \"本文最有可能选自哪种素材?\", \"options\": [\"体育\", \"旅行\", \"文化\", \"健康\"], \"answer\": 2, \"citationText\": \"书中最吸引读者的主人公便是孙悟空，他非常聪明勇敢，他的能力也很强，能够分出好人和坏人，深受人们的喜欢，当然孙悟空身上也是有很多缺点的，比如说，他的耐心不够，他喜欢欺负猪八戒，他很难管理\", \"explanationVi\": \"Dựa vào câu: \\\"书中最吸引读者的主人公便是孙悟空，他非常聪明勇敢，他的能力也很强，能够分出好人和坏人，深受人们的喜欢，当然孙悟空身上也是有很多缺点的，比如说，他的耐心不够，他喜欢欺负猪八戒，他很难管理\\\", đáp án chính xác là: 文化.\"}]",
+    "topic": "Văn hóa & Lễ hội"
   }
 ]

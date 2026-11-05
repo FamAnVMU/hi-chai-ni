@@ -8,6 +8,7 @@ class ReadingQuestionsSection extends StatefulWidget {
   final Map<String, int> initialAnswers;
   final bool isSubmitted;
   final Function(Map<String, int> answers, double scorePercent) onSubmitted;
+  final void Function(ReadingQuestion question)? onAskAiQuestion;
 
   const ReadingQuestionsSection({
     super.key,
@@ -15,6 +16,7 @@ class ReadingQuestionsSection extends StatefulWidget {
     this.initialAnswers = const {},
     this.isSubmitted = false,
     required this.onSubmitted,
+    this.onAskAiQuestion,
   });
 
   @override
@@ -107,7 +109,8 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
           final qIndex = entry.key + 1;
           final q = entry.value;
           final selectedOption = _userAnswers[q.id];
-          final isCorrect = _hasSubmitted && selectedOption == q.answerIndex;
+          final isAnswered = selectedOption != null || _hasSubmitted;
+          final isCorrect = selectedOption == q.answerIndex;
 
           return Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.lg),
@@ -120,23 +123,33 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Câu $qIndex: ',
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryBlueLight,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          'Câu $qIndex',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryBlueDark,
+                          ),
                         ),
                       ),
+                      const SizedBox(width: AppSpacing.xs),
                       Expanded(
                         child: Text(
                           q.question,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w600,
+                            color: AppColors.primaryText,
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: AppSpacing.md),
 
                   // Options
                   ...q.options.asMap().entries.map((opt) {
@@ -147,16 +160,22 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                     Color cardBg = AppColors.cardBackground;
                     Color cardBorder = AppColors.border;
                     Color textColor = AppColors.primaryText;
+                    IconData? statusIcon;
+                    Color? iconColor;
 
-                    if (_hasSubmitted) {
+                    if (isAnswered) {
                       if (optIndex == q.answerIndex) {
                         cardBg = AppColors.successContainerLight;
                         cardBorder = AppColors.success;
                         textColor = AppColors.success;
+                        statusIcon = Icons.check_circle_rounded;
+                        iconColor = AppColors.success;
                       } else if (isSelected) {
                         cardBg = AppColors.errorContainerLight;
                         cardBorder = AppColors.error;
                         textColor = AppColors.error;
+                        statusIcon = Icons.cancel_rounded;
+                        iconColor = AppColors.error;
                       }
                     } else if (isSelected) {
                       cardBg = AppColors.primaryBlueLight;
@@ -172,43 +191,48 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                           borderRadius: BorderRadius.circular(AppRadius.sm),
                           side: BorderSide(
                             color: cardBorder,
-                            width: isSelected || (_hasSubmitted && optIndex == q.answerIndex) ? 1.5 : 1.0,
+                            width: isSelected || (isAnswered && optIndex == q.answerIndex) ? 1.5 : 1.0,
                           ),
                         ),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(AppRadius.sm),
-                          onTap: _hasSubmitted
-                              ? null
-                              : () {
-                                  setState(() {
-                                    _userAnswers[q.id] = optIndex;
-                                  });
-                                },
+                          onTap: () {
+                            setState(() {
+                              _userAnswers[q.id] = optIndex;
+                              _calculateScore();
+                            });
+                            widget.onSubmitted(_userAnswers, _score ?? 100.0);
+                          },
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                             child: Row(
                               children: [
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: isSelected ? cardBorder : Colors.transparent,
-                                    border: Border.all(
-                                      color: isSelected ? cardBorder : AppColors.mutedText,
-                                      width: 2,
+                                if (statusIcon != null)
+                                  Icon(statusIcon, size: 18, color: iconColor)
+                                else
+                                  Container(
+                                    width: 18,
+                                    height: 18,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: isSelected ? AppColors.primaryBlueDark : Colors.transparent,
+                                      border: Border.all(
+                                        color: isSelected ? AppColors.primaryBlueDark : AppColors.mutedText,
+                                        width: 2,
+                                      ),
                                     ),
+                                    child: isSelected
+                                        ? const Icon(Icons.check, size: 12, color: Colors.white)
+                                        : null,
                                   ),
-                                  child: isSelected
-                                      ? const Icon(Icons.check, size: 12, color: Colors.white)
-                                      : null,
-                                ),
                                 const SizedBox(width: AppSpacing.sm),
                                 Expanded(
                                   child: Text(
                                     optText,
                                     style: theme.textTheme.bodyMedium?.copyWith(
-                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                      fontWeight: isSelected || (isAnswered && optIndex == q.answerIndex)
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
                                       color: textColor,
                                     ),
                                   ),
@@ -221,11 +245,11 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                     );
                   }),
 
-                  // Explanation after submission
-                  if (_hasSubmitted) ...[
+                  // Immediate Explanation Box (C3 Comprehension Box)
+                  if (isAnswered) ...[
                     const SizedBox(height: AppSpacing.sm),
                     Container(
-                      padding: const EdgeInsets.all(AppSpacing.sm),
+                      padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
                         color: isCorrect
                             ? AppColors.successContainerLight.withAlpha(120)
@@ -234,7 +258,7 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                         border: Border(
                           left: BorderSide(
                             color: isCorrect ? AppColors.success : AppColors.warning,
-                            width: 3,
+                            width: 3.5,
                           ),
                         ),
                       ),
@@ -258,21 +282,84 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            q.explanationVi,
-                            style: theme.textTheme.bodySmall,
-                          ),
-                          if (q.citationText != null) ...[
-                            const SizedBox(height: 4),
-                            Text(
-                              'Trích dẫn: "${q.citationText!}"',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                fontStyle: FontStyle.italic,
-                                color: theme.colorScheme.onSurfaceVariant,
+                          const SizedBox(height: 6),
+
+                          // Citation Highlight Box (màu vàng nổi bật)
+                          if (q.citationText != null && q.citationText!.isNotEmpty) ...[
+                            Container(
+                              width: double.infinity,
+                              margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFEF6E7),
+                                borderRadius: BorderRadius.circular(AppRadius.sm),
+                                border: Border.all(color: AppColors.warning.withAlpha(140)),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(Icons.format_quote_rounded, size: 16, color: AppColors.warning),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Dẫn chứng trích đoạn bài đọc:',
+                                          style: theme.textTheme.labelSmall?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.warning,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          'Trích dẫn: "${q.citationText!}"',
+                                          style: theme.textTheme.bodySmall?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.primaryText,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
+
+                          // Vietnamese Explanation
+                          Text(
+                            q.explanationVi,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              height: 1.4,
+                              color: AppColors.primaryText,
+                            ),
+                          ),
+
+                          const SizedBox(height: AppSpacing.xs),
+
+                          // Button: "Hỏi AI Tutor về câu này"
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton.icon(
+                              onPressed: () {
+                                if (widget.onAskAiQuestion != null) {
+                                  widget.onAskAiQuestion!(q);
+                                } else {
+                                  _showAiExplanationDialog(context, q);
+                                }
+                              },
+                              icon: const Icon(Icons.smart_toy_outlined, size: 16, color: AppColors.primaryBlueDark),
+                              label: const Text(
+                                'Hỏi AI Tutor về câu này',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryBlueDark,
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -302,6 +389,51 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
           ),
         ],
       ],
+    );
+  }
+
+  void _showAiExplanationDialog(BuildContext context, ReadingQuestion q) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.smart_toy_outlined, color: AppColors.primaryBlueDark),
+            SizedBox(width: 8),
+            Text('Trợ Lý AI Đọc Hiểu'),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Câu hỏi: ${q.question}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              if (q.citationText != null && q.citationText!.isNotEmpty) ...[
+                Text(
+                  'Dẫn chứng: "${q.citationText}"',
+                  style: const TextStyle(color: AppColors.secondaryText, fontStyle: FontStyle.italic),
+                ),
+                const SizedBox(height: 8),
+              ],
+              Text(
+                'Phân tích ngữ nghĩa & ngữ pháp:\n${q.explanationVi}\n\nMẹo sư phạm: Đối chiếu kỹ từ khóa trong câu hỏi với các câu đơn trong bài đọc để tránh bị bẫy bởi từ đồng âm/gần nghĩa.',
+                style: const TextStyle(height: 1.4),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Đã hiểu'),
+          ),
+        ],
+      ),
     );
   }
 }

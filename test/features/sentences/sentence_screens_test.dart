@@ -178,6 +178,7 @@ void main() {
           home: SentenceReadingScreen(
             sentence: sample!,
             repository: fakeRepo,
+            minReadingDuration: Duration.zero,
           ),
         ),
       );
@@ -202,7 +203,7 @@ void main() {
       expect(find.text('Đã ghi nhận hoàn thành'), findsOneWidget);
       final progress = await fakeRepo.getProgress('tat_1');
       expect(progress, isNotNull);
-      expect(progress!.lastScore, 100.0);
+      expect(progress!.lastScore, 50.0);
     });
 
     testWidgets('SentenceShadowingScreen displays model sentence and mic button', (tester) async {

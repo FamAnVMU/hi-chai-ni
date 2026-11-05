@@ -41,9 +41,25 @@ class _PinyinPracticeScreenState extends ConsumerState<PinyinPracticeScreen> {
       _results.add(eval);
     });
 
-    // Save item progress in repository
-    final itemId = widget.lesson.items.isNotEmpty ? widget.lesson.items.first.id : ex.id;
-    final itemType = widget.lesson.items.isNotEmpty ? widget.lesson.items.first.type.name : 'syllable';
+    // Save item progress in repository matching the exercise target item
+    PinyinItem? matchedItem;
+    if (ex.metadata.containsKey('item_id')) {
+      final refId = ex.metadata['item_id'];
+      matchedItem = widget.lesson.items.where((it) => it.id == refId).firstOrNull;
+    }
+    matchedItem ??= widget.lesson.items.where((it) {
+      final sym = it.symbol.trim().toLowerCase();
+      final ans = ex.correctAnswer.trim().toLowerCase();
+      return ans == sym || ans.startsWith('$sym ') || ans.startsWith('$sym(') || ans.startsWith('$sym/');
+    }).firstOrNull;
+    matchedItem ??= widget.lesson.items.where((it) => it.audioUri == ex.audioUri).firstOrNull;
+    if (matchedItem == null && widget.lesson.items.isNotEmpty) {
+      final fallbackIndex = _currentIndex % widget.lesson.items.length;
+      matchedItem = widget.lesson.items[fallbackIndex];
+    }
+
+    final itemId = matchedItem?.id ?? ex.id;
+    final itemType = matchedItem?.type.name ?? 'syllable';
 
     await ref.read(pinyinRepositoryProvider).recordItemAttempt(
       itemId: itemId,

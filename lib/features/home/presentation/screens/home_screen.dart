@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../app_shell/presentation/providers/app_shell_providers.dart';
-import '../../../design_system/presentation/screens/design_system_demo_screen.dart';
-import '../../../settings/presentation/screens/ai_settings_screen.dart';
 import '../providers/home_providers.dart';
 import '../widgets/home_quick_actions_grid.dart';
 import '../widgets/home_recent_activities_card.dart';
-import '../widgets/home_roadmap_card.dart';
+import '../widgets/home_lesson_access_card.dart';
 import '../widgets/home_skeleton_loading.dart';
 import '../widgets/home_srs_due_card.dart';
 import '../widgets/home_welcome_streak_card.dart';
@@ -35,26 +33,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('HI Chinese'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.palette_outlined),
-            tooltip: 'Design System Showcase',
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const DesignSystemDemoScreen()),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: 'Cài Đặt AI & Kết Nối',
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const AiSettingsScreen()),
-              );
-            },
-          ),
-        ],
       ),
       body: SafeArea(
         child: dashboardAsync.hasError && !dashboardAsync.hasValue
@@ -95,19 +73,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   HomeWelcomeStreakCard(data: data),
                   const SizedBox(height: AppSpacing.lg),
 
-                  // 2. SRS Review Due Alert Card
-                  HomeSrsDueCard(
-                    dueCount: data.srsDueCount,
-                    onStartReview: () {
-                      ref
-                          .read(selectedTabProvider.notifier)
-                          .selectTab(AppTab.review);
+                  // 2. Lesson Access Card (Truy cập bài học HSK)
+                  HomeLessonAccessCard(
+                    roadmap: data.roadmap,
+                    onNavigateLearning: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const CurriculumSyllabusScreen(),
+                        ),
+                      );
                     },
                   ),
                   const SizedBox(height: AppSpacing.lg),
 
                   // 3. Quick Actions Grid (Học tập, Ôn tập, Từ điển, AI Tutor)
                   HomeQuickActionsGrid(
+                    hasCompletedLessons: data.hasCompletedLessons,
                     onNavigateLearning: () {
                       ref
                           .read(selectedTabProvider.notifier)
@@ -126,18 +107,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   ),
                   const SizedBox(height: AppSpacing.lg),
 
-                  // 4. Curriculum Roadmap Progress Card
-                  HomeRoadmapCard(
-                    roadmap: data.roadmap,
-                    onContinueLesson: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const CurriculumSyllabusScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
+                  // 4. SRS Due Card (chỉ hiển thị khi có lesson đã hoàn thành)
+                  if (data.hasCompletedLessons && data.srsDueCount > 0) ...[
+                    HomeSrsDueCard(
+                      dueCount: data.srsDueCount,
+                      onStartReview: () {
+                        ref
+                            .read(selectedTabProvider.notifier)
+                            .selectTab(AppTab.review);
+                      },
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                  ],
 
                   // 5. Recent Learning Activities Summary
                   HomeRecentActivitiesCard(
