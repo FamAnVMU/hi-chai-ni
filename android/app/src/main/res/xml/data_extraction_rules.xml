@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Exclude SQLite databases containing sensitive learning and user records -->
+        <exclude path="databases/" />
+        <!-- Exclude local backup archives -->
+        <exclude path="*.hibak" />
+    </cloud-backup>
+    <device-transfer>
+        <!-- Exclude sensitive database files during unencrypted device transfer -->
+        <exclude path="databases/" />
+        <exclude path="*.hibak" />
+    </device-transfer>
+</data-extraction-rules>

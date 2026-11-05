@@ -27,15 +27,21 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
     return const AppSettings();
   }
 
+  /// Synchronously or asynchronously re-syncs state from the database
+  Future<void> reloadSettings() async {
+    await _loadSettingsAsync();
+  }
+
   Future<void> _loadSettingsAsync() async {
     try {
       final dao = ref.read(appSettingsDaoProvider);
       final map = await dao.getAllSettings();
       if (map.isEmpty) return;
 
-      ThemeMode themeMode = ThemeMode.dark;
-      if (map['theme_mode'] == 'light') themeMode = ThemeMode.light;
+      ThemeMode themeMode = ThemeMode.light;
+      if (map['theme_mode'] == 'dark') themeMode = ThemeMode.dark;
       if (map['theme_mode'] == 'system') themeMode = ThemeMode.system;
+      if (map['theme_mode'] == 'light') themeMode = ThemeMode.light;
 
       final fontScale = double.tryParse(map['font_scale'] ?? '') ?? 1.0;
       final showPinyin = map['show_pinyin'] != 'false';
