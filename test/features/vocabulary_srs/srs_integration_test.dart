@@ -23,7 +23,7 @@ void main() {
     final engine = MigrationEngine();
     await engine.executeMigrations(db, 0, DatabaseConstants.currentDatabaseVersion);
 
-    repository = SrsRepository(db, debounceCooldownMs: 100);
+    repository = SrsRepository(db, debounceCooldownMs: 500);
 
     // Seed test vocabulary
     await db.insert(DatabaseConstants.tableVocabularies, {

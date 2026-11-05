@@ -134,6 +134,8 @@ void main() {
       expect(progress, isNotNull);
       expect(progress!.status, LessonStatus.skipped);
       expect(progress.isCompleted, isFalse);
+      expect(progress.completionScore, equals(0.0));
+      expect(progress.completedAt, isNull);
     });
 
     test('6. getAdaptiveRoadmapState calculates and snapshots state to SQLite', () async {
