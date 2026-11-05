@@ -45,6 +45,7 @@ class _OnboardingPersonalizationScreenState extends State<OnboardingPersonalizat
   final List<int> _commitmentOptions = [10, 15, 30, 45, 60];
 
   final List<Map<String, String>> _skillOptions = [
+    {'id': 'balanced', 'label': 'Toàn diện (Cân bằng)', 'desc': 'Phát triển đồng đều cả 6 kỹ năng (mỗi kỹ năng ~16.7%)'},
     {'id': 'listening', 'label': 'Nghe hiểu', 'desc': 'Luyện nghe phản xạ và nhận diện thanh điệu'},
     {'id': 'speaking', 'label': 'Nói / Phát âm', 'desc': 'Luyện phát âm chuẩn Pinyin & kỹ thuật Shadowing'},
     {'id': 'reading', 'label': 'Đọc hiểu', 'desc': 'Nhận diện mặt chữ Hán và ngữ cảnh văn bản'},
@@ -372,7 +373,9 @@ class _OnboardingPersonalizationScreenState extends State<OnboardingPersonalizat
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'Hệ thống sẽ tăng 40% tỷ trọng bài tập của kỹ năng này trong mỗi bài học.',
+            _selectedSkill == 'balanced'
+                ? 'Hệ thống sẽ phân bổ đồng đều 6 kỹ năng (mỗi kỹ năng ~16.7% tỷ trọng bài tập).'
+                : 'Hệ thống sẽ tăng 40% tỷ trọng bài tập của kỹ năng này trong mỗi bài học.',
             style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
           ),
           const SizedBox(height: AppSpacing.sm),

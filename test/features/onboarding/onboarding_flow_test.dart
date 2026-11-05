@@ -90,6 +90,43 @@ void main() {
       expect(selectedSkill, 'listening');
     });
 
+    testWidgets('2b. OnboardingPersonalizationScreen selects balanced comprehensive path', (tester) async {
+      int? selectedMinutes;
+      String? selectedSkill;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: OnboardingPersonalizationScreen(
+              onComplete: (minutes, skill, [data]) {
+                selectedMinutes = minutes;
+                selectedSkill = skill;
+              },
+            ),
+          ),
+        ),
+      );
+
+      final balancedCard = find.text('Toàn diện (Cân bằng)');
+      expect(balancedCard, findsOneWidget);
+      await tester.ensureVisible(balancedCard);
+      await tester.tap(balancedCard);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Hệ thống sẽ phân bổ đồng đều 6 kỹ năng (mỗi kỹ năng ~16.7% tỷ trọng bài tập).'),
+        findsOneWidget,
+      );
+
+      final startBtn = find.text('Bắt đầu lộ trình ngay');
+      await tester.ensureVisible(startBtn);
+      await tester.tap(startBtn);
+      await tester.pumpAndSettle();
+
+      expect(selectedMinutes, equals(30));
+      expect(selectedSkill, equals('balanced'));
+    });
+
     testWidgets('3. PlacementTestIntroScreen allows beginner to skip to HSK 1 directly', (tester) async {
       int? assessedLevel;
 

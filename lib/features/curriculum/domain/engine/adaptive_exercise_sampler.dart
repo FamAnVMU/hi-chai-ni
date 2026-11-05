@@ -17,7 +17,21 @@ class ExerciseEvaluationResult {
 class AdaptiveExerciseSampler {
   const AdaptiveExerciseSampler();
 
-  /// Samples [totalCount] questions, prioritizing [focusSkill] to at least 40% (e.g. 4 of 10).
+  /// Canonical 6 core skills for comprehensive balanced curriculum distribution.
+  static const List<String> canonicalSkills = [
+    'listening',
+    'speaking',
+    'reading',
+    'writing',
+    'vocabulary',
+    'grammar',
+  ];
+
+  /// Samples [totalCount] questions:
+  /// - When [focusSkill] is 'balanced' (Comprehensive path): distributes exercises evenly
+  ///   across the 6 skills (~16.7% each), without applying the 40% single-skill boost.
+  /// - When [focusSkill] is a specific skill (e.g. 'reading'): allocates at least 40%
+  ///   to that priority skill and distributes the remaining 60% across other skills.
   List<Map<String, dynamic>> sampleQuestions({
     required List<Map<String, dynamic>> allExercises,
     required String focusSkill,
@@ -27,14 +41,74 @@ class AdaptiveExerciseSampler {
       return List<Map<String, dynamic>>.from(allExercises);
     }
 
+    final normalizedFocus = focusSkill.toLowerCase().trim();
+
+    // 1. Comprehensive / Balanced distribution path (~16.7% each across 6 skills)
+    if (normalizedFocus == 'balanced') {
+      final skillBuckets = <String, List<Map<String, dynamic>>>{};
+      for (final q in allExercises) {
+        final skill = (q['skill_type'] as String?)?.toLowerCase().trim() ?? 'other';
+        skillBuckets.putIfAbsent(skill, () => []).add(q);
+      }
+
+      // Order skills: canonical 6 first, then any other skills
+      final orderedSkills = <String>[];
+      for (final s in canonicalSkills) {
+        if (skillBuckets.containsKey(s)) {
+          orderedSkills.add(s);
+        }
+      }
+      for (final s in skillBuckets.keys) {
+        if (!orderedSkills.contains(s)) {
+          orderedSkills.add(s);
+        }
+      }
+
+      if (orderedSkills.isEmpty) {
+        return allExercises.take(totalCount).toList();
+      }
+
+      final selected = <Map<String, dynamic>>[];
+      final pointers = <String, int>{for (final s in orderedSkills) s: 0};
+
+      while (selected.length < totalCount) {
+        bool addedInCycle = false;
+        for (final s in orderedSkills) {
+          if (selected.length >= totalCount) break;
+          final pool = skillBuckets[s]!;
+          final idx = pointers[s]!;
+          if (idx < pool.length) {
+            selected.add(pool[idx]);
+            pointers[s] = idx + 1;
+            addedInCycle = true;
+          }
+        }
+        if (!addedInCycle) break;
+      }
+
+      // If still short of totalCount, top up with remaining unselected questions
+      if (selected.length < totalCount) {
+        final selectedIds = selected.map((q) => q['id']).toSet();
+        for (final q in allExercises) {
+          if (selected.length >= totalCount) break;
+          if (!selectedIds.contains(q['id'])) {
+            selected.add(q);
+          }
+        }
+      }
+
+      return selected;
+    }
+
+    // 2. Focused priority skill path (40% priority skill + 60% other skills)
     final focusQuestions = allExercises.where((q) {
       final skill = (q['skill_type'] as String?)?.toLowerCase() ?? '';
-      return skill == focusSkill.toLowerCase();
+      return skill == normalizedFocus;
     }).toList();
 
     final otherQuestions = allExercises.where((q) {
       final skill = (q['skill_type'] as String?)?.toLowerCase() ?? '';
-      return skill != focusSkill.toLowerCase();
+      return skill != normalizedFocus;
     }).toList();
 
     // Target 40% focus questions (min 4 of 10)

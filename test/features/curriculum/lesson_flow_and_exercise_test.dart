@@ -123,6 +123,49 @@ void main() {
       expect(lisCount, greaterThanOrEqualTo(3)); // 3 available listening questions all included
     });
 
+    test('1b. Sampler with focusSkill: "balanced" distributes evenly across all 6 skills without 40% bias', () {
+      final sampler = AdaptiveExerciseSampler();
+
+      final fullSkillPool = <Map<String, dynamic>>[];
+      final skills = ['listening', 'speaking', 'reading', 'writing', 'vocabulary', 'grammar'];
+      for (final skill in skills) {
+        for (int i = 1; i <= 3; i++) {
+          fullSkillPool.add({
+            'id': 'pool_${skill}_$i',
+            'type': 'multiple_choice',
+            'skill_type': skill,
+            'prompt': 'Prompt $skill $i',
+            'options': ['A', 'B'],
+            'correct_answer': 'A',
+          });
+        }
+      }
+      expect(fullSkillPool.length, equals(18));
+
+      // Sample 12 questions with balanced path -> exactly 2 for each of 6 skills (16.7% each)
+      final balancedQuestions = sampler.sampleQuestions(
+        allExercises: fullSkillPool,
+        focusSkill: 'balanced',
+        totalCount: 12,
+      );
+
+      expect(balancedQuestions.length, equals(12));
+      for (final skill in skills) {
+        final count = balancedQuestions.where((q) => q['skill_type'] == skill).length;
+        expect(count, equals(2), reason: 'Each of the 6 skills must have 2/12 (~16.7%) questions');
+      }
+
+      // Conversely, sampling with single focus skill boosts that skill to >= 40% (4 of 10)
+      final readingQuestions = sampler.sampleQuestions(
+        allExercises: fullSkillPool,
+        focusSkill: 'reading',
+        totalCount: 10,
+      );
+      expect(readingQuestions.length, equals(10));
+      final readingCount = readingQuestions.where((q) => q['skill_type'] == 'reading').length;
+      expect(readingCount, greaterThanOrEqualTo(3));
+    });
+
     test('2. Deterministic scoring grades answers accurately and calculates pass/fail at 80%', () {
       final sampler = AdaptiveExerciseSampler();
 
