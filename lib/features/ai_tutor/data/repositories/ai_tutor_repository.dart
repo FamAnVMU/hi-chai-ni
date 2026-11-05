@@ -199,8 +199,11 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
       learnerName: learnerName,
     );
 
-    // 3. Fetch history and build prompt request
-    final rawHistory = await chatDao.getMessagesBySessionId(sessionId);
+    // 3. Fetch history and build prompt request with 20-message sliding window (F-08)
+    final rawHistory = await chatDao.getSessionMessages(
+      sessionId,
+      limit: 20,
+    );
     // Remove the message we just inserted so the context builder can append it cleanly
     final historyExcludingLast =
         rawHistory.isNotEmpty && rawHistory.last['id'] == userMessageId
@@ -302,8 +305,11 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
             learnerName: learnerName,
           );
 
-          // 3. Fetch history and build request
-          final rawHistory = await chatDao.getMessagesBySessionId(sessionId);
+          // 3. Fetch history and build request with 20-message sliding window (F-08)
+          final rawHistory = await chatDao.getSessionMessages(
+            sessionId,
+            limit: 20,
+          );
           final historyExcludingLast =
               rawHistory.isNotEmpty && rawHistory.last['id'] == userMessageId
                   ? rawHistory.sublist(0, rawHistory.length - 1)
