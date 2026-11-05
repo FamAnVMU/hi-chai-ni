@@ -93,9 +93,40 @@ class LessonFlowNotifier extends Notifier<LessonFlowState> {
 
   /// Explicitly records lesson completion when learner finishes all segments
   /// (e.g. via Exit Exam completion or when masteryCheck has no standalone questions).
-  Future<MasteryUpdateResult> completeLesson({double defaultScorePercent = 1.0}) async {
+  ///
+  /// Anti-cheating & Educational Measurement Integrity (F-05):
+  /// - Case 1: If empirical assessment score exists (`state.lastScorePercent != null`),
+  ///   record it faithfully. Preserves exact actual score (including 0.0).
+  /// - Case 2: If no mastery exam was taken (`state.lastScorePercent == null`) but
+  ///   evidence exists (learner completed exercises/answers, `state.userAnswers.isNotEmpty`),
+  ///   use pedagogical benchmark passing threshold [defaultScorePercent] (defaulting to 0.8, never 1.0).
+  /// - Case 3: If learner has no assessment evidence (`state.lastScorePercent == null` and
+  ///   `state.userAnswers.isEmpty`), strictly assign 0.0 score. Never grant virtual mastery.
+  /// - Case 4: Sanitize invalid numbers (NaN, infinite, negative, or > 1.0) by clamping to [0.0, 1.0].
+  Future<MasteryUpdateResult> completeLesson({
+    double defaultScorePercent = 0.8,
+  }) async {
     final masteryEngine = ref.read(masteryEngineProvider);
-    final scoreToRecord = state.lastScorePercent ?? defaultScorePercent;
+
+    double candidateScore;
+    if (state.lastScorePercent != null) {
+      // Case 1: Empirical assessment score exists. Preserve exact score.
+      candidateScore = state.lastScorePercent!;
+    } else if (state.userAnswers.isNotEmpty) {
+      // Case 2: Engaged with lesson exercises / valid completion without standalone mastery quiz.
+      candidateScore = defaultScorePercent;
+    } else {
+      // Case 3: Zero evidence / learner skipped straight to completion without answering.
+      candidateScore = 0.0;
+    }
+
+    // Case 4: Validation & clamping against NaN, infinite, negative, or > 1.0 values.
+    final double scoreToRecord;
+    if (candidateScore.isNaN || candidateScore.isInfinite) {
+      scoreToRecord = 0.0;
+    } else {
+      scoreToRecord = candidateScore.clamp(0.0, 1.0);
+    }
 
     final result = await masteryEngine.recordLessonAttempt(
       lessonId: state.lessonId,
