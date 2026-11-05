@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../data/audio_pack_manager.dart';
 import '../../data/sentence_dao.dart';
@@ -33,6 +34,7 @@ class _SentenceBrowserScreenState extends State<SentenceBrowserScreen> {
   List<SentenceItem> _sentences = [];
   Map<String, SentencePracticeProgress> _progressMap = {};
   bool _isLoading = true;
+  Timer? _debounceTimer;
 
   final TextEditingController _searchController = TextEditingController();
 
@@ -45,6 +47,7 @@ class _SentenceBrowserScreenState extends State<SentenceBrowserScreen> {
 
   @override
   void dispose() {
+    _debounceTimer?.cancel();
     _searchController.dispose();
     super.dispose();
   }
@@ -80,8 +83,13 @@ class _SentenceBrowserScreenState extends State<SentenceBrowserScreen> {
   }
 
   void _onSearchChanged(String val) {
-    setState(() => _searchQuery = val);
-    _loadSentences();
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        setState(() => _searchQuery = val.trim());
+        _loadSentences();
+      }
+    });
   }
 
   void _openListening(SentenceItem s) {

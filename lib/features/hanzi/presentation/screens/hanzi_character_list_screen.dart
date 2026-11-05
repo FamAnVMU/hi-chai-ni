@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../data/hanzi_repository.dart';
 import '../../domain/models/hanzi_models.dart';
@@ -25,6 +26,7 @@ class _HanziCharacterListScreenState extends State<HanziCharacterListScreen> {
   List<HanziCharacter> _characters = [];
   Map<String, HanziWritingProgress> _progressMap = {};
   bool _isLoading = true;
+  Timer? _debounceTimer;
 
   final TextEditingController _searchController = TextEditingController();
 
@@ -37,6 +39,7 @@ class _HanziCharacterListScreenState extends State<HanziCharacterListScreen> {
 
   @override
   void dispose() {
+    _debounceTimer?.cancel();
     _searchController.dispose();
     super.dispose();
   }
@@ -70,10 +73,15 @@ class _HanziCharacterListScreenState extends State<HanziCharacterListScreen> {
   }
 
   void _onSearchChanged(String val) {
-    setState(() {
-      _searchQuery = val;
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        setState(() {
+          _searchQuery = val.trim();
+        });
+        _loadCharacters();
+      }
     });
-    _loadCharacters();
   }
 
   void _openWritingScreen(HanziCharacter c) {
