@@ -1,0 +1,44 @@
+{
+  "report_name": "HI Chinese Dialogue Audio Curation Report",
+  "generated_at": "2026-11-06T02:27:35.347335+00:00",
+  "pipeline_type": "Multi-Speaker Conversational Role-Playing TTS",
+  "audio_spec": {
+    "codec": "MP3 (MPEG-1 Audio Layer 3)",
+    "sample_rate_hz": 24000,
+    "channels": "Mono (1)",
+    "bitrate_kbps": 64,
+    "target_loudness_lufs": -16.0,
+    "female_voice": "zh-CN-XiaoxiaoNeural",
+    "male_voice": "zh-CN-YunxiNeural",
+    "rate": "-6%",
+    "naming_convention": "assets/audio/dialogue/hsk<lvl>_l<lesson>_<turn_index>.mp3"
+  },
+  "summary": {
+    "total_levels_processed": 3,
+    "total_dialogue_lessons": 116,
+    "total_dialogue_turns": 868,
+    "total_audio_generated": 868,
+    "completion_rate_pct": 100.0,
+    "pipeline_duration_seconds": 309.56
+  },
+  "levels": {
+    "hsk4": {
+      "hsk_level": 4,
+      "dialogue_lessons_count": 30,
+      "total_turns": 180,
+      "synthesized_turns": 180
+    },
+    "hsk5": {
+      "hsk_level": 5,
+      "dialogue_lessons_count": 36,
+      "total_turns": 288,
+      "synthesized_turns": 288
+    },
+    "hsk6": {
+      "hsk_level": 6,
+      "dialogue_lessons_count": 50,
+      "total_turns": 400,
+      "synthesized_turns": 400
+    }
+  }
+}

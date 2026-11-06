@@ -15,7 +15,10 @@
     "total_human_audio_acquired": 3917,
     "total_missing_routed_to_tts": 484,
     "overall_coverage_pct": 89.0,
-    "pipeline_duration_seconds": 119.03
+    "pipeline_duration_seconds": 119.03,
+    "total_tts_supplemented": 484,
+    "total_audio_available": 4401,
+    "final_overall_coverage_pct": 100.0
   },
   "levels": {
     "hsk4": {
@@ -206,7 +209,10 @@
           "pinyin": "zuò shēng yì",
           "meaning_vi": "làm kinh doanh"
         }
-      ]
+      ],
+      "tts_supplemented_count": 30,
+      "total_available_audio": 601,
+      "final_coverage_pct": 100.0
     },
     "hsk5": {
       "hsk_level": 5,
@@ -852,7 +858,10 @@
           "pinyin": "zǒng cái",
           "meaning_vi": "chủ tịch; tổng giám đốc (của một công ty, v.v.)"
         }
-      ]
+      ],
+      "tts_supplemented_count": 106,
+      "total_available_audio": 1300,
+      "final_coverage_pct": 100.0
     },
     "hsk6": {
       "hsk_level": 6,
@@ -2950,7 +2959,10 @@
           "pinyin": "zuò xī",
           "meaning_vi": "làm việc và nghỉ ngơi"
         }
-      ]
+      ],
+      "tts_supplemented_count": 348,
+      "total_available_audio": 2500,
+      "final_coverage_pct": 100.0
     }
   }
 }

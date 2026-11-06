@@ -28,6 +28,7 @@ from tool.ai_curation.pinyin_aligner import PinyinAligner
 from tool.ai_curation.translation_verifier import TranslationVerifier
 from tool.ai_curation.audio_processor import ReadingAudioProcessor
 from tool.ai_curation.download_cmn_audio import CmnAudioDownloader
+from tool.ai_curation.generate_dialogue_audio import DialogueAudioGenerator
 
 
 class TestPinyinAligner(unittest.TestCase):
@@ -185,6 +186,54 @@ class TestCmnAudioDownloader(unittest.TestCase):
         sample_file = os.path.join(vocab_dir, "hsk4_爱情.mp3")
         self.assertTrue(os.path.exists(sample_file), "hsk4_爱情.mp3 was not downloaded")
         self.assertGreater(os.path.getsize(sample_file), 5000)
+
+
+class TestVocabularyAudioFullCoverage(unittest.TestCase):
+    def test_100_percent_vocabulary_coverage(self):
+        """Verifies that 100% of HSK 4-6 vocabularies (4,401) have audio files."""
+        report_path = os.path.join(PROJECT_ROOT, "data_pipeline", "reports", "audio_coverage_report.json")
+        self.assertTrue(os.path.exists(report_path))
+        with open(report_path, "r", encoding="utf-8") as f:
+            rep = json.load(f)
+
+        summary = rep.get("summary", {})
+        self.assertEqual(summary.get("total_vocabularies"), 4401)
+        self.assertEqual(summary.get("total_audio_available"), 4401)
+        self.assertEqual(summary.get("total_tts_supplemented"), 484)
+        self.assertEqual(summary.get("final_overall_coverage_pct"), 100.0)
+
+        # Check sample TTS-supplemented audio
+        vocab_dir = os.path.join(PROJECT_ROOT, "assets", "audio", "vocab")
+        sample_tts_file = os.path.join(vocab_dir, "hsk4_笔记本.mp3")
+        self.assertTrue(os.path.exists(sample_tts_file), "hsk4_笔记本.mp3 was not generated")
+        self.assertGreater(os.path.getsize(sample_tts_file), 1000)
+
+
+class TestDialogueAudioGenerator(unittest.TestCase):
+    def test_dialogue_audio_coverage_and_report(self):
+        """Verifies dialogue_audio_report.json schema, turn counts, and audio files."""
+        report_path = os.path.join(PROJECT_ROOT, "data_pipeline", "reports", "dialogue_audio_report.json")
+        if not os.path.exists(report_path):
+            self.skipTest("dialogue_audio_report.json not yet generated; skipping until pipeline finishes.")
+
+        with open(report_path, "r", encoding="utf-8") as f:
+            rep = json.load(f)
+
+        self.assertIn("summary", rep)
+        self.assertIn("levels", rep)
+        self.assertIn("audio_spec", rep)
+
+        summary = rep["summary"]
+        self.assertEqual(summary["total_levels_processed"], 3)
+        self.assertEqual(summary["total_dialogue_lessons"], 116)
+        self.assertEqual(summary["total_dialogue_turns"], 868)
+        self.assertEqual(summary["total_audio_generated"], 868)
+        self.assertEqual(summary["completion_rate_pct"], 100.0)
+
+        generator = DialogueAudioGenerator()
+        audit = generator.verify_all()
+        self.assertEqual(audit["failed_files"], [])
+        self.assertGreaterEqual(audit["passed_files"], 868)
 
 
 if __name__ == "__main__":
