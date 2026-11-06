@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/models/curriculum_models.dart';
 import '../providers/curriculum_providers.dart';
+import '../../../content_packs/presentation/screens/content_pack_manager_screen.dart';
 import 'lesson_study_screen.dart';
 import 'level_exit_exam_screen.dart';
 
@@ -56,65 +57,102 @@ class CurriculumSyllabusScreen extends ConsumerWidget {
   Widget _buildSyllabusBody(BuildContext context, WidgetRef ref, List<CurriculumUnit> displayUnits) {
     final theme = Theme.of(context);
 
+    // Khi chưa tải học liệu (displayUnits rỗng)
+    if (displayUnits.isEmpty) {
+      return ListView(
+        padding: AppSpacing.screenPadding,
+        children: [
+          // Hero Download Card
+          HiCard(
+            backgroundColor: AppColors.primaryBlueLight.withAlpha(80),
+            borderColor: AppColors.secondaryBlue,
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: const BoxDecoration(
+                    color: AppColors.primaryBlueDark,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.cloud_download_rounded,
+                    color: Colors.white,
+                    size: 36,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  'Chưa tải giáo trình HSK $hskLevel',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryBlueDark,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  'Trọn bộ bài học tương tác, từ vựng chuẩn, cấu trúc ngữ pháp và bài tập thực hành HSK $hskLevel cần được tải về để học offline mọi lúc mọi nơi.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppColors.secondaryText,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                HiButton(
+                  text: 'Tải gói học liệu HSK $hskLevel ngay',
+                  icon: const Icon(Icons.download_rounded),
+                  variant: HiButtonVariant.primary,
+                  isFullWidth: true,
+                  onPressed: () {
+                    Navigator.of(context)
+                        .push(
+                          MaterialPageRoute(
+                            builder: (_) => const ContentPackManagerScreen(),
+                          ),
+                        )
+                        .then((_) {
+                      ref.invalidate(curriculumUnitsProvider(curriculumId));
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xl),
+
+          // Divider / Heading
+          Row(
+            children: [
+              const Expanded(child: Divider()),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                child: Text(
+                  'Hoặc thi tốt nghiệp trực tiếp',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.secondaryText,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              const Expanded(child: Divider()),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+
+          // Banner Đề thi tốt nghiệp HSK
+          _buildExitExamCard(context, theme),
+        ],
+      );
+    }
+
+    // Khi đã có dữ liệu bài học
     return ListView(
       padding: AppSpacing.screenPadding,
       children: [
-        // Banner Đề thi tốt nghiệp HSK 1
-        HiCard(
-          backgroundColor: AppColors.primaryBlueLight,
-          borderColor: AppColors.secondaryBlue,
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryBlueDark,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.school_rounded,
-                  color: Colors.white,
-                  size: 28,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Thi tốt nghiệp HSK $hskLevel',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primaryBlueDark,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Đề thi chuẩn quốc tế 40 câu • 35 phút',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: AppColors.secondaryText,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: AppSpacing.xs),
-              HiButton(
-                text: 'Thi ngay',
-                size: HiButtonSize.sm,
-                variant: HiButtonVariant.primary,
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => LevelExitExamScreen(level: hskLevel.toString()),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
+        // Banner Đề thi tốt nghiệp HSK
+        _buildExitExamCard(context, theme),
         const SizedBox(height: AppSpacing.lg),
 
         // Units List
@@ -156,6 +194,64 @@ class CurriculumSyllabusScreen extends ConsumerWidget {
           );
         }),
       ],
+    );
+  }
+
+  Widget _buildExitExamCard(BuildContext context, ThemeData theme) {
+    return HiCard(
+      backgroundColor: AppColors.primaryBlueLight,
+      borderColor: AppColors.secondaryBlue,
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            decoration: BoxDecoration(
+              color: AppColors.primaryBlueDark,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.school_rounded,
+              color: Colors.white,
+              size: 28,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Thi tốt nghiệp HSK $hskLevel',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryBlueDark,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Đề thi chuẩn quốc tế 40 câu • 35 phút',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.secondaryText,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppSpacing.xs),
+          HiButton(
+            text: 'Thi ngay',
+            size: HiButtonSize.sm,
+            variant: HiButtonVariant.primary,
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => LevelExitExamScreen(level: hskLevel.toString()),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 

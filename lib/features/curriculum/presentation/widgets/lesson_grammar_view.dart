@@ -23,7 +23,10 @@ class LessonGrammarView extends StatelessWidget {
     final rawPoints = (segment?.contentPayload?['points'] as List<dynamic>?) ??
         (segment?.contentPayload?['grammar_points'] as List<dynamic>?) ??
         [];
-    final points = rawPoints.whereType<Map<String, dynamic>>().toList();
+    final points = rawPoints
+        .whereType<Map>()
+        .map((m) => Map<String, dynamic>.from(m))
+        .toList();
 
     if (points.isEmpty) {
       return LessonContentEmptyState(

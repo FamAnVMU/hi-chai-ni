@@ -3,6 +3,7 @@ import '../../domain/models/lesson_flow_state.dart';
 import '../../domain/engine/adaptive_exercise_sampler.dart';
 import '../../domain/engine/mastery_engine.dart';
 import '../../../../core/database/app_database.dart';
+import 'curriculum_providers.dart';
 
 final adaptiveExerciseSamplerProvider = Provider<AdaptiveExerciseSampler>((ref) {
   return const AdaptiveExerciseSampler();
@@ -29,6 +30,11 @@ class LessonFlowNotifier extends Notifier<LessonFlowState> {
 
   void previousStep() {
     state = state.previousStep();
+  }
+
+  /// Sets or resets the active lesson step (e.g. jumping to Stage 1 or resuming a step).
+  void resetToStep(LessonStep step) {
+    state = state.copyWith(currentStep: step);
   }
 
   void recordAnswer(String questionId, dynamic answer) {
@@ -138,11 +144,15 @@ class LessonFlowNotifier extends Notifier<LessonFlowState> {
       lastScorePercent: scoreToRecord,
     );
 
+    if (result.isPassed) {
+      ref.invalidate(hasCompletedLessonsProvider);
+    }
+
     return result;
   }
 }
 
 final lessonFlowNotifierProvider =
-    NotifierProvider.family<LessonFlowNotifier, LessonFlowState, String>(
+    NotifierProvider.autoDispose.family<LessonFlowNotifier, LessonFlowState, String>(
   (lessonId) => LessonFlowNotifier(lessonId),
 );

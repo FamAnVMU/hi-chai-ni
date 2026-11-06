@@ -34,7 +34,10 @@ class _LessonPracticeViewState extends State<LessonPracticeView> {
     final rawExercises = (widget.segment?.contentPayload?['exercises'] as List<dynamic>?) ??
         (widget.segment?.contentPayload?['questions'] as List<dynamic>?) ??
         [];
-    final exercises = rawExercises.whereType<Map<String, dynamic>>().toList();
+    final exercises = rawExercises
+        .whereType<Map>()
+        .map((m) => Map<String, dynamic>.from(m))
+        .toList();
 
     if (exercises.isEmpty) {
       return LessonContentEmptyState(

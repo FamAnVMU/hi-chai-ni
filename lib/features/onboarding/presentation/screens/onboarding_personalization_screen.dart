@@ -10,11 +10,13 @@ import '../widgets/onboarding_progress_header.dart';
 class OnboardingPersonalizationScreen extends StatefulWidget {
   final dynamic onComplete;
   final VoidCallback? onBack;
+  final int? initialHskLevel;
 
   const OnboardingPersonalizationScreen({
     super.key,
     required this.onComplete,
     this.onBack,
+    this.initialHskLevel,
   });
 
   @override
@@ -30,6 +32,15 @@ class _OnboardingPersonalizationScreenState extends State<OnboardingPersonalizat
   int _selectedMinutes = 30;
   String _selectedSkill = 'reading';
   String _selectedPurpose = 'dailyCommunication';
+  late int _selectedHskLevel;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedHskLevel = (widget.initialHskLevel != null && widget.initialHskLevel! > 0)
+        ? widget.initialHskLevel!
+        : 1;
+  }
 
   // --- Step 2 State: Method & Habit ---
   String _learningMethod = 'contextual_lessons';
@@ -45,7 +56,7 @@ class _OnboardingPersonalizationScreenState extends State<OnboardingPersonalizat
   final List<int> _commitmentOptions = [10, 15, 30, 45, 60];
 
   final List<Map<String, String>> _skillOptions = [
-    {'id': 'balanced', 'label': 'Toàn diện – Học đều 6 kỹ năng', 'desc': 'Phân bổ đều 6 kỹ năng, không ưu tiên riêng lẻ'},
+    {'id': 'balanced', 'label': 'Toàn diện (Cân bằng)', 'desc': 'Phát triển đồng đều cả 6 kỹ năng (mỗi kỹ năng ~16.7%)'},
     {'id': 'listening', 'label': 'Nghe hiểu', 'desc': 'Luyện nghe phản xạ và nhận diện thanh điệu'},
     {'id': 'speaking', 'label': 'Nói / Phát âm', 'desc': 'Luyện phát âm chuẩn Pinyin & kỹ thuật Shadowing'},
     {'id': 'reading', 'label': 'Đọc hiểu', 'desc': 'Nhận diện mặt chữ Hán và ngữ cảnh văn bản'},
@@ -142,6 +153,7 @@ class _OnboardingPersonalizationScreenState extends State<OnboardingPersonalizat
       speechRate: _speechRate,
       reminderEnabled: _reminderEnabled,
       reminderTime: formattedTime,
+      targetHskLevel: _selectedHskLevel,
     );
 
     try {
@@ -339,6 +351,41 @@ class _OnboardingPersonalizationScreenState extends State<OnboardingPersonalizat
 
           const SizedBox(height: AppSpacing.md),
 
+          // Cấp độ HSK mục tiêu
+          Text(
+            'Cấp độ HSK mục tiêu:',
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            'Chọn cấp độ HSK bạn muốn bắt đầu để ứng dụng cấu hình lộ trình phù hợp:',
+            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: List.generate(6, (index) {
+              final level = index + 1;
+              final isSelected = _selectedHskLevel == level;
+              return ChoiceChip(
+                key: ValueKey('chip_hsk_$level'),
+                label: Text(
+                  'HSK $level',
+                  style: TextStyle(
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+                selected: isSelected,
+                onSelected: (val) {
+                  if (val) setState(() => _selectedHskLevel = level);
+                },
+              );
+            }),
+          ),
+
+          const SizedBox(height: AppSpacing.md),
+
           // 2. Daily time commitment
           Text(
             'Thời gian học mỗi ngày:',
@@ -373,7 +420,9 @@ class _OnboardingPersonalizationScreenState extends State<OnboardingPersonalizat
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'Hệ thống sẽ tăng 40% tỷ trọng bài tập của kỹ năng này trong mỗi bài học.',
+            _selectedSkill == 'balanced'
+                ? 'Hệ thống sẽ phân bổ đồng đều 6 kỹ năng (mỗi kỹ năng ~16.7% tỷ trọng bài tập).'
+                : 'Hệ thống sẽ tăng 40% tỷ trọng bài tập của kỹ năng này trong mỗi bài học.',
             style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
           ),
           const SizedBox(height: AppSpacing.sm),

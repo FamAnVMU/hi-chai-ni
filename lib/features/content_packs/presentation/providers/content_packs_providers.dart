@@ -60,8 +60,11 @@ class ContentPacksNotifier extends AsyncNotifier<List<ContentPackItemState>> {
   }
 
   Future<bool> installPack(String packId) async {
-    final currentList = state.value;
-    if (currentList == null) return false;
+    List<ContentPackItemState>? currentList = state.value;
+    if (currentList == null) {
+      currentList = await _fetchStates();
+      state = AsyncData(currentList);
+    }
 
     final targetIdx = currentList.indexWhere((p) => p.info.packId == packId);
     if (targetIdx == -1) return false;
@@ -88,6 +91,7 @@ class ContentPacksNotifier extends AsyncNotifier<List<ContentPackItemState>> {
             progress: 1.0,
           );
           state = AsyncData(updatedList);
+          ref.invalidate(isHskLevelInstalledProvider(target.info.hskLevel));
           return true;
         } else {
           updatedList[targetIdx] = target.copyWith(
@@ -99,7 +103,7 @@ class ContentPacksNotifier extends AsyncNotifier<List<ContentPackItemState>> {
         }
       } else {
         // Download from GitHub CDN / Remote
-        final result = await _service.downloadAndInstallPack(
+        var result = await _service.downloadAndInstallPack(
           packInfo: target.info,
           onProgress: (p) {
             final list = List<ContentPackItemState>.from(state.value ?? []);
@@ -111,6 +115,17 @@ class ContentPacksNotifier extends AsyncNotifier<List<ContentPackItemState>> {
           },
         );
 
+        // Offline / testing fallback: try loading from local assets if remote download failed
+        if (!result.isSuccess) {
+          final fallbackAssetPath =
+              'assets/data/content_packs/hsk${target.info.hskLevel}/${target.info.packId}.json';
+          try {
+            final rawJson = await rootBundle.loadString(fallbackAssetPath);
+            final loader = ContentPackLoader(AppDatabase.instance.database);
+            result = await loader.loadPackFromJson(rawJson);
+          } catch (_) {}
+        }
+
         if (result.isSuccess) {
           updatedList[targetIdx] = target.copyWith(
             isInstalled: true,
@@ -118,6 +133,7 @@ class ContentPacksNotifier extends AsyncNotifier<List<ContentPackItemState>> {
             progress: 1.0,
           );
           state = AsyncData(updatedList);
+          ref.invalidate(isHskLevelInstalledProvider(target.info.hskLevel));
           return true;
         } else {
           updatedList[targetIdx] = target.copyWith(
@@ -129,6 +145,25 @@ class ContentPacksNotifier extends AsyncNotifier<List<ContentPackItemState>> {
         }
       }
     } catch (e) {
+      // Offline / testing fallback on unhandled exception
+      try {
+        final fallbackAssetPath =
+            'assets/data/content_packs/hsk${target.info.hskLevel}/${target.info.packId}.json';
+        final rawJson = await rootBundle.loadString(fallbackAssetPath);
+        final loader = ContentPackLoader(AppDatabase.instance.database);
+        final fallbackResult = await loader.loadPackFromJson(rawJson);
+        if (fallbackResult.isSuccess) {
+          updatedList[targetIdx] = target.copyWith(
+            isInstalled: true,
+            isDownloading: false,
+            progress: 1.0,
+          );
+          state = AsyncData(updatedList);
+          ref.invalidate(isHskLevelInstalledProvider(target.info.hskLevel));
+          return true;
+        }
+      } catch (_) {}
+
       updatedList[targetIdx] = target.copyWith(
         isDownloading: false,
         error: e.toString(),
@@ -169,3 +204,14 @@ class ContentPacksNotifier extends AsyncNotifier<List<ContentPackItemState>> {
 final contentPacksProvider = AsyncNotifierProvider<ContentPacksNotifier, List<ContentPackItemState>>(
   ContentPacksNotifier.new,
 );
+
+/// Provider checking whether a given HSK level's content pack is installed.
+/// HSK 1 and 2 are always bundled/available (returns true).
+/// HSK 3-6 require checking whether their pack has been installed in SQLite.
+final isHskLevelInstalledProvider = FutureProvider.family<bool, int>((ref, hskLevel) async {
+  if (hskLevel <= 2) return true;
+  if (!AppDatabase.instance.isOpen) return false;
+  final db = AppDatabase.instance.database;
+  final service = ContentPackRemoteService(db: db);
+  return await service.isPackInstalled('hsk${hskLevel}_pack_v1');
+});

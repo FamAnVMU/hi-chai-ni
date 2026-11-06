@@ -2,8 +2,8 @@
 
 - **Agent Role**: Senior Curriculum Specialist & Chinese Language Pedagogist · Pedagogy Lead
 - **Branch**: `feature/thread-2-learning`
-- **Current Status**: ACTIVE / PHASE 4 (TASK LEARN-HSK46-VI-002) COMPLETED
-- **Health**: HEALTHY (Phase 3 Ingested Subset 100% Validated, Zero Progress Loss Verified, 50 Candidates Approved, 3 Correction Requests Documented, 222 Flutter Tests PASS)
+- **Current Status**: ACTIVE / TASK-T2-006 (ONBOARDING DOWNLOAD INTERCEPTOR & FLOW LIFECYCLE) COMPLETED
+- **Health**: HEALTHY (Onboarding Interceptor 100% Verified, LessonFlow autoDispose & warmup Lifecycle Standardized, All Tests PASS)
 
 ---
 
@@ -114,5 +114,25 @@
   - 575 Missing Curriculum Examples: Escalated to Project Owner for professional curriculum authoring.
 - **Detailed Report**: [LEARN-HSK46-VI-002.md](file:///C:/Users/phama/.gemini/antigravity/worktrees/hi_chinese/thread_2_learning/docs/agent-coordination/reports/thread-2/LEARN-HSK46-VI-002.md).
 
+---
 
+## 7. Latest Deliverables: Task TASK-T2-006 (Onboarding Download Interceptor & Flow Lifecycle)
 
+- **Execution Scope**:
+  1. **Onboarding Download Interceptor (HSK 3+)**:
+     - Check `isHskLevelInstalledProvider(currentHsk)` when learner finishes personalization or placement test with `currentHsk >= 3`.
+     - Standardized Pedagogical Interceptor Dialog:
+       - **Tiêu đề:** `"Bạn đã sẵn sàng học HSK $currentHsk!"`
+       - **Nội dung:** `"Để học ngay giáo trình và từ vựng chuẩn HSK $currentHsk, ứng dụng cần tải gói học liệu (~350KB - 1.5MB). Bạn muốn tải ngay bây giờ không?"`
+       - **Nút hành động 1:** `"Tải ngay & Bắt đầu"` -> Kích hoạt tải gói từ CDN GitHub / asset fallback với hộp thoại tiến trình trực quan.
+       - **Nút hành động 2:** `"Để sau"` -> Vẫn lưu cấu hình HSK đã chọn, điều hướng sang Lộ trình kèm SnackBar chỉ dẫn trực quan.
+  2. **Chuẩn hóa vòng đời `LessonFlowNotifier`**:
+     - Chuyển `lessonFlowNotifierProvider` sang `autoDispose`.
+     - Bổ sung `resetToStep(LessonStep step)`.
+     - Đảm bảo mở bất kỳ bài học nào luôn khởi động tại Chặng 1 (`LessonStep.warmup`), trừ khi người dùng chủ động chọn `Tiếp tục` (truyền `resumeStep`).
+- **Test Gate**:
+  - `test/features/curriculum/lesson_flow_providers_test.dart`: 9/9 PASS.
+  - `test/features/onboarding/onboarding_download_interceptor_test.dart`: 3/3 PASS.
+  - `test/features/onboarding/onboarding_flow_test.dart`: 6/6 PASS.
+  - `flutter analyze lib/`: 0 errors, 0 warnings (PASS).
+- **Detailed Report**: [TASK-T2-006-ONBOARDING-DOWNLOAD-INTERCEPTOR.md](file:///C:/Users/phama/.gemini/antigravity/worktrees/chinese/pedagogy_learning_experience/docs/agent-coordination/reports/thread-2/TASK-T2-006-ONBOARDING-DOWNLOAD-INTERCEPTOR.md).

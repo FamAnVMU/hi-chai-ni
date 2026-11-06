@@ -4,7 +4,6 @@ import '../../../../core/database/app_database.dart';
 import '../../../../core/database/database_constants.dart';
 import '../../../../core/startup/app_startup_provider.dart';
 import '../../../curriculum/data/placement_unlock_handler.dart';
-import '../../../roadmap/domain/models/roadmap_models.dart';
 
 enum OnboardingStep {
   aiSetup(0),
@@ -32,6 +31,7 @@ class PersonalizationData {
   final double speechRate;
   final bool reminderEnabled;
   final String reminderTime;
+  final int? targetHskLevel;
 
   const PersonalizationData({
     this.purpose = 'dailyCommunication',
@@ -42,6 +42,7 @@ class PersonalizationData {
     this.speechRate = 1.0,
     this.reminderEnabled = true,
     this.reminderTime = '20:00',
+    this.targetHskLevel,
   });
 }
 
@@ -55,7 +56,6 @@ class OnboardingState {
   final int? assessedHskLevel;
   final int dailyMinutes;
   final String focusSkill;
-  final LearningPathType learningPathType;
   final String learningPurpose;
   final bool showPinyin;
   final String pinyinPosition;
@@ -75,7 +75,6 @@ class OnboardingState {
     this.assessedHskLevel,
     this.dailyMinutes = 30,
     this.focusSkill = 'reading',
-    this.learningPathType = LearningPathType.focused,
     this.learningPurpose = 'dailyCommunication',
     this.showPinyin = true,
     this.pinyinPosition = 'above_hanzi',
@@ -97,7 +96,6 @@ class OnboardingState {
     int? assessedHskLevel,
     int? dailyMinutes,
     String? focusSkill,
-    LearningPathType? learningPathType,
     String? learningPurpose,
     bool? showPinyin,
     String? pinyinPosition,
@@ -117,7 +115,6 @@ class OnboardingState {
       assessedHskLevel: assessedHskLevel ?? this.assessedHskLevel,
       dailyMinutes: dailyMinutes ?? this.dailyMinutes,
       focusSkill: focusSkill ?? this.focusSkill,
-      learningPathType: learningPathType ?? this.learningPathType,
       learningPurpose: learningPurpose ?? this.learningPurpose,
       showPinyin: showPinyin ?? this.showPinyin,
       pinyinPosition: pinyinPosition ?? this.pinyinPosition,
@@ -135,7 +132,6 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
   static const String keyOnboardingStep = 'onboarding_current_step';
   static const String keyDailyMinutes = 'daily_learning_minutes';
   static const String keyPrioritySkill = 'priority_focus_skill';
-  static const String keyLearningPathType = 'learning_path_type';
   static const String keyLearningPurpose = 'learning_purpose';
   static const String keyShowPinyin = 'show_pinyin';
   static const String keyPinyinPosition = 'pinyin_position';
@@ -194,10 +190,6 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
           ? (int.tryParse(map[keyDailyMinutes]!) ?? state.dailyMinutes)
           : state.dailyMinutes;
       final focusSkill = map[keyPrioritySkill] ?? state.focusSkill;
-      final rawPathType = map[keyLearningPathType];
-      final learningPathType = (rawPathType == 'balanced' || rawPathType == 'comprehensive' || focusSkill == 'balanced')
-          ? LearningPathType.comprehensive
-          : LearningPathTypeExtension.fromDb(rawPathType);
       final purpose = map[keyLearningPurpose] ?? state.learningPurpose;
       final showPinyin = map.containsKey(keyShowPinyin)
           ? map[keyShowPinyin] == 'true'
@@ -223,7 +215,6 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
         currentStep: isCompleted ? OnboardingStep.completed : OnboardingStep.fromIndex(stepIndex),
         dailyMinutes: dailyMinutes,
         focusSkill: focusSkill,
-        learningPathType: learningPathType,
         learningPurpose: purpose,
         showPinyin: showPinyin,
         pinyinPosition: pinyinPos,
@@ -306,7 +297,6 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
   Future<bool> completePersonalization({
     required int dailyMinutes,
     required String focusSkill,
-    LearningPathType learningPathType = LearningPathType.focused,
     String learningPurpose = 'dailyCommunication',
     bool showPinyin = true,
     String pinyinPosition = 'above_hanzi',
@@ -315,22 +305,16 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
     double speechRate = 1.0,
     bool reminderEnabled = true,
     String reminderTime = '20:00',
+    int? targetHskLevel,
   }) async {
-    final effectivePathType = (focusSkill == 'balanced' || learningPathType == LearningPathType.comprehensive)
-        ? LearningPathType.comprehensive
-        : learningPathType;
-    final effectiveFocusSkill = (effectivePathType == LearningPathType.comprehensive)
-        ? 'balanced'
-        : focusSkill;
-
     if (!ref.mounted) return false;
+    final effectiveHsk = targetHskLevel ?? state.assessedHskLevel;
     state = state.copyWith(
       isLoading: true,
       isSubmitting: true,
       clearErrorMessage: true,
       dailyMinutes: dailyMinutes,
-      focusSkill: effectiveFocusSkill,
-      learningPathType: effectivePathType,
+      focusSkill: focusSkill,
       learningPurpose: learningPurpose,
       showPinyin: showPinyin,
       pinyinPosition: pinyinPosition,
@@ -339,6 +323,7 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
       speechRate: speechRate,
       reminderEnabled: reminderEnabled,
       reminderTime: reminderTime,
+      assessedHskLevel: effectiveHsk,
     );
 
     try {
@@ -346,11 +331,14 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
         final db = AppDatabase.instance.database;
         final nowUtc = DateTime.now().toUtc().toIso8601String();
 
+        final assessedHsk = effectiveHsk;
+        // For beginners (0, null, or <= 0), the active curriculum level starts at HSK 1
+        final currentHsk = (assessedHsk == null || assessedHsk <= 0) ? 1 : (assessedHsk > 6 ? 6 : assessedHsk);
+
         await db.transaction((txn) async {
           final settingsMap = {
             keyDailyMinutes: dailyMinutes.toString(),
-            keyPrioritySkill: effectiveFocusSkill,
-            keyLearningPathType: (effectivePathType == LearningPathType.comprehensive) ? 'balanced' : 'focused',
+            keyPrioritySkill: focusSkill,
             keyLearningPurpose: learningPurpose,
             keyShowPinyin: showPinyin.toString(),
             keyPinyinPosition: pinyinPosition,
@@ -359,7 +347,8 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
             keySpeechRate: speechRate.toString(),
             keyReminderEnabled: reminderEnabled.toString(),
             keyReminderTime: reminderTime,
-            keyStartingHsk: (state.assessedHskLevel ?? 1).toString(),
+            keyStartingHsk: currentHsk.toString(),
+            'key_assessed_hsk_level': (assessedHsk ?? 0).toString(),
             keyOnboardingStep: OnboardingStep.completed.stepIndex.toString(),
             keyOnboardingCompleted: 'true',
           };
@@ -376,7 +365,6 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
             );
           }
 
-          final currentHsk = state.assessedHskLevel ?? 1;
           final updatedRows = await txn.update(
             DatabaseConstants.tableUserProfiles,
             {

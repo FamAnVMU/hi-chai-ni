@@ -137,7 +137,10 @@ class _LessonVocabViewState extends State<LessonVocabView> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final rawWords = (widget.segment?.contentPayload?['words'] as List<dynamic>?) ?? [];
-    final words = rawWords.whereType<Map<String, dynamic>>().toList();
+    final words = rawWords
+        .whereType<Map>()
+        .map((m) => Map<String, dynamic>.from(m))
+        .toList();
 
     if (words.isEmpty) {
       return LessonContentEmptyState(

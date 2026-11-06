@@ -221,5 +221,41 @@ void main() {
       expect(finalResult.masteryState, 'completed');
       expect(container.read(lessonFlowNotifierProvider(lessonId)).isCompleted, isTrue);
     });
+    test('8. Standardized Lifecycle: Opening lesson always starts at Stage 1 (warmup)', () {
+      final lessonId = 'les_lifecycle_01';
+      final state = container.read(lessonFlowNotifierProvider(lessonId));
+      expect(state.currentStep, LessonStep.warmup);
+      expect(state.currentStep.stepIndex, 0);
+    });
+
+    test('9. Standardized Lifecycle: resetToStep allows programmatic step switching', () {
+      final lessonId = 'les_lifecycle_02';
+      final notifier = container.read(lessonFlowNotifierProvider(lessonId).notifier);
+      expect(container.read(lessonFlowNotifierProvider(lessonId)).currentStep, LessonStep.warmup);
+
+      notifier.resetToStep(LessonStep.dialogue);
+      expect(container.read(lessonFlowNotifierProvider(lessonId)).currentStep, LessonStep.dialogue);
+
+      notifier.resetToStep(LessonStep.warmup);
+      expect(container.read(lessonFlowNotifierProvider(lessonId)).currentStep, LessonStep.warmup);
+    });
+
+    test('10. Standardized Lifecycle: autoDispose resets state when subscriber is disposed', () async {
+      final lessonId = 'les_lifecycle_03';
+      final subContainer = ProviderContainer(
+        overrides: [masteryEngineProvider.overrideWithValue(fakeEngine)],
+      );
+      final subNotifier = subContainer.read(lessonFlowNotifierProvider(lessonId).notifier);
+      subNotifier.nextStep();
+      subNotifier.nextStep();
+      expect(subContainer.read(lessonFlowNotifierProvider(lessonId)).currentStep, LessonStep.grammar);
+      subContainer.dispose();
+
+      final newContainer = ProviderContainer(
+        overrides: [masteryEngineProvider.overrideWithValue(fakeEngine)],
+      );
+      expect(newContainer.read(lessonFlowNotifierProvider(lessonId)).currentStep, LessonStep.warmup);
+      newContainer.dispose();
+    });
   });
 }

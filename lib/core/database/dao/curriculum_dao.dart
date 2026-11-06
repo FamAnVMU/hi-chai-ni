@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 import '../database_constants.dart';
 
@@ -165,5 +166,39 @@ class CurriculumDao {
       limit: 1,
     );
     return results.isNotEmpty ? results.first : null;
+  }
+
+  static Map<String, dynamic>? safeParsePayload(dynamic raw) {
+    if (raw == null) return null;
+    if (raw is String) {
+      final trimmed = raw.trim();
+      if (trimmed.isEmpty) return null;
+      try {
+        final decoded = json.decode(trimmed);
+        return _deepNormalizeMap(decoded);
+      } catch (_) {
+        return null;
+      }
+    }
+    return _deepNormalizeMap(raw);
+  }
+
+  static Map<String, dynamic>? _deepNormalizeMap(dynamic raw) {
+    if (raw is! Map) return null;
+    final result = <String, dynamic>{};
+    for (final entry in raw.entries) {
+      result[entry.key.toString()] = _deepNormalizeValue(entry.value);
+    }
+    return result;
+  }
+
+  static dynamic _deepNormalizeValue(dynamic value) {
+    if (value is Map) {
+      return _deepNormalizeMap(value);
+    }
+    if (value is List) {
+      return value.map(_deepNormalizeValue).toList();
+    }
+    return value;
   }
 }

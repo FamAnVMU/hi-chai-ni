@@ -212,25 +212,43 @@ class LessonSegment {
     this.contentPayload,
   });
 
-  factory LessonSegment.fromMap(Map<String, dynamic> map, {Map<String, dynamic>? contentPayload}) {
-    Map<String, dynamic>? payload = contentPayload;
-    if (payload == null && map['content_payload'] != null) {
-      if (map['content_payload'] is Map<String, dynamic>) {
-        payload = map['content_payload'] as Map<String, dynamic>;
-      } else if (map['content_payload'] is String) {
-        try {
-          payload = json.decode(map['content_payload'] as String) as Map<String, dynamic>;
-        } catch (_) {}
-      }
-    } else if (payload == null && map['content_json'] != null) {
-      if (map['content_json'] is Map<String, dynamic>) {
-        payload = map['content_json'] as Map<String, dynamic>;
-      } else if (map['content_json'] is String) {
-        try {
-          payload = json.decode(map['content_json'] as String) as Map<String, dynamic>;
-        } catch (_) {}
+  static Map<String, dynamic>? safeParsePayload(dynamic raw) {
+    if (raw == null) return null;
+    if (raw is String) {
+      final trimmed = raw.trim();
+      if (trimmed.isEmpty) return null;
+      try {
+        final decoded = json.decode(trimmed);
+        return _deepNormalizeMap(decoded);
+      } catch (_) {
+        return null;
       }
     }
+    return _deepNormalizeMap(raw);
+  }
+
+  static Map<String, dynamic>? _deepNormalizeMap(dynamic raw) {
+    if (raw is! Map) return null;
+    final result = <String, dynamic>{};
+    for (final entry in raw.entries) {
+      result[entry.key.toString()] = _deepNormalizeValue(entry.value);
+    }
+    return result;
+  }
+
+  static dynamic _deepNormalizeValue(dynamic value) {
+    if (value is Map) {
+      return _deepNormalizeMap(value);
+    }
+    if (value is List) {
+      return value.map(_deepNormalizeValue).toList();
+    }
+    return value;
+  }
+
+  factory LessonSegment.fromMap(Map<String, dynamic> map, {Map<String, dynamic>? contentPayload}) {
+    final raw = contentPayload ?? map['content_payload'] ?? map['content_json'];
+    final payload = safeParsePayload(raw);
 
     return LessonSegment(
       id: map['id'] as String,

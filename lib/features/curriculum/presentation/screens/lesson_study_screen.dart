@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/models/curriculum_models.dart';
+import '../../domain/models/lesson_flow_state.dart';
 import '../providers/lesson_flow_providers.dart';
 import '../widgets/lesson_warmup_view.dart';
 import '../widgets/lesson_vocab_view.dart';
@@ -13,10 +14,12 @@ import '../widgets/ai_tutor_helper_sheet.dart';
 
 class LessonStudyScreen extends ConsumerStatefulWidget {
   final CurriculumLesson lesson;
+  final LessonStep? resumeStep;
 
   const LessonStudyScreen({
     super.key,
     required this.lesson,
+    this.resumeStep,
   });
 
   @override
@@ -24,6 +27,19 @@ class LessonStudyScreen extends ConsumerStatefulWidget {
 }
 
 class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Default flow starts at LessonStep.warmup (Stage 1).
+    // If the learner explicitly requested to resume from a specific step, jump to it.
+    if (widget.resumeStep != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ref.read(lessonFlowNotifierProvider(widget.lesson.id).notifier).resetToStep(widget.resumeStep!);
+        }
+      });
+    }
+  }
   static const List<String> _stepTitles = [
     'Khởi động',
     'Từ vựng mới',

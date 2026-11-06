@@ -92,7 +92,52 @@ class _LearningScreenState extends ConsumerState<LearningScreen>
                 }).toList(),
               ),
             ),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.md),
+
+            // Cảnh báo ngay dưới thanh chọn cấp độ nếu chưa tải học liệu
+            if (unitsAsync.asData?.value != null && unitsAsync.asData!.value.isEmpty) ...[
+              HiCard(
+                backgroundColor: AppColors.primaryBlueLight.withAlpha(70),
+                borderColor: AppColors.secondaryBlue,
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                child: Row(
+                  children: [
+                    const Icon(Icons.cloud_download_outlined, color: AppColors.primaryBlueDark, size: 22),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Text(
+                        'Chưa tải giáo trình $_selectedLevel về máy.',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppColors.primaryBlueDark,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    TextButton.icon(
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      onPressed: () {
+                        Navigator.of(context)
+                            .push(
+                              MaterialPageRoute(
+                                builder: (_) => const ContentPackManagerScreen(),
+                              ),
+                            )
+                            .then((_) {
+                          ref.invalidate(curriculumUnitsWithLessonsProvider(_curriculumId));
+                        });
+                      },
+                      icon: const Icon(Icons.download_rounded, size: 16),
+                      label: const Text('Tải ngay', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+            ],
+            const SizedBox(height: AppSpacing.sm),
 
             _buildFeatureBanner(
               context: context,
@@ -457,9 +502,10 @@ class _LearningScreenState extends ConsumerState<LearningScreen>
                 Text(
                   totalLessons > 0
                       ? '$totalLessons bài học liên hoàn • Giáo trình chuẩn'
-                      : 'Giáo trình chuẩn quốc tế HSK',
+                      : 'Chưa tải giáo trình • Nhấn để tải về',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.secondaryText,
+                    color: totalLessons > 0 ? AppColors.secondaryText : AppColors.primaryBlueDark,
+                    fontWeight: totalLessons > 0 ? FontWeight.normal : FontWeight.w600,
                   ),
                 ),
               ],
@@ -467,22 +513,35 @@ class _LearningScreenState extends ConsumerState<LearningScreen>
           ),
           const SizedBox(width: AppSpacing.xs),
           HiButton(
-            text: 'Học ngay',
+            text: totalLessons > 0 ? 'Học ngay' : 'Tải học liệu',
             size: HiButtonSize.sm,
-            variant: HiButtonVariant.primary,
+            variant: totalLessons > 0 ? HiButtonVariant.primary : HiButtonVariant.secondary,
+            icon: totalLessons > 0 ? null : const Icon(Icons.cloud_download_rounded, size: 16),
             onPressed: () {
-              Navigator.of(context)
-                  .push(
-                    MaterialPageRoute(
-                      builder: (_) => CurriculumSyllabusScreen(
-                        curriculumId: _curriculumId,
-                        curriculumTitle: 'Giáo trình $_selectedLevel Chuẩn',
+              if (totalLessons > 0) {
+                Navigator.of(context)
+                    .push(
+                      MaterialPageRoute(
+                        builder: (_) => CurriculumSyllabusScreen(
+                          curriculumId: _curriculumId,
+                          curriculumTitle: 'Giáo trình $_selectedLevel Chuẩn',
+                        ),
                       ),
-                    ),
-                  )
-                  .then((_) {
-                ref.invalidate(curriculumUnitsWithLessonsProvider(_curriculumId));
-              });
+                    )
+                    .then((_) {
+                  ref.invalidate(curriculumUnitsWithLessonsProvider(_curriculumId));
+                });
+              } else {
+                Navigator.of(context)
+                    .push(
+                      MaterialPageRoute(
+                        builder: (_) => const ContentPackManagerScreen(),
+                      ),
+                    )
+                    .then((_) {
+                  ref.invalidate(curriculumUnitsWithLessonsProvider(_curriculumId));
+                });
+              }
             },
           ),
         ],
