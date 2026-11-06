@@ -6,8 +6,8 @@
     "title": "Giáo trình chuẩn HSK 4 (HSK 2.0)",
     "description": "601 từ vựng cao cấp HSK 4, 30 bài học liên hoàn 5 chuyên đề, 180 điểm ngữ pháp AllSet Learning, 30 bài khóa hội thoại, 300 bài tập thích ứng và đề thi tốt nghiệp HSK 4.",
     "is_bundled": false,
-    "size_bytes": 739838,
-    "sha256": "a006782e047403280cf9edb193f33b3ed9f4c0f84b11ff624cd368371edff716"
+    "size_bytes": 683297,
+    "sha256": "0b4cbbcb3adeba1ae08d4b3b0952c0803923f3c007509736e7c66c2150bda492"
   },
   "curriculum": {
     "units": [
@@ -1769,7 +1769,10 @@
           }
         ]
       }
-    ]
+    ],
+    "id": "curr_hsk4",
+    "code": "HSK_4",
+    "standard_name": "Giáo trình chuẩn HSK 4"
   },
   "content_items": [
     {

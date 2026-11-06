@@ -300,6 +300,9 @@ def build_hsk4_pack():
             "sha256": ""
         },
         "curriculum": {
+            "id": "curr_hsk4",
+            "code": "HSK_4",
+            "standard_name": "Giáo trình chuẩn HSK 4",
             "units": units
         },
         "content_items": content_items,
@@ -313,10 +316,13 @@ def build_hsk4_pack():
     }
 
     # Serialize and compute sha256
-    raw_json = json.dumps(pack, indent=2, ensure_ascii=False)
-    checksum = compute_sha256(raw_json.encode("utf-8"))
+    pack["manifest"]["sha256"] = ""
+    for _ in range(3):
+        compact_json = json.dumps(pack, ensure_ascii=False, separators=(',', ':'))
+        pack["manifest"]["size_bytes"] = len(compact_json.encode("utf-8"))
+    compact_json = json.dumps(pack, ensure_ascii=False, separators=(',', ':'))
+    checksum = compute_sha256(compact_json.encode("utf-8"))
     pack["manifest"]["sha256"] = checksum
-    pack["manifest"]["size_bytes"] = len(raw_json.encode("utf-8"))
 
     # Write out
     out_dir = os.path.join(PACKS_DIR, "hsk4")
@@ -328,6 +334,11 @@ def build_hsk4_pack():
     cdn_file = os.path.join(CDN_DIR, "hsk4_pack_v1.json")
     with open(cdn_file, "w", encoding="utf-8") as f:
         json.dump(pack, f, indent=2, ensure_ascii=False)
+
+    cdn_pkg_file = os.path.join(CDN_DIR, "packages", "hsk4_pack_v1.json")
+    if os.path.exists(os.path.dirname(cdn_pkg_file)):
+        with open(cdn_pkg_file, "w", encoding="utf-8") as f:
+            json.dump(pack, f, indent=2, ensure_ascii=False)
 
     print(f"[HSK 4] Successfully generated content pack:")
     print(f"  - Units: {len(units)}, Lessons: {len(lesson_titles)}, Content items: {len(content_items)}")
@@ -578,6 +589,9 @@ def build_hsk5_pack():
             "sha256": ""
         },
         "curriculum": {
+            "id": "curr_hsk5",
+            "code": "HSK_5",
+            "standard_name": "Giáo trình chuẩn HSK 5",
             "units": units
         },
         "content_items": content_items,
@@ -590,10 +604,13 @@ def build_hsk5_pack():
         }
     }
 
-    raw_json = json.dumps(pack, indent=2, ensure_ascii=False)
-    checksum = compute_sha256(raw_json.encode("utf-8"))
+    pack["manifest"]["sha256"] = ""
+    for _ in range(3):
+        compact_json = json.dumps(pack, ensure_ascii=False, separators=(',', ':'))
+        pack["manifest"]["size_bytes"] = len(compact_json.encode("utf-8"))
+    compact_json = json.dumps(pack, ensure_ascii=False, separators=(',', ':'))
+    checksum = compute_sha256(compact_json.encode("utf-8"))
     pack["manifest"]["sha256"] = checksum
-    pack["manifest"]["size_bytes"] = len(raw_json.encode("utf-8"))
 
     out_dir = os.path.join(PACKS_DIR, "hsk5")
     os.makedirs(out_dir, exist_ok=True)
@@ -604,6 +621,11 @@ def build_hsk5_pack():
     cdn_file = os.path.join(CDN_DIR, "hsk5_pack_v1.json")
     with open(cdn_file, "w", encoding="utf-8") as f:
         json.dump(pack, f, indent=2, ensure_ascii=False)
+
+    cdn_pkg_file = os.path.join(CDN_DIR, "packages", "hsk5_pack_v1.json")
+    if os.path.exists(os.path.dirname(cdn_pkg_file)):
+        with open(cdn_pkg_file, "w", encoding="utf-8") as f:
+            json.dump(pack, f, indent=2, ensure_ascii=False)
 
     print(f"[HSK 5] Successfully generated content pack:")
     print(f"  - Units: {len(units)}, Lessons: {lesson_idx}, Content items: {len(content_items)}")
@@ -858,6 +880,9 @@ def build_hsk6_pack():
             "sha256": ""
         },
         "curriculum": {
+            "id": "curr_hsk6",
+            "code": "HSK_6",
+            "standard_name": "Giáo trình chuẩn HSK 6",
             "units": units
         },
         "content_items": content_items,
@@ -870,10 +895,13 @@ def build_hsk6_pack():
         }
     }
 
-    raw_json = json.dumps(pack, indent=2, ensure_ascii=False)
-    checksum = compute_sha256(raw_json.encode("utf-8"))
+    pack["manifest"]["sha256"] = ""
+    for _ in range(3):
+        compact_json = json.dumps(pack, ensure_ascii=False, separators=(',', ':'))
+        pack["manifest"]["size_bytes"] = len(compact_json.encode("utf-8"))
+    compact_json = json.dumps(pack, ensure_ascii=False, separators=(',', ':'))
+    checksum = compute_sha256(compact_json.encode("utf-8"))
     pack["manifest"]["sha256"] = checksum
-    pack["manifest"]["size_bytes"] = len(raw_json.encode("utf-8"))
 
     out_dir = os.path.join(PACKS_DIR, "hsk6")
     os.makedirs(out_dir, exist_ok=True)
@@ -884,6 +912,11 @@ def build_hsk6_pack():
     cdn_file = os.path.join(CDN_DIR, "hsk6_pack_v1.json")
     with open(cdn_file, "w", encoding="utf-8") as f:
         json.dump(pack, f, indent=2, ensure_ascii=False)
+
+    cdn_pkg_file = os.path.join(CDN_DIR, "packages", "hsk6_pack_v1.json")
+    if os.path.exists(os.path.dirname(cdn_pkg_file)):
+        with open(cdn_pkg_file, "w", encoding="utf-8") as f:
+            json.dump(pack, f, indent=2, ensure_ascii=False)
 
     print(f"[HSK 6] Successfully generated content pack:")
     print(f"  - Units: {len(units)}, Lessons: {lesson_idx}, Content items: {len(content_items)}")

@@ -6,8 +6,8 @@
     "title": "Giáo trình chuẩn HSK 5 (HSK 2.0)",
     "description": "1.300 từ vựng trung-cao cấp HSK 5, 36 bài học liên hoàn 6 chủ đề, 217 điểm ngữ pháp, bài khóa luận thuyết và đề thi thử HSK 5 tốt nghiệp.",
     "is_bundled": false,
-    "size_bytes": 1104899,
-    "sha256": "ceaf009ed4ab16e509adf9167c41fe3f5b25c169a427541cf72eaca8f86aa449"
+    "size_bytes": 1036492,
+    "sha256": "fb9786804d342ac9e162a1c017a8a4eb87fbf8269f8e8308a19cc12fcd1b720d"
   },
   "curriculum": {
     "units": [
@@ -2121,7 +2121,10 @@
           }
         ]
       }
-    ]
+    ],
+    "id": "curr_hsk5",
+    "code": "HSK_5",
+    "standard_name": "Giáo trình chuẩn HSK 5"
   },
   "content_items": [
     {
