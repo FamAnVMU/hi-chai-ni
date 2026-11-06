@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hi_chinese/core/theme/theme.dart';
 import 'package:hi_chinese/features/curriculum/domain/models/curriculum_models.dart';
-import 'package:hi_chinese/features/curriculum/domain/models/lesson_flow_state.dart';
 import 'package:hi_chinese/features/curriculum/presentation/providers/curriculum_providers.dart';
 import 'package:hi_chinese/features/curriculum/presentation/providers/lesson_flow_providers.dart';
 import 'package:hi_chinese/features/curriculum/presentation/screens/lesson_study_screen.dart';

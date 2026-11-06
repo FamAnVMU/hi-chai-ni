@@ -6,20 +6,25 @@ HI Chinese hoạt động theo mô hình **Offline-First**, lưu trữ toàn b�
 
 ---
 
-## 📦 Tải Ứng Dụng (Download Release APK v1.0.14)
+## 📦 Tải Ứng Dụng (Download Release APK v1.0.15)
 
 Ứng dụng được tối ưu hóa chuyên biệt cho các thiết bị Android hiện đại với kiến trúc đa chip (Split APKs):
 
 | Phiên Bản APK | Kích Thước | Cấu Trúc Khuyên Dùng | Tải Về Trực Tiếp |
 | :--- | :---: | :--- | :--- |
-| **`hi-chinese-v1.0.14-arm64-v8a.apk`** | **44.1 MB** | **64-bit ARM64 (arm64-v8a)** - Chuẩn cho 99% smartphone Android hiện đại | [⬇️ Tải APK ARM64](release-apk/hi-chinese-v1.0.14-arm64-v8a.apk) |
-| **`hi-chinese-v1.0.14-armeabi-v7a.apk`** | **42.0 MB** | **32-bit ARM (armeabi-v7a)** - Tương thích máy Android đời cũ hoặc cấu hình thấp | [⬇️ Tải APK ARM32](release-apk/hi-chinese-v1.0.14-armeabi-v7a.apk) |
-| **`app-release.apk`** | **44.1 MB** | Tệp cài đặt Release mặc định (arm64-v8a) | [⬇️ Tải APK Release](release-apk/app-release.apk) |
+| **`hi-chinese-v1.0.15-arm64-v8a.apk`** | **44.2 MB** | **64-bit ARM64 (arm64-v8a)** - Chuẩn cho 99% smartphone Android hiện đại | [⬇️ Tải APK ARM64](release-apk/hi-chinese-v1.0.15-arm64-v8a.apk) |
+| **`hi-chinese-v1.0.15-armeabi-v7a.apk`** | **42.1 MB** | **32-bit ARM (armeabi-v7a)** - Tương thích máy Android đời cũ hoặc cấu hình thấp | [⬇️ Tải APK ARM32](release-apk/hi-chinese-v1.0.15-armeabi-v7a.apk) |
+| **`app-release.apk`** | **44.2 MB** | Tệp cài đặt Release mặc định (arm64-v8a) | [⬇️ Tải APK Release](release-apk/app-release.apk) |
 
-> 🚀 **Điểm mới ở bản v1.0.14:**
-> - 🛠️ **Khắc phục triệt để màn hình bài học trắng (Blank Screen)**: Chuyển đổi lifecycle provider `lesson_flow_providers` sang `.autoDispose.family`, chống stale state và thêm fallback giao diện an toàn khi học liệu có định dạng dữ liệu không khớp.
-> - 📥 **Thẻ kêu gọi tải học liệu HSK 3 - HSK 6**: Khi người dùng vào giáo trình các cấp độ nâng cao chưa tải, ứng dụng hiển thị trực quan thông báo, trạng thái dung lượng và nút tải về ngay đầu màn hình thay vì chỉ hiển thị bài thi tốt nghiệp.
-> - 🎯 **Hỗ trợ Onboarding thông minh**: Tự động hiển thị hộp thoại hướng dẫn tải gói nội dung tương ứng khi người dùng thiết lập xuất phát điểm từ HSK 3 trở lên ở lần đầu khởi động.
+> 🚀 **Điểm mới ở bản v1.0.15:**
+> - 🛡️ **Khắc phục triệt để màn hình bài học trắng (Blank Screen)**:
+>   - **Tự động phục hồi học liệu (Self-Healing Ingestion)**: Cơ chế khởi động tự động kiểm tra và phục hồi trọn vẹn 90 segments cho HSK 1 & HSK 2 nếu bản cài đặt nâng cấp trước đó bị thiếu segments, bảo toàn 100% dữ liệu tiến độ của người dùng.
+>   - **Sửa lỗi thanh điều hướng tràn chiều cao**: Đặt chiều cao cố định `64px` cho `bottomNavigationBar`, giải phóng toàn bộ không gian hiển thị cho thân bài học.
+>   - **Đồng bộ học liệu phản ứng (Reactive Lesson Detail)**: `lessonDetailProvider` truy vấn và làm mới danh sách segments trực tiếp từ SQLite theo thời gian thực.
+>   - **Bọc Error Boundary an toàn**: Từng chặng học được bảo vệ bởi `LessonStepErrorBoundary`, cung cấp nút "Bỏ qua bước này" hoặc "Thử lại", ngăn chặn hoàn toàn việc rơi vào màn hình trắng.
+>   - **Khởi tạo đúng chặng & độ tương phản cao**: Luôn tự động đưa người học về chặng Khởi động (Step 0) khi bắt đầu bài học mới và tối ưu độ tương phản văn bản AppBar theo chuẩn WCAG.
+> - 📥 **Thẻ kêu gọi tải học liệu HSK 3 - HSK 6**: Hiển thị thông báo tải và quản lý dung lượng trực quan ngay đầu màn hình giáo trình.
+> - 🎯 **Hỗ trợ Onboarding thông minh**: Hướng dẫn tải gói nội dung HSK tương ứng khi người dùng lựa chọn xuất phát điểm từ HSK 3 trở lên.
 
 ---
 
@@ -75,21 +80,6 @@ lib/
 │
 └── main.dart                   # Điểm khởi chạy ứng dụng (ProviderScope & App Theme)
 ```
-│   ├── roadmap/                # Lộ trình học cá nhân hóa HSK 1-6
-│   ├── dictionary/             # Từ điển tra cứu Hán tự, Pinyin, nghĩa tiếng Việt
-│   ├── vocabulary_srs/         # Flashcard lặp lại ngắt quãng (SRS)
-│   ├── grammar/                # Ngữ pháp tiếng Trung theo cấp độ
-│   ├── practice/               # Bài tập trắc nghiệm, điền từ, ghép câu
-│   ├── pronunciation/          # Luyện phát âm Pinyin & thanh điệu
-│   ├── shadowing/              # Luyện nói theo mẫu câu chuẩn giọng Bắc Kinh
-│   ├── hanzi_writing/          # Luyện viết chữ Hán, mô phỏng thứ tự nét vẽ
-│   ├── reading/                # Luyện đọc hiểu đoạn văn kèm Pinyin tương tác
-│   ├── listening/              # Luyện nghe hội thoại và câu đàm thoại
-│   ├── ai_tutor/               # Gia sư AI đàm thoại & giải đáp ngữ pháp
-│   └── profile/                # Hồ sơ cá nhân, thống kê & cài đặt
-│
-└── main.dart                   # Điểm khởi chạy ứng dụng (ProviderScope & App Theme)
-```
 
 ---
 
@@ -132,11 +122,11 @@ flutter run -d <device-id>
 
 ## 📦 Quy Trình Đóng Gói (Build)
 
-### 1. Đóng gói file cài đặt Android APK (Release)
+### 1. Đóng gói file cài đặt Android APK (Release Split per ABI)
 ```bash
-flutter build apk --release
+flutter build apk --split-per-abi --release --android-skip-build-dependency-validation
 ```
-*Tệp APK đầu ra sẽ nằm tại:* `build/app/outputs/flutter-apk/app-release.apk`
+*Tệp APK đầu ra sẽ nằm tại:* `build/app/outputs/flutter-apk/`
 
 ### 2. Đóng gói file Android App Bundle (Google Play)
 ```bash
