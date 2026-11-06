@@ -1,0 +1,60 @@
+{
+  "manifest_version": "1.0.0",
+  "generated_at": "2026-11-06T10:15:00Z",
+  "packs": [
+    {
+      "pack_id": "audio_pack_hsk4",
+      "hsk_level": 4,
+      "version": "1.0.0",
+      "file_count": 627,
+      "size_bytes": 97744,
+      "sha256": "99ebb3a49407ba71a4aea9797eb167e400b44d16d321da0fd1b24f7608a7a4f1",
+      "download_url": "audio/audio_pack_hsk4.zip"
+    },
+    {
+      "pack_id": "audio_pack_hsk5",
+      "hsk_level": 5,
+      "version": "1.0.0",
+      "file_count": 1332,
+      "size_bytes": 207568,
+      "sha256": "c958828e22b2929147bf4828aa4cf70a248b364f88baad59905759248dc12a13",
+      "download_url": "audio/audio_pack_hsk5.zip"
+    },
+    {
+      "pack_id": "audio_pack_hsk6",
+      "hsk_level": 6,
+      "version": "1.0.0",
+      "file_count": 2550,
+      "size_bytes": 399480,
+      "sha256": "efac37124e3dfd3f8ae63dca383bc91711d39974c4aed2d6744b47ec873d576b",
+      "download_url": "audio/audio_pack_hsk6.zip"
+    }
+  ],
+  "audio_pack_hsk4": {
+    "pack_id": "audio_pack_hsk4",
+    "hsk_level": 4,
+    "version": "1.0.0",
+    "file_count": 627,
+    "size_bytes": 97744,
+    "sha256": "99ebb3a49407ba71a4aea9797eb167e400b44d16d321da0fd1b24f7608a7a4f1",
+    "download_url": "audio/audio_pack_hsk4.zip"
+  },
+  "audio_pack_hsk5": {
+    "pack_id": "audio_pack_hsk5",
+    "hsk_level": 5,
+    "version": "1.0.0",
+    "file_count": 1332,
+    "size_bytes": 207568,
+    "sha256": "c958828e22b2929147bf4828aa4cf70a248b364f88baad59905759248dc12a13",
+    "download_url": "audio/audio_pack_hsk5.zip"
+  },
+  "audio_pack_hsk6": {
+    "pack_id": "audio_pack_hsk6",
+    "hsk_level": 6,
+    "version": "1.0.0",
+    "file_count": 2550,
+    "size_bytes": 399480,
+    "sha256": "efac37124e3dfd3f8ae63dca383bc91711d39974c4aed2d6744b47ec873d576b",
+    "download_url": "audio/audio_pack_hsk6.zip"
+  }
+}

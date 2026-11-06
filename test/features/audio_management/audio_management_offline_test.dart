@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:archive/archive.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -23,7 +24,7 @@ void main() {
     MockAudioPlatformHelper.setupMockPlatformChannels();
   });
 
-  group('Offline Audio Asset Management Tests (Tests C–H)', () {
+  group('Offline Audio Asset Management Tests (Tests C–K)', () {
     late Directory tempDir;
     late String dbPath;
     late Database db;
@@ -329,6 +330,110 @@ void main() {
 
       // Overall percentage is calculated objectively
       expect(report.overallCoveragePercentage, isNonNegative);
+    });
+
+    test('Test I - Extract pack audio archive safely into target directory with checksum verification', () async {
+      final archive = Archive();
+      final sampleBytes = utf8.encode('ID3_MPEG_SAMPLE_BYTES');
+      archive.addFile(ArchiveFile('vocab/word1.mp3', sampleBytes.length, sampleBytes));
+      archive.addFile(ArchiveFile('dialogue/conv1.mp3', sampleBytes.length, sampleBytes));
+
+      final encoder = ZipEncoder();
+      final zipBytes = encoder.encode(archive);
+      final zipSha256 = sha256.convert(zipBytes).toString();
+
+      final zipFile = File('${tempDir.path}/test_pack.zip');
+      await zipFile.writeAsBytes(zipBytes);
+
+      final extractedCount = await storageManager.extractPackAudioArchive(
+        packId: 'hsk4',
+        zipFilePath: zipFile.path,
+        expectedSha256: zipSha256,
+      );
+
+      expect(extractedCount, 2);
+
+      final vocabFile = File(p.join(storageManager.getPackAudioDirectory('hsk4'), 'vocab', 'word1.mp3'));
+      expect(await vocabFile.exists(), isTrue);
+      expect(await vocabFile.readAsBytes(), sampleBytes);
+
+      final dialogueFile = File(p.join(storageManager.getPackAudioDirectory('hsk4'), 'dialogue', 'conv1.mp3'));
+      expect(await dialogueFile.exists(), isTrue);
+
+      expect(
+        () async => await storageManager.extractPackAudioArchive(
+          packId: 'hsk4',
+          zipFilePath: zipFile.path,
+          expectedSha256: 'invalid_sha256_hash_value',
+        ),
+        throwsA(isA<StateError>()),
+      );
+    });
+
+    test('Test J - Zip-Slip path traversal attacks are blocked and throw FileSystemException', () async {
+      final destDir = p.join(tempDir.path, 'safe_extraction_zone');
+      await Directory(destDir).create(recursive: true);
+
+      final archive1 = Archive();
+      archive1.addFile(ArchiveFile('../../outside.mp3', 4, [1, 2, 3, 4]));
+      final maliciousZip1 = ZipEncoder().encode(archive1);
+
+      expect(
+        () async => await storageManager.extractZipBytesSafely(
+          zipBytes: maliciousZip1,
+          destinationDir: destDir,
+        ),
+        throwsA(isA<FileSystemException>()),
+      );
+
+      final outsideFile = File(p.join(tempDir.path, 'outside.mp3'));
+      expect(await outsideFile.exists(), isFalse);
+
+      final archive2 = Archive();
+      archive2.addFile(ArchiveFile('/root_escape.mp3', 4, [1, 2, 3, 4]));
+      final maliciousZip2 = ZipEncoder().encode(archive2);
+
+      expect(
+        () async => await storageManager.extractZipBytesSafely(
+          zipBytes: maliciousZip2,
+          destinationDir: destDir,
+        ),
+        throwsA(isA<FileSystemException>()),
+      );
+    });
+
+    test('Test K - Audio packs manifest and packaged zip archives match 100% in SHA-256 and file counts', () async {
+      final manifestFile = File('content_packs_cdn/manifests/audio_packs_manifest.json');
+      expect(await manifestFile.exists(), isTrue);
+
+      final manifestContent = await manifestFile.readAsString();
+      final manifestJson = json.decode(manifestContent) as Map<String, dynamic>;
+
+      expect(manifestJson.containsKey('packs'), isTrue);
+      final packsList = (manifestJson['packs'] as List<dynamic>).cast<Map<String, dynamic>>();
+
+      final expectedPacks = ['audio_pack_hsk4', 'audio_pack_hsk5', 'audio_pack_hsk6'];
+      for (final packId in expectedPacks) {
+        final packMeta = packsList.firstWhere(
+          (p) => p['pack_id'] == packId,
+          orElse: () => throw StateError('Missing pack in manifest: $packId'),
+        );
+
+        final downloadUrl = packMeta['download_url'] as String;
+        final zipFile = File(p.join('content_packs_cdn', downloadUrl));
+        expect(await zipFile.exists(), isTrue);
+
+        final actualBytes = await zipFile.readAsBytes();
+        expect(actualBytes.length, packMeta['size_bytes']);
+
+        final actualSha256 = sha256.convert(actualBytes).toString();
+        expect(actualSha256, packMeta['sha256']);
+
+        final archive = ZipDecoder().decodeBytes(actualBytes);
+        final fileCount = archive.where((e) => e.isFile).length;
+        expect(fileCount, packMeta['file_count']);
+        expect(fileCount, greaterThan(0));
+      }
     });
   });
 }

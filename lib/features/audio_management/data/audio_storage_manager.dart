@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:archive/archive.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
@@ -130,5 +131,95 @@ class AudioStorageManager {
     } catch (_) {
       return false;
     }
+  }
+
+  Future<int> extractZipArchiveSafely({
+    required String zipFilePath,
+    required String destinationDir,
+    String? expectedSha256,
+  }) async {
+    final zipFile = File(zipFilePath);
+    if (!await zipFile.exists()) {
+      throw FileSystemException('Zip archive file not found: $zipFilePath', zipFilePath);
+    }
+
+    if (expectedSha256 != null && expectedSha256.isNotEmpty) {
+      final isValid = await verifyFileIntegrity(zipFile, expectedSha256);
+      if (!isValid) {
+        throw StateError('Zip archive SHA-256 verification failed for: $zipFilePath');
+      }
+    }
+
+    final bytes = await zipFile.readAsBytes();
+    return extractZipBytesSafely(
+      zipBytes: bytes,
+      destinationDir: destinationDir,
+    );
+  }
+
+  Future<int> extractZipBytesSafely({
+    required List<int> zipBytes,
+    required String destinationDir,
+  }) async {
+    final canonicalDest = p.canonicalize(destinationDir);
+    final targetDirectory = Directory(canonicalDest);
+    if (!await targetDirectory.exists()) {
+      await targetDirectory.create(recursive: true);
+    }
+
+    final safePrefix = canonicalDest.endsWith(p.separator)
+        ? canonicalDest
+        : '$canonicalDest${p.separator}';
+
+    final archive = ZipDecoder().decodeBytes(zipBytes);
+    int extractedCount = 0;
+
+    for (final entry in archive) {
+      if (entry.isFile) {
+        final rawName = entry.name;
+        if (rawName.startsWith('/') ||
+            rawName.startsWith('\\') ||
+            (rawName.length > 1 && rawName[1] == ':')) {
+          throw FileSystemException(
+            'Blocked Zip-Slip path traversal attack attempt with absolute path: $rawName',
+            rawName,
+          );
+        }
+
+        final resolvedPath = p.canonicalize(p.join(canonicalDest, rawName));
+
+        if (!resolvedPath.startsWith(safePrefix) && resolvedPath != canonicalDest) {
+          throw FileSystemException(
+            'Blocked Zip-Slip path traversal attack attempt: $rawName',
+            rawName,
+          );
+        }
+
+        final outFile = File(resolvedPath);
+        final parentDir = outFile.parent;
+        if (!await parentDir.exists()) {
+          await parentDir.create(recursive: true);
+        }
+
+        await outFile.writeAsBytes(entry.content as List<int>);
+        extractedCount++;
+      }
+    }
+
+    return extractedCount;
+  }
+
+  Future<int> extractPackAudioArchive({
+    required String packId,
+    required String zipFilePath,
+    String? expectedSha256,
+  }) async {
+    await ensureDirectories(packId);
+    final destDir = getPackAudioDirectory(packId);
+    return extractZipArchiveSafely(
+      zipFilePath: zipFilePath,
+      destinationDir: destDir,
+      expectedSha256: expectedSha256,
+    );
   }
 }
