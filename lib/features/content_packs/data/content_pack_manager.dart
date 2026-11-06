@@ -488,12 +488,21 @@ class ContentPackManager {
               // 1. Insert/update vocabulary without cascade delete
               final existingVocab = await txn.query(
                 DatabaseConstants.tableVocabularies,
-                columns: ['id'],
+                columns: ['id', 'hsk_level'],
                 where: 'id = ?',
                 whereArgs: [vocabId],
                 limit: 1,
               );
-              if (existingVocab.isNotEmpty) {
+              // Level-drift guard: a word already owned by a LOWER HSK level (e.g. 对 in HSK 2)
+              // must keep its original level, pinyin and meaning when a higher-level pack
+              // (e.g. HSK 4) re-lists it. Otherwise SRS review filtered by hsk_level loses the card.
+              final existingLevel = existingVocab.isNotEmpty
+                  ? (existingVocab.first['hsk_level'] as int? ?? hskLevel)
+                  : hskLevel;
+              final ownedByLowerLevel = existingVocab.isNotEmpty && existingLevel < hskLevel;
+              if (ownedByLowerLevel) {
+                // Keep canonical lower-level data; only link the knowledge item to the new lesson below.
+              } else if (existingVocab.isNotEmpty) {
                 await txn.update(
                   DatabaseConstants.tableVocabularies,
                   {
@@ -531,7 +540,9 @@ class ContentPackManager {
                 whereArgs: [senseId],
                 limit: 1,
               );
-              if (existingSense.isNotEmpty) {
+              if (ownedByLowerLevel) {
+                // Preserve the lower-level sense (see level-drift guard above).
+              } else if (existingSense.isNotEmpty) {
                 await txn.update(
                   DatabaseConstants.tableVocabularySenses,
                   {
@@ -571,16 +582,18 @@ class ContentPackManager {
               String activeKnowId = knowId;
               if (existingKnow.isNotEmpty) {
                 activeKnowId = existingKnow.first['id'] as String;
-                await txn.update(
-                  DatabaseConstants.tableKnowledgeRegistry,
-                  {
-                    'title': simplified,
-                    'metadata_json': json.encode({'pinyin': pinyin, 'meaning_vi': meaningVi}),
-                    'updated_at': nowUtc,
-                  },
-                  where: 'id = ?',
-                  whereArgs: [activeKnowId],
-                );
+                if (!ownedByLowerLevel) {
+                  await txn.update(
+                    DatabaseConstants.tableKnowledgeRegistry,
+                    {
+                      'title': simplified,
+                      'metadata_json': json.encode({'pinyin': pinyin, 'meaning_vi': meaningVi}),
+                      'updated_at': nowUtc,
+                    },
+                    where: 'id = ?',
+                    whereArgs: [activeKnowId],
+                  );
+                }
               } else {
                 await txn.insert(
                   DatabaseConstants.tableKnowledgeRegistry,

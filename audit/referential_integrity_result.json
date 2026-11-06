@@ -1,0 +1,107 @@
+{
+  "C1_unique_unit_ids": {
+    "status": "PASS",
+    "count": 0,
+    "samples": []
+  },
+  "C1_unique_lesson_ids": {
+    "status": "PASS",
+    "count": 0,
+    "samples": []
+  },
+  "C1_unique_segment_ids": {
+    "status": "PASS",
+    "count": 0,
+    "samples": []
+  },
+  "C2_unique_content_ids": {
+    "status": "PASS",
+    "count": 0,
+    "samples": []
+  },
+  "C3_dangling_segment_refs": {
+    "status": "PASS",
+    "count": 0,
+    "samples": []
+  },
+  "C4_content_item_curriculum_mismatch": {
+    "status": "PASS",
+    "count": 0,
+    "samples": []
+  },
+  "C5_vocab_missing_pinyin_or_meaning": {
+    "status": "PASS",
+    "count": 0,
+    "samples": []
+  },
+  "C6_pack_words_missing_fields": {
+    "status": "PASS",
+    "count": 0,
+    "samples": []
+  },
+  "C7_exit_exam_bad_answer_index": {
+    "status": "PASS",
+    "count": 0,
+    "samples": []
+  },
+  "W1_english_gloss_in_pack_examples": {
+    "1": 2,
+    "4": 572,
+    "5": 1016,
+    "6": 752
+  },
+  "W2_vocab_without_example": {
+    "hsk5_vocabularies.json": 17,
+    "hsk6_vocabularies.json": 558
+  },
+  "pack_summary": {
+    "hsk1": {
+      "units": 3,
+      "lessons": 15,
+      "segments": 90,
+      "content_items": 90,
+      "exit_exam_questions": 0
+    },
+    "hsk2": {
+      "units": 3,
+      "lessons": 15,
+      "segments": 90,
+      "content_items": 90,
+      "exit_exam_questions": 0
+    },
+    "hsk3": {
+      "units": 3,
+      "lessons": 15,
+      "segments": 90,
+      "content_items": 90,
+      "exit_exam_questions": 0
+    },
+    "hsk4": {
+      "units": 5,
+      "lessons": 30,
+      "segments": 180,
+      "content_items": 180,
+      "exit_exam_questions": 20
+    },
+    "hsk5": {
+      "units": 6,
+      "lessons": 36,
+      "segments": 216,
+      "content_items": 216,
+      "exit_exam_questions": 25
+    },
+    "hsk6": {
+      "units": 10,
+      "lessons": 50,
+      "segments": 300,
+      "content_items": 300,
+      "exit_exam_questions": 30
+    }
+  },
+  "vocab_counts": {
+    "hsk4_vocabularies.json": 601,
+    "hsk5_vocabularies.json": 1300,
+    "hsk6_vocabularies.json": 2500,
+    "hsk_seed_fixture_v2.json": 5000
+  }
+}
