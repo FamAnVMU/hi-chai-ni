@@ -11,6 +11,7 @@ import '../widgets/lesson_grammar_view.dart';
 import '../widgets/lesson_dialogue_view.dart';
 import '../widgets/lesson_practice_view.dart';
 import '../widgets/lesson_mastery_view.dart';
+import '../widgets/lesson_step_error_boundary.dart';
 import '../widgets/ai_tutor_helper_sheet.dart';
 
 class LessonStudyScreen extends ConsumerStatefulWidget {
@@ -76,7 +77,7 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
     );
   }
 
-  Widget _buildCurrentStep(int index, LessonFlowNotifier flowNotifier, CurriculumLesson currentLesson) {
+  Widget _buildStepContent(int index, LessonFlowNotifier flowNotifier, CurriculumLesson currentLesson) {
     switch (index) {
       case 0:
         return LessonWarmupView(
@@ -126,6 +127,19 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
       default:
         return const SizedBox.shrink();
     }
+  }
+
+  Widget _buildCurrentStep(int index, LessonFlowNotifier flowNotifier, CurriculumLesson currentLesson) {
+    final safeIndex = index.clamp(0, _stepTitles.length - 1);
+    final stepWidget = _buildStepContent(safeIndex, flowNotifier, currentLesson);
+
+    return LessonStepErrorBoundary(
+      stepName: _stepTitles[safeIndex],
+      onSkip: safeIndex < 5 ? () => flowNotifier.nextStep() : () => Navigator.of(context).pop(true),
+      onRetry: () => setState(() {}),
+      child: stepWidget,
+      builder: (ctx) => _buildStepContent(safeIndex, flowNotifier, currentLesson),
+    );
   }
 
   @override
