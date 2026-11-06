@@ -1,0 +1,148 @@
+{
+  "timestamp": "2026-11-06T05:30:57.458224+00:00",
+  "seed_fixture": {
+    "file": "assets/data/hsk_seed_fixture_v2.json",
+    "total_vocabularies": 5000,
+    "declared_source": "clem109;drkameleon;CVDICT;hanviet;no7z",
+    "verified_oer_sources": [
+      "clem109",
+      "drkameleon",
+      "no7z",
+      "hanviet",
+      "CVDICT"
+    ],
+    "unrecognized_sources": [],
+    "license_assessment": "COMPLIANT (Dual MIT + CC BY-SA 4.0)",
+    "status": "PASS"
+  },
+  "vocabularies": {
+    "hsk4": {
+      "file": "assets/data/hsk4_vocabularies.json",
+      "declared_license": "MIT (clem109, drkameleon, no7z) & CC BY-SA 4.0 (CVDICT)",
+      "vocab_count": 601,
+      "expected_count": 601,
+      "sense_sources": [
+        "CC-CEDICT",
+        "CVDICT"
+      ],
+      "detected_example_sources": [
+        "Tatoeba Project (CC BY 2.0 FR)"
+      ],
+      "status": "PASS"
+    },
+    "hsk5": {
+      "file": "assets/data/hsk5_vocabularies.json",
+      "declared_license": "MIT (clem109, drkameleon, no7z) & CC BY-SA 4.0 (CVDICT)",
+      "vocab_count": 1300,
+      "expected_count": 1300,
+      "sense_sources": [
+        "CC-CEDICT",
+        "CVDICT"
+      ],
+      "detected_example_sources": [
+        "Tatoeba Project (CC BY 2.0 FR)"
+      ],
+      "status": "PASS"
+    },
+    "hsk6": {
+      "file": "assets/data/hsk6_vocabularies.json",
+      "declared_license": "MIT (clem109, drkameleon, no7z) & CC BY-SA 4.0 (CVDICT)",
+      "vocab_count": 2500,
+      "expected_count": 2500,
+      "sense_sources": [
+        "CC-CEDICT",
+        "CVDICT"
+      ],
+      "detected_example_sources": [
+        "Tatoeba Project (CC BY 2.0 FR)"
+      ],
+      "status": "PASS"
+    }
+  },
+  "content_packs": {
+    "hsk1": {
+      "file": "assets/data/content_packs/hsk1/hsk1_pack_v1.json",
+      "pack_id": "hsk1_pack_v1",
+      "version": "1.0.0",
+      "units_count": 3,
+      "content_items_count": 90,
+      "grammar_sources": [
+        "HSK 2.0 Grammar Handbook Level 1"
+      ],
+      "vocabulary_sources": [
+        "HSK 2.0 Official Vocabulary List Level 1"
+      ],
+      "status": "PASS"
+    },
+    "hsk2": {
+      "file": "assets/data/content_packs/hsk2/hsk2_pack_v1.json",
+      "pack_id": "hsk2_pack_v1",
+      "version": "1.0.0",
+      "units_count": 3,
+      "content_items_count": 90,
+      "grammar_sources": [
+        "HSK 2.0 Grammar Handbook Level 2"
+      ],
+      "vocabulary_sources": [
+        "HSK 2.0 Official Vocabulary List Level 2"
+      ],
+      "status": "PASS"
+    },
+    "hsk3": {
+      "file": "assets/data/content_packs/hsk3/hsk3_pack_v1.json",
+      "pack_id": "hsk3_pack_v1",
+      "version": "1.0.0",
+      "units_count": 3,
+      "content_items_count": 90,
+      "grammar_sources": [
+        "AllSet Learning Chinese Grammar Wiki & HSK 3.0 Syllabus"
+      ],
+      "vocabulary_sources": [
+        "HSK 3.0 / HSK 2.0 Official Vocabulary List Level 3"
+      ],
+      "status": "PASS"
+    },
+    "hsk4": {
+      "file": "assets/data/content_packs/hsk4/hsk4_pack_v1.json",
+      "pack_id": "hsk4_pack_v1",
+      "version": "1.0.0",
+      "units_count": 5,
+      "content_items_count": 180,
+      "grammar_sources": [
+        "Chinese Grammar Wiki (AllSet Learning) - HSK 4"
+      ],
+      "vocabulary_sources": [
+        "Official HSK 2.0 Vocabulary List Level 4"
+      ],
+      "status": "PASS"
+    },
+    "hsk5": {
+      "file": "assets/data/content_packs/hsk5/hsk5_pack_v1.json",
+      "pack_id": "hsk5_pack_v1",
+      "version": "1.0.0",
+      "units_count": 6,
+      "content_items_count": 216,
+      "grammar_sources": [
+        "Chinese Grammar Wiki - HSK 5"
+      ],
+      "vocabulary_sources": [
+        "Official HSK 2.0 Vocabulary List Level 5"
+      ],
+      "status": "PASS"
+    },
+    "hsk6": {
+      "file": "assets/data/content_packs/hsk6/hsk6_pack_v1.json",
+      "pack_id": "hsk6_pack_v1",
+      "version": "1.0.0",
+      "units_count": 10,
+      "content_items_count": 300,
+      "grammar_sources": [
+        "Chinese Grammar Wiki - HSK 6"
+      ],
+      "vocabulary_sources": [
+        "Official HSK 2.0 Vocabulary List Level 6"
+      ],
+      "status": "PASS"
+    }
+  }
+}
