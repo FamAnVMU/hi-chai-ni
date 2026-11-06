@@ -147,7 +147,7 @@ class CurriculumDao {
     return _db.rawQuery('''
       SELECT ls.*, ci.content_json AS content_payload
       FROM ${DatabaseConstants.tableLessonSegments} ls
-      LEFT JOIN ${DatabaseConstants.tableContentItems} ci ON ls.content_ref_id = ci.content_id
+      LEFT JOIN ${DatabaseConstants.tableContentItems} ci ON UPPER(TRIM(ls.content_ref_id)) = UPPER(TRIM(ci.content_id))
       WHERE ls.lesson_id = ?
       ORDER BY ls.step_order ASC
     ''', [lessonId]);

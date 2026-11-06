@@ -231,7 +231,8 @@ class AppStartupNotifier extends Notifier<AppStartupState> {
     return count >= minimumExpectedVocabCount;
   }
 
-  Future<bool> _checkPackNeedsImport(Database db, MandatoryPackInfo pack) async {
+  @visibleForTesting
+  static Future<bool> checkPackNeedsImport(Database db, MandatoryPackInfo pack) async {
     final packRow = await db.query(
       DatabaseConstants.tableContentPacks,
       where: 'id = ? AND status IN (?, ?)',
@@ -248,10 +249,32 @@ class AppStartupNotifier extends Notifier<AppStartupState> {
       )
     ''', [pack.curriculumId]);
     final lessonCount = Sqflite.firstIntValue(lessonsRes) ?? 0;
-    return lessonCount == 0;
+    if (lessonCount == 0) {
+      return true;
+    }
+
+    final segmentsRes = await db.rawQuery('''
+      SELECT COUNT(*) as cnt 
+      FROM ${DatabaseConstants.tableLessonSegments} 
+      WHERE lesson_id IN (
+        SELECT l.id FROM ${DatabaseConstants.tableCurriculumLessons} l
+        INNER JOIN ${DatabaseConstants.tableCurriculumUnits} u ON l.unit_id = u.id
+        WHERE u.curriculum_id = ?
+      )
+    ''', [pack.curriculumId]);
+    final segmentCount = Sqflite.firstIntValue(segmentsRes) ?? 0;
+    if (segmentCount == 0) {
+      return true; // Force re-importing bundled pack to repair missing segments
+    }
+
+    return false;
   }
 
-  Future<void> _verifyDataIntegrity(Database db) async {
+  Future<bool> _checkPackNeedsImport(Database db, MandatoryPackInfo pack) =>
+      checkPackNeedsImport(db, pack);
+
+  @visibleForTesting
+  static Future<void> verifyDataIntegrity(Database db) async {
     // 1. Verify curr_hsk1 exists and has lessons
     final hsk1LessonsRes = await db.rawQuery('''
       SELECT COUNT(*) as cnt 
@@ -263,6 +286,22 @@ class AppStartupNotifier extends Notifier<AppStartupState> {
     final hsk1Count = Sqflite.firstIntValue(hsk1LessonsRes) ?? 0;
     if (hsk1Count == 0) {
       throw StateError('Xác minh dữ liệu thất bại: Không tìm thấy bài học cho curr_hsk1');
+    }
+
+    final hsk1SegmentsRes = await db.rawQuery('''
+      SELECT COUNT(*) as cnt 
+      FROM ${DatabaseConstants.tableLessonSegments} 
+      WHERE lesson_id IN (
+        SELECT l.id FROM ${DatabaseConstants.tableCurriculumLessons} l
+        INNER JOIN ${DatabaseConstants.tableCurriculumUnits} u ON l.unit_id = u.id
+        WHERE u.curriculum_id = ?
+      )
+    ''', ['curr_hsk1']);
+    final hsk1SegmentCount = Sqflite.firstIntValue(hsk1SegmentsRes) ?? 0;
+    if (hsk1SegmentCount < 90) {
+      throw StateError(
+        'Xác minh dữ liệu thất bại: curr_hsk1 thiếu dữ liệu segments (tìm thấy $hsk1SegmentCount/90)',
+      );
     }
 
     // 2. Verify curr_hsk2 exists and has lessons
@@ -278,6 +317,22 @@ class AppStartupNotifier extends Notifier<AppStartupState> {
       throw StateError('Xác minh dữ liệu thất bại: Không tìm thấy bài học cho curr_hsk2');
     }
 
+    final hsk2SegmentsRes = await db.rawQuery('''
+      SELECT COUNT(*) as cnt 
+      FROM ${DatabaseConstants.tableLessonSegments} 
+      WHERE lesson_id IN (
+        SELECT l.id FROM ${DatabaseConstants.tableCurriculumLessons} l
+        INNER JOIN ${DatabaseConstants.tableCurriculumUnits} u ON l.unit_id = u.id
+        WHERE u.curriculum_id = ?
+      )
+    ''', ['curr_hsk2']);
+    final hsk2SegmentCount = Sqflite.firstIntValue(hsk2SegmentsRes) ?? 0;
+    if (hsk2SegmentCount < 90) {
+      throw StateError(
+        'Xác minh dữ liệu thất bại: curr_hsk2 thiếu dữ liệu segments (tìm thấy $hsk2SegmentCount/90)',
+      );
+    }
+
     // 3. Verify content_items populated
     final itemsRes = await db.rawQuery(
       'SELECT COUNT(*) as cnt FROM ${DatabaseConstants.tableContentItems}',
@@ -287,6 +342,9 @@ class AppStartupNotifier extends Notifier<AppStartupState> {
       throw StateError('Xác minh dữ liệu thất bại: Không tìm thấy mục học liệu trong content_items');
     }
   }
+
+  Future<void> _verifyDataIntegrity(Database db) =>
+      verifyDataIntegrity(db);
 
   Future<void> _initializeDependentServices(
     Database db, {
