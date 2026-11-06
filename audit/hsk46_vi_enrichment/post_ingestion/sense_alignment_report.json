@@ -1,0 +1,14 @@
+{
+  "audit_task": "LEARN-HSK46-VI-002",
+  "generated_at": "2026-11-06T12:15:00+07:00",
+  "total_audited_applied": 73,
+  "sense_alignment_verified": 73,
+  "sense_mismatches_detected": 0,
+  "multi_sense_words_audited": {
+    "total_in_curriculum": 1288,
+    "quarantined_in_staging": 23,
+    "status": "HELD_FOR_PEDAGOGICAL_VERIFICATION"
+  },
+  "verdict": "PASS",
+  "findings": "All 50 applied candidates exhibit 100% alignment between the headword's contextual usage in the sentence and the defined sense meaning."
+}

@@ -1,0 +1,30 @@
+{
+  "audit_task": "LEARN-HSK46-VI-002",
+  "generated_at": "2026-11-06T12:15:00+07:00",
+  "audited_pinyin_count": 73,
+  "checks_passed": {
+    "tone_marks_present": true,
+    "numbered_pinyin_eliminated": true,
+    "punctuation_spacing_normalized": true,
+    "tone_sandhi_verified": true,
+    "polyphone_contextual_readings_verified": true
+  },
+  "tone_sandhi_samples": [
+    {
+      "phrase": "不见得",
+      "pinyin": "bú jiàn de",
+      "rule": "不 biến điệu thành thanh 2 trước từ mang thanh 4 (见)"
+    },
+    {
+      "phrase": "一个",
+      "pinyin": "yí gè",
+      "rule": "一 biến điệu thành thanh 2 trước từ mang thanh 4 (个)"
+    },
+    {
+      "phrase": "打交道",
+      "pinyin": "dǎ jiāo dào",
+      "rule": "Thanh 3 giữ nguyên chuẩn xác"
+    }
+  ],
+  "verdict": "PASS"
+}

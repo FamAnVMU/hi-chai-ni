@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-11-06T05:04:21.158253+00:00",
+  "counts_before": {
+    "vocabularies": 4401,
+    "lessons": 116,
+    "segments": 696,
+    "examples": 4396
+  },
+  "counts_after": {
+    "vocabularies": 4401,
+    "lessons": 116,
+    "segments": 696,
+    "content_items": 696
+  },
+  "zero_loss_verified": true
+}

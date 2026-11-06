@@ -1,0 +1,51 @@
+{
+  "audit_task": "LEARN-HSK46-VI-002",
+  "generated_at": "2026-11-06T12:15:00+07:00",
+  "sources_admitted_to_production": [
+    {
+      "source_id": "TATOEBA_CMN_VIE",
+      "license": "CC-BY-2.0-FR",
+      "redistribution": "ALLOWED",
+      "modification": "ALLOWED",
+      "attribution_required": true
+    },
+    {
+      "source_id": "CVDICT_ZH_VI",
+      "license": "CC-BY-SA-4.0",
+      "redistribution": "ALLOWED",
+      "modification": "ALLOWED",
+      "attribution_required": true
+    },
+    {
+      "source_id": "HSK_STANDARD_CURRICULUM",
+      "license": "CC-BY-NC-SA-3.0",
+      "redistribution": "ALLOWED",
+      "modification": "ALLOWED",
+      "attribution_required": true
+    }
+  ],
+  "sources_strictly_excluded": [
+    {
+      "source_id": "OPUS_TED2020",
+      "reason": "CC BY-NC-ND 4.0 forbids derivative works (Clause 3(a)(4))"
+    },
+    {
+      "source_id": "C3_READING_COMPREHENSION",
+      "reason": "Research only & Monolingual Chinese (no Vietnamese)"
+    },
+    {
+      "source_id": "OPUS_OPEN_SUBTITLES",
+      "reason": "Unverified cinema studio copyright clearance"
+    },
+    {
+      "source_id": "STORYWEAVER_PRATHAM",
+      "reason": "Juvenile register unsuitable for HSK 4-6 academic concepts"
+    },
+    {
+      "source_id": "ANKI_SHARED_DECKS",
+      "reason": "BLCUP textbook copyright & TOS personal use restriction"
+    }
+  ],
+  "unauthorized_source_leakage_detected": false,
+  "verdict": "PASS"
+}

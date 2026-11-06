@@ -1,0 +1,231 @@
+{
+  "generated_at": "2026-11-06T05:04:19.798999+00:00",
+  "mode": "dry-run",
+  "pre_snapshot": {
+    "timestamp": "2026-11-06T05:04:19.459748+00:00",
+    "vocab_files": {
+      "4": {
+        "sha256": "41e904b27e057bd2348ee18852f8dc5e95575e6100abc28af27578900b8a25af",
+        "size": 1321855
+      },
+      "5": {
+        "sha256": "220872d775f6e34ea90c118efea731082ee414efea79b193f2798917decc7398",
+        "size": 2658844
+      },
+      "6": {
+        "sha256": "a2a8d33d1d2266976d62713e718f6566617f60892d741430f5ea0171edfc69a1",
+        "size": 4414538
+      }
+    },
+    "pack_files": {
+      "4": {
+        "sha256": "0c4ffd64ce38072c9ac115c04c601f7c92fbe6aee494a082b88632629bfb8002",
+        "size": 683361
+      },
+      "5": {
+        "sha256": "30493424aba6ec6e4bb31484277392dee03922b480288bf55b30960be8c527d2",
+        "size": 1036556
+      },
+      "6": {
+        "sha256": "8e11d5d25509ef98b44e70e4966dbbcd54b066d13393dfa69eec3cabb2adaa5c",
+        "size": 1544288
+      }
+    },
+    "cdn_files": {
+      "4": {
+        "sha256": "0c4ffd64ce38072c9ac115c04c601f7c92fbe6aee494a082b88632629bfb8002",
+        "size": 683361
+      },
+      "5": {
+        "sha256": "30493424aba6ec6e4bb31484277392dee03922b480288bf55b30960be8c527d2",
+        "size": 1036556
+      },
+      "6": {
+        "sha256": "8e11d5d25509ef98b44e70e4966dbbcd54b066d13393dfa69eec3cabb2adaa5c",
+        "size": 1544288
+      }
+    },
+    "counts": {
+      "vocabularies": 4401,
+      "lessons": 116,
+      "segments": 696,
+      "examples": 4396
+    }
+  },
+  "summary": {
+    "total_candidates": 3815,
+    "validated_approved_count": 50,
+    "pending_human_review_count": 3764,
+    "rejected_count": 1,
+    "blocked_count": 0,
+    "changed_sentence_count": 0,
+    "identical_sentence_count": 50
+  },
+  "validated_approved_sample": [
+    {
+      "candidate_id": "CAND_HSK4_lesson_4_9_seg_4_9_2_害羞_6",
+      "corpus_id": "HI_CHINESE_HSK_CURRICULUM",
+      "corpus_version": "1.0.0",
+      "source_record_id": "LOC_HSK4_lesson_4_9_seg_4_9_2_害羞_6",
+      "source_url": "assets/data/content_packs/hsk4/hsk4_pack_v1.json",
+      "source_license": "CC-BY-NC-SA-3.0",
+      "hsk_level": 4,
+      "vocab_id": "VOC_HSK4_害羞_haixiu",
+      "headword": "害羞",
+      "sense_locator": {
+        "sense_index": 0,
+        "sense_id": "SNS_VOC_HSK4_害羞_haixiu_1",
+        "sense_fingerprint": "SNS_VOC_HSK4_害羞_haixiu_1"
+      },
+      "lesson_id": "lesson_4_9",
+      "segment_id": "seg_4_9_2",
+      "content_item_id": "VOCAB_L4_9",
+      "target_field": "example_sentence",
+      "original_example": "你很害羞。 (Bạn rất nhút nhát.)",
+      "original_example_hash": "7c163efb30c6db6eef2dd24101ca2767d91e8b8002e2f0460cb7f7914332f614",
+      "replacement_chinese": "你很害羞。",
+      "replacement_pinyin": "nǐ hěn hài xiū。",
+      "replacement_vietnamese": "Bạn rất nhút nhát.",
+      "source_chinese": "你很害羞。",
+      "source_vietnamese": "Bạn rất nhút nhát.",
+      "curator_status": "APPROVED",
+      "language_review_status": "VERIFIED",
+      "license_status": "COMPLIANT"
+    },
+    {
+      "candidate_id": "CAND_HSK4_lesson_4_15_seg_4_15_2_聊天_2",
+      "corpus_id": "HI_CHINESE_HSK_CURRICULUM",
+      "corpus_version": "1.0.0",
+      "source_record_id": "LOC_HSK4_lesson_4_15_seg_4_15_2_聊天_2",
+      "source_url": "assets/data/content_packs/hsk4/hsk4_pack_v1.json",
+      "source_license": "CC-BY-NC-SA-3.0",
+      "hsk_level": 4,
+      "vocab_id": "VOC_HSK4_聊天_liaotian",
+      "headword": "聊天",
+      "sense_locator": {
+        "sense_index": 0,
+        "sense_id": "SNS_VOC_HSK4_聊天_liaotian_1",
+        "sense_fingerprint": "SNS_VOC_HSK4_聊天_liaotian_1"
+      },
+      "lesson_id": "lesson_4_15",
+      "segment_id": "seg_4_15_2",
+      "content_item_id": "VOCAB_L4_15",
+      "target_field": "example_sentence",
+      "original_example": "我很疑惑为什么冷的时候会寂寞得想找个人聊聊天。 (Tôi tự hỏi không biết tại sao mỗi khi trời lạnh là tôi lại cảm thấy cô đơn như thế.)",
+      "original_example_hash": "17ad72140d69b7337f8403d05f351065867158b55d2abb29d2303e9f793c4d10",
+      "replacement_chinese": "我很疑惑为什么冷的时候会寂寞得想找个人聊聊天。",
+      "replacement_pinyin": "wǒ hěn yí huò wèi shén me lěng de shí hòu huì jì mò dé xiǎng zhǎo gè rén liáo liáo tiān。",
+      "replacement_vietnamese": "Tôi tự hỏi không biết tại sao mỗi khi trời lạnh là tôi lại cảm thấy cô đơn như thế.",
+      "source_chinese": "我很疑惑为什么冷的时候会寂寞得想找个人聊聊天。",
+      "source_vietnamese": "Tôi tự hỏi không biết tại sao mỗi khi trời lạnh là tôi lại cảm thấy cô đơn như thế.",
+      "curator_status": "APPROVED",
+      "language_review_status": "VERIFIED",
+      "license_status": "COMPLIANT"
+    },
+    {
+      "candidate_id": "CAND_HSK5_lesson_5_2_seg_5_2_2_不见得_20",
+      "corpus_id": "HI_CHINESE_HSK_CURRICULUM",
+      "corpus_version": "1.0.0",
+      "source_record_id": "LOC_HSK5_lesson_5_2_seg_5_2_2_不见得_20",
+      "source_url": "assets/data/content_packs/hsk5/hsk5_pack_v1.json",
+      "source_license": "CC-BY-NC-SA-3.0",
+      "hsk_level": 5,
+      "vocab_id": "VOC_HSK5_不见得_bujiande",
+      "headword": "不见得",
+      "sense_locator": {
+        "sense_index": 0,
+        "sense_id": "SNS_VOC_HSK5_不见得_bujiande_1",
+        "sense_fingerprint": "SNS_VOC_HSK5_不见得_bujiande_1"
+      },
+      "lesson_id": "lesson_5_2",
+      "segment_id": "seg_5_2_2",
+      "content_item_id": "VOCAB_L5_2",
+      "target_field": "example_sentence",
+      "original_example": "药吃多了，对身体不见得好。 (Uống nhiều thuốc không hẳn là tốt cho sức khỏe.)",
+      "original_example_hash": "bbb5df5b692d5e2fbdf127068c9085c82d4a84d94b1a04702df4c467abfdccd2",
+      "replacement_chinese": "药吃多了，对身体不见得好。",
+      "replacement_pinyin": "yào chī duō le， duì shēn tǐ bú jiàn de hǎo。",
+      "replacement_vietnamese": "Uống nhiều thuốc không hẳn là tốt cho sức khỏe.",
+      "source_chinese": "药吃多了，对身体不见得好。",
+      "source_vietnamese": "Uống nhiều thuốc không hẳn là tốt cho sức khỏe.",
+      "curator_status": "APPROVED",
+      "language_review_status": "VERIFIED",
+      "license_status": "COMPLIANT"
+    },
+    {
+      "candidate_id": "CAND_HSK5_lesson_5_5_seg_5_5_2_打交道_30",
+      "corpus_id": "HI_CHINESE_HSK_CURRICULUM",
+      "corpus_version": "1.0.0",
+      "source_record_id": "LOC_HSK5_lesson_5_5_seg_5_5_2_打交道_30",
+      "source_url": "assets/data/content_packs/hsk5/hsk5_pack_v1.json",
+      "source_license": "CC-BY-NC-SA-3.0",
+      "hsk_level": 5,
+      "vocab_id": "VOC_HSK5_打交道_dajiaodao",
+      "headword": "打交道",
+      "sense_locator": {
+        "sense_index": 0,
+        "sense_id": "SNS_VOC_HSK5_打交道_dajiaodao_1",
+        "sense_fingerprint": "SNS_VOC_HSK5_打交道_dajiaodao_1"
+      },
+      "lesson_id": "lesson_5_5",
+      "segment_id": "seg_5_5_2",
+      "content_item_id": "VOCAB_L5_5",
+      "target_field": "example_sentence",
+      "original_example": "他们俩工作上联系多，经常打交道。 (Hai người họ có liên hệ nhiều trong công việc, thường xuyên giao thiệp với nhau.)",
+      "original_example_hash": "7766f7570990000bc5a84b6a2a8da7467b14efd40e413a4524608ff0d2ce658f",
+      "replacement_chinese": "他们俩工作上联系多，经常打交道。",
+      "replacement_pinyin": "tā men liǎ gōng zuò shàng lián xì duō， jīng cháng dǎ jiāo dào。",
+      "replacement_vietnamese": "Hai người họ có liên hệ nhiều trong công việc, thường xuyên giao thiệp với nhau.",
+      "source_chinese": "他们俩工作上联系多，经常打交道。",
+      "source_vietnamese": "Hai người họ có liên hệ nhiều trong công việc, thường xuyên giao thiệp với nhau.",
+      "curator_status": "APPROVED",
+      "language_review_status": "VERIFIED",
+      "license_status": "COMPLIANT"
+    },
+    {
+      "candidate_id": "CAND_HSK5_lesson_5_7_seg_5_7_2_钓_6",
+      "corpus_id": "HI_CHINESE_HSK_CURRICULUM",
+      "corpus_version": "1.0.0",
+      "source_record_id": "LOC_HSK5_lesson_5_7_seg_5_7_2_钓_6",
+      "source_url": "assets/data/content_packs/hsk5/hsk5_pack_v1.json",
+      "source_license": "CC-BY-NC-SA-3.0",
+      "hsk_level": 5,
+      "vocab_id": "VOC_HSK5_钓_diao",
+      "headword": "钓",
+      "sense_locator": {
+        "sense_index": 0,
+        "sense_id": "SNS_VOC_HSK5_钓_diao_1",
+        "sense_fingerprint": "SNS_VOC_HSK5_钓_diao_1"
+      },
+      "lesson_id": "lesson_5_7",
+      "segment_id": "seg_5_7_2",
+      "content_item_id": "VOCAB_L5_7",
+      "target_field": "example_sentence",
+      "original_example": "她把所有的业余时间都用在钓鱼上了。 (Cô ấy sử dụng thời gian rảnh rỗi để câu cá.)",
+      "original_example_hash": "199f28fbf00f7208ba7cc0f70af7ccb2250db79c82d8814410d4ca573ed87ce6",
+      "replacement_chinese": "她把所有的业余时间都用在钓鱼上了。",
+      "replacement_pinyin": "tā bǎ suǒ yǒu de yè yú shí jiān dōu yòng zài diào yú shàng le。",
+      "replacement_vietnamese": "Cô ấy sử dụng thời gian rảnh rỗi để câu cá.",
+      "source_chinese": "她把所有的业余时间都用在钓鱼上了。",
+      "source_vietnamese": "Cô ấy sử dụng thời gian rảnh rỗi để câu cá.",
+      "curator_status": "APPROVED",
+      "language_review_status": "VERIFIED",
+      "license_status": "COMPLIANT"
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "candidate_id": "CAND_HSK5_lesson_5_14_seg_5_14_2_简历_9",
+      "source_record_id": "LOC_HSK5_lesson_5_14_seg_5_14_2_简历_9",
+      "headword": "简历",
+      "curator_status": "APPROVED",
+      "hsk_level": 5,
+      "failures": [
+        "CHECK_16_RESIDUAL_ENGLISH_GLOSS"
+      ],
+      "replacement_vietnamese": "Prepare your résumé before the interview."
+    }
+  ],
+  "blocked_candidates": [],
+  "changed_diffs": []
+}
