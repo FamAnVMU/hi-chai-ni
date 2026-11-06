@@ -326,16 +326,14 @@ void main() {
       await tester.pumpWidget(buildTestableWidget());
       await tester.pumpAndSettle();
 
-      expect(find.text('Cá Nhân & Cài Đặt'), findsOneWidget);
+      expect(find.text('Cá Nhân'), findsOneWidget);
       expect(find.text('Người học HI Chinese'), findsOneWidget);
       expect(find.text('HSK 1'), findsOneWidget);
       expect(find.textContaining('Mục tiêu: HSK 3'), findsOneWidget);
       expect(find.text('Sửa hồ sơ'), findsOneWidget);
       expect(find.text('Đổi mục tiêu'), findsOneWidget);
       expect(find.text('Giao Diện & Tùy Chọn Đọc'), findsOneWidget);
-      expect(find.text('Âm Thanh & Giọng Đọc'), findsOneWidget);
-      expect(find.text('Cài đặt AI Tutor & Chẩn đoán kết nối'), findsOneWidget);
-      expect(find.text('Quản lý Dữ liệu & Sao lưu'), findsOneWidget);
+      expect(find.text('Cài Đặt'), findsOneWidget);
     });
 
     testWidgets('2. Tapping "Sửa hồ sơ" opens EditProfileSheet', (tester) async {
@@ -396,6 +394,8 @@ void main() {
       await tester.pumpWidget(buildTestableWidget());
       await tester.pumpAndSettle();
 
+      await tester.tap(find.text('Cài Đặt'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Quản lý Dữ liệu & Sao lưu'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
@@ -412,6 +412,8 @@ void main() {
       await tester.pumpWidget(buildTestableWidget());
       await tester.pumpAndSettle();
 
+      await tester.tap(find.text('Cài Đặt'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Quản lý Dữ liệu & Sao lưu'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));

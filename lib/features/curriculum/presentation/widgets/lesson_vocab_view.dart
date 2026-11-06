@@ -167,7 +167,8 @@ class _LessonVocabViewState extends State<LessonVocabView> {
         final pinyin = (w['pinyin'] ?? '') as String;
         final meaning = (w['meaning'] ?? w['meaning_vi'] ?? '') as String;
         final type = (w['type'] ?? w['part_of_speech'] ?? '') as String;
-        final audioUri = (w['audio_uri'] ?? w['audio_path'] ?? w['audio_url']) as String?;
+        final rawAudio = w['audio_uri'] ?? w['audio_path'] ?? w['audio_url'];
+    final audioUri = rawAudio is String ? rawAudio : null;
         final isPlaying = _currentlyPlayingHanzi == hanzi;
 
         return HiCard(

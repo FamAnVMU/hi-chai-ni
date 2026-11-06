@@ -14,6 +14,13 @@ class LessonWarmupView extends StatelessWidget {
     required this.onStart,
   });
 
+  /// Safely converts untyped JSON payload values to non-empty text.
+  static String? _asText(Object? value) {
+    if (value == null) return null;
+    final text = value.toString().trim();
+    return text.isEmpty ? null : text;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -23,8 +30,8 @@ class LessonWarmupView extends StatelessWidget {
         'lessonId=${lesson.id}, segmentId=${segment?.id}, refId=${segment?.contentRefId}',
       );
     }
-    final introText = (segment?.contentPayload?['intro'] as String?) ??
-        (segment?.contentPayload?['objective'] as String?) ??
+    final introText = _asText(segment?.contentPayload?['intro']) ??
+        _asText(segment?.contentPayload?['objective']) ??
         'Chào mừng bạn đến với bài học "${lesson.titleZh}". Hãy cùng khởi động và nắm vững kiến thức nhé!';
 
     return SingleChildScrollView(

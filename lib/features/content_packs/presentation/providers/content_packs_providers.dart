@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/database/app_database.dart';
 import '../../../curriculum/data/content_pack_loader.dart';
+import '../../../curriculum/domain/models/content_pack_models.dart';
 import '../../data/content_pack_remote_service.dart';
 
 class ContentPackItemState {
@@ -205,13 +206,31 @@ final contentPacksProvider = AsyncNotifierProvider<ContentPacksNotifier, List<Co
   ContentPacksNotifier.new,
 );
 
+/// Provider exposing the active [ContentPackRemoteService].
+final contentPackRemoteServiceProvider = Provider<ContentPackRemoteService?>((ref) {
+  if (!AppDatabase.instance.isOpen) return null;
+  return ContentPackRemoteService(db: AppDatabase.instance.database);
+});
+
 /// Provider checking whether a given HSK level's content pack is installed.
 /// HSK 1 and 2 are always bundled/available (returns true).
 /// HSK 3-6 require checking whether their pack has been installed in SQLite.
 final isHskLevelInstalledProvider = FutureProvider.family<bool, int>((ref, hskLevel) async {
-  if (hskLevel <= 2) return true;
-  if (!AppDatabase.instance.isOpen) return false;
-  final db = AppDatabase.instance.database;
-  final service = ContentPackRemoteService(db: db);
-  return await service.isPackInstalled('hsk${hskLevel}_pack_v1');
+  final service = ref.watch(contentPackRemoteServiceProvider);
+  if (hskLevel <= 2) {
+    if (service != null) {
+      final dbInstalled = await service.isHskLevelInstalled(hskLevel);
+      if (dbInstalled) return true;
+    }
+    return true;
+  }
+  if (service == null) return false;
+  return await service.isHskLevelInstalled(hskLevel);
+});
+
+/// Provider retrieving the installed [ContentPackManifest] for [hskLevel], or null if not installed.
+final hskPackMetadataProvider = FutureProvider.family<ContentPackManifest?, int>((ref, hskLevel) async {
+  final service = ref.watch(contentPackRemoteServiceProvider);
+  if (service == null) return null;
+  return await service.getHskPackManifest(hskLevel);
 });

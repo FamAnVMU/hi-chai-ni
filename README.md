@@ -6,14 +6,20 @@ HI Chinese hoạt động theo mô hình **Offline-First**, lưu trữ toàn b�
 
 ---
 
-## 📦 Tải Ứng Dụng (Download Release APK v1.0.9 - 64-bit ARM64)
+## 📦 Tải Ứng Dụng (Download Release APK v1.0.14)
 
-Ứng dụng được tối ưu hóa chuyên biệt cho cấu trúc **64-bit Android (arm64-v8a)** hiện đại:
+Ứng dụng được tối ưu hóa chuyên biệt cho các thiết bị Android hiện đại với kiến trúc đa chip (Split APKs):
 
-| Phiên Bản APK | Kích Thước | Cấu Trúc | Tải Về Trực Tiếp |
+| Phiên Bản APK | Kích Thước | Cấu Trúc Khuyên Dùng | Tải Về Trực Tiếp |
 | :--- | :---: | :--- | :--- |
-| **`hi-chinese-v1.0.9-arm64.apk`** | **20.2 MB** | **64-bit ARM64 (arm64-v8a)** dành cho mọi smartphone Android hiện nay | [⬇️ Tải APK ARM64](release-apk/hi-chinese-v1.0.9-arm64.apk) |
-| **`app-release.apk`** | **20.2 MB** | Tệp cài đặt Release tiêu chuẩn (64-bit) | [⬇️ Tải APK Release](release-apk/app-release.apk) |
+| **`hi-chinese-v1.0.14-arm64-v8a.apk`** | **44.1 MB** | **64-bit ARM64 (arm64-v8a)** - Chuẩn cho 99% smartphone Android hiện đại | [⬇️ Tải APK ARM64](release-apk/hi-chinese-v1.0.14-arm64-v8a.apk) |
+| **`hi-chinese-v1.0.14-armeabi-v7a.apk`** | **42.0 MB** | **32-bit ARM (armeabi-v7a)** - Tương thích máy Android đời cũ hoặc cấu hình thấp | [⬇️ Tải APK ARM32](release-apk/hi-chinese-v1.0.14-armeabi-v7a.apk) |
+| **`app-release.apk`** | **44.1 MB** | Tệp cài đặt Release mặc định (arm64-v8a) | [⬇️ Tải APK Release](release-apk/app-release.apk) |
+
+> 🚀 **Điểm mới ở bản v1.0.14:**
+> - 🛠️ **Khắc phục triệt để màn hình bài học trắng (Blank Screen)**: Chuyển đổi lifecycle provider `lesson_flow_providers` sang `.autoDispose.family`, chống stale state và thêm fallback giao diện an toàn khi học liệu có định dạng dữ liệu không khớp.
+> - 📥 **Thẻ kêu gọi tải học liệu HSK 3 - HSK 6**: Khi người dùng vào giáo trình các cấp độ nâng cao chưa tải, ứng dụng hiển thị trực quan thông báo, trạng thái dung lượng và nút tải về ngay đầu màn hình thay vì chỉ hiển thị bài thi tốt nghiệp.
+> - 🎯 **Hỗ trợ Onboarding thông minh**: Tự động hiển thị hộp thoại hướng dẫn tải gói nội dung tương ứng khi người dùng thiết lập xuất phát điểm từ HSK 3 trở lên ở lần đầu khởi động.
 
 ---
 

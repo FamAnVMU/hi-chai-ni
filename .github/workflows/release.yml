@@ -35,10 +35,10 @@ jobs:
             - **Split-ABI APKs (< 45MB):** Tối ưu hóa kích thước cài đặt, chia riêng theo kiến trúc vi xử lý (arm64-v8a và armeabi-v7a).
 
             ### 📦 Danh Sách Tệp APK Cài Đặt (Release APKs)
-            - **`hi-chinese-v1.0.13-arm64-v8a.apk`** (44.1 MB): Dành cho hầu hết thiết bị Android 64-bit hiện đại (khuyên dùng).
-            - **`hi-chinese-v1.0.13-armeabi-v7a.apk`** (42.0 MB): Dành cho thiết bị Android 32-bit đời cũ hoặc máy cấu hình phổ thông.
+            - **`hi-chinese-v1.0.14-arm64-v8a.apk`** (44.1 MB): Dành cho hầu hết thiết bị Android 64-bit hiện đại (khuyên dùng).
+            - **`hi-chinese-v1.0.14-armeabi-v7a.apk`** (42.0 MB): Dành cho thiết bị Android 32-bit đời cũ hoặc máy cấu hình phổ thông.
             - **`app-release.apk`** (44.1 MB): Bản dựng Release tiêu chuẩn (arm64-v8a).
           files: |
-            release-apk/hi-chinese-v1.0.13-arm64-v8a.apk
-            release-apk/hi-chinese-v1.0.13-armeabi-v7a.apk
+            release-apk/hi-chinese-v1.0.14-arm64-v8a.apk
+            release-apk/hi-chinese-v1.0.14-armeabi-v7a.apk
             release-apk/app-release.apk

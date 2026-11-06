@@ -3,7 +3,7 @@ import '../../domain/models/lesson_flow_state.dart';
 import '../../domain/engine/adaptive_exercise_sampler.dart';
 import '../../domain/engine/mastery_engine.dart';
 import '../../../../core/database/app_database.dart';
-import 'curriculum_providers.dart';
+import '../../../vocabulary_srs/presentation/providers/srs_providers.dart' show hasCompletedLessonsProvider;
 
 final adaptiveExerciseSamplerProvider = Provider<AdaptiveExerciseSampler>((ref) {
   return const AdaptiveExerciseSampler();

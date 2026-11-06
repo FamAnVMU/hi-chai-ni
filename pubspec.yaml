@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.9+10
+version: 1.0.14+14
 
 environment:
   sdk: ^3.13.7
@@ -48,6 +48,7 @@ dependencies:
   just_audio: ^0.10.6
   record: ^7.1.2
   path_provider: ^2.1.6
+  package_info_plus: ^10.2.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -85,9 +86,12 @@ flutter:
     - assets/audio/hsk1/
     - assets/audio/hsk2/
     - assets/audio/hsk3/
+    - assets/audio/curriculum/
+    - assets/audio/reading/
     - assets/audio/pinyin/
     - assets/audio/pronunciation/
     - assets/audio/shadowing/
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:

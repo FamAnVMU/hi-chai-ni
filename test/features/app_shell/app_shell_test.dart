@@ -127,7 +127,7 @@ void main() {
       await tester.tap(find.text('Cá nhân'));
       await tester.pump(const Duration(milliseconds: 200));
 
-      expect(find.text('Cá Nhân & Cài Đặt'), findsOneWidget);
+      expect(find.text('Cá Nhân'), findsOneWidget);
       expect(find.text('Giao Diện & Tùy Chọn Đọc'), findsOneWidget);
     });
   });
@@ -218,7 +218,7 @@ void main() {
       // Switch to Profile tab
       await tester.tap(find.text('Cá nhân'));
       await tester.pump(const Duration(milliseconds: 200));
-      expect(find.text('Cá Nhân & Cài Đặt'), findsOneWidget);
+      expect(find.text('Cá Nhân'), findsOneWidget);
 
       // Switch back to AI Tutor tab
       await tester.tap(aiTutorFinder);

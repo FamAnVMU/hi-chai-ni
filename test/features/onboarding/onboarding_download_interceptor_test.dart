@@ -23,7 +23,6 @@ void main() {
 
       PersonalizationData? resultData;
       int selectedMin = 0;
-      String selectedSkill = '';
 
       await tester.pumpWidget(
         MaterialApp(
@@ -32,7 +31,6 @@ void main() {
               initialHskLevel: 3,
               onComplete: (minutes, skill, [data]) {
                 selectedMin = minutes;
-                selectedSkill = skill;
                 resultData = data;
               },
             ),

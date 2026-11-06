@@ -205,7 +205,8 @@ class PracticeScoringEngine {
     // 1. Error detection mode
     if (definition.errorToken != null && definition.errorToken!.isNotEmpty) {
       final selected = answer.selectedErrorToken ?? '';
-      final isCorrect = selected == definition.errorToken;
+      final isCorrect = selected == definition.errorToken ||
+          (selected.isNotEmpty && _normalize(selected) == _normalize(definition.errorToken!));
       return ScoringResult(
         isCorrect: isCorrect,
         score: isCorrect ? 1.0 : 0.0,

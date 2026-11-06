@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:sqflite/sqflite.dart';
+import '../../../../core/database/database_constants.dart';
 import 'content_pack_manager.dart';
 import '../../curriculum/data/content_pack_loader.dart';
 import '../../curriculum/domain/models/content_pack_models.dart';
@@ -95,33 +95,33 @@ class ContentPackRemoteService {
         packId: 'hsk4_pack_v1',
         hskLevel: 4,
         title: 'Giáo trình chuẩn HSK 4 (Trực tuyến)',
-        description: '600 từ vựng cao cấp, 30 bài học chuyên đề văn hóa xã hội & đề thi mô phỏng chuẩn quốc tế.',
+        description: '601 từ vựng cao cấp, 30 bài học 5 chuyên đề & đề thi tốt nghiệp HSK 4.',
         version: '1.0.0',
-        sizeBytes: 744756,
+        sizeBytes: 683297,
         downloadUrl: '$cdnBaseUrl/hsk4_pack_v1.json',
-        sha256Checksum: '',
+        sha256Checksum: '0b4cbbcb3adeba1ae08d4b3b0952c0803923f3c007509736e7c66c2150bda492',
         isBundled: false,
       ),
       const RemoteContentPackInfo(
         packId: 'hsk5_pack_v1',
         hskLevel: 5,
         title: 'Giáo trình chuẩn HSK 5 (Trực tuyến)',
-        description: '1.300 từ vựng nâng cao, 36 bài học chuyên đề văn học, khoa học & xã hội hiện đại.',
+        description: '1.300 từ vựng cao cấp, 36 bài học luận thuyết & đề thi tốt nghiệp HSK 5.',
         version: '1.0.0',
-        sizeBytes: 1110841,
+        sizeBytes: 1036492,
         downloadUrl: '$cdnBaseUrl/hsk5_pack_v1.json',
-        sha256Checksum: '',
+        sha256Checksum: 'fb9786804d342ac9e162a1c017a8a4eb87fbf8269f8e8308a19cc12fcd1b720d',
         isBundled: false,
       ),
       const RemoteContentPackInfo(
         packId: 'hsk6_pack_v1',
         hskLevel: 6,
         title: 'Giáo trình chuẩn HSK 6 (Trực tuyến)',
-        description: '2.500 từ vựng chuyên sâu & thành ngữ, 50 bài học nghiên cứu, hùng biện & bài viết chuyên luận.',
+        description: '2.500 từ vựng học thuật đỉnh cao, 50 bài học 10 đại chuyên đề & đề thi HSK 6.',
         version: '1.0.0',
-        sizeBytes: 1644508,
+        sizeBytes: 1544224,
         downloadUrl: '$cdnBaseUrl/hsk6_pack_v1.json',
-        sha256Checksum: '',
+        sha256Checksum: '0bb04e558f7c3c19cda4c43217a49cf3446d2dc0a485e327dfad8d0e93b5c8cf',
         isBundled: false,
       ),
     ];
@@ -130,12 +130,46 @@ class ContentPackRemoteService {
   /// Checks if a pack is already installed in SQLite.
   Future<bool> isPackInstalled(String packId) async {
     final result = await db.query(
-      'content_packs',
+      DatabaseConstants.tableContentPacks,
       where: 'id = ?',
       whereArgs: [packId],
       limit: 1,
     );
     return result.isNotEmpty;
+  }
+
+  /// Checks whether a given HSK level has both an installed/bundled content_pack
+  /// record and a curriculum with at least 1 lesson in SQLite.
+  Future<bool> isHskLevelInstalled(int hskLevel) async {
+    final packRows = await db.query(
+      DatabaseConstants.tableContentPacks,
+      columns: ['id', 'status'],
+      where: 'hsk_level = ? AND status IN (?, ?)',
+      whereArgs: [hskLevel, 'installed', 'bundled'],
+      limit: 1,
+    );
+    if (packRows.isEmpty) return false;
+
+    final currRows = await db.query(
+      DatabaseConstants.tableCurriculums,
+      columns: ['id', 'total_lessons'],
+      where: 'hsk_level = ? AND total_lessons > 0',
+      whereArgs: [hskLevel],
+      limit: 1,
+    );
+    return currRows.isNotEmpty;
+  }
+
+  /// Retrieves the installed content pack manifest for [hskLevel], or null if not found.
+  Future<ContentPackManifest?> getHskPackManifest(int hskLevel) async {
+    final rows = await db.query(
+      DatabaseConstants.tableContentPacks,
+      where: 'hsk_level = ?',
+      whereArgs: [hskLevel],
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    return ContentPackManifest.fromJson(Map<String, dynamic>.from(rows.first));
   }
 
   /// Downloads a remote JSON content pack, verifies its SHA-256 (if specified), and installs it.
@@ -144,6 +178,13 @@ class ContentPackRemoteService {
     void Function(double progress)? onProgress,
   }) async {
     try {
+      if (packInfo.sha256Checksum.isEmpty) {
+        return ContentPackInstallResult.failure(
+          packId: packInfo.packId,
+          message: 'Từ chối cài đặt gói học liệu thiếu mã băm tin cậy.',
+        );
+      }
+
       onProgress?.call(0.1);
       final uri = Uri.parse(packInfo.downloadUrl);
       final response = await _httpClient.get(uri);
@@ -158,15 +199,28 @@ class ContentPackRemoteService {
       onProgress?.call(0.5);
       final rawJson = utf8.decode(response.bodyBytes);
 
-      // Verify checksum if provided
-      if (packInfo.sha256Checksum.isNotEmpty) {
-        final computed = sha256.convert(response.bodyBytes).toString();
-        if (computed != packInfo.sha256Checksum) {
-          return ContentPackInstallResult.failure(
-            packId: packInfo.packId,
-            message: 'Mã băm SHA-256 không khớp! File có thể bị lỗi khi truyền tải.',
-          );
-        }
+      final decoded = json.decode(rawJson);
+      if (decoded is! Map<String, dynamic> || decoded['manifest'] is! Map<String, dynamic>) {
+        return ContentPackInstallResult.failure(
+          packId: packInfo.packId,
+          message: 'Cấu trúc gói học liệu không hợp lệ.',
+        );
+      }
+
+      final manifestSha = decoded['manifest']['sha256'] as String? ?? '';
+      if (manifestSha.isNotEmpty && manifestSha.toLowerCase() != packInfo.sha256Checksum.toLowerCase()) {
+        return ContentPackInstallResult.failure(
+          packId: packInfo.packId,
+          message: 'Mã băm khai báo trong manifest không khớp với danh mục tin cậy.',
+        );
+      }
+
+      final computed = ContentPackLoader.computeChecksum(rawJson);
+      if (computed.toLowerCase() != packInfo.sha256Checksum.toLowerCase()) {
+        return ContentPackInstallResult.failure(
+          packId: packInfo.packId,
+          message: 'Mã băm SHA-256 không khớp! File có thể bị lỗi khi truyền tải hoặc bị sửa đổi.',
+        );
       }
 
       onProgress?.call(0.8);
