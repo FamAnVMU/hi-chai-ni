@@ -30,16 +30,14 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
   @override
   void initState() {
     super.initState();
-    // Default flow starts at LessonStep.warmup (Stage 1).
-    // If the learner explicitly requested to resume from a specific step, jump to it.
-    if (widget.resumeStep != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          ref.read(lessonFlowNotifierProvider(widget.lesson.id).notifier).resetToStep(widget.resumeStep!);
-        }
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final targetStep = widget.resumeStep ?? LessonStep.warmup;
+        ref.read(lessonFlowNotifierProvider(widget.lesson.id).notifier).resetToStep(targetStep);
+      }
+    });
   }
+
   static const List<String> _stepTitles = [
     'Khởi động',
     'Từ vựng mới',
@@ -136,6 +134,7 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
     final theme = Theme.of(context);
 
     final currentIndex = flowState.currentStep.index;
+    final safeIndex = currentIndex.clamp(0, _stepTitles.length - 1);
 
     return Scaffold(
       appBar: AppBar(
@@ -144,11 +143,17 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
           children: [
             Text(
               widget.lesson.titleVi,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryText,
+              ),
             ),
             Text(
-              '${_stepTitles[currentIndex]} (${currentIndex + 1}/6)',
-              style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+              '${_stepTitles[safeIndex]} (${safeIndex + 1}/6)',
+              style: const TextStyle(
+                fontSize: 12,
+                color: AppColors.secondaryText,
+              ),
             ),
           ],
         ),
@@ -162,14 +167,14 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(4),
           child: LinearProgressIndicator(
-            value: (currentIndex + 1) / 6,
+            value: (safeIndex + 1) / 6,
             backgroundColor: AppColors.primaryBlueLight,
             color: AppColors.primaryBlueDark,
             minHeight: 4,
           ),
         ),
       ),
-      body: _buildCurrentStep(currentIndex, flowNotifier),
+      body: _buildCurrentStep(safeIndex, flowNotifier),
       bottomNavigationBar: SafeArea(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
@@ -180,7 +185,7 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              if (currentIndex > 0)
+              if (safeIndex > 0)
                 HiButton(
                   text: 'Trước',
                   variant: HiButtonVariant.secondary,
@@ -193,7 +198,7 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: List.generate(6, (idx) {
-                  final isActive = idx == currentIndex;
+                  final isActive = idx == safeIndex;
                   return Container(
                     margin: const EdgeInsets.symmetric(horizontal: 3),
                     width: isActive ? 16 : 8,
@@ -205,7 +210,7 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
                   );
                 }),
               ),
-              if (currentIndex < 5)
+              if (safeIndex < 5)
                 HiButton(
                   text: 'Tiếp theo',
                   variant: HiButtonVariant.primary,
