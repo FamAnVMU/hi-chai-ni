@@ -20,7 +20,7 @@ Map<String, dynamic> _parseContentPackJson(String jsonString) {
 
 class ContentPackManager {
   final DatabaseExecutor _db;
-  static const String currentAppVersion = '1.0.12';
+  static const String currentAppVersion = '1.0.13';
   static const int currentSupportedSchemaVersion = 2;
 
   const ContentPackManager(this._db);

@@ -19,24 +19,26 @@ jobs:
       - name: Create GitHub Release with Assets
         uses: softprops/action-gh-release@v2
         with:
-          name: HI Chinese ${{ github.ref_name }} – Nền Tảng Tự Học HSK Hoàn Chỉnh
+          name: HI Chinese ${{ github.ref_name }} – Nền Tảng Tự Học HSK Hoàn Chỉnh (HSK 1–6)
           draft: false
           prerelease: false
           body: |
             ## 🌟 HI Chinese ${{ github.ref_name }} – Nền Tảng Tự Học HSK Hoàn Chỉnh (Offline-First)
 
-            Bản phát hành chính thức của **HI Chinese** dành riêng cho hệ điều hành Android.
+            Bản phát hành chính thức của **HI Chinese** dành riêng cho hệ điều hành Android, mở rộng toàn diện học liệu HSK 1 đến HSK 6.
             
-            ### 🚀 Tính Năng Cốt Lõi
-            - **Offline-First 100%:** Giáo trình chuẩn HSK 1, 150 từ vựng cốt lõi, 45 điểm ngữ pháp, 15 bài hội thoại, 150 bài tập xác định và đề thi tốt nghiệp cấp độ hoạt động không cần mạng.
-            - **Quy Trình Học 6 Chặng Chuẩn Sư Phạm:** Khởi động $\rightarrow$ Từ vựng mới $\rightarrow$ Điểm ngữ pháp $\rightarrow$ Hội thoại $\rightarrow$ Luyện tập thích ứng $\rightarrow$ Kiểm tra hoàn thành bài.
-            - **Mở Khóa Có Điều Kiện & SRS:** Yêu cầu $\ge 80\%$ để mở bài tiếp theo, tự động phát hiện kiến thức yếu để đề xuất ôn tập.
-            - **Trắc Nghiệm Thích Ứng CAT & Phân Lớp:** Tự động ghi nhận đạt chuẩn các bài trước khi vượt qua khảo sát đầu vào.
-            - **AI Trợ Giảng Bổ Trợ An Toàn:** Cung cấp giải thích ngữ cảnh khi có mạng với rào chắn nghiêm ngặt bảo vệ tính bất biến của giáo trình.
+            ### 🚀 Điểm Nhấn Phiên Bản ${{ github.ref_name }}
+            - **Mở Rộng Học Liệu HSK 4–6:** Tích hợp 3 gói Content Pack chuẩn hóa (`hsk4_pack_v1.json`, `hsk5_pack_v1.json`, `hsk6_pack_v1.json`) với đầy đủ 6 chặng sư phạm, 116 bài học mới, điểm ngữ pháp và bài thi tốt nghiệp từng cấp.
+            - **Làm Giàu Ngữ Liệu Song Ngữ Trung – Việt (OER):** Làm giàu câu ví dụ chuẩn từ Tatoeba Project (CC BY 2.0 FR) và từ điển Hán-Việt CVDICT (CC BY-SA 4.0), loại bỏ bản dịch máy chưa kiểm chứng.
+            - **Bảo Vệ Tiến Độ Người Học Tuyệt Đối (Zero Progress Loss):** Cơ chế bảo vệ Level-Drift Guard ngăn chặn lệch cấp độ từ vựng khi nâng cấp, bảo toàn 100% dữ liệu SRS, streak và tiến độ bài học đã hoàn thành.
+            - **Offline-First & CDN Tối Ưu:** HSK 1–2 nạp sẵn; HSK 3–6 hỗ trợ tải về theo nhu cầu qua CDN bảo mật với mã băm Canonical SHA-256 đối soát chặt chẽ.
+            - **Split-ABI APKs (< 45MB):** Tối ưu hóa kích thước cài đặt, chia riêng theo kiến trúc vi xử lý (arm64-v8a và armeabi-v7a).
 
-            ### 📦 Danh Sách Tệp APK Cài Đặt (64-bit ARM64)
-            - **`hi-chinese-v1.0.9-arm64.apk`**: Bản dựng 64-bit tối ưu kích thước và hiệu năng (arm64-v8a).
-            - **`app-release.apk`**: Tệp APK Release 64-bit tiêu chuẩn.
+            ### 📦 Danh Sách Tệp APK Cài Đặt (Release APKs)
+            - **`hi-chinese-v1.0.13-arm64-v8a.apk`** (44.1 MB): Dành cho hầu hết thiết bị Android 64-bit hiện đại (khuyên dùng).
+            - **`hi-chinese-v1.0.13-armeabi-v7a.apk`** (42.0 MB): Dành cho thiết bị Android 32-bit đời cũ hoặc máy cấu hình phổ thông.
+            - **`app-release.apk`** (44.1 MB): Bản dựng Release tiêu chuẩn (arm64-v8a).
           files: |
-            release-apk/hi-chinese-v1.0.9-arm64.apk
+            release-apk/hi-chinese-v1.0.13-arm64-v8a.apk
+            release-apk/hi-chinese-v1.0.13-armeabi-v7a.apk
             release-apk/app-release.apk
