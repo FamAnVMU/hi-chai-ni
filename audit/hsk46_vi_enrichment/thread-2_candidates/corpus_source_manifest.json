@@ -1,0 +1,185 @@
+{
+  "manifest_version": "1.0.0",
+  "task_id": "LEARN-HSK46-VI-001",
+  "generated_at": "2026-11-06T11:45:00+07:00",
+  "curator_role": "Senior Chinese–Vietnamese Bilingual Corpus Curator (Thread 2)",
+  "license_policy_reference": "HI_CHINESE_OPEN_CONTENT_POLICY_V2",
+  "sources_surveyed": [
+    {
+      "corpus_id": "TATOEBA_CMN_VIE",
+      "name": "Tatoeba Project (cmn-vie parallel corpus)",
+      "provider": "Tatoeba Foundation (tatoeba.org)",
+      "url": "https://tatoeba.org",
+      "license_code": "CC-BY-2.0-FR",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/fr/",
+      "language_pair": "cmn-vie",
+      "sentence_pairs_available": 1500,
+      "redistribution_allowed": true,
+      "commercial_allowed": true,
+      "modification_allowed": true,
+      "attribution_required": true,
+      "attribution_text": "Sentence pairs from Tatoeba Project (tatoeba.org), licensed under CC BY 2.0 FR.",
+      "pedagogical_suitability": {
+        "hsk1_3": "EXCELLENT",
+        "hsk4": "GOOD",
+        "hsk5_6": "MODERATE (Limited advanced academic vocabulary)"
+      },
+      "gate_verdict": "APPROVED",
+      "gate_rationale": "Permissive license explicitly allows redistribution, adaptation, and packaging into offline datasets with attribution."
+    },
+    {
+      "corpus_id": "ALLSET_GRAMMAR_WIKI",
+      "name": "AllSet Learning Chinese Grammar Wiki",
+      "provider": "AllSet Learning (John Pasden et al.)",
+      "url": "https://resources.allsetlearning.com/chinese/grammar/",
+      "license_code": "CC-BY-NC-SA-3.0",
+      "license_url": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+      "language_pair": "zh-en (with Vietnamese community glosses)",
+      "sentence_pairs_available": 2400,
+      "redistribution_allowed": true,
+      "commercial_allowed": false,
+      "modification_allowed": true,
+      "attribution_required": true,
+      "attribution_text": "Grammar patterns and examples courtesy of Chinese Grammar Wiki by AllSet Learning, licensed under CC BY-NC-SA 3.0.",
+      "pedagogical_suitability": {
+        "hsk1_3": "EXCELLENT",
+        "hsk4": "EXCELLENT",
+        "hsk5_6": "EXCELLENT"
+      },
+      "gate_verdict": "APPROVED_NONCOMMERCIAL",
+      "gate_rationale": "High pedagogical quality, strictly non-commercial educational alignment matching project guidelines."
+    },
+    {
+      "corpus_id": "CVDICT_ZH_VI",
+      "name": "Từ điển Hán Việt CVDICT",
+      "provider": "Phong Phan",
+      "url": "https://github.com/ph0ngp/CVDICT",
+      "license_code": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "language_pair": "zh-vi",
+      "sentence_pairs_available": 38000,
+      "redistribution_allowed": true,
+      "commercial_allowed": true,
+      "modification_allowed": true,
+      "attribution_required": true,
+      "attribution_text": "Dữ liệu từ điển Hán Việt CVDICT, CC BY-SA 4.0 bởi Phong Phan.",
+      "pedagogical_suitability": {
+        "hsk1_3": "EXCELLENT",
+        "hsk4": "EXCELLENT",
+        "hsk5_6": "EXCELLENT"
+      },
+      "gate_verdict": "APPROVED",
+      "gate_rationale": "Lexical definitions and glosses verified under CC BY-SA 4.0."
+    },
+    {
+      "corpus_id": "OPUS_TED2020",
+      "name": "OPUS TED2020 Parallel Corpus (zh-vi)",
+      "provider": "OPUS (University of Helsinki) / TED Conferences LLC",
+      "url": "https://opus.nlpl.eu/TED2020/",
+      "license_code": "CC-BY-NC-ND-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
+      "language_pair": "zh-vi",
+      "sentence_pairs_available": 125000,
+      "redistribution_allowed": true,
+      "commercial_allowed": false,
+      "modification_allowed": false,
+      "attribution_required": true,
+      "attribution_text": "TED Talks transcripts, CC BY-NC-ND 4.0.",
+      "pedagogical_suitability": {
+        "hsk1_3": "POOR",
+        "hsk4": "MODERATE",
+        "hsk5_6": "GOOD"
+      },
+      "gate_verdict": "LICENSE_REJECTED",
+      "gate_rationale": "VIOLATION OF LICENSE GATE: TED Talks terms and CC BY-NC-ND 4.0 explicitly prohibit creating and distributing adapted material (Clause 3(a)(4) NoDerivatives). Slicing speeches into standalone flashcard example sentences constitutes an unauthorized derivative work."
+    },
+    {
+      "corpus_id": "C3_READING_COMPREHENSION",
+      "name": "C3: A Free-form Multiple-Choice Chinese Machine Reading Comprehension Dataset",
+      "provider": "Tsinghua University / nlpdata",
+      "url": "https://github.com/nlpdata/c3",
+      "license_code": "RESEARCH_ONLY",
+      "license_url": "https://github.com/nlpdata/c3/blob/master/license.txt",
+      "language_pair": "zh (Monolingual Chinese)",
+      "sentence_pairs_available": 0,
+      "redistribution_allowed": false,
+      "commercial_allowed": false,
+      "modification_allowed": false,
+      "attribution_required": true,
+      "attribution_text": "C3 Reading Comprehension Dataset, non-commercial research use only.",
+      "pedagogical_suitability": {
+        "hsk1_3": "POOR",
+        "hsk4": "MODERATE",
+        "hsk5_6": "EXCELLENT (for reading passages, not vocabulary examples)"
+      },
+      "gate_verdict": "LICENSE_REJECTED",
+      "gate_rationale": "NOT_ZH_VI_PARALLEL & RESEARCH_ONLY: Contains zero Vietnamese text. License strictly restricts usage to non-commercial research; bundling into an offline production learning application without express permission is prohibited."
+    },
+    {
+      "corpus_id": "OPUS_OPEN_SUBTITLES",
+      "name": "OPUS OpenSubtitles v2018 (zh-vi)",
+      "provider": "OPUS / OpenSubtitles.org community",
+      "url": "https://opus.nlpl.eu/OpenSubtitles/",
+      "license_code": "LICENSE_UNVERIFIED",
+      "license_url": "https://www.opensubtitles.org",
+      "language_pair": "zh-vi",
+      "sentence_pairs_available": 850000,
+      "redistribution_allowed": false,
+      "commercial_allowed": false,
+      "modification_allowed": false,
+      "attribution_required": true,
+      "attribution_text": "OpenSubtitles user contributions.",
+      "pedagogical_suitability": {
+        "hsk1_3": "GOOD",
+        "hsk4": "GOOD",
+        "hsk5_6": "MODERATE"
+      },
+      "gate_verdict": "LICENSE_REJECTED",
+      "gate_rationale": "COPYRIGHT RISK: Subtitles derived from copyrighted cinema and television productions without explicit redistribution rights from media studios. Unfit for production inclusion under HI Chinese Anti-Infringement Directives."
+    },
+    {
+      "corpus_id": "STORYWEAVER_PRATHAM",
+      "name": "StoryWeaver Open Children's Stories",
+      "provider": "Pratham Books",
+      "url": "https://storyweaver.org.in",
+      "license_code": "CC-BY-4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "language_pair": "zh-vi (where dual language published)",
+      "sentence_pairs_available": 450,
+      "redistribution_allowed": true,
+      "commercial_allowed": true,
+      "modification_allowed": true,
+      "attribution_required": true,
+      "attribution_text": "StoryWeaver by Pratham Books, CC BY 4.0.",
+      "pedagogical_suitability": {
+        "hsk1_3": "EXCELLENT",
+        "hsk4": "POOR",
+        "hsk5_6": "UNUSABLE (Early literacy register unsuitable for advanced Chinese)"
+      },
+      "gate_verdict": "PEDAGOGICALLY_REJECTED_FOR_HSK46",
+      "gate_rationale": "While legally compliant under CC BY 4.0, vocabulary complexity in children's early literacy books is predominantly HSK 1–2. Abstract, professional, and academic vocabulary for HSK 4–6 does not appear in natural StoryWeaver narratives."
+    },
+    {
+      "corpus_id": "ANKI_SHARED_DECKS_HSK",
+      "name": "AnkiWeb Shared Decks (HSK Standard Course / Boya Chinese)",
+      "provider": "AnkiWeb Community",
+      "url": "https://ankiweb.net/shared/decks",
+      "license_code": "LICENSE_UNVERIFIED",
+      "license_url": "https://community.ankihub.net/tos",
+      "language_pair": "zh-vi / zh-en",
+      "sentence_pairs_available": 5000,
+      "redistribution_allowed": false,
+      "commercial_allowed": false,
+      "modification_allowed": false,
+      "attribution_required": false,
+      "attribution_text": "AnkiWeb user decks.",
+      "pedagogical_suitability": {
+        "hsk1_3": "EXCELLENT",
+        "hsk4": "EXCELLENT",
+        "hsk5_6": "EXCELLENT"
+      },
+      "gate_verdict": "LICENSE_REJECTED",
+      "gate_rationale": "AnkiWeb TOS stipulates shared decks uploaded by users are for personal use only unless accompanied by an explicit open source license. Most HSK standard course decks are direct scrapes of copyrighted textbook series from BLCUP without publisher licensing."
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "CORE-HSK46-VI-001",
+  "generated_at": "2026-11-06T04:35:31.121107+00:00",
+  "dataset_summary": {
+    "total_standalone_vocabularies": 4401,
+    "standalone_by_level": {
+      "hsk4": 601,
+      "hsk5": 1300,
+      "hsk6": 2500
+    },
+    "total_lessons": 116,
+    "lessons_by_level": {
+      "hsk4": 30,
+      "hsk5": 36,
+      "hsk6": 50
+    },
+    "total_segments": 696,
+    "segments_by_level": {
+      "hsk4": 180,
+      "hsk5": 216,
+      "hsk6": 300
+    },
+    "total_lesson_word_occurrences": 4396,
+    "lesson_words_by_level": {
+      "hsk4": 600,
+      "hsk5": 1296,
+      "hsk6": 2500
+    },
+    "total_english_gloss_sentences": 2340,
+    "english_gloss_by_level": {
+      "hsk4": 572,
+      "hsk5": 1016,
+      "hsk6": 752
+    },
+    "total_missing_examples_at_all": 575,
+    "missing_examples_by_level": {
+      "hsk4": 0,
+      "hsk5": 17,
+      "hsk6": 558
+    },
+    "total_empty_parentheses": 1407,
+    "empty_parentheses_by_level": {
+      "hsk4": 24,
+      "hsk5": 236,
+      "hsk6": 1147
+    },
+    "total_standalone_omitted_words": 5,
+    "total_multi_sense_words": 1288,
+    "multi_sense_by_level": {
+      "hsk4": 224,
+      "hsk5": 452,
+      "hsk6": 612
+    }
+  },
+  "registries_sha256": {
+    "vocabulary_registry.json": "03bc6015ba9aac2144794156e069cbc29c39fcefa1a3e8fecf501db68de78658",
+    "lesson_registry.json": "7952a15b5b824d5155ef6755b06d81c1f7a131557d9d19b0b5837112169292da",
+    "segment_registry.json": "df867a9a803659cc7775d0b3e4a53706c9d56931c9da93b3f521da0d67f76cba",
+    "example_registry.json": "377d63d0abae6a8604c753c4b2d49a17e45e4c4309fc9b28ff576e12d6bfd152",
+    "english_gloss_report.json": "4eed52b3a07bb16d369b2e457397fef239fe3b5d427c96ea8be21578e5911aba",
+    "missing_examples_report.json": "34910dc00778b715c7ce5e2ada2e00e503ed972ab77696425f52fc40ef399124",
+    "ambiguous_mapping_report.json": "a8c7cce731690cc16b298cdba7347e8b8d517b3c035b0c034bcaa257825c202e"
+  },
+  "production_content_packs_sha256": {
+    "hsk4_pack_v1.json": "0b4cbbcb3adeba1ae08d4b3b0952c0803923f3c007509736e7c66c2150bda492",
+    "hsk5_pack_v1.json": "fb9786804d342ac9e162a1c017a8a4eb87fbf8269f8e8308a19cc12fcd1b720d",
+    "hsk6_pack_v1.json": "0bb04e558f7c3c19cda4c43217a49cf3446d2dc0a485e327dfad8d0e93b5c8cf"
+  }
+}

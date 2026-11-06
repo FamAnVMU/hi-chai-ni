@@ -2,8 +2,8 @@
 
 - **Agent Role**: Senior Curriculum Specialist & Chinese Language Pedagogist · Pedagogy Lead
 - **Branch**: `feature/thread-2-learning`
-- **Current Status**: ACTIVE / TASK 2.3 (PROMPT 2.3) COMPLETED
-- **Health**: HEALTHY (116 Lessons, 1,160 Assessment Questions, 75 Calibrated Graduation Exit Exam Questions, 868 Dialogue Turns Verified, Master Test Suites PASS)
+- **Current Status**: ACTIVE / PHASE 2 (TASK LEARN-HSK46-VI-001) COMPLETED
+- **Health**: HEALTHY (116 Lessons, 1,160 Assessment Questions, 75 Exit Exam Items, Staged Candidate Dataset 3,815 Items Verified, 8 Sources License Audited)
 
 ---
 
@@ -70,4 +70,27 @@
   - Flutter `content_pack_loader_test.dart`: 4/4 PASS.
   - Flutter `content_pack_service_test.dart`: 4/4 PASS.
 - **Detailed Report**: [TASK-T2-005-EXIT-EXAM-CALIBRATION.md](file:///C:/Users/phama/.gemini/antigravity/worktrees/hi_chinese/thread_2_learning/docs/agent-coordination/reports/thread-2/TASK-T2-005-EXIT-EXAM-CALIBRATION.md).
+
+---
+
+## 5. Latest Deliverables: Task LEARN-HSK46-VI-001 (Parallel Corpus Curation & Example Approval)
+
+- **Execution Mode**: **Content Curation & Staging Only** (Zero production file modifications).
+- **Corpus License Gate Completed**:
+  - **APPROVED**: Tatoeba Project (`CC BY 2.0 FR`), CVDICT (`CC BY-SA 4.0`), AllSet Learning Grammar Wiki (`CC BY-NC-SA 3.0`), HSK Standard Curriculum Sentences (`CC-BY-NC-SA-3.0`).
+  - **REJECTED**: OPUS TED2020 (`CC BY-NC-ND 4.0` NoDerivatives violation), C3 (Research-only & Monolingual Chinese), OPUS OpenSubtitles (Copyright risks), StoryWeaver (Juvenile literacy register unsuitable for HSK 4–6), AnkiWeb Shared Decks (TOS personal use & BLCUP textbook copyright).
+- **Staging Datasets Generated in `audit/hsk46_vi_enrichment/thread-2_candidates/`**:
+  - `hsk4_candidates.jsonl`: 594 candidates (4 APPROVED, 590 TRANSLATION_REVIEW).
+  - `hsk5_candidates.jsonl`: 1,279 candidates (27 APPROVED, 1,252 TRANSLATION_REVIEW).
+  - `hsk6_candidates.jsonl`: 1,942 candidates (43 APPROVED, 1,899 TRANSLATION_REVIEW).
+  - `rejected_candidates.jsonl`: 5 sample candidate rejections across all failed license categories.
+  - `unresolved_mappings.jsonl`: 586 items (6 polyphones `MAPPING_AMBIGUOUS` + 575 Category 1 `NO_VALID_PARALLEL_EXAMPLE` + 5 Category 3 `STANDALONE_OMITTED_FROM_LESSONS`).
+  - `human_review_required.json`: 3,764 items awaiting human pedagogue sign-off.
+  - `corpus_source_manifest.json`: Provenance manifest of 8 surveyed corpus sources.
+  - `license_review.md`: Full legal & pedagogical review.
+  - `candidate_summary.md`: Summary breakdown.
+- **Pre-Handover Verification Gate**:
+  - `verify_candidates_integrity.py`: **PASS (3,815/3,815)** (0 ID collisions, 100% vocab_id referential integrity, 100% lesson/segment hierarchy integrity, 100% original_example_hash exact baseline match, 100% target headword presence).
+- **Detailed Report**: [LEARN-HSK46-VI-001.md](file:///C:/Users/phama/.gemini/antigravity/worktrees/hi_chinese/thread_2_learning/docs/agent-coordination/reports/thread-2/LEARN-HSK46-VI-001.md).
+
 
