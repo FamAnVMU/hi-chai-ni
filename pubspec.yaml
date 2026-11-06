@@ -79,6 +79,9 @@ flutter:
     - assets/data/content_packs/hsk1/
     - assets/data/content_packs/hsk2/
     - assets/data/content_packs/hsk3/
+    - assets/data/content_packs/hsk4/
+    - assets/data/content_packs/hsk5/
+    - assets/data/content_packs/hsk6/
     - assets/audio/
     - assets/audio/hsk1/
     - assets/audio/hsk2/

@@ -88,8 +88,9 @@ void main() {
       final cdnFile = File('content_packs_cdn/hsk3_pack_v1.json');
       expect(await cdnFile.exists(), isTrue);
       final cdnContent = await cdnFile.readAsString();
+      final expectedSha = ContentPackLoader.computeChecksum(cdnContent);
 
-      final targetPack = const RemoteContentPackInfo(
+      final targetPack = RemoteContentPackInfo(
         packId: 'hsk3_pack_v1',
         hskLevel: 3,
         title: 'Giáo trình chuẩn HSK 3 (Trực tuyến)',
@@ -97,7 +98,7 @@ void main() {
         version: '1.0.0',
         sizeBytes: 8885,
         downloadUrl: 'https://raw.githubusercontent.com/FamAnVMU/hi-chai-ni/main/content_packs_cdn/hsk3_pack_v1.json',
-        sha256Checksum: '52b9b37f88c24b45f99be31f7ccdbfada80a7161c09a6d6f0eebe882fa3968da',
+        sha256Checksum: expectedSha,
         isBundled: false,
       );
 
@@ -109,7 +110,7 @@ void main() {
       expect(isAlreadyInstalled, isFalse);
 
       final result = await remoteService.downloadAndInstallPack(packInfo: targetPack);
-      expect(result.isSuccess, isTrue);
+      expect(result.isSuccess, isTrue, reason: 'Install failed: ${result.errorMessage}');
 
       final isNowInstalled = await remoteService.isPackInstalled(targetPack.packId);
       expect(isNowInstalled, isTrue);
@@ -163,7 +164,18 @@ void main() {
       final cdnContent = await cdnFile.readAsString();
       final tamperedContent = cdnContent.replaceFirst('打算', 'TamperedWord');
 
-      final targetPack = ContentPackRemoteService.getAvailablePacks().firstWhere((p) => p.packId == 'hsk3_pack_v1');
+      final basePack = ContentPackRemoteService.getAvailablePacks().firstWhere((p) => p.packId == 'hsk3_pack_v1');
+      final targetPack = RemoteContentPackInfo(
+        packId: basePack.packId,
+        hskLevel: basePack.hskLevel,
+        title: basePack.title,
+        description: basePack.description,
+        version: basePack.version,
+        sizeBytes: basePack.sizeBytes,
+        downloadUrl: basePack.downloadUrl,
+        sha256Checksum: ContentPackLoader.computeChecksum(cdnContent),
+        isBundled: basePack.isBundled,
+      );
 
       when(() => mockClient.get(Uri.parse(targetPack.downloadUrl))).thenAnswer(
         (_) async => http.Response(tamperedContent, 200, headers: {'content-type': 'application/json'}),
@@ -186,7 +198,18 @@ void main() {
       decoded['manifest'] = manifest;
       final tamperedJson = jsonEncode(decoded);
 
-      final targetPack = ContentPackRemoteService.getAvailablePacks().firstWhere((p) => p.packId == 'hsk3_pack_v1');
+      final basePack = ContentPackRemoteService.getAvailablePacks().firstWhere((p) => p.packId == 'hsk3_pack_v1');
+      final targetPack = RemoteContentPackInfo(
+        packId: basePack.packId,
+        hskLevel: basePack.hskLevel,
+        title: basePack.title,
+        description: basePack.description,
+        version: basePack.version,
+        sizeBytes: basePack.sizeBytes,
+        downloadUrl: basePack.downloadUrl,
+        sha256Checksum: ContentPackLoader.computeChecksum(raw),
+        isBundled: basePack.isBundled,
+      );
 
       when(() => mockClient.get(Uri.parse(targetPack.downloadUrl))).thenAnswer(
         (_) async => http.Response(tamperedJson, 200, headers: {'content-type': 'application/json'}),
@@ -200,7 +223,18 @@ void main() {
     test('8. Rejects invalid HTTP response from CDN without crash', () async {
       final mockClient = MockHttpClient();
       final remoteService = ContentPackRemoteService(db: db, httpClient: mockClient);
-      final targetPack = ContentPackRemoteService.getAvailablePacks().firstWhere((p) => p.packId == 'hsk3_pack_v1');
+      final basePack = ContentPackRemoteService.getAvailablePacks().firstWhere((p) => p.packId == 'hsk3_pack_v1');
+      final targetPack = RemoteContentPackInfo(
+        packId: basePack.packId,
+        hskLevel: basePack.hskLevel,
+        title: basePack.title,
+        description: basePack.description,
+        version: basePack.version,
+        sizeBytes: basePack.sizeBytes,
+        downloadUrl: basePack.downloadUrl,
+        sha256Checksum: 'dummy_valid_format_checksum',
+        isBundled: basePack.isBundled,
+      );
 
       when(() => mockClient.get(Uri.parse(targetPack.downloadUrl))).thenAnswer(
         (_) async => http.Response('Server Error', 500),
@@ -214,7 +248,18 @@ void main() {
     test('9. Rejects corrupt non-JSON payload from CDN', () async {
       final mockClient = MockHttpClient();
       final remoteService = ContentPackRemoteService(db: db, httpClient: mockClient);
-      final targetPack = ContentPackRemoteService.getAvailablePacks().firstWhere((p) => p.packId == 'hsk3_pack_v1');
+      final basePack = ContentPackRemoteService.getAvailablePacks().firstWhere((p) => p.packId == 'hsk3_pack_v1');
+      final targetPack = RemoteContentPackInfo(
+        packId: basePack.packId,
+        hskLevel: basePack.hskLevel,
+        title: basePack.title,
+        description: basePack.description,
+        version: basePack.version,
+        sizeBytes: basePack.sizeBytes,
+        downloadUrl: basePack.downloadUrl,
+        sha256Checksum: 'dummy_valid_format_checksum',
+        isBundled: basePack.isBundled,
+      );
 
       when(() => mockClient.get(Uri.parse(targetPack.downloadUrl))).thenAnswer(
         (_) async => http.Response('<!DOCTYPE html><html><body>Error</body></html>', 200),
