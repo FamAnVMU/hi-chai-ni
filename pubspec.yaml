@@ -80,6 +80,7 @@ flutter:
     - assets/audio/hsk1/
     - assets/audio/hsk2/
     - assets/audio/reading/
+    - assets/audio/vocab/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -66,3 +66,5 @@ key.properties
 data_pipeline/raw/
 data_pipeline/processed/
 data_pipeline/audio_staging/
+
+data_pipeline/cache/

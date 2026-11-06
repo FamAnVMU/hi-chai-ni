@@ -27,6 +27,7 @@ sys.path.insert(0, PROJECT_ROOT)
 from tool.ai_curation.pinyin_aligner import PinyinAligner
 from tool.ai_curation.translation_verifier import TranslationVerifier
 from tool.ai_curation.audio_processor import ReadingAudioProcessor
+from tool.ai_curation.download_cmn_audio import CmnAudioDownloader
 
 
 class TestPinyinAligner(unittest.TestCase):
@@ -138,6 +139,52 @@ class TestReadingAudioProcessor(unittest.TestCase):
             f"Some audio files failed criteria: {report['failed_files']}",
         )
         self.assertEqual(report["passed_files"], report["total_files"])
+
+
+class TestCmnAudioDownloader(unittest.TestCase):
+    def test_coverage_report_schema_and_metrics(self):
+        """Verifies audio_coverage_report.json conforms to metrics and coverage bounds."""
+        report_path = os.path.join(PROJECT_ROOT, "data_pipeline", "reports", "audio_coverage_report.json")
+        self.assertTrue(os.path.exists(report_path), "audio_coverage_report.json not found")
+        with open(report_path, "r", encoding="utf-8") as f:
+            rep = json.load(f)
+
+        self.assertIn("summary", rep)
+        self.assertIn("levels", rep)
+        self.assertIn("audio_spec", rep)
+
+        # Specs
+        spec = rep["audio_spec"]
+        self.assertEqual(spec["sample_rate_hz"], 24000)
+        self.assertEqual(spec["bitrate_kbps"], 64)
+        self.assertEqual(spec["target_loudness_lufs"], -16.0)
+
+        # Overall summary
+        summary = rep["summary"]
+        self.assertEqual(summary["total_vocabularies"], 4401)
+        self.assertGreaterEqual(summary["overall_coverage_pct"], 85.0)
+        self.assertGreater(summary["total_human_audio_acquired"], 3500)
+        self.assertGreater(summary["total_missing_routed_to_tts"], 0)
+
+        # Level breakdowns
+        hsk4 = rep["levels"]["hsk4"]
+        self.assertEqual(hsk4["total_vocabularies"], 601)
+        self.assertGreaterEqual(hsk4["coverage_pct"], 90.0)
+
+        hsk5 = rep["levels"]["hsk5"]
+        self.assertEqual(hsk5["total_vocabularies"], 1300)
+        self.assertGreaterEqual(hsk5["coverage_pct"], 85.0)
+
+        hsk6 = rep["levels"]["hsk6"]
+        self.assertEqual(hsk6["total_vocabularies"], 2500)
+        self.assertGreaterEqual(hsk6["coverage_pct"], 80.0)
+
+    def test_sample_downloaded_audio_integrity(self):
+        """Verifies sample downloaded vocabulary audio files are non-empty and well-formed."""
+        vocab_dir = os.path.join(PROJECT_ROOT, "assets", "audio", "vocab")
+        sample_file = os.path.join(vocab_dir, "hsk4_爱情.mp3")
+        self.assertTrue(os.path.exists(sample_file), "hsk4_爱情.mp3 was not downloaded")
+        self.assertGreater(os.path.getsize(sample_file), 5000)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,2956 @@
+{
+  "report_name": "HI Chinese Audio Acquisition & Coverage Matrix",
+  "generated_at": "2026-11-06T02:07:43.826503+00:00",
+  "source": "hugolpz/audio-cmn (Yue Tan / Wikimedia Commons, CC BY-SA 4.0)",
+  "audio_spec": {
+    "codec": "MP3 (MPEG-1 Audio Layer 3)",
+    "sample_rate_hz": 24000,
+    "channels": "Mono (1)",
+    "bitrate_kbps": 64,
+    "target_loudness_lufs": -16.0,
+    "naming_convention": "assets/audio/vocab/hsk<level>_{simplified}.mp3"
+  },
+  "summary": {
+    "total_vocabularies": 4401,
+    "total_human_audio_acquired": 3917,
+    "total_missing_routed_to_tts": 484,
+    "overall_coverage_pct": 89.0,
+    "pipeline_duration_seconds": 119.03
+  },
+  "levels": {
+    "hsk4": {
+      "hsk_level": 4,
+      "total_vocabularies": 601,
+      "human_audio_available": 571,
+      "human_audio_downloaded": 571,
+      "coverage_pct": 95.01,
+      "missing_for_tts_count": 30,
+      "missing_words_for_tts": [
+        {
+          "id": "VOC_HSK4_笔记本_bijiben",
+          "simplified": "笔记本",
+          "pinyin": "bǐ jì běn",
+          "meaning_vi": "sổ tay (văn phòng phẩm); LT:本[ben3]; máy tính xách tay"
+        },
+        {
+          "id": "VOC_HSK4_表格_biaoge",
+          "simplified": "表格",
+          "pinyin": "biǎo gé",
+          "meaning_vi": "biểu mẫu; bảng; LT:張|张[zhang1],份[fen4]"
+        },
+        {
+          "id": "VOC_HSK4_长城_changcheng",
+          "simplified": "长城",
+          "pinyin": "Cháng chéng",
+          "meaning_vi": "Vạn Lý Trường Thành"
+        },
+        {
+          "id": "VOC_HSK4_长江_changjiang",
+          "simplified": "长江",
+          "pinyin": "Cháng Jiāng",
+          "meaning_vi": "sông Trường Giang, hay sông Dương Tử"
+        },
+        {
+          "id": "VOC_HSK4_乘坐_chengzuo",
+          "simplified": "乘坐",
+          "pinyin": "chéng zuò",
+          "meaning_vi": "đi (phương tiện giao thông)"
+        },
+        {
+          "id": "VOC_HSK4_抽烟_chouyan",
+          "simplified": "抽烟",
+          "pinyin": "chōu yān",
+          "meaning_vi": "hút thuốc (thuốc lá, thuốc lào)"
+        },
+        {
+          "id": "VOC_HSK4_打印_dayin",
+          "simplified": "打印",
+          "pinyin": "dǎ yìn",
+          "meaning_vi": "đóng dấu; đóng mộc; in ra (bằng máy in)"
+        },
+        {
+          "id": "VOC_HSK4_打折_dazhe",
+          "simplified": "打折",
+          "pinyin": "dǎ zhé",
+          "meaning_vi": "giảm giá"
+        },
+        {
+          "id": "VOC_HSK4_堵车_duche",
+          "simplified": "堵车",
+          "pinyin": "dǔ chē",
+          "meaning_vi": "kẹt xe; (giao thông) bị tắc nghẽn"
+        },
+        {
+          "id": "VOC_HSK4_放暑假_fangshujia",
+          "simplified": "放暑假",
+          "pinyin": "fàng shǔ jià",
+          "meaning_vi": "nghỉ hè"
+        },
+        {
+          "id": "VOC_HSK4_分之_fenzhi",
+          "simplified": "分之",
+          "pinyin": "fēn zhī",
+          "meaning_vi": "(chỉ một phân số)"
+        },
+        {
+          "id": "VOC_HSK4_购物_gouwu",
+          "simplified": "购物",
+          "pinyin": "gòu wù",
+          "meaning_vi": "mua sắm"
+        },
+        {
+          "id": "VOC_HSK4_管理_guanli",
+          "simplified": "管理",
+          "pinyin": "guǎn lǐ",
+          "meaning_vi": "giám sát; quản lý; quản trị"
+        },
+        {
+          "id": "VOC_HSK4_盒子_hezi",
+          "simplified": "盒子",
+          "pinyin": "hé zi",
+          "meaning_vi": "hộp; thùng"
+        },
+        {
+          "id": "VOC_HSK4_加油站_jiayouzhan",
+          "simplified": "加油站",
+          "pinyin": "jiā yóu zhàn",
+          "meaning_vi": "trạm xăng"
+        },
+        {
+          "id": "VOC_HSK4_减肥_jianfei",
+          "simplified": "减肥",
+          "pinyin": "jiǎn féi",
+          "meaning_vi": "giảm cân"
+        },
+        {
+          "id": "VOC_HSK4_垃圾桶_lajitong",
+          "simplified": "垃圾桶",
+          "pinyin": "lā jī tǒng",
+          "meaning_vi": "thùng rác; Tiếng Đài Loan đọc là [le4 se4 tong3]"
+        },
+        {
+          "id": "VOC_HSK4_流泪_liulei",
+          "simplified": "流泪",
+          "pinyin": "liú lèi",
+          "meaning_vi": "rơi nước mắt"
+        },
+        {
+          "id": "VOC_HSK4_密码_mima",
+          "simplified": "密码",
+          "pinyin": "mì mǎ",
+          "meaning_vi": "mã hóa; mã bí mật; mật khẩu; mã PIN"
+        },
+        {
+          "id": "VOC_HSK4_巧克力_qiaokeli",
+          "simplified": "巧克力",
+          "pinyin": "qiǎo kè lì",
+          "meaning_vi": "sô-cô-la (từ mượn); LT:塊|块[kuai4]"
+        },
+        {
+          "id": "VOC_HSK4_受不了_shoubuliao",
+          "simplified": "受不了",
+          "pinyin": "shòu bù liǎo",
+          "meaning_vi": "không chịu nổi; không thể chịu đựng; không thể chịu nổi"
+        },
+        {
+          "id": "VOC_HSK4_受到_shoudao",
+          "simplified": "受到",
+          "pinyin": "shòu dào",
+          "meaning_vi": "nhận được (lời khen ngợi, sự giáo dục, hình phạt, v.v.); bị (khen ngợi, giáo dục, trừng phạt, v.v.)"
+        },
+        {
+          "id": "VOC_HSK4_售货员_shouhuoyuan",
+          "simplified": "售货员",
+          "pinyin": "shòu huò yuán",
+          "meaning_vi": "nhân viên bán hàng; LT:個|个[ge4]"
+        },
+        {
+          "id": "VOC_HSK4_硕士_shuoshi",
+          "simplified": "硕士",
+          "pinyin": "shuò shì",
+          "meaning_vi": "bằng thạc sĩ; người có bằng thạc sĩ; người học rộng"
+        },
+        {
+          "id": "VOC_HSK4_塑料袋_suliaodai",
+          "simplified": "塑料袋",
+          "pinyin": "sù liào dài",
+          "meaning_vi": "túi nhựa"
+        },
+        {
+          "id": "VOC_HSK4_填空_tiankong",
+          "simplified": "填空",
+          "pinyin": "tián kòng",
+          "meaning_vi": "lấp chỗ trống công việc; điền vào chỗ trống (ví dụ: trên phiếu khảo sát hoặc bài thi)"
+        },
+        {
+          "id": "VOC_HSK4_网站_wangzhan",
+          "simplified": "网站",
+          "pinyin": "wǎng zhàn",
+          "meaning_vi": "trang web"
+        },
+        {
+          "id": "VOC_HSK4_信用卡_xinyongka",
+          "simplified": "信用卡",
+          "pinyin": "xìn yòng kǎ",
+          "meaning_vi": "thẻ tín dụng"
+        },
+        {
+          "id": "VOC_HSK4_亚洲_yazhou",
+          "simplified": "亚洲",
+          "pinyin": "Yà zhōu",
+          "meaning_vi": "Châu Á (viết tắt của 亞細亞洲|亚细亚洲[Ya4 xi4 ya4 Zhou1])"
+        },
+        {
+          "id": "VOC_HSK4_做生意_zuoshengyi",
+          "simplified": "做生意",
+          "pinyin": "zuò shēng yì",
+          "meaning_vi": "làm kinh doanh"
+        }
+      ]
+    },
+    "hsk5": {
+      "hsk_level": 5,
+      "total_vocabularies": 1300,
+      "human_audio_available": 1194,
+      "human_audio_downloaded": 1194,
+      "coverage_pct": 91.85,
+      "missing_for_tts_count": 106,
+      "missing_words_for_tts": [
+        {
+          "id": "VOC_HSK5_爱心_aixin",
+          "simplified": "爱心",
+          "pinyin": "ài xīn",
+          "meaning_vi": "lòng trắc ẩn; nhân ái; quan tâm đến người khác"
+        },
+        {
+          "id": "VOC_HSK5_班主任_banzhuren",
+          "simplified": "班主任",
+          "pinyin": "bān zhǔ rèn",
+          "meaning_vi": "giáo viên chủ nhiệm"
+        },
+        {
+          "id": "VOC_HSK5_本科_benke",
+          "simplified": "本科",
+          "pinyin": "běn kē",
+          "meaning_vi": "khóa học đại học; đại học (tính từ)"
+        },
+        {
+          "id": "VOC_HSK5_不耐烦_bunaifan",
+          "simplified": "不耐烦",
+          "pinyin": "bù nài fán",
+          "meaning_vi": "mất kiên nhẫn; mất bình tĩnh"
+        },
+        {
+          "id": "VOC_HSK5_彩虹_caihong",
+          "simplified": "彩虹",
+          "pinyin": "cǎi hóng",
+          "meaning_vi": "cầu vồng; LT:道[dao4]"
+        },
+        {
+          "id": "VOC_HSK5_车库_cheku",
+          "simplified": "车库",
+          "pinyin": "chē kù",
+          "meaning_vi": "garage"
+        },
+        {
+          "id": "VOC_HSK5_池子_chizi",
+          "simplified": "池子",
+          "pinyin": "chí zi",
+          "meaning_vi": "ao; bể tắm; sàn nhảy của phòng khiêu vũ"
+        },
+        {
+          "id": "VOC_HSK5_充电器_chongdianqi",
+          "simplified": "充电器",
+          "pinyin": "chōng diàn qì",
+          "meaning_vi": "bộ sạc pin"
+        },
+        {
+          "id": "VOC_HSK5_宠物_chongwu",
+          "simplified": "宠物",
+          "pinyin": "chǒng wù",
+          "meaning_vi": "thú cưng"
+        },
+        {
+          "id": "VOC_HSK5_打工_dagong",
+          "simplified": "打工",
+          "pinyin": "dǎ gōng",
+          "meaning_vi": "làm công việc tạm thời hoặc không chính thức; (đối với học sinh, sinh viên) đi làm ngoài giờ học, hoặc trong kỳ nghỉ"
+        },
+        {
+          "id": "VOC_HSK5_打喷嚏_dapenti",
+          "simplified": "打喷嚏",
+          "pinyin": "dǎ pēn tì",
+          "meaning_vi": "hắt xì"
+        },
+        {
+          "id": "VOC_HSK5_大象_daxiang",
+          "simplified": "大象",
+          "pinyin": "dà xiàng",
+          "meaning_vi": "con voi; LT:隻|只[zhi1]"
+        },
+        {
+          "id": "VOC_HSK5_胆小鬼_danxiaogui",
+          "simplified": "胆小鬼",
+          "pinyin": "dǎn xiǎo guǐ",
+          "meaning_vi": "kẻ nhát gan"
+        },
+        {
+          "id": "VOC_HSK5_登机牌_dengjipai",
+          "simplified": "登机牌",
+          "pinyin": "dēng jī pái",
+          "meaning_vi": "thẻ lên máy bay"
+        },
+        {
+          "id": "VOC_HSK5_点头_diantou",
+          "simplified": "点头",
+          "pinyin": "diǎn tóu",
+          "meaning_vi": "gật đầu"
+        },
+        {
+          "id": "VOC_HSK5_动画片_donghuapian",
+          "simplified": "动画片",
+          "pinyin": "dòng huà piàn",
+          "meaning_vi": "phim hoạt hình"
+        },
+        {
+          "id": "VOC_HSK5_短信_duanxin",
+          "simplified": "短信",
+          "pinyin": "duǎn xìn",
+          "meaning_vi": "tin nhắn văn bản; SMS"
+        },
+        {
+          "id": "VOC_HSK5_钢铁_gangtie",
+          "simplified": "钢铁",
+          "pinyin": "gāng tiě",
+          "meaning_vi": "thép"
+        },
+        {
+          "id": "VOC_HSK5_公寓_gongyu",
+          "simplified": "公寓",
+          "pinyin": "gōng yù",
+          "meaning_vi": "toà nhà chung cư; khu căn hộ (có thể là nhà ở công cộng hoặc chung cư tư nhân, v.v.) (LT:套[tao4])"
+        },
+        {
+          "id": "VOC_HSK5_公元_gongyuan",
+          "simplified": "公元",
+          "pinyin": "gōng yuán",
+          "meaning_vi": "Công Nguyên; Kỷ Nguyên Chung; Sau Công Nguyên"
+        },
+        {
+          "id": "VOC_HSK5_公主_gongzhu",
+          "simplified": "公主",
+          "pinyin": "gōng zhǔ",
+          "meaning_vi": "công chúa"
+        },
+        {
+          "id": "VOC_HSK5_拐弯_guaiwan",
+          "simplified": "拐弯",
+          "pinyin": "guǎi wān",
+          "meaning_vi": "đi vòng qua khúc cua; rẽ ngoặt; nghĩa bóng: hướng đi mới"
+        },
+        {
+          "id": "VOC_HSK5_光盘_guangpan",
+          "simplified": "光盘",
+          "pinyin": "guāng pán",
+          "meaning_vi": "đĩa CD; DVD; CD-ROM; LT:片[pian4],張|张[zhang1]"
+        },
+        {
+          "id": "VOC_HSK5_过敏_guomin",
+          "simplified": "过敏",
+          "pinyin": "guò mǐn",
+          "meaning_vi": "quá nhạy cảm; dị ứng"
+        },
+        {
+          "id": "VOC_HSK5_过期_guoqi",
+          "simplified": "过期",
+          "pinyin": "guò qī",
+          "meaning_vi": "quá hạn; vượt quá thời gian; hết hạn (như ngày hết hạn)"
+        },
+        {
+          "id": "VOC_HSK5_哈_ha",
+          "simplified": "哈",
+          "pinyin": "hā",
+          "meaning_vi": "viết tắt của 哈薩克斯坦|哈萨克斯坦[Ha1 sa4 ke4 si1 tan3], Kazakhstan; viết tắt của 哈爾濱|哈尔滨[Ha1 er3 bin1], Harbin; (thán từ) ha!"
+        },
+        {
+          "id": "VOC_HSK5_海鲜_haixian",
+          "simplified": "海鲜",
+          "pinyin": "hǎi xiān",
+          "meaning_vi": "hải sản"
+        },
+        {
+          "id": "VOC_HSK5_合影_heying",
+          "simplified": "合影",
+          "pinyin": "hé yǐng",
+          "meaning_vi": "chụp ảnh chung; ảnh nhóm"
+        },
+        {
+          "id": "VOC_HSK5_胡须_huxu",
+          "simplified": "胡须",
+          "pinyin": "hú xū",
+          "meaning_vi": "râu; LT:根[gen1],綹|绺[liu3]"
+        },
+        {
+          "id": "VOC_HSK5_划船_huachuan",
+          "simplified": "划船",
+          "pinyin": "huá chuán",
+          "meaning_vi": "chèo thuyền; môn chèo thuyền; thuyền nhỏ"
+        },
+        {
+          "id": "VOC_HSK5_华裔_huayi",
+          "simplified": "华裔",
+          "pinyin": "Huá yì",
+          "meaning_vi": "người Hoa; gốc Hoa, quốc tịch không phải Trung Quốc"
+        },
+        {
+          "id": "VOC_HSK5_缓解_huanjie",
+          "simplified": "缓解",
+          "pinyin": "huǎn jiě",
+          "meaning_vi": "mang lại sự nhẹ nhõm; làm giảm bớt (khủng hoảng); làm dịu (cơn đau)"
+        },
+        {
+          "id": "VOC_HSK5_婚礼_hunli",
+          "simplified": "婚礼",
+          "pinyin": "hūn lǐ",
+          "meaning_vi": "lễ cưới; đám cưới; LT:場|场[chang3]"
+        },
+        {
+          "id": "VOC_HSK5_系领带_jilingdai",
+          "simplified": "系领带",
+          "pinyin": "jì lǐng dài",
+          "meaning_vi": "thắt cà vạt; đeo cà vạt"
+        },
+        {
+          "id": "VOC_HSK5_纪录_jilu",
+          "simplified": "纪录",
+          "pinyin": "jì lù",
+          "meaning_vi": "biến thể của 記錄|记录[ji4 lu4] (nhưng ở Đài Loan, không dùng cho nghĩa động từ \"ghi lại\")"
+        },
+        {
+          "id": "VOC_HSK5_嘉宾_jiabin",
+          "simplified": "嘉宾",
+          "pinyin": "jiā bīn",
+          "meaning_vi": "khách quý; khách mời danh dự; khách mời (trong chương trình)"
+        },
+        {
+          "id": "VOC_HSK5_简历_jianli",
+          "simplified": "简历",
+          "pinyin": "jiǎn lì",
+          "meaning_vi": "sơ yếu lý lịch (CV); hồ sơ cá nhân; ghi chú tiểu sử"
+        },
+        {
+          "id": "VOC_HSK5_健身房_jianshenfang",
+          "simplified": "健身房",
+          "pinyin": "jiàn shēn fáng",
+          "meaning_vi": "phòng gym; phòng thể dục"
+        },
+        {
+          "id": "VOC_HSK5_胶水_jiaoshui",
+          "simplified": "胶水",
+          "pinyin": "jiāo shuǐ",
+          "meaning_vi": "keo dán"
+        },
+        {
+          "id": "VOC_HSK5_结账_jiezhang",
+          "simplified": "结账",
+          "pinyin": "jié zhàng",
+          "meaning_vi": "trả hóa đơn; thanh toán tài khoản; cũng viết 結帳|结帐"
+        },
+        {
+          "id": "VOC_HSK5_解说员_jieshuoyuan",
+          "simplified": "解说员",
+          "pinyin": "jiě shuō yuán",
+          "meaning_vi": "bình luận viên"
+        },
+        {
+          "id": "VOC_HSK5_戒烟_jieyan",
+          "simplified": "戒烟",
+          "pinyin": "jiè yān",
+          "meaning_vi": "bỏ thuốc lá"
+        },
+        {
+          "id": "VOC_HSK5_戒指_jiezhi",
+          "simplified": "戒指",
+          "pinyin": "jiè zhi",
+          "meaning_vi": "nhẫn (đeo tay)"
+        },
+        {
+          "id": "VOC_HSK5_酒吧_jiuba",
+          "simplified": "酒吧",
+          "pinyin": "jiǔ bā",
+          "meaning_vi": "quán bar; tiệm rượu; phòng rượu"
+        },
+        {
+          "id": "VOC_HSK5_救护车_jiuhuche",
+          "simplified": "救护车",
+          "pinyin": "jiù hù chē",
+          "meaning_vi": "xe cứu thương; LT:輛|辆[liang4]"
+        },
+        {
+          "id": "VOC_HSK5_桔子_juzi",
+          "simplified": "桔子",
+          "pinyin": "jú zi",
+          "meaning_vi": "quýt; cũng viết 橘子; LT:個|个[ge4],瓣[ban4]"
+        },
+        {
+          "id": "VOC_HSK5_角色_juese",
+          "simplified": "角色",
+          "pinyin": "jué sè",
+          "meaning_vi": "vai trò; vai (trong vở kịch hoặc phim,...)"
+        },
+        {
+          "id": "VOC_HSK5_开幕式_kaimushi",
+          "simplified": "开幕式",
+          "pinyin": "kāi mù shì",
+          "meaning_vi": "lễ khai mạc"
+        },
+        {
+          "id": "VOC_HSK5_烤鸭_kaoya",
+          "simplified": "烤鸭",
+          "pinyin": "kǎo yā",
+          "meaning_vi": "vịt quay"
+        },
+        {
+          "id": "VOC_HSK5_空闲_kongxian",
+          "simplified": "空闲",
+          "pinyin": "kòng xián",
+          "meaning_vi": "thời gian rảnh rỗi; thời gian rảnh; (về người) rảnh rỗi; không bận; (về thiết bị, phòng ốc, v.v.) không sử dụng; không dùng đến; nhàn rỗi; trống; để không"
+        },
+        {
+          "id": "VOC_HSK5_口味_kouwei",
+          "simplified": "口味",
+          "pinyin": "kǒu wèi",
+          "meaning_vi": "sở thích của một người; khẩu vị (trong ăn uống); hương vị"
+        },
+        {
+          "id": "VOC_HSK5_矿泉水_kuangquanshui",
+          "simplified": "矿泉水",
+          "pinyin": "kuàng quán shuǐ",
+          "meaning_vi": "nước khoáng; LT:瓶[ping2],杯[bei1]"
+        },
+        {
+          "id": "VOC_HSK5_零食_lingshi",
+          "simplified": "零食",
+          "pinyin": "líng shí",
+          "meaning_vi": "đồ ăn vặt; đồ ăn nhẹ"
+        },
+        {
+          "id": "VOC_HSK5_浏览_liulan",
+          "simplified": "浏览",
+          "pinyin": "liú lǎn",
+          "meaning_vi": "xem lướt; duyệt"
+        },
+        {
+          "id": "VOC_HSK5_麦克风_maikefeng",
+          "simplified": "麦克风",
+          "pinyin": "mài kè fēng",
+          "meaning_vi": "microphone (từ mượn)"
+        },
+        {
+          "id": "VOC_HSK5_煤炭_meitan",
+          "simplified": "煤炭",
+          "pinyin": "méi tàn",
+          "meaning_vi": "than đá"
+        },
+        {
+          "id": "VOC_HSK5_魅力_meili",
+          "simplified": "魅力",
+          "pinyin": "mèi lì",
+          "meaning_vi": "sự quyến rũ; sức hút; sự lôi cuốn"
+        },
+        {
+          "id": "VOC_HSK5_迷路_milu",
+          "simplified": "迷路",
+          "pinyin": "mí lù",
+          "meaning_vi": "lạc đường; lạc; mê cung"
+        },
+        {
+          "id": "VOC_HSK5_苗条_miaotiao",
+          "simplified": "苗条",
+          "pinyin": "miáo tiáo",
+          "meaning_vi": "(của phụ nữ) mảnh mai; thon thả; duyên dáng"
+        },
+        {
+          "id": "VOC_HSK5_名片_mingpian",
+          "simplified": "名片",
+          "pinyin": "míng piàn",
+          "meaning_vi": "danh thiếp"
+        },
+        {
+          "id": "VOC_HSK5_牛仔裤_niuzaiku",
+          "simplified": "牛仔裤",
+          "pinyin": "niú zǎi kù",
+          "meaning_vi": "quần jean; LT:條|条[tiao2]"
+        },
+        {
+          "id": "VOC_HSK5_皮鞋_pixie",
+          "simplified": "皮鞋",
+          "pinyin": "pí xié",
+          "meaning_vi": "giày da"
+        },
+        {
+          "id": "VOC_HSK5_频道_pindao",
+          "simplified": "频道",
+          "pinyin": "pín dào",
+          "meaning_vi": "tần số; kênh (truyền hình)"
+        },
+        {
+          "id": "VOC_HSK5_青少年_qingshaonian",
+          "simplified": "青少年",
+          "pinyin": "qīng shào nián",
+          "meaning_vi": "thanh thiếu niên; tuổi trẻ; thanh niên"
+        },
+        {
+          "id": "VOC_HSK5_清淡_qingdan",
+          "simplified": "清淡",
+          "pinyin": "qīng dàn",
+          "meaning_vi": "nhạt (thức ăn, không béo hoặc đậm vị); nhạt nhẽo; ế ẩm (kinh doanh)"
+        },
+        {
+          "id": "VOC_HSK5_日历_rili",
+          "simplified": "日历",
+          "pinyin": "rì lì",
+          "meaning_vi": "lịch; LT:張|张[zhang1],本[ben3]"
+        },
+        {
+          "id": "VOC_HSK5_删除_shanchu",
+          "simplified": "删除",
+          "pinyin": "shān chú",
+          "meaning_vi": "xóa; hủy"
+        },
+        {
+          "id": "VOC_HSK5_时尚_shishang",
+          "simplified": "时尚",
+          "pinyin": "shí shàng",
+          "meaning_vi": "thời trang; mốt; hợp thời"
+        },
+        {
+          "id": "VOC_HSK5_实验_shiyan",
+          "simplified": "实验",
+          "pinyin": "shí yàn",
+          "meaning_vi": "thí nghiệm; kiểm tra; LT:個|个[ge4],次[ci4]"
+        },
+        {
+          "id": "VOC_HSK5_使劲儿_shijiner",
+          "simplified": "使劲儿",
+          "pinyin": "shǐ jìn ér",
+          "meaning_vi": "biến thể er hoá của 使勁|使劲[shi3 jin4]"
+        },
+        {
+          "id": "VOC_HSK5_收据_shouju",
+          "simplified": "收据",
+          "pinyin": "shōu jù",
+          "meaning_vi": "biên lai; LT:張|张[zhang1]"
+        },
+        {
+          "id": "VOC_HSK5_鼠标_shubiao",
+          "simplified": "鼠标",
+          "pinyin": "shǔ biāo",
+          "meaning_vi": "chuột (máy tính)"
+        },
+        {
+          "id": "VOC_HSK5_数码_shuma",
+          "simplified": "数码",
+          "pinyin": "shù mǎ",
+          "meaning_vi": "số; chữ số; số liệu"
+        },
+        {
+          "id": "VOC_HSK5_丝绸_sichou",
+          "simplified": "丝绸",
+          "pinyin": "sī chóu",
+          "meaning_vi": "vải lụa; lụa"
+        },
+        {
+          "id": "VOC_HSK5_寺庙_simiao",
+          "simplified": "寺庙",
+          "pinyin": "sì miào",
+          "meaning_vi": "đền; chùa; miếu"
+        },
+        {
+          "id": "VOC_HSK5_太极拳_taijiquan",
+          "simplified": "太极拳",
+          "pinyin": "tài jí quán",
+          "meaning_vi": "thái cực quyền; hình thức truyền thống của bài tập thể chất hoặc thư giãn; một môn võ thuật"
+        },
+        {
+          "id": "VOC_HSK5_坦率_tanshuai",
+          "simplified": "坦率",
+          "pinyin": "tǎn shuài",
+          "meaning_vi": "thẳng thắn (thảo luận); bộc trực; mở lòng"
+        },
+        {
+          "id": "VOC_HSK5_疼爱_tengai",
+          "simplified": "疼爱",
+          "pinyin": "téng ài",
+          "meaning_vi": "rất mực yêu thương"
+        },
+        {
+          "id": "VOC_HSK5_完美_wanmei",
+          "simplified": "完美",
+          "pinyin": "wán měi",
+          "meaning_vi": "hoàn hảo"
+        },
+        {
+          "id": "VOC_HSK5_王子_wangzi",
+          "simplified": "王子",
+          "pinyin": "wáng zǐ",
+          "meaning_vi": "hoàng tử; con trai của vua"
+        },
+        {
+          "id": "VOC_HSK5_唯一_weiyi",
+          "simplified": "唯一",
+          "pinyin": "wéi yī",
+          "meaning_vi": "chỉ; duy nhất"
+        },
+        {
+          "id": "VOC_HSK5_卫生间_weishengjian",
+          "simplified": "卫生间",
+          "pinyin": "wèi shēng jiān",
+          "meaning_vi": "phòng tắm; nhà vệ sinh; WC"
+        },
+        {
+          "id": "VOC_HSK5_文具_wenju",
+          "simplified": "文具",
+          "pinyin": "wén jù",
+          "meaning_vi": "văn phòng phẩm; dụng cụ văn phòng phẩm (bút, bút chì, tẩy, gọt bút chì, v.v.)"
+        },
+        {
+          "id": "VOC_HSK5_无奈_wunai",
+          "simplified": "无奈",
+          "pinyin": "wú nài",
+          "meaning_vi": "không có lựa chọn nào khác; nản lòng; bực bội"
+        },
+        {
+          "id": "VOC_HSK5_下载_xiazai",
+          "simplified": "下载",
+          "pinyin": "xià zǎi",
+          "meaning_vi": "tải xuống; cũng đọc là [xia4 zai4]"
+        },
+        {
+          "id": "VOC_HSK5_相处_xiangchu",
+          "simplified": "相处",
+          "pinyin": "xiāng chǔ",
+          "meaning_vi": "tiếp xúc (với ai); giao tiếp; tương tác"
+        },
+        {
+          "id": "VOC_HSK5_象棋_xiangqi",
+          "simplified": "象棋",
+          "pinyin": "xiàng qí",
+          "meaning_vi": "cờ tướng; LT:副[fu4]"
+        },
+        {
+          "id": "VOC_HSK5_小吃_xiaochi",
+          "simplified": "小吃",
+          "pinyin": "xiǎo chī",
+          "meaning_vi": "đồ ăn vặt; điểm tâm; Lượng từ: 家[jia1]"
+        },
+        {
+          "id": "VOC_HSK5_小气_xiaoqi",
+          "simplified": "小气",
+          "pinyin": "xiǎo qì",
+          "meaning_vi": "keo kiệt; bủn xỉn; hẹp hòi"
+        },
+        {
+          "id": "VOC_HSK5_小偷_xiaotou",
+          "simplified": "小偷",
+          "pinyin": "xiǎo tōu",
+          "meaning_vi": "kẻ trộm"
+        },
+        {
+          "id": "VOC_HSK5_休闲_xiuxian",
+          "simplified": "休闲",
+          "pinyin": "xiū xián",
+          "meaning_vi": "giải trí; thư giãn; không làm việc"
+        },
+        {
+          "id": "VOC_HSK5_阳台_yangtai",
+          "simplified": "阳台",
+          "pinyin": "yáng tái",
+          "meaning_vi": "biến thể của 陽臺|阳台[yang2 tai2]; ban công; hiên nhà"
+        },
+        {
+          "id": "VOC_HSK5_样式_yangshi",
+          "simplified": "样式",
+          "pinyin": "yàng shì",
+          "meaning_vi": "loại; phong cách"
+        },
+        {
+          "id": "VOC_HSK5_一路_yilu",
+          "simplified": "一路",
+          "pinyin": "yī lù",
+          "meaning_vi": "cả chặng đường; suốt dọc đường; đi cùng đường"
+        },
+        {
+          "id": "VOC_HSK5_硬币_yingbi",
+          "simplified": "硬币",
+          "pinyin": "yìng bì",
+          "meaning_vi": "đồng xu; LT:枚[mei2]"
+        },
+        {
+          "id": "VOC_HSK5_应聘_yingpin",
+          "simplified": "应聘",
+          "pinyin": "yìng pìn",
+          "meaning_vi": "chấp nhận lời mời làm việc; ứng tuyển vào vị trí đã quảng cáo"
+        },
+        {
+          "id": "VOC_HSK5_油炸_youzha",
+          "simplified": "油炸",
+          "pinyin": "yóu zhá",
+          "meaning_vi": "chiên ngập dầu"
+        },
+        {
+          "id": "VOC_HSK5_造成_zaocheng",
+          "simplified": "造成",
+          "pinyin": "zào chéng",
+          "meaning_vi": "gây ra; tạo ra; khiến"
+        },
+        {
+          "id": "VOC_HSK5_粘贴_zhantie",
+          "simplified": "粘贴",
+          "pinyin": "zhān tiē",
+          "meaning_vi": "dán; gắn; dính"
+        },
+        {
+          "id": "VOC_HSK5_占线_zhanxian",
+          "simplified": "占线",
+          "pinyin": "zhàn xiàn",
+          "meaning_vi": "bận (đường dây điện thoại)"
+        },
+        {
+          "id": "VOC_HSK5_账户_zhanghu",
+          "simplified": "账户",
+          "pinyin": "zhàng hù",
+          "meaning_vi": "tài khoản ngân hàng; tài khoản trực tuyến"
+        },
+        {
+          "id": "VOC_HSK5_挣钱_zhengqian",
+          "simplified": "挣钱",
+          "pinyin": "zhèng qián",
+          "meaning_vi": "kiếm tiền"
+        },
+        {
+          "id": "VOC_HSK5_志愿者_zhiyuanzhe",
+          "simplified": "志愿者",
+          "pinyin": "zhì yuàn zhě",
+          "meaning_vi": "tình nguyện viên"
+        },
+        {
+          "id": "VOC_HSK5_中介_zhongjie",
+          "simplified": "中介",
+          "pinyin": "zhōng jiè",
+          "meaning_vi": "làm trung gian; kết nối; trung gian"
+        },
+        {
+          "id": "VOC_HSK5_字幕_zimu",
+          "simplified": "字幕",
+          "pinyin": "zì mù",
+          "meaning_vi": "chú thích; phụ đề"
+        },
+        {
+          "id": "VOC_HSK5_总裁_zongcai",
+          "simplified": "总裁",
+          "pinyin": "zǒng cái",
+          "meaning_vi": "chủ tịch; tổng giám đốc (của một công ty, v.v.)"
+        }
+      ]
+    },
+    "hsk6": {
+      "hsk_level": 6,
+      "total_vocabularies": 2500,
+      "human_audio_available": 2152,
+      "human_audio_downloaded": 2152,
+      "coverage_pct": 86.08,
+      "missing_for_tts_count": 348,
+      "missing_words_for_tts": [
+        {
+          "id": "VOC_HSK6_癌症_aizheng",
+          "simplified": "癌症",
+          "pinyin": "ái zhèng",
+          "meaning_vi": "ung thư"
+        },
+        {
+          "id": "VOC_HSK6_爱不释手_aibushishou",
+          "simplified": "爱不释手",
+          "pinyin": "ài bù shì shǒu",
+          "meaning_vi": "(thành ngữ) thích đến mức không muốn đặt xuống; thấy cái gì đó hoàn toàn không thể cưỡng lại"
+        },
+        {
+          "id": "VOC_HSK6_暧昧_aimei",
+          "simplified": "暧昧",
+          "pinyin": "ài mèi",
+          "meaning_vi": "mơ hồ; không rõ ràng; lập lờ"
+        },
+        {
+          "id": "VOC_HSK6_安居乐业_anjuleye",
+          "simplified": "安居乐业",
+          "pinyin": "ān jū lè yè",
+          "meaning_vi": "sống yên ổn và làm việc vui vẻ (thành ngữ)"
+        },
+        {
+          "id": "VOC_HSK6_案例_anli",
+          "simplified": "案例",
+          "pinyin": "àn lì",
+          "meaning_vi": "vụ việc (lừa đảo, viêm gan, hợp tác quốc tế, v.v.); trường hợp; ví dụ; LT:個|个[ge4]"
+        },
+        {
+          "id": "VOC_HSK6_按摩_anmo",
+          "simplified": "按摩",
+          "pinyin": "àn mó",
+          "meaning_vi": "mát-xa; xoa bóp"
+        },
+        {
+          "id": "VOC_HSK6_凹凸_aotu",
+          "simplified": "凹凸",
+          "pinyin": "āo tū",
+          "meaning_vi": "lõm hoặc lồi; lồi lõm và hố; mặt không phẳng"
+        },
+        {
+          "id": "VOC_HSK6_巴不得_babude",
+          "simplified": "巴不得",
+          "pinyin": "bā bù dé",
+          "meaning_vi": "(khẩu ngữ) rất muốn; mong mỏi; trông chờ"
+        },
+        {
+          "id": "VOC_HSK6_拔苗助长_bamiaozhuzhang",
+          "simplified": "拔苗助长",
+          "pinyin": "bá miáo zhù zhǎng",
+          "meaning_vi": "hỏng việc vì quá nhiệt tình (thành ngữ)"
+        },
+        {
+          "id": "VOC_HSK6_百分点_baifendian",
+          "simplified": "百分点",
+          "pinyin": "bǎi fēn diǎn",
+          "meaning_vi": "điểm phần trăm"
+        },
+        {
+          "id": "VOC_HSK6_拜托_baituo",
+          "simplified": "拜托",
+          "pinyin": "bài tuō",
+          "meaning_vi": "nhờ ai đó làm gì; lam ơn!"
+        },
+        {
+          "id": "VOC_HSK6_斑纹_banwen",
+          "simplified": "斑纹",
+          "pinyin": "bān wén",
+          "meaning_vi": "sọc; vệt"
+        },
+        {
+          "id": "VOC_HSK6_版本_banben",
+          "simplified": "版本",
+          "pinyin": "bǎn běn",
+          "meaning_vi": "phiên bản; ấn bản; phát hành"
+        },
+        {
+          "id": "VOC_HSK6_包庇_baobi",
+          "simplified": "包庇",
+          "pinyin": "bāo bì",
+          "meaning_vi": "che giấu; chứa chấp; bao che"
+        },
+        {
+          "id": "VOC_HSK6_饱经沧桑_baojingcangsang",
+          "simplified": "饱经沧桑",
+          "pinyin": "bǎo jīng cāng sāng",
+          "meaning_vi": "trải qua nhiều biến cố"
+        },
+        {
+          "id": "VOC_HSK6_曝光_baoguang",
+          "simplified": "曝光",
+          "pinyin": "bào guāng",
+          "meaning_vi": "phơi sáng (nhiếp ảnh); (bóng) phơi bày (một vụ bê bối); (quảng cáo) sự xuất hiện"
+        },
+        {
+          "id": "VOC_HSK6_北极_beiji",
+          "simplified": "北极",
+          "pinyin": "běi jí",
+          "meaning_vi": "Bắc Cực; Cực Bắc; cực từ bắc"
+        },
+        {
+          "id": "VOC_HSK6_备份_beifen",
+          "simplified": "备份",
+          "pinyin": "bèi fèn",
+          "meaning_vi": "sao lưu"
+        },
+        {
+          "id": "VOC_HSK6_备忘录_beiwanglu",
+          "simplified": "备忘录",
+          "pinyin": "bèi wàng lù",
+          "meaning_vi": "bản ghi nhớ; bản nhắc việc; sổ ghi nhớ"
+        },
+        {
+          "id": "VOC_HSK6_奔波_benbo",
+          "simplified": "奔波",
+          "pinyin": "bēn bō",
+          "meaning_vi": "chạy đôn chạy đáo; liên tục di chuyển"
+        },
+        {
+          "id": "VOC_HSK6_迸发_bengfa",
+          "simplified": "迸发",
+          "pinyin": "bèng fā",
+          "meaning_vi": "bung ra"
+        },
+        {
+          "id": "VOC_HSK6_臂_bi",
+          "simplified": "臂",
+          "pinyin": "bì",
+          "meaning_vi": "cánh tay"
+        },
+        {
+          "id": "VOC_HSK6_碧玉_biyu",
+          "simplified": "碧玉",
+          "pinyin": "bì yù",
+          "meaning_vi": "ngọc bích"
+        },
+        {
+          "id": "VOC_HSK6_编织_bianzhi",
+          "simplified": "编织",
+          "pinyin": "biān zhī",
+          "meaning_vi": "đan; thêu; tết; bện; (nghĩa bóng) tạo ra (một cái gì đó trừu tượng, ví dụ: giấc mơ, lời nói dối, v.v.)"
+        },
+        {
+          "id": "VOC_HSK6_遍布_bianbu",
+          "simplified": "遍布",
+          "pinyin": "biàn bù",
+          "meaning_vi": "phủ khắp (khu vực); có mặt khắp nơi"
+        },
+        {
+          "id": "VOC_HSK6_变故_biangu",
+          "simplified": "变故",
+          "pinyin": "biàn gù",
+          "meaning_vi": "một sự kiện bất ngờ; tai nạn; điều không may"
+        },
+        {
+          "id": "VOC_HSK6_辨认_bianren",
+          "simplified": "辨认",
+          "pinyin": "biàn rèn",
+          "meaning_vi": "nhận ra; xác định"
+        },
+        {
+          "id": "VOC_HSK6_标记_biaoji",
+          "simplified": "标记",
+          "pinyin": "biāo jì",
+          "meaning_vi": "ký hiệu; đánh dấu; biểu tượng"
+        },
+        {
+          "id": "VOC_HSK6_飙升_biaosheng",
+          "simplified": "飙升",
+          "pinyin": "biāo shēng",
+          "meaning_vi": "tăng nhanh; phóng lên"
+        },
+        {
+          "id": "VOC_HSK6_表决_biaojue",
+          "simplified": "表决",
+          "pinyin": "biǎo jué",
+          "meaning_vi": "quyết định bằng biểu quyết; bỏ phiếu"
+        },
+        {
+          "id": "VOC_HSK6_表态_biaotai",
+          "simplified": "表态",
+          "pinyin": "biǎo tài",
+          "meaning_vi": "tuyên bố lập trường; nói rõ lập trường"
+        },
+        {
+          "id": "VOC_HSK6_别墅_bieshu",
+          "simplified": "别墅",
+          "pinyin": "bié shù",
+          "meaning_vi": "biệt thự; LT:幢[zhuang4],座[zuo4]"
+        },
+        {
+          "id": "VOC_HSK6_别致_biezhi",
+          "simplified": "别致",
+          "pinyin": "bié zhì",
+          "meaning_vi": "độc đáo; biến thể của 別緻|别致[bie2 zhi4]"
+        },
+        {
+          "id": "VOC_HSK6_濒临_binlin",
+          "simplified": "濒临",
+          "pinyin": "bīn lín",
+          "meaning_vi": "bên bờ của; (nghĩa bóng) sắp; chạm đến gần"
+        },
+        {
+          "id": "VOC_HSK6_冰雹_bingbao",
+          "simplified": "冰雹",
+          "pinyin": "bīng báo",
+          "meaning_vi": "mưa đá; cục mưa đá; Lượng từ: 場|场[chang2], 粒[li4]"
+        },
+        {
+          "id": "VOC_HSK6_拨打_boda",
+          "simplified": "拨打",
+          "pinyin": "bō dǎ",
+          "meaning_vi": "gọi; quay số"
+        },
+        {
+          "id": "VOC_HSK6_波涛汹涌_botaoxiongyong",
+          "simplified": "波涛汹涌",
+          "pinyin": "bō tāo xiōng yǒng",
+          "meaning_vi": "sóng cuộn trào; biển gầm rú"
+        },
+        {
+          "id": "VOC_HSK6_博大精深_bodajingshen",
+          "simplified": "博大精深",
+          "pinyin": "bó dà jīng shēn",
+          "meaning_vi": "rộng và sâu; sâu sắc và uyên thâm"
+        },
+        {
+          "id": "VOC_HSK6_不屑一顾_buxieyigu",
+          "simplified": "不屑一顾",
+          "pinyin": "bù xiè yī gù",
+          "meaning_vi": "coi thường đến mức không đáng quan tâm (thành ngữ)"
+        },
+        {
+          "id": "VOC_HSK6_哺乳_buru",
+          "simplified": "哺乳",
+          "pinyin": "bǔ rǔ",
+          "meaning_vi": "cho con bú; bú; nuôi con bằng sữa"
+        },
+        {
+          "id": "VOC_HSK6_不可思议_bukesiyi",
+          "simplified": "不可思议",
+          "pinyin": "bù kě sī yì",
+          "meaning_vi": "không thể tưởng tượng được (thành ngữ); không thể hình dung; khó mà hiểu nổi"
+        },
+        {
+          "id": "VOC_HSK6_不择手段_buzeshouduan",
+          "simplified": "不择手段",
+          "pinyin": "bù zé shǒu duàn",
+          "meaning_vi": "bằng mọi cách có thể; dù thủ đoạn gì; không từ thủ đoạn nào"
+        },
+        {
+          "id": "VOC_HSK6_裁员_caiyuan",
+          "simplified": "裁员",
+          "pinyin": "cái yuán",
+          "meaning_vi": "cắt giảm nhân sự; sa thải nhân viên"
+        },
+        {
+          "id": "VOC_HSK6_彩票_caipiao",
+          "simplified": "彩票",
+          "pinyin": "cǎi piào",
+          "meaning_vi": "vé số"
+        },
+        {
+          "id": "VOC_HSK6_残留_canliu",
+          "simplified": "残留",
+          "pinyin": "cán liú",
+          "meaning_vi": "còn lại; bị bỏ lại; dư thừa; tàn dư; cặn"
+        },
+        {
+          "id": "VOC_HSK6_嘈杂_caoza",
+          "simplified": "嘈杂",
+          "pinyin": "cáo zá",
+          "meaning_vi": "ồn ào; ầm ĩ"
+        },
+        {
+          "id": "VOC_HSK6_缠绕_chanrao",
+          "simplified": "缠绕",
+          "pinyin": "chán rào",
+          "meaning_vi": "xoắn; quấn; quấn quanh"
+        },
+        {
+          "id": "VOC_HSK6_倡导_changdao",
+          "simplified": "倡导",
+          "pinyin": "chàng dǎo",
+          "meaning_vi": "tán thành; khởi xướng; đề xuất"
+        },
+        {
+          "id": "VOC_HSK6_称心如意_chenxinruyi",
+          "simplified": "称心如意",
+          "pinyin": "chèn xīn rú yì",
+          "meaning_vi": "(thành ngữ) hợp ý nguyện; thỏa mãn; vừa ý; mọi điều như mong muốn"
+        },
+        {
+          "id": "VOC_HSK6_橙_cheng",
+          "simplified": "橙",
+          "pinyin": "chéng",
+          "meaning_vi": "cây cam; màu cam"
+        },
+        {
+          "id": "VOC_HSK6_承诺_chengnuo",
+          "simplified": "承诺",
+          "pinyin": "chéng nuò",
+          "meaning_vi": "hứa; hứa làm gì đó; cam kết"
+        },
+        {
+          "id": "VOC_HSK6_城堡_chengbao",
+          "simplified": "城堡",
+          "pinyin": "chéng bǎo",
+          "meaning_vi": "lâu đài; xe (quân cờ vua)"
+        },
+        {
+          "id": "VOC_HSK6_冲动_chongdong",
+          "simplified": "冲动",
+          "pinyin": "chōng dòng",
+          "meaning_vi": "có sự thôi thúc; bốc đồng; xung động"
+        },
+        {
+          "id": "VOC_HSK6_重阳节_chongyangjie",
+          "simplified": "重阳节",
+          "pinyin": "Chóng yáng jié",
+          "meaning_vi": "Lễ Trùng Cửu hoặc Lễ hội Trùng Dương; ngày 9 tháng 9 âm lịch"
+        },
+        {
+          "id": "VOC_HSK6_穿越_chuanyue",
+          "simplified": "穿越",
+          "pinyin": "chuān yuè",
+          "meaning_vi": "đi qua; xuyên qua; vượt qua"
+        },
+        {
+          "id": "VOC_HSK6_喘气_chuanqi",
+          "simplified": "喘气",
+          "pinyin": "chuǎn qì",
+          "meaning_vi": "thở sâu; thở hổn hển; thở dốc; nghỉ lấy hơi; lấy lại hơi thở"
+        },
+        {
+          "id": "VOC_HSK6_雌雄_cixiong",
+          "simplified": "雌雄",
+          "pinyin": "cí xióng",
+          "meaning_vi": "đực và cái"
+        },
+        {
+          "id": "VOC_HSK6_搭档_dadang",
+          "simplified": "搭档",
+          "pinyin": "dā dàng",
+          "meaning_vi": "hợp tác; cộng sự"
+        },
+        {
+          "id": "VOC_HSK6_答辩_dabian",
+          "simplified": "答辩",
+          "pinyin": "dá biàn",
+          "meaning_vi": "trả lời (một cáo buộc); bảo vệ luận án"
+        },
+        {
+          "id": "VOC_HSK6_打包_dabao",
+          "simplified": "打包",
+          "pinyin": "dǎ bāo",
+          "meaning_vi": "gói; đóng gói; mang đồ ăn thừa về nhà (đóng gói mang đi); (tin học) đóng gói (tức là tạo tệp lưu trữ)"
+        },
+        {
+          "id": "VOC_HSK6_打官司_daguansi",
+          "simplified": "打官司",
+          "pinyin": "dǎ guān si",
+          "meaning_vi": "khởi kiện; kiện tụng; tranh chấp"
+        },
+        {
+          "id": "VOC_HSK6_大不了_dabuliao",
+          "simplified": "大不了",
+          "pinyin": "dà bù liǎo",
+          "meaning_vi": "tệ nhất thì; nếu tệ nhất xảy ra; (thường dùng ở phủ định) nghiêm trọng; đáng lo ngại"
+        },
+        {
+          "id": "VOC_HSK6_当务之急_dangwuzhiji",
+          "simplified": "当务之急",
+          "pinyin": "dāng wù zhī jí",
+          "meaning_vi": "(thành ngữ) công việc ưu tiên hàng đầu; việc quan trọng sống còn"
+        },
+        {
+          "id": "VOC_HSK6_导向_daoxiang",
+          "simplified": "导向",
+          "pinyin": "dǎo xiàng",
+          "meaning_vi": "được định hướng tới; định hướng"
+        },
+        {
+          "id": "VOC_HSK6_稻谷_daogu",
+          "simplified": "稻谷",
+          "pinyin": "dào gǔ",
+          "meaning_vi": "lúa chưa xay; lúa"
+        },
+        {
+          "id": "VOC_HSK6_得天独厚_detianduhou",
+          "simplified": "得天独厚",
+          "pinyin": "dé tiān dú hòu",
+          "meaning_vi": "được trời phú (thành ngữ); hưởng lợi thế đặc biệt; được thiên nhiên ưu đãi"
+        },
+        {
+          "id": "VOC_HSK6_登录_denglu",
+          "simplified": "登录",
+          "pinyin": "dēng lù",
+          "meaning_vi": "đăng ký; đăng nhập"
+        },
+        {
+          "id": "VOC_HSK6_堤坝_diba",
+          "simplified": "堤坝",
+          "pinyin": "dī bà",
+          "meaning_vi": "đập; đê"
+        },
+        {
+          "id": "VOC_HSK6_丢三落四_diusanlasi",
+          "simplified": "丢三落四",
+          "pinyin": "diū sān là sì",
+          "meaning_vi": "đãng trí; đầu óc trống rỗng"
+        },
+        {
+          "id": "VOC_HSK6_东张西望_dongzhangxiwang",
+          "simplified": "东张西望",
+          "pinyin": "dōng zhāng xī wàng",
+          "meaning_vi": "nhìn tứ phía (thành ngữ); nhìn quanh quất"
+        },
+        {
+          "id": "VOC_HSK6_董事长_dongshizhang",
+          "simplified": "董事长",
+          "pinyin": "dǒng shì zhǎng",
+          "meaning_vi": "chủ tịch hội đồng quản trị"
+        },
+        {
+          "id": "VOC_HSK6_洞穴_dongxue",
+          "simplified": "洞穴",
+          "pinyin": "dòng xué",
+          "meaning_vi": "hang; động"
+        },
+        {
+          "id": "VOC_HSK6_陡峭_douqiao",
+          "simplified": "陡峭",
+          "pinyin": "dǒu qiào",
+          "meaning_vi": "dựng đứng"
+        },
+        {
+          "id": "VOC_HSK6_端午节_duanwujie",
+          "simplified": "端午节",
+          "pinyin": "Duān wǔ jié",
+          "meaning_vi": "Lễ hội Thuyền Rồng (ngày mùng 5 tháng 5 âm lịch)"
+        },
+        {
+          "id": "VOC_HSK6_多元化_duoyuanhua",
+          "simplified": "多元化",
+          "pinyin": "duō yuán huà",
+          "meaning_vi": "đa dạng hóa; chủ nghĩa đa nguyên"
+        },
+        {
+          "id": "VOC_HSK6_遏制_ezhi",
+          "simplified": "遏制",
+          "pinyin": "è zhì",
+          "meaning_vi": "ngăn chặn; kiềm chế; giữ lại"
+        },
+        {
+          "id": "VOC_HSK6_恩怨_enyuan",
+          "simplified": "恩怨",
+          "pinyin": "ēn yuàn",
+          "meaning_vi": "lòng biết ơn và mối hận; thù hận; mối hận"
+        },
+        {
+          "id": "VOC_HSK6_耳环_erhuan",
+          "simplified": "耳环",
+          "pinyin": "ěr huán",
+          "meaning_vi": "bông tai; LT:隻|只[zhi1],對|对[dui4]"
+        },
+        {
+          "id": "VOC_HSK6_发呆_fadai",
+          "simplified": "发呆",
+          "pinyin": "fā dāi",
+          "meaning_vi": "ngây người; bị sững sờ; mải mê suy nghĩ"
+        },
+        {
+          "id": "VOC_HSK6_方位_fangwei",
+          "simplified": "方位",
+          "pinyin": "fāng wèi",
+          "meaning_vi": "phương hướng; điểm la bàn; hướng"
+        },
+        {
+          "id": "VOC_HSK6_方言_fangyan",
+          "simplified": "方言",
+          "pinyin": "fāng yán",
+          "meaning_vi": "từ điển phương ngôn Trung Quốc đầu tiên, biên soạn bởi Dương Hùng 揚雄|扬雄[Yang2 Xiong2] vào thế kỷ 1, chứa hơn 9000 chữ; phương ngữ; tiếng địa phương"
+        },
+        {
+          "id": "VOC_HSK6_飞禽走兽_feiqinzoushou",
+          "simplified": "飞禽走兽",
+          "pinyin": "fēi qín zǒu shòu",
+          "meaning_vi": "chim chóc và muông thú; dã thú và chim trời"
+        },
+        {
+          "id": "VOC_HSK6_分手_fenshou",
+          "simplified": "分手",
+          "pinyin": "fēn shǒu",
+          "meaning_vi": "chia tay; chia lìa; chia tay tình cảm"
+        },
+        {
+          "id": "VOC_HSK6_粉色_fense",
+          "simplified": "粉色",
+          "pinyin": "fěn sè",
+          "meaning_vi": "màu hồng; màu trắng; khêu gợi"
+        },
+        {
+          "id": "VOC_HSK6_风土人情_fengturenqing",
+          "simplified": "风土人情",
+          "pinyin": "fēng tǔ rén qíng",
+          "meaning_vi": "điều kiện và phong tục địa phương (thành ngữ)"
+        },
+        {
+          "id": "VOC_HSK6_丰盛_fengsheng",
+          "simplified": "丰盛",
+          "pinyin": "fēng shèng",
+          "meaning_vi": "phong phú; thịnh soạn"
+        },
+        {
+          "id": "VOC_HSK6_俯仰_fuyang",
+          "simplified": "俯仰",
+          "pinyin": "fǔ yǎng",
+          "meaning_vi": "cúi và ngẩng đầu; (ví) động tác nhỏ; độ cao thấp (góc hướng)"
+        },
+        {
+          "id": "VOC_HSK6_附件_fujian",
+          "simplified": "附件",
+          "pinyin": "fù jiàn",
+          "meaning_vi": "phụ lục (trong tài liệu); tài liệu đính kèm; tệp đính kèm (email)"
+        },
+        {
+          "id": "VOC_HSK6_腹泻_fuxie",
+          "simplified": "腹泻",
+          "pinyin": "fù xiè",
+          "meaning_vi": "tiêu chảy; bị tiêu chảy"
+        },
+        {
+          "id": "VOC_HSK6_盖章_gaizhang",
+          "simplified": "盖章",
+          "pinyin": "gài zhāng",
+          "meaning_vi": "đóng dấu; đóng mộc; xác nhận"
+        },
+        {
+          "id": "VOC_HSK6_尴尬_ganga",
+          "simplified": "尴尬",
+          "pinyin": "gān gà",
+          "meaning_vi": "ngượng ngùng; lúng túng"
+        },
+        {
+          "id": "VOC_HSK6_港湾_gangwan",
+          "simplified": "港湾",
+          "pinyin": "gǎng wān",
+          "meaning_vi": "vịnh dùng làm cảng"
+        },
+        {
+          "id": "VOC_HSK6_各抒己见_geshujijian",
+          "simplified": "各抒己见",
+          "pinyin": "gè shū jǐ jiàn",
+          "meaning_vi": "mọi người đưa ra ý kiến riêng của mình"
+        },
+        {
+          "id": "VOC_HSK6_公安局_gonganju",
+          "simplified": "公安局",
+          "pinyin": "gōng ān jú",
+          "meaning_vi": "cục công an (cơ quan chính phủ có chức năng tương tự đồn cảnh sát)"
+        },
+        {
+          "id": "VOC_HSK6_公婆_gongpo",
+          "simplified": "公婆",
+          "pinyin": "gōng pó",
+          "meaning_vi": "bố mẹ chồng; bố mẹ vợ; bố mẹ của vợ hoặc chồng; (phương ngữ) một cặp đôi; vợ chồng"
+        },
+        {
+          "id": "VOC_HSK6_公正_gongzheng",
+          "simplified": "公正",
+          "pinyin": "gōng zhèng",
+          "meaning_vi": "công bằng; công chính; bình đẳng"
+        },
+        {
+          "id": "VOC_HSK6_古董_gudong",
+          "simplified": "古董",
+          "pinyin": "gǔ dǒng",
+          "meaning_vi": "đồ cổ"
+        },
+        {
+          "id": "VOC_HSK6_拐杖_guaizhang",
+          "simplified": "拐杖",
+          "pinyin": "guǎi zhàng",
+          "meaning_vi": "nạng; gậy; gậy đi bộ"
+        },
+        {
+          "id": "VOC_HSK6_棍棒_gunbang",
+          "simplified": "棍棒",
+          "pinyin": "gùn bàng",
+          "meaning_vi": "gậy; côn; que"
+        },
+        {
+          "id": "VOC_HSK6_过奖_guojiang",
+          "simplified": "过奖",
+          "pinyin": "guò jiǎng",
+          "meaning_vi": "khen quá lời; tâng bốc"
+        },
+        {
+          "id": "VOC_HSK6_过瘾_guoyin",
+          "simplified": "过瘾",
+          "pinyin": "guò yǐn",
+          "meaning_vi": "thỏa mãn cơn thèm; tìm được niềm vui từ điều gì đó; thỏa mãn"
+        },
+        {
+          "id": "VOC_HSK6_嗨_hai",
+          "simplified": "嗨",
+          "pinyin": "hāi",
+          "meaning_vi": "ồ than ôi; này!; chào! (từ mượn)"
+        },
+        {
+          "id": "VOC_HSK6_豪迈_haomai",
+          "simplified": "豪迈",
+          "pinyin": "háo mài",
+          "meaning_vi": "táo bạo; cởi mở; anh hùng"
+        },
+        {
+          "id": "VOC_HSK6_合身_heshen",
+          "simplified": "合身",
+          "pinyin": "hé shēn",
+          "meaning_vi": "vừa vặn (quần áo)"
+        },
+        {
+          "id": "VOC_HSK6_红包_hongbao",
+          "simplified": "红包",
+          "pinyin": "hóng bāo",
+          "meaning_vi": "tiền mừng tuổi; bưu kiện thưởng; lại quả"
+        },
+        {
+          "id": "VOC_HSK6_宏观_hongguan",
+          "simplified": "宏观",
+          "pinyin": "hóng guān",
+          "meaning_vi": "vĩ mô; thuộc về vĩ mô; toàn diện"
+        },
+        {
+          "id": "VOC_HSK6_后顾之忧_houguzhiyou",
+          "simplified": "后顾之忧",
+          "pinyin": "hòu gù zhī yōu",
+          "meaning_vi": "nỗi lo lắng phía sau (thành ngữ); lo lắng gia đình (cản trở hành động tự do); lo lắng về hậu quả tương lai; thường trong biểu đạt phủ định, nghĩa là \"không lo lắng gì cả\""
+        },
+        {
+          "id": "VOC_HSK6_候选_houxuan",
+          "simplified": "候选",
+          "pinyin": "hòu xuǎn",
+          "meaning_vi": "ứng cử viên (định ngữ)"
+        },
+        {
+          "id": "VOC_HSK6_湖泊_hupo",
+          "simplified": "湖泊",
+          "pinyin": "hú pō",
+          "meaning_vi": "hồ"
+        },
+        {
+          "id": "VOC_HSK6_互联网_hulianwang",
+          "simplified": "互联网",
+          "pinyin": "Hù lián wǎng",
+          "meaning_vi": "Internet"
+        },
+        {
+          "id": "VOC_HSK6_花瓣_huaban",
+          "simplified": "花瓣",
+          "pinyin": "huā bàn",
+          "meaning_vi": "cánh hoa; LT:片[pian4]"
+        },
+        {
+          "id": "VOC_HSK6_话筒_huatong",
+          "simplified": "话筒",
+          "pinyin": "huà tǒng",
+          "meaning_vi": "microphone; ống nghe (điện thoại); loa"
+        },
+        {
+          "id": "VOC_HSK6_恍然大悟_huangrandawu",
+          "simplified": "恍然大悟",
+          "pinyin": "huǎng rán dà wù",
+          "meaning_vi": "đột nhiên nhận ra; bỗng nhiên hiểu ra"
+        },
+        {
+          "id": "VOC_HSK6_回报_huibao",
+          "simplified": "回报",
+          "pinyin": "huí bào",
+          "meaning_vi": "(để) đáp lại; sự đáp trả; báo đáp"
+        },
+        {
+          "id": "VOC_HSK6_基因_jiyin",
+          "simplified": "基因",
+          "pinyin": "jī yīn",
+          "meaning_vi": "gen (từ mượn)"
+        },
+        {
+          "id": "VOC_HSK6_急功近利_jigongjinli",
+          "simplified": "急功近利",
+          "pinyin": "jí gōng jìn lì",
+          "meaning_vi": "cầu lợi ngay lập tức (thành ngữ); tầm nhìn thiển cận, chỉ nhìn vào lợi ích nhanh chóng"
+        },
+        {
+          "id": "VOC_HSK6_急于求成_jiyuqiucheng",
+          "simplified": "急于求成",
+          "pinyin": "jí yú qiú chéng",
+          "meaning_vi": "nóng vội đạt kết quả (thành ngữ); muốn thành công ngay lập tức; nôn nóng kết quả; nóng vội"
+        },
+        {
+          "id": "VOC_HSK6_继往开来_jiwangkailai",
+          "simplified": "继往开来",
+          "pinyin": "jì wǎng kāi lái",
+          "meaning_vi": "kế thừa quá khứ và mở ra tương lai (thành ngữ); phần của chuyển tiếp lịch sử; hình thành cầu nối giữa các giai đoạn trước và sau"
+        },
+        {
+          "id": "VOC_HSK6_季军_jijun",
+          "simplified": "季军",
+          "pinyin": "jì jūn",
+          "meaning_vi": "hạng ba trong một cuộc đua; đoạt huy chương đồng"
+        },
+        {
+          "id": "VOC_HSK6_忌讳_jihui",
+          "simplified": "忌讳",
+          "pinyin": "jì huì",
+          "meaning_vi": "điều cấm kỵ; tránh né vì cấm kỵ; kiêng kỵ"
+        },
+        {
+          "id": "VOC_HSK6_佳肴_jiayao",
+          "simplified": "佳肴",
+          "pinyin": "jiā yáo",
+          "meaning_vi": "món ăn ngon; mỹ vị; thức ăn ngon"
+        },
+        {
+          "id": "VOC_HSK6_兼职_jianzhi",
+          "simplified": "兼职",
+          "pinyin": "jiān zhí",
+          "meaning_vi": "làm nhiều công việc cùng lúc; công việc kiêm nhiệm; làm thêm"
+        },
+        {
+          "id": "VOC_HSK6_间谍_jiandie",
+          "simplified": "间谍",
+          "pinyin": "jiàn dié",
+          "meaning_vi": "gián điệp"
+        },
+        {
+          "id": "VOC_HSK6_见多识广_jianduoshiguang",
+          "simplified": "见多识广",
+          "pinyin": "jiàn duō shí guǎng",
+          "meaning_vi": "từng trải và hiểu biết rộng (thành ngữ)"
+        },
+        {
+          "id": "VOC_HSK6_见闻_jianwen",
+          "simplified": "见闻",
+          "pinyin": "jiàn wén",
+          "meaning_vi": "những gì người ta đã nhìn thấy và nghe được; kiến thức; kinh nghiệm của một người"
+        },
+        {
+          "id": "VOC_HSK6_见义勇为_jianyiyongwei",
+          "simplified": "见义勇为",
+          "pinyin": "jiàn yì yǒng wéi",
+          "meaning_vi": "thấy điều đúng đắn liền dũng cảm hành động (thành ngữ, từ Luận Ngữ); đứng lên dũng cảm vì sự thật; hành động anh hùng trong việc chính nghĩa"
+        },
+        {
+          "id": "VOC_HSK6_舰艇_jianting",
+          "simplified": "舰艇",
+          "pinyin": "jiàn tǐng",
+          "meaning_vi": "tàu chiến; tàu hải quân"
+        },
+        {
+          "id": "VOC_HSK6_僵硬_jiangying",
+          "simplified": "僵硬",
+          "pinyin": "jiāng yìng",
+          "meaning_vi": "cứng; cứng nhắc"
+        },
+        {
+          "id": "VOC_HSK6_奖赏_jiangshang",
+          "simplified": "奖赏",
+          "pinyin": "jiǎng shǎng",
+          "meaning_vi": "phần thưởng; giải thưởng; tặng thưởng"
+        },
+        {
+          "id": "VOC_HSK6_竭尽全力_jiejinquanli",
+          "simplified": "竭尽全力",
+          "pinyin": "jié jìn quán lì",
+          "meaning_vi": "không tiếc công sức (thành ngữ); làm hết sức mình"
+        },
+        {
+          "id": "VOC_HSK6_截至_jiezhi",
+          "simplified": "截至",
+          "pinyin": "jié zhì",
+          "meaning_vi": "tính đến (một thời gian); đến (một thời gian)"
+        },
+        {
+          "id": "VOC_HSK6_解体_jieti",
+          "simplified": "解体",
+          "pinyin": "jiě tǐ",
+          "meaning_vi": "phân rã thành từng phần; tan rã; sụp đổ"
+        },
+        {
+          "id": "VOC_HSK6_戒备_jiebei",
+          "simplified": "戒备",
+          "pinyin": "jiè bèi",
+          "meaning_vi": "thực hiện phòng bị; cảnh giác (trường hợp khẩn cấp)"
+        },
+        {
+          "id": "VOC_HSK6_锦绣前程_jinxiuqiancheng",
+          "simplified": "锦绣前程",
+          "pinyin": "jǐn xiù qián chéng",
+          "meaning_vi": "tương lai tươi sáng; triển vọng rực rỡ"
+        },
+        {
+          "id": "VOC_HSK6_浸泡_jinpao",
+          "simplified": "浸泡",
+          "pinyin": "jìn pào",
+          "meaning_vi": "ngâm; nhúng; nhấn chìm"
+        },
+        {
+          "id": "VOC_HSK6_经纬_jingwei",
+          "simplified": "经纬",
+          "pinyin": "jīng wěi",
+          "meaning_vi": "sợi dọc và sợi ngang; kinh độ và vĩ độ; điểm chính yếu"
+        },
+        {
+          "id": "VOC_HSK6_颈椎_jingzhui",
+          "simplified": "颈椎",
+          "pinyin": "jǐng zhuī",
+          "meaning_vi": "đốt sống cổ; bảy đốt sống cổ ở cổ của người và hầu hết động vật có vú"
+        },
+        {
+          "id": "VOC_HSK6_举足轻重_juzuqingzhong",
+          "simplified": "举足轻重",
+          "pinyin": "jǔ zú qīng zhòng",
+          "meaning_vi": "đóng vai trò quan trọng (thành ngữ); có ảnh hưởng"
+        },
+        {
+          "id": "VOC_HSK6_咀嚼_jujue",
+          "simplified": "咀嚼",
+          "pinyin": "jǔ jué",
+          "meaning_vi": "nhai; ngẫm nghĩ"
+        },
+        {
+          "id": "VOC_HSK6_沮丧_jusang",
+          "simplified": "沮丧",
+          "pinyin": "jǔ sàng",
+          "meaning_vi": "chán nản; suy sụp; thất vọng"
+        },
+        {
+          "id": "VOC_HSK6_卡通_katong",
+          "simplified": "卡通",
+          "pinyin": "kǎ tōng",
+          "meaning_vi": "hoạt hình (từ mượn)"
+        },
+        {
+          "id": "VOC_HSK6_靠拢_kaolong",
+          "simplified": "靠拢",
+          "pinyin": "kào lǒng",
+          "meaning_vi": "xích lại gần"
+        },
+        {
+          "id": "VOC_HSK6_刻不容缓_keburonghuan",
+          "simplified": "刻不容缓",
+          "pinyin": "kè bù róng huǎn",
+          "meaning_vi": "không thể trì hoãn; đòi hỏi hành động ngay lập tức"
+        },
+        {
+          "id": "VOC_HSK6_客户_kehu",
+          "simplified": "客户",
+          "pinyin": "kè hù",
+          "meaning_vi": "khách hàng"
+        },
+        {
+          "id": "VOC_HSK6_空前绝后_kongqianjuehou",
+          "simplified": "空前绝后",
+          "pinyin": "kōng qián jué hòu",
+          "meaning_vi": "chưa từng có và không thể lặp lại; đầu tiên và cuối cùng; vô song"
+        },
+        {
+          "id": "VOC_HSK6_恐吓_konghe",
+          "simplified": "恐吓",
+          "pinyin": "kǒng hè",
+          "meaning_vi": "đe dọa; doạ nạt"
+        },
+        {
+          "id": "VOC_HSK6_口音_kouyin",
+          "simplified": "口音",
+          "pinyin": "kǒu yīn",
+          "meaning_vi": "(ngôn ngữ học) âm thanh lời nói; giọng; giọng địa phương"
+        },
+        {
+          "id": "VOC_HSK6_枯竭_kujie",
+          "simplified": "枯竭",
+          "pinyin": "kū jié",
+          "meaning_vi": "bị cạn kiệt; bị khô cạn; kiệt quệ (về tài nguyên)"
+        },
+        {
+          "id": "VOC_HSK6_苦尽甘来_kujinganlai",
+          "simplified": "苦尽甘来",
+          "pinyin": "kǔ jìn gān lái",
+          "meaning_vi": "khổ tận cam lai (thành ngữ); thời kỳ khó khăn đã qua, thời kỳ tốt đẹp vừa bắt đầu"
+        },
+        {
+          "id": "VOC_HSK6_款式_kuanshi",
+          "simplified": "款式",
+          "pinyin": "kuǎn shì",
+          "meaning_vi": "mẫu mã; phong cách; thiết kế"
+        },
+        {
+          "id": "VOC_HSK6_框架_kuangjia",
+          "simplified": "框架",
+          "pinyin": "kuàng jià",
+          "meaning_vi": "(xây dựng) khung; (bóng) khuôn khổ"
+        },
+        {
+          "id": "VOC_HSK6_捆绑_kunbang",
+          "simplified": "捆绑",
+          "pinyin": "kǔn bǎng",
+          "meaning_vi": "trói buộc"
+        },
+        {
+          "id": "VOC_HSK6_栏目_lanmu",
+          "simplified": "栏目",
+          "pinyin": "lán mù",
+          "meaning_vi": "chuyên mục cố định hoặc phân đoạn (trong ấn phẩm hoặc chương trình phát sóng); chương trình (truyền hình hoặc radio)"
+        },
+        {
+          "id": "VOC_HSK6_唠叨_laodao",
+          "simplified": "唠叨",
+          "pinyin": "láo dao",
+          "meaning_vi": "lải nhải; nói huyên thuyên; cằn nhằn"
+        },
+        {
+          "id": "VOC_HSK6_冷酷_lengku",
+          "simplified": "冷酷",
+          "pinyin": "lěng kù",
+          "meaning_vi": "vô cảm; nhẫn tâm"
+        },
+        {
+          "id": "VOC_HSK6_里程碑_lichengbei",
+          "simplified": "里程碑",
+          "pinyin": "lǐ chéng bēi",
+          "meaning_vi": "cột mốc"
+        },
+        {
+          "id": "VOC_HSK6_理智_lizhi",
+          "simplified": "理智",
+          "pinyin": "lǐ zhì",
+          "meaning_vi": "lý trí; trí tuệ; tính hợp lý"
+        },
+        {
+          "id": "VOC_HSK6_立足_lizu",
+          "simplified": "立足",
+          "pinyin": "lì zú",
+          "meaning_vi": "đứng; có chỗ đứng; được thiết lập"
+        },
+        {
+          "id": "VOC_HSK6_利害_lihai",
+          "simplified": "利害",
+          "pinyin": "lì hài",
+          "meaning_vi": "ưu và nhược điểm; lợi ích và tổn thất; điểm mạnh và điểm yếu"
+        },
+        {
+          "id": "VOC_HSK6_利率_lilv",
+          "simplified": "利率",
+          "pinyin": "lì lǜ",
+          "meaning_vi": "lãi suất"
+        },
+        {
+          "id": "VOC_HSK6_连锁_liansuo",
+          "simplified": "连锁",
+          "pinyin": "lián suǒ",
+          "meaning_vi": "liên kết; được kết nối; chuỗi (cửa hàng v.v.)"
+        },
+        {
+          "id": "VOC_HSK6_良心_liangxin",
+          "simplified": "良心",
+          "pinyin": "liáng xīn",
+          "meaning_vi": "lương tâm"
+        },
+        {
+          "id": "VOC_HSK6_吝啬_linse",
+          "simplified": "吝啬",
+          "pinyin": "lìn sè",
+          "meaning_vi": "keo kiệt; bủn xỉn; hà tiện"
+        },
+        {
+          "id": "VOC_HSK6_灵感_linggan",
+          "simplified": "灵感",
+          "pinyin": "líng gǎn",
+          "meaning_vi": "cảm hứng; sự sáng suốt; một bùng nổ sáng tạo trong nỗ lực khoa học hoặc nghệ thuật"
+        },
+        {
+          "id": "VOC_HSK6_领事馆_lingshiguan",
+          "simplified": "领事馆",
+          "pinyin": "lǐng shì guǎn",
+          "meaning_vi": "lãnh sự quán"
+        },
+        {
+          "id": "VOC_HSK6_领悟_lingwu",
+          "simplified": "领悟",
+          "pinyin": "lǐng wù",
+          "meaning_vi": "hiểu; nhận thức"
+        },
+        {
+          "id": "VOC_HSK6_聋哑_longya",
+          "simplified": "聋哑",
+          "pinyin": "lóng yǎ",
+          "meaning_vi": "điếc và không nói được"
+        },
+        {
+          "id": "VOC_HSK6_炉灶_luzao",
+          "simplified": "炉灶",
+          "pinyin": "lú zào",
+          "meaning_vi": "bếp"
+        },
+        {
+          "id": "VOC_HSK6_轮胎_luntai",
+          "simplified": "轮胎",
+          "pinyin": "lún tāi",
+          "meaning_vi": "lốp xe; lốp hơi"
+        },
+        {
+          "id": "VOC_HSK6_论坛_luntan",
+          "simplified": "论坛",
+          "pinyin": "lùn tán",
+          "meaning_vi": "diễn đàn (để thảo luận)"
+        },
+        {
+          "id": "VOC_HSK6_啰唆_luosuo",
+          "simplified": "啰唆",
+          "pinyin": "luō suō",
+          "meaning_vi": "biến thể của 囉嗦|啰嗦[luo1 suo5]"
+        },
+        {
+          "id": "VOC_HSK6_络绎不绝_luoyibujue",
+          "simplified": "络绎不绝",
+          "pinyin": "luò yì bù jué",
+          "meaning_vi": "(thành ngữ) liên tục; không ngớt"
+        },
+        {
+          "id": "VOC_HSK6_埋伏_maifu",
+          "simplified": "埋伏",
+          "pinyin": "mái fú",
+          "meaning_vi": "phục kích; nằm chờ; ẩn nấp"
+        },
+        {
+          "id": "VOC_HSK6_埋葬_maizang",
+          "simplified": "埋葬",
+          "pinyin": "mái zàng",
+          "meaning_vi": "chôn cất"
+        },
+        {
+          "id": "VOC_HSK6_漫画_manhua",
+          "simplified": "漫画",
+          "pinyin": "màn huà",
+          "meaning_vi": "tranh biếm họa; phim hoạt hình; manga Nhật Bản"
+        },
+        {
+          "id": "VOC_HSK6_冒充_maochong",
+          "simplified": "冒充",
+          "pinyin": "mào chōng",
+          "meaning_vi": "giả mạo; giả làm; tự nhận là"
+        },
+        {
+          "id": "VOC_HSK6_媒体_meiti",
+          "simplified": "媒体",
+          "pinyin": "méi tǐ",
+          "meaning_vi": "truyền thông, đặc biệt là truyền thông tin tức"
+        },
+        {
+          "id": "VOC_HSK6_迷人_miren",
+          "simplified": "迷人",
+          "pinyin": "mí rén",
+          "meaning_vi": "quyến rũ; mê hoặc; lôi cuốn"
+        },
+        {
+          "id": "VOC_HSK6_免疫_mianyi",
+          "simplified": "免疫",
+          "pinyin": "miǎn yì",
+          "meaning_vi": "miễn dịch (với bệnh)"
+        },
+        {
+          "id": "VOC_HSK6_磨合_mohe",
+          "simplified": "磨合",
+          "pinyin": "mó hé",
+          "meaning_vi": "mài giũa; làm cho ăn khớp"
+        },
+        {
+          "id": "VOC_HSK6_母语_muyu",
+          "simplified": "母语",
+          "pinyin": "mǔ yǔ",
+          "meaning_vi": "ngôn ngữ mẹ đẻ; tiếng mẹ đẻ; (ngôn ngữ học) ngôn ngữ tổ tiên"
+        },
+        {
+          "id": "VOC_HSK6_沐浴_muyu",
+          "simplified": "沐浴",
+          "pinyin": "mù yù",
+          "meaning_vi": "tắm; rửa; ngâm mình"
+        },
+        {
+          "id": "VOC_HSK6_拿手_nashou",
+          "simplified": "拿手",
+          "pinyin": "ná shǒu",
+          "meaning_vi": "thành thạo; giỏi về"
+        },
+        {
+          "id": "VOC_HSK6_难能可贵_nannengkegui",
+          "simplified": "难能可贵",
+          "pinyin": "nán néng kě guì",
+          "meaning_vi": "hiếm và quý; giá trị; đáng kể"
+        },
+        {
+          "id": "VOC_HSK6_内涵_neihan",
+          "simplified": "内涵",
+          "pinyin": "nèi hán",
+          "meaning_vi": "nội dung ý nghĩa; hàm ý; (ngữ nghĩa) ý nghĩa bao hàm"
+        },
+        {
+          "id": "VOC_HSK6_凝聚_ningju",
+          "simplified": "凝聚",
+          "pinyin": "níng jù",
+          "meaning_vi": "ngưng tụ; đông lại; kết tụ (tức là hình thành giọt nhỏ)"
+        },
+        {
+          "id": "VOC_HSK6_农历_nongli",
+          "simplified": "农历",
+          "pinyin": "nóng lì",
+          "meaning_vi": "lịch Trung Quốc truyền thống; lịch âm"
+        },
+        {
+          "id": "VOC_HSK6_虐待_nvedai",
+          "simplified": "虐待",
+          "pinyin": "nvè dài",
+          "meaning_vi": "ngược đãi; đối xử tệ; lạm dụng"
+        },
+        {
+          "id": "VOC_HSK6_欧洲_ouzhou",
+          "simplified": "欧洲",
+          "pinyin": "Oū zhōu",
+          "meaning_vi": "châu Âu (viết tắt của 歐羅巴洲|欧罗巴洲[Ou1 luo2 ba1 Zhou1])"
+        },
+        {
+          "id": "VOC_HSK6_排放_paifang",
+          "simplified": "排放",
+          "pinyin": "pái fàng",
+          "meaning_vi": "sắp xếp theo thứ tự; phát thải; xả (khí thải, nước thải, v.v.); (động vật) rụng trứng; xuất tinh"
+        },
+        {
+          "id": "VOC_HSK6_片断_pianduan",
+          "simplified": "片断",
+          "pinyin": "piàn duàn",
+          "meaning_vi": "đoạn; mảnh; phân đoạn"
+        },
+        {
+          "id": "VOC_HSK6_漂浮_piaofu",
+          "simplified": "漂浮",
+          "pinyin": "piāo fú",
+          "meaning_vi": "nổi; lơ lửng; trôi dạt (cũng nghĩa bóng, sống lang thang)"
+        },
+        {
+          "id": "VOC_HSK6_破例_poli",
+          "simplified": "破例",
+          "pinyin": "pò lì",
+          "meaning_vi": "phá lệ"
+        },
+        {
+          "id": "VOC_HSK6_迫不及待_pobujidai",
+          "simplified": "迫不及待",
+          "pinyin": "pò bù jí dài",
+          "meaning_vi": "nóng lòng (thành ngữ); vội vàng; không thể chờ đợi được"
+        },
+        {
+          "id": "VOC_HSK6_魄力_poli",
+          "simplified": "魄力",
+          "pinyin": "pò lì",
+          "meaning_vi": "can đảm; táo bạo; sự quyết đoán"
+        },
+        {
+          "id": "VOC_HSK6_齐心协力_qixinxieli",
+          "simplified": "齐心协力",
+          "pinyin": "qí xīn xié lì",
+          "meaning_vi": "cùng chung mục đích (thành ngữ); nỗ lực đồng bộ; hợp sức; làm việc như một"
+        },
+        {
+          "id": "VOC_HSK6_乞丐_qigai",
+          "simplified": "乞丐",
+          "pinyin": "qǐ gài",
+          "meaning_vi": "người ăn xin"
+        },
+        {
+          "id": "VOC_HSK6_气色_qise",
+          "simplified": "气色",
+          "pinyin": "qì sè",
+          "meaning_vi": "nước da"
+        },
+        {
+          "id": "VOC_HSK6_迄今为止_qijinweizhi",
+          "simplified": "迄今为止",
+          "pinyin": "qì jīn wéi zhǐ",
+          "meaning_vi": "cho đến nay; đến bây giờ; vẫn (chưa)"
+        },
+        {
+          "id": "VOC_HSK6_迁徙_qianxi",
+          "simplified": "迁徙",
+          "pinyin": "qiān xǐ",
+          "meaning_vi": "di cư; di chuyển"
+        },
+        {
+          "id": "VOC_HSK6_潜水_qianshui",
+          "simplified": "潜水",
+          "pinyin": "qián shuǐ",
+          "meaning_vi": "lặn; xuống nước; (trong diễn đàn trực tuyến) ẩn mình"
+        },
+        {
+          "id": "VOC_HSK6_潜移默化_qianyimohua",
+          "simplified": "潜移默化",
+          "pinyin": "qián yí mò huà",
+          "meaning_vi": "ảnh hưởng một cách không nhận ra; tác động một cách bí mật"
+        },
+        {
+          "id": "VOC_HSK6_锲而不舍_qieerbushe",
+          "simplified": "锲而不舍",
+          "pinyin": "qiè ér bù shě",
+          "meaning_vi": "làm việc không bỏ cuộc (thành ngữ); mài giũa không ngừng; kiên trì; nỗ lực không mệt mỏi"
+        },
+        {
+          "id": "VOC_HSK6_轻而易举_qingeryiju",
+          "simplified": "轻而易举",
+          "pinyin": "qīng ér yì jǔ",
+          "meaning_vi": "dễ dàng; không có khó khăn"
+        },
+        {
+          "id": "VOC_HSK6_清澈_qingche",
+          "simplified": "清澈",
+          "pinyin": "qīng chè",
+          "meaning_vi": "trong; trong veo"
+        },
+        {
+          "id": "VOC_HSK6_清真_qingzhen",
+          "simplified": "清真",
+          "pinyin": "qīng zhēn",
+          "meaning_vi": "Hồi giáo; người Hồi giáo; halal (đồ ăn)"
+        },
+        {
+          "id": "VOC_HSK6_取缔_qudi",
+          "simplified": "取缔",
+          "pinyin": "qǔ dì",
+          "meaning_vi": "trấn áp; triệt phá; cấm"
+        },
+        {
+          "id": "VOC_HSK6_权衡_quanheng",
+          "simplified": "权衡",
+          "pinyin": "quán héng",
+          "meaning_vi": "cân nhắc; cân đo (một vấn đề); cân bằng (lợi và hại)"
+        },
+        {
+          "id": "VOC_HSK6_饶恕_raoshu",
+          "simplified": "饶恕",
+          "pinyin": "ráo shù",
+          "meaning_vi": "tha thứ; khoan dung; bỏ qua"
+        },
+        {
+          "id": "VOC_HSK6_惹祸_rehuo",
+          "simplified": "惹祸",
+          "pinyin": "rě huò",
+          "meaning_vi": "gây rắc rối; rước họa vào thân"
+        },
+        {
+          "id": "VOC_HSK6_热门_remen",
+          "simplified": "热门",
+          "pinyin": "rè mén",
+          "meaning_vi": "phổ biến; hot; thịnh hành"
+        },
+        {
+          "id": "VOC_HSK6_人道_rendao",
+          "simplified": "人道",
+          "pinyin": "rén dào",
+          "meaning_vi": "cảm thông con người; chủ nghĩa nhân đạo; nhân đạo"
+        },
+        {
+          "id": "VOC_HSK6_任重道远_renzhongdaoyuan",
+          "simplified": "任重道远",
+          "pinyin": "rèn zhòng dào yuǎn",
+          "meaning_vi": "gánh nặng lớn và đường dài; bóng gió mang trách nhiệm nặng nề trong cuộc đấu tranh dài (xem Luận Ngữ của Khổng Tử, 8.7)"
+        },
+        {
+          "id": "VOC_HSK6_日新月异_rixinyueyi",
+          "simplified": "日新月异",
+          "pinyin": "rì xīn yuè yì",
+          "meaning_vi": "mỗi ngày đổi mới, mỗi tháng thay đổi (thành ngữ); mỗi ngày có tiến triển mới; tiến bộ nhanh chóng"
+        },
+        {
+          "id": "VOC_HSK6_容貌_rongmao",
+          "simplified": "容貌",
+          "pinyin": "róng mào",
+          "meaning_vi": "diện mạo; vẻ ngoài; ngoại hình"
+        },
+        {
+          "id": "VOC_HSK6_啥_sha",
+          "simplified": "啥",
+          "pinyin": "shá",
+          "meaning_vi": "từ địa phương tương đương với 什麼|什么[shen2 me5]; cũng đọc là [sha4]"
+        },
+        {
+          "id": "VOC_HSK6_筛选_shaixuan",
+          "simplified": "筛选",
+          "pinyin": "shāi xuǎn",
+          "meaning_vi": "lọc"
+        },
+        {
+          "id": "VOC_HSK6_上进心_shangjinxin",
+          "simplified": "上进心",
+          "pinyin": "shàng jìn xīn",
+          "meaning_vi": "động lực; tham vọng"
+        },
+        {
+          "id": "VOC_HSK6_上瘾_shangyin",
+          "simplified": "上瘾",
+          "pinyin": "shàng yǐn",
+          "meaning_vi": "bị nghiện; thành nghiện"
+        },
+        {
+          "id": "VOC_HSK6_社区_shequ",
+          "simplified": "社区",
+          "pinyin": "shè qū",
+          "meaning_vi": "cộng đồng; khu dân cư"
+        },
+        {
+          "id": "VOC_HSK6_摄取_shequ",
+          "simplified": "摄取",
+          "pinyin": "shè qǔ",
+          "meaning_vi": "hấp thụ (chất dinh dưỡng, v.v.); đồng hóa; lượng tiếp nhận"
+        },
+        {
+          "id": "VOC_HSK6_摄氏度_sheshidu",
+          "simplified": "摄氏度",
+          "pinyin": "shè shì dù",
+          "meaning_vi": "°C (độ C)"
+        },
+        {
+          "id": "VOC_HSK6_深情厚谊_shenqinghouyi",
+          "simplified": "深情厚谊",
+          "pinyin": "shēn qíng hòu yì",
+          "meaning_vi": "tình bạn sâu sắc"
+        },
+        {
+          "id": "VOC_HSK6_生锈_shengxiu",
+          "simplified": "生锈",
+          "pinyin": "shēng xiù",
+          "meaning_vi": "bị rỉ; sét; mòn"
+        },
+        {
+          "id": "VOC_HSK6_胜负_shengfu",
+          "simplified": "胜负",
+          "pinyin": "shèng fù",
+          "meaning_vi": "thắng hoặc bại; kết quả của một trận đấu"
+        },
+        {
+          "id": "VOC_HSK6_时差_shicha",
+          "simplified": "时差",
+          "pinyin": "shí chā",
+          "meaning_vi": "chênh lệch múi giờ; sai lệch thời gian; lệch múi giờ"
+        },
+        {
+          "id": "VOC_HSK6_试图_shitu",
+          "simplified": "试图",
+          "pinyin": "shì tú",
+          "meaning_vi": "cố gắng; thử"
+        },
+        {
+          "id": "VOC_HSK6_示意_shiyi",
+          "simplified": "示意",
+          "pinyin": "shì yì",
+          "meaning_vi": "ra hiệu; chỉ ra (ý cho ai đó)"
+        },
+        {
+          "id": "VOC_HSK6_守护_shouhu",
+          "simplified": "守护",
+          "pinyin": "shǒu hù",
+          "meaning_vi": "bảo vệ; bảo hộ"
+        },
+        {
+          "id": "VOC_HSK6_受罪_shouzui",
+          "simplified": "受罪",
+          "pinyin": "shòu zuì",
+          "meaning_vi": "chịu đựng; chịu khổ; gian khổ"
+        },
+        {
+          "id": "VOC_HSK6_疏忽_shuhu",
+          "simplified": "疏忽",
+          "pinyin": "shū hu",
+          "meaning_vi": "sao nhãng; bỏ sót; sơ suất"
+        },
+        {
+          "id": "VOC_HSK6_涮_shuan",
+          "simplified": "涮",
+          "pinyin": "shuàn",
+          "meaning_vi": "rửa; lừa; gạt ai đó"
+        },
+        {
+          "id": "VOC_HSK6_双胞胎_shuangbaotai",
+          "simplified": "双胞胎",
+          "pinyin": "shuāng bāo tāi",
+          "meaning_vi": "sinh đôi; LT:對|对[dui4]"
+        },
+        {
+          "id": "VOC_HSK6_水龙头_shuilongtou",
+          "simplified": "水龙头",
+          "pinyin": "shuǐ lóng tóu",
+          "meaning_vi": "vòi nước; vòi"
+        },
+        {
+          "id": "VOC_HSK6_肆无忌惮_siwujidan",
+          "simplified": "肆无忌惮",
+          "pinyin": "sì wú jì dàn",
+          "meaning_vi": "hoàn toàn không kiêng nể; không kiềm chế; không chút e dè"
+        },
+        {
+          "id": "VOC_HSK6_素食_sushi",
+          "simplified": "素食",
+          "pinyin": "sù shí",
+          "meaning_vi": "đồ ăn chay; ăn chay"
+        },
+        {
+          "id": "VOC_HSK6_随身_suishen",
+          "simplified": "随身",
+          "pinyin": "suí shēn",
+          "meaning_vi": "(mang) trên người; (mang) theo bên mình"
+        },
+        {
+          "id": "VOC_HSK6_索赔_suopei",
+          "simplified": "索赔",
+          "pinyin": "suǒ péi",
+          "meaning_vi": "yêu cầu bồi thường; đòi bồi thường; khởi kiện đòi bồi thường"
+        },
+        {
+          "id": "VOC_HSK6_泰斗_taidou",
+          "simplified": "泰斗",
+          "pinyin": "tài dǒu",
+          "meaning_vi": "(viết tắt của 泰山北斗[Tai4 Shan1 Bei3 dou3]) nhân vật kiệt xuất; cây đại thụ; người được tôn kính"
+        },
+        {
+          "id": "VOC_HSK6_贪婪_tanlan",
+          "simplified": "贪婪",
+          "pinyin": "tān lán",
+          "meaning_vi": "tham lam; tham vọng; ngốn nghiến"
+        },
+        {
+          "id": "VOC_HSK6_摊儿_tanr",
+          "simplified": "摊儿",
+          "pinyin": "tān r",
+          "meaning_vi": "biến thể er hoá của 攤|摊[tan1]"
+        },
+        {
+          "id": "VOC_HSK6_弹性_tanxing",
+          "simplified": "弹性",
+          "pinyin": "tán xìng",
+          "meaning_vi": "tính linh hoạt; đàn hồi"
+        },
+        {
+          "id": "VOC_HSK6_糖葫芦_tanghulu",
+          "simplified": "糖葫芦",
+          "pinyin": "táng hú lu",
+          "meaning_vi": "quả sơn tra hoặc trái cây khác được bọc đường trên que tre; đường hồ lô"
+        },
+        {
+          "id": "VOC_HSK6_特长_techang",
+          "simplified": "特长",
+          "pinyin": "tè cháng",
+          "meaning_vi": "thế mạnh cá nhân; khả năng đặc biệt hoặc điểm mạnh của một người"
+        },
+        {
+          "id": "VOC_HSK6_天伦之乐_tianlunzhile",
+          "simplified": "天伦之乐",
+          "pinyin": "tiān lún zhī lè",
+          "meaning_vi": "tình yêu và niềm vui gia đình; hạnh phúc gia đình"
+        },
+        {
+          "id": "VOC_HSK6_舔_tian",
+          "simplified": "舔",
+          "pinyin": "tiǎn",
+          "meaning_vi": "liếm"
+        },
+        {
+          "id": "VOC_HSK6_挑剔_tiaoti",
+          "simplified": "挑剔",
+          "pinyin": "tiāo ti",
+          "meaning_vi": "kén chọn; khó tính"
+        },
+        {
+          "id": "VOC_HSK6_调料_tiaoliao",
+          "simplified": "调料",
+          "pinyin": "tiáo liào",
+          "meaning_vi": "gia vị; chất điều vị; hương liệu"
+        },
+        {
+          "id": "VOC_HSK6_通货_tonghuo",
+          "simplified": "通货",
+          "pinyin": "tōng huò",
+          "meaning_vi": "tiền tệ; (cũ) trao đổi hàng hóa"
+        },
+        {
+          "id": "VOC_HSK6_铜矿_tongkuang",
+          "simplified": "铜矿",
+          "pinyin": "tóng kuàng",
+          "meaning_vi": "mỏ đồng; quặng đồng"
+        },
+        {
+          "id": "VOC_HSK6_童话_tonghua",
+          "simplified": "童话",
+          "pinyin": "tóng huà",
+          "meaning_vi": "truyện cổ tích trẻ em"
+        },
+        {
+          "id": "VOC_HSK6_统筹兼顾_tongchoujiangu",
+          "simplified": "统筹兼顾",
+          "pinyin": "tǒng chóu jiān gù",
+          "meaning_vi": "kế hoạch tổng thể, tính đến tất cả các yếu tố"
+        },
+        {
+          "id": "VOC_HSK6_涂抹_tumo",
+          "simplified": "涂抹",
+          "pinyin": "tú mǒ",
+          "meaning_vi": "sơn; bôi; thoa (trang điểm,...)"
+        },
+        {
+          "id": "VOC_HSK6_吞咽_tunyan",
+          "simplified": "吞咽",
+          "pinyin": "tūn yàn",
+          "meaning_vi": "nuốt; nuốt ực"
+        },
+        {
+          "id": "VOC_HSK6_托运_tuoyun",
+          "simplified": "托运",
+          "pinyin": "tuō yùn",
+          "meaning_vi": "gửi hàng hoá; ký gửi hành lý"
+        },
+        {
+          "id": "VOC_HSK6_外向_waixiang",
+          "simplified": "外向",
+          "pinyin": "wài xiàng",
+          "meaning_vi": "hướng ngoại (tính cách); (kinh tế, v.v.) định hướng xuất khẩu"
+        },
+        {
+          "id": "VOC_HSK6_挽回_wanhui",
+          "simplified": "挽回",
+          "pinyin": "wǎn huí",
+          "meaning_vi": "lấy lại; cứu vãn"
+        },
+        {
+          "id": "VOC_HSK6_网络_wangluo",
+          "simplified": "网络",
+          "pinyin": "wǎng luò",
+          "meaning_vi": "Internet; mạng lưới (máy tính, viễn thông, vận tải,...)"
+        },
+        {
+          "id": "VOC_HSK6_唯独_weidu",
+          "simplified": "唯独",
+          "pinyin": "wéi dú",
+          "meaning_vi": "chỉ; chỉ là (tức là chỉ có...); tất cả ngoại trừ"
+        },
+        {
+          "id": "VOC_HSK6_胃口_weikou",
+          "simplified": "胃口",
+          "pinyin": "wèi kǒu",
+          "meaning_vi": "thèm ăn; sở thích"
+        },
+        {
+          "id": "VOC_HSK6_乌黑_wuhei",
+          "simplified": "乌黑",
+          "pinyin": "wū hēi",
+          "meaning_vi": "đen tuyền; tối"
+        },
+        {
+          "id": "VOC_HSK6_无动于衷_wudongyuzhong",
+          "simplified": "无动于衷",
+          "pinyin": "wú dòng yú zhōng",
+          "meaning_vi": "lãnh đạm; thờ ơ; không quan tâm"
+        },
+        {
+          "id": "VOC_HSK6_无精打采_wujingdacai",
+          "simplified": "无精打采",
+          "pinyin": "wú jīng dǎ cǎi",
+          "meaning_vi": "chán nản và ủ rũ (thành ngữ); uể oải; tinh thần xuống dốc; mệt mỏi"
+        },
+        {
+          "id": "VOC_HSK6_无赖_wulai",
+          "simplified": "无赖",
+          "pinyin": "wú lài",
+          "meaning_vi": "du côn; lưu manh; xảo trá"
+        },
+        {
+          "id": "VOC_HSK6_无理取闹_wuliqunao",
+          "simplified": "无理取闹",
+          "pinyin": "wú lǐ qǔ nào",
+          "meaning_vi": "gây rối vô cớ (thành ngữ); cố tình khiêu khích"
+        },
+        {
+          "id": "VOC_HSK6_无穷无尽_wuqiongwujin",
+          "simplified": "无穷无尽",
+          "pinyin": "wú qióng wú jìn",
+          "meaning_vi": "vô tận; bao la; vô hạn"
+        },
+        {
+          "id": "VOC_HSK6_无忧无虑_wuyouwulv",
+          "simplified": "无忧无虑",
+          "pinyin": "wú yōu wú lǜ",
+          "meaning_vi": "vô tư vô lo (thành ngữ)"
+        },
+        {
+          "id": "VOC_HSK6_武侠_wuxia",
+          "simplified": "武侠",
+          "pinyin": "wǔ xiá",
+          "meaning_vi": "hiệp sĩ võ thuật (thể loại văn học, sân khấu và điện ảnh Trung Quốc); hiệp khách"
+        },
+        {
+          "id": "VOC_HSK6_务实_wushi",
+          "simplified": "务实",
+          "pinyin": "wù shí",
+          "meaning_vi": "giải quyết vấn đề cụ thể; thực tế"
+        },
+        {
+          "id": "VOC_HSK6_物美价廉_wumeijialian",
+          "simplified": "物美价廉",
+          "pinyin": "wù měi jià lián",
+          "meaning_vi": "chất lượng tốt và giá rẻ; món hời"
+        },
+        {
+          "id": "VOC_HSK6_昔日_xiri",
+          "simplified": "昔日",
+          "pinyin": "xī rì",
+          "meaning_vi": "những ngày trước; trong quá khứ"
+        },
+        {
+          "id": "VOC_HSK6_夕阳_xiyang",
+          "simplified": "夕阳",
+          "pinyin": "xī yáng",
+          "meaning_vi": "hoàng hôn; mặt trời lặn"
+        },
+        {
+          "id": "VOC_HSK6_喜闻乐见_xiwenlejian",
+          "simplified": "喜闻乐见",
+          "pinyin": "xǐ wén lè jiàn",
+          "meaning_vi": "rất thích nghe và thấy (thành ngữ); được đón nhận; phù hợp với sở thích"
+        },
+        {
+          "id": "VOC_HSK6_夏令营_xialingying",
+          "simplified": "夏令营",
+          "pinyin": "xià lìng yíng",
+          "meaning_vi": "trại hè"
+        },
+        {
+          "id": "VOC_HSK6_下属_xiashu",
+          "simplified": "下属",
+          "pinyin": "xià shǔ",
+          "meaning_vi": "cấp dưới; người dưới quyền"
+        },
+        {
+          "id": "VOC_HSK6_相辅相成_xiangfuxiangcheng",
+          "simplified": "相辅相成",
+          "pinyin": "xiāng fǔ xiāng chéng",
+          "meaning_vi": "bổ trợ lẫn nhau (thành ngữ)"
+        },
+        {
+          "id": "VOC_HSK6_镶嵌_xiangqian",
+          "simplified": "镶嵌",
+          "pinyin": "xiāng qiàn",
+          "meaning_vi": "khảm; nạm; đính (ví dụ: đá quý trên nhẫn)"
+        },
+        {
+          "id": "VOC_HSK6_乡镇_xiangzhen",
+          "simplified": "乡镇",
+          "pinyin": "xiāng zhèn",
+          "meaning_vi": "làng; xã"
+        },
+        {
+          "id": "VOC_HSK6_消防_xiaofang",
+          "simplified": "消防",
+          "pinyin": "xiāo fáng",
+          "meaning_vi": "cứu hoả; kiểm soát hoả hoạn"
+        },
+        {
+          "id": "VOC_HSK6_心态_xintai",
+          "simplified": "心态",
+          "pinyin": "xīn tài",
+          "meaning_vi": "thái độ (của tâm); trạng thái tâm lý; cách suy nghĩ"
+        },
+        {
+          "id": "VOC_HSK6_欣慰_xinwei",
+          "simplified": "欣慰",
+          "pinyin": "xīn wèi",
+          "meaning_vi": "cảm thấy hài lòng"
+        },
+        {
+          "id": "VOC_HSK6_薪水_xinshui",
+          "simplified": "薪水",
+          "pinyin": "xīn shuǐ",
+          "meaning_vi": "lương; tiền công"
+        },
+        {
+          "id": "VOC_HSK6_兴隆_xinglong",
+          "simplified": "兴隆",
+          "pinyin": "xīng lóng",
+          "meaning_vi": "huyện Hưng Long, Thừa Đức 承德[Cheng2 de2], Hà Bắc; thịnh vượng; phồn thịnh"
+        },
+        {
+          "id": "VOC_HSK6_性感_xinggan",
+          "simplified": "性感",
+          "pinyin": "xìng gǎn",
+          "meaning_vi": "sự quyến rũ; tính gợi cảm; tình dục"
+        },
+        {
+          "id": "VOC_HSK6_兴致勃勃_xingzhibobo",
+          "simplified": "兴致勃勃",
+          "pinyin": "xìng zhì bó bó",
+          "meaning_vi": "trở nên phấn chấn (thành ngữ); tinh thần cao độ; tràn đầy nhiệt huyết"
+        },
+        {
+          "id": "VOC_HSK6_凶手_xiongshou",
+          "simplified": "凶手",
+          "pinyin": "xiōng shǒu",
+          "meaning_vi": "kẻ sát nhân; hung thủ"
+        },
+        {
+          "id": "VOC_HSK6_嗅觉_xiujue",
+          "simplified": "嗅觉",
+          "pinyin": "xiù jué",
+          "meaning_vi": "khứu giác"
+        },
+        {
+          "id": "VOC_HSK6_虚荣_xurong",
+          "simplified": "虚荣",
+          "pinyin": "xū róng",
+          "meaning_vi": "thói phù phiếm"
+        },
+        {
+          "id": "VOC_HSK6_悬崖峭壁_xuanyaqiaobi",
+          "simplified": "悬崖峭壁",
+          "pinyin": "xuán yá qiào bì",
+          "meaning_vi": "vách đá dựng đứng và mặt đá dốc đứng (thành ngữ)"
+        },
+        {
+          "id": "VOC_HSK6_雪上加霜_xueshangjiashuang",
+          "simplified": "雪上加霜",
+          "pinyin": "xuě shàng jiā shuāng",
+          "meaning_vi": "(thành ngữ) làm cho tình hình tồi tệ hơn thêm; châm dầu vào lửa"
+        },
+        {
+          "id": "VOC_HSK6_熏陶_xuntao",
+          "simplified": "熏陶",
+          "pinyin": "xūn táo",
+          "meaning_vi": "thấm nhuần; ảnh hưởng; nuôi dưỡng"
+        },
+        {
+          "id": "VOC_HSK6_寻觅_xunmi",
+          "simplified": "寻觅",
+          "pinyin": "xún mì",
+          "meaning_vi": "tìm kiếm"
+        },
+        {
+          "id": "VOC_HSK6_押金_yajin",
+          "simplified": "押金",
+          "pinyin": "yā jīn",
+          "meaning_vi": "tiền đặt cọc; thanh toán trước"
+        },
+        {
+          "id": "VOC_HSK6_压岁钱_yasuiqian",
+          "simplified": "压岁钱",
+          "pinyin": "yā suì qián",
+          "meaning_vi": "tiền mừng tuổi cho trẻ em vào đêm Giao thừa"
+        },
+        {
+          "id": "VOC_HSK6_压榨_yazha",
+          "simplified": "压榨",
+          "pinyin": "yā zhà",
+          "meaning_vi": "ép; vắt; chiết xuất nước, dầu v.v. bằng cách vắt"
+        },
+        {
+          "id": "VOC_HSK6_烟花_yanhua",
+          "simplified": "烟花",
+          "pinyin": "yān huā",
+          "meaning_vi": "pháo hoa; gái mại dâm (đặc biệt trong kịch nhà Nguyên)"
+        },
+        {
+          "id": "VOC_HSK6_演绎_yanyi",
+          "simplified": "演绎",
+          "pinyin": "yǎn yì",
+          "meaning_vi": "(câu chuyện, v.v.) diễn ra; phát triển; (kỹ thuật, v.v.) phát triển; diễn xuất"
+        },
+        {
+          "id": "VOC_HSK6_摇滚_yaogun",
+          "simplified": "摇滚",
+          "pinyin": "yáo gǔn",
+          "meaning_vi": "nhạc rock 'n' roll; đung đưa; rơi xuống"
+        },
+        {
+          "id": "VOC_HSK6_咬牙切齿_yaoyaqiechi",
+          "simplified": "咬牙切齿",
+          "pinyin": "yǎo yá qiè chǐ",
+          "meaning_vi": "(thành ngữ) nghiến răng; tức giận nghiến răng"
+        },
+        {
+          "id": "VOC_HSK6_一流_yiliu",
+          "simplified": "一流",
+          "pinyin": "yī liú",
+          "meaning_vi": "chất lượng hàng đầu; hàng đầu"
+        },
+        {
+          "id": "VOC_HSK6_依托_yituo",
+          "simplified": "依托",
+          "pinyin": "yī tuō",
+          "meaning_vi": "dựa vào; phụ thuộc; hỗ trợ"
+        },
+        {
+          "id": "VOC_HSK6_一目了然_yimuliaoran",
+          "simplified": "一目了然",
+          "pinyin": "yī mù liǎo rán",
+          "meaning_vi": "rõ ràng ngay từ cái nhìn đầu tiên (thành ngữ); rõ ràng ngay khi nhìn thoáng qua (thành ngữ)"
+        },
+        {
+          "id": "VOC_HSK6_一举两得_yijuliangde",
+          "simplified": "一举两得",
+          "pinyin": "yī jǔ liǎng dé",
+          "meaning_vi": "một hành động, hai kết quả (thành ngữ); một mũi tên trúng hai đích"
+        },
+        {
+          "id": "VOC_HSK6_一如既往_yirujiwang",
+          "simplified": "一如既往",
+          "pinyin": "yī rú jì wǎng",
+          "meaning_vi": "(thành ngữ) giống như trước đây; như trước; tiếp tục như mọi khi"
+        },
+        {
+          "id": "VOC_HSK6_一丝不苟_yisibugou",
+          "simplified": "一丝不苟",
+          "pinyin": "yī sī bù gǒu",
+          "meaning_vi": "không một sợi lỏng lẻo (thành ngữ); tuân thủ nghiêm ngặt; theo sát từng chi tiết; không một sợi tóc sai chỗ"
+        },
+        {
+          "id": "VOC_HSK6_隐患_yinhuan",
+          "simplified": "隐患",
+          "pinyin": "yǐn huàn",
+          "meaning_vi": "nguy hiểm tiềm ẩn; bị hư hại ẩn giấu; điều không may không thấy trên bề mặt"
+        },
+        {
+          "id": "VOC_HSK6_隐私_yinsi",
+          "simplified": "隐私",
+          "pinyin": "yǐn sī",
+          "meaning_vi": "bí mật; việc riêng tư; quyền riêng tư"
+        },
+        {
+          "id": "VOC_HSK6_引擎_yinqing",
+          "simplified": "引擎",
+          "pinyin": "yǐn qíng",
+          "meaning_vi": "động cơ (từ mượn); LT:臺|台[tai2]"
+        },
+        {
+          "id": "VOC_HSK6_荧屏_yingping",
+          "simplified": "荧屏",
+          "pinyin": "yíng píng",
+          "meaning_vi": "màn hình huỳnh quang; màn hình TV"
+        },
+        {
+          "id": "VOC_HSK6_永恒_yongheng",
+          "simplified": "永恒",
+          "pinyin": "yǒng héng",
+          "meaning_vi": "vĩnh cửu; mãi mãi; bóng nghĩa: qua đời"
+        },
+        {
+          "id": "VOC_HSK6_优胜劣汰_youshenglietai",
+          "simplified": "优胜劣汰",
+          "pinyin": "yōu shèng liè tài",
+          "meaning_vi": "sự sống sót của kẻ thích nghi nhất (thành ngữ)"
+        },
+        {
+          "id": "VOC_HSK6_油腻_youni",
+          "simplified": "油腻",
+          "pinyin": "yóu nì",
+          "meaning_vi": "thức ăn nhiều dầu mỡ; đồ ăn béo ngậy; (về món ăn) nhiều dầu; nhiều mỡ; béo; (từ mới khoảng năm 2017) (về người đàn ông trung niên) đáng ghét; tự phụ; thô tục"
+        },
+        {
+          "id": "VOC_HSK6_有条不紊_youtiaobuwen",
+          "simplified": "有条不紊",
+          "pinyin": "yǒu tiáo bù wěn",
+          "meaning_vi": "chu đáo và kỹ lưỡng (thành ngữ); sắp xếp một cách có phương pháp"
+        },
+        {
+          "id": "VOC_HSK6_与日俱增_yurijuzeng",
+          "simplified": "与日俱增",
+          "pinyin": "yǔ rì jù zēng",
+          "meaning_vi": "tăng đều đặn; tăng lên theo từng ngày"
+        },
+        {
+          "id": "VOC_HSK6_羽绒服_yurongfu",
+          "simplified": "羽绒服",
+          "pinyin": "yǔ róng fú",
+          "meaning_vi": "trang phục nhồi lông vũ"
+        },
+        {
+          "id": "VOC_HSK6_预兆_yuzhao",
+          "simplified": "预兆",
+          "pinyin": "yù zhào",
+          "meaning_vi": "điềm; báo hiệu (của điều gì đó chưa xảy ra); dấu hiệu trước"
+        },
+        {
+          "id": "VOC_HSK6_元宵节_yuanxiaojie",
+          "simplified": "元宵节",
+          "pinyin": "Yuán xiāo jié",
+          "meaning_vi": "Lễ Hội Đèn Lồng, sự kiện kết thúc Tết Xuân 春節|春节, vào ngày 15 tháng Giêng âm lịch"
+        },
+        {
+          "id": "VOC_HSK6_岳父_yuefu",
+          "simplified": "岳父",
+          "pinyin": "yuè fù",
+          "meaning_vi": "bố vợ, nhạc phụ"
+        },
+        {
+          "id": "VOC_HSK6_乐谱_yuepu",
+          "simplified": "乐谱",
+          "pinyin": "yuè pǔ",
+          "meaning_vi": "bản nhạc; phổ nhạc"
+        },
+        {
+          "id": "VOC_HSK6_熨_yun",
+          "simplified": "熨",
+          "pinyin": "yùn",
+          "meaning_vi": "bàn ủi; ủi quần áo"
+        },
+        {
+          "id": "VOC_HSK6_再接再厉_zaijiezaili",
+          "simplified": "再接再厉",
+          "pinyin": "zài jiē zài lì",
+          "meaning_vi": "tiếp tục phấn đấu (thành ngữ); kiên trì; nỗ lực không ngừng"
+        },
+        {
+          "id": "VOC_HSK6_债券_zhaiquan",
+          "simplified": "债券",
+          "pinyin": "zhài quàn",
+          "meaning_vi": "trái phiếu; tín phiếu"
+        },
+        {
+          "id": "VOC_HSK6_展示_zhanshi",
+          "simplified": "展示",
+          "pinyin": "zhǎn shì",
+          "meaning_vi": "tiết lộ; trưng bày; trình diễn; triển lãm"
+        },
+        {
+          "id": "VOC_HSK6_长辈_zhangbei",
+          "simplified": "长辈",
+          "pinyin": "zhǎng bèi",
+          "meaning_vi": "người lớn tuổi; thế hệ trước"
+        },
+        {
+          "id": "VOC_HSK6_帐篷_zhangpeng",
+          "simplified": "帐篷",
+          "pinyin": "zhàng peng",
+          "meaning_vi": "lều; LT:頂|顶[ding3],座[zuo4]"
+        },
+        {
+          "id": "VOC_HSK6_招投标_zhaotoubiao",
+          "simplified": "招投标",
+          "pinyin": "zhāo tóu biāo",
+          "meaning_vi": "mời thầu và đấu thầu; đấu thầu; đấu giá"
+        },
+        {
+          "id": "VOC_HSK6_着迷_zhaomi",
+          "simplified": "着迷",
+          "pinyin": "zháo mí",
+          "meaning_vi": "bị mê hoặc; bị cuốn hút"
+        },
+        {
+          "id": "VOC_HSK6_遮挡_zhedang",
+          "simplified": "遮挡",
+          "pinyin": "zhē dǎng",
+          "meaning_vi": "che chắn; che khỏi"
+        },
+        {
+          "id": "VOC_HSK6_真挚_zhenzhi",
+          "simplified": "真挚",
+          "pinyin": "zhēn zhì",
+          "meaning_vi": "chân thành; sự chân thành"
+        },
+        {
+          "id": "VOC_HSK6_珍稀_zhenxi",
+          "simplified": "珍稀",
+          "pinyin": "zhēn xī",
+          "meaning_vi": "hiếm; quý và không phổ biến"
+        },
+        {
+          "id": "VOC_HSK6_斟酌_zhenzhuo",
+          "simplified": "斟酌",
+          "pinyin": "zhēn zhuó",
+          "meaning_vi": "cân nhắc; suy xét; rót đầy ly"
+        },
+        {
+          "id": "VOC_HSK6_正负_zhengfu",
+          "simplified": "正负",
+          "pinyin": "zhèng fù",
+          "meaning_vi": "dương và âm"
+        },
+        {
+          "id": "VOC_HSK6_支流_zhiliu",
+          "simplified": "支流",
+          "pinyin": "zhī liú",
+          "meaning_vi": "phụ lưu (sông)"
+        },
+        {
+          "id": "VOC_HSK6_知足常乐_zhizuchangle",
+          "simplified": "知足常乐",
+          "pinyin": "zhī zú cháng lè",
+          "meaning_vi": "hài lòng với những gì mình có (thành ngữ)"
+        },
+        {
+          "id": "VOC_HSK6_职位_zhiwei",
+          "simplified": "职位",
+          "pinyin": "zhí wèi",
+          "meaning_vi": "vị trí; chức vụ; công việc"
+        },
+        {
+          "id": "VOC_HSK6_指责_zhize",
+          "simplified": "指责",
+          "pinyin": "zhǐ zé",
+          "meaning_vi": "chỉ trích; tìm lỗi; lên án"
+        },
+        {
+          "id": "VOC_HSK6_致辞_zhici",
+          "simplified": "致辞",
+          "pinyin": "zhì cí",
+          "meaning_vi": "diễn đạt bằng lời nói hoặc viết; lên phát biểu (đặc biệt là lời giới thiệu ngắn, lời cảm ơn, lời bạt, điếu văn tang lễ, v.v.); diễn thuyết (trước khán giả)"
+        },
+        {
+          "id": "VOC_HSK6_致力于_zhiliyu",
+          "simplified": "致力于",
+          "pinyin": "zhì lì yú",
+          "meaning_vi": "tận tâm tận lực; cống hiến hết mình cho"
+        },
+        {
+          "id": "VOC_HSK6_智商_zhishang",
+          "simplified": "智商",
+          "pinyin": "zhì shāng",
+          "meaning_vi": "chỉ số IQ (chỉ số thông minh)"
+        },
+        {
+          "id": "VOC_HSK6_滞留_zhiliu",
+          "simplified": "滞留",
+          "pinyin": "zhì liú",
+          "meaning_vi": "(người) ở lại (một nơi) (do hoàn cảnh không thể rời đi); bị mắc kẹt; (điều gì đó thường tiêu tan, ví dụ: nước lũ, chất ô nhiễm) vẫn còn; tồn đọng"
+        },
+        {
+          "id": "VOC_HSK6_周边_zhoubian",
+          "simplified": "周边",
+          "pinyin": "zhōu biān",
+          "meaning_vi": "ngoại vi; rìa; môi trường xung quanh"
+        },
+        {
+          "id": "VOC_HSK6_砖瓦_zhuanwa",
+          "simplified": "砖瓦",
+          "pinyin": "zhuān wǎ",
+          "meaning_vi": "ngói và gạch"
+        },
+        {
+          "id": "VOC_HSK6_资深_zishen",
+          "simplified": "资深",
+          "pinyin": "zī shēn",
+          "meaning_vi": "kỳ cựu (nhà báo,...); cao cấp; rất giàu kinh nghiệm"
+        },
+        {
+          "id": "VOC_HSK6_租赁_zulin",
+          "simplified": "租赁",
+          "pinyin": "zū lìn",
+          "meaning_vi": "thuê; cho thuê; mướn"
+        },
+        {
+          "id": "VOC_HSK6_做东_zuodong",
+          "simplified": "做东",
+          "pinyin": "zuò dōng",
+          "meaning_vi": "làm chủ toạ"
+        },
+        {
+          "id": "VOC_HSK6_做主_zuozhu",
+          "simplified": "做主",
+          "pinyin": "zuò zhǔ",
+          "meaning_vi": "xem 作主[zuo4 zhu3]"
+        },
+        {
+          "id": "VOC_HSK6_作弊_zuobi",
+          "simplified": "作弊",
+          "pinyin": "zuò bì",
+          "meaning_vi": "thực hành gian lận; gian lận; tham gia vào hành vi tham nhũng"
+        },
+        {
+          "id": "VOC_HSK6_作息_zuoxi",
+          "simplified": "作息",
+          "pinyin": "zuò xī",
+          "meaning_vi": "làm việc và nghỉ ngơi"
+        }
+      ]
+    }
+  }
+}
