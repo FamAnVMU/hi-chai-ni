@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/models/curriculum_models.dart';
 import '../../domain/models/lesson_flow_state.dart';
+import '../providers/curriculum_providers.dart';
 import '../providers/lesson_flow_providers.dart';
 import '../widgets/lesson_warmup_view.dart';
 import '../widgets/lesson_vocab_view.dart';
@@ -47,9 +48,9 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
     'Đánh giá hoàn thành',
   ];
 
-  LessonSegment? _getSegment(String type) {
+  LessonSegment? _getSegment(CurriculumLesson lesson, String type) {
     try {
-      return widget.lesson.segments.firstWhere(
+      return lesson.segments.firstWhere(
         (s) => s.segmentType.toLowerCase() == type.toLowerCase() ||
                (type == 'masteryCheck' && (s.segmentType == 'mastery_check' || s.segmentType == 'masteryCheck')),
       );
@@ -68,52 +69,52 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
       builder: (ctx) {
         return AiTutorHelperSheet(
           topicTitle: title,
-          topicContext: contextDescription ?? 'Nội dung thuộc bài học ${widget.lesson.titleVi}',
+          topicContext: contextDescription ?? 'Nội dung thuộc bài học $title',
           isOnline: true,
         );
       },
     );
   }
 
-  Widget _buildCurrentStep(int index, LessonFlowNotifier flowNotifier) {
+  Widget _buildCurrentStep(int index, LessonFlowNotifier flowNotifier, CurriculumLesson currentLesson) {
     switch (index) {
       case 0:
         return LessonWarmupView(
-          lesson: widget.lesson,
-          segment: _getSegment('warmup'),
+          lesson: currentLesson,
+          segment: _getSegment(currentLesson, 'warmup'),
           onStart: () => flowNotifier.nextStep(),
         );
       case 1:
         return LessonVocabView(
-          lesson: widget.lesson,
-          segment: _getSegment('vocabulary'),
+          lesson: currentLesson,
+          segment: _getSegment(currentLesson, 'vocabulary'),
           onNext: () => flowNotifier.nextStep(),
         );
       case 2:
         return LessonGrammarView(
-          lesson: widget.lesson,
-          segment: _getSegment('grammar'),
+          lesson: currentLesson,
+          segment: _getSegment(currentLesson, 'grammar'),
           onNext: () => flowNotifier.nextStep(),
-          onAskAi: () => _showAiExplanationDialog(context, 'Ngữ pháp ${widget.lesson.titleZh}'),
+          onAskAi: () => _showAiExplanationDialog(context, 'Ngữ pháp ${currentLesson.titleZh}'),
         );
       case 3:
         return LessonDialogueView(
-          lesson: widget.lesson,
-          segment: _getSegment('dialogue'),
+          lesson: currentLesson,
+          segment: _getSegment(currentLesson, 'dialogue'),
           onNext: () => flowNotifier.nextStep(),
         );
       case 4:
         return LessonPracticeView(
-          lesson: widget.lesson,
-          segment: _getSegment('practice'),
+          lesson: currentLesson,
+          segment: _getSegment(currentLesson, 'practice'),
           onAnswerRecorded: (qId, ans) => flowNotifier.recordAnswer(qId, ans),
           onNext: () => flowNotifier.nextStep(),
           onAskAi: () => _showAiExplanationDialog(context, 'Bài tập luyện tập'),
         );
       case 5:
         return LessonMasteryView(
-          lesson: widget.lesson,
-          segment: _getSegment('masteryCheck'),
+          lesson: currentLesson,
+          segment: _getSegment(currentLesson, 'masteryCheck'),
           onAnswerRecorded: (qId, ans) => flowNotifier.recordAnswer(qId, ans),
           onSubmit: (questions) => flowNotifier.submitPractice(questions),
           onFinishLesson: () async {
@@ -131,6 +132,8 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
   Widget build(BuildContext context) {
     final flowState = ref.watch(lessonFlowNotifierProvider(widget.lesson.id));
     final flowNotifier = ref.read(lessonFlowNotifierProvider(widget.lesson.id).notifier);
+    final reactiveLessonAsync = ref.watch(lessonDetailProvider(widget.lesson.id));
+    final currentLesson = reactiveLessonAsync.value ?? widget.lesson;
     final theme = Theme.of(context);
 
     final currentIndex = flowState.currentStep.index;
@@ -142,7 +145,7 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              widget.lesson.titleVi,
+              currentLesson.titleVi,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: AppColors.primaryText,
@@ -161,7 +164,7 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
           IconButton(
             icon: const Icon(Icons.smart_toy_outlined),
             tooltip: 'Hỏi trợ giảng AI',
-            onPressed: () => _showAiExplanationDialog(context, widget.lesson.titleVi),
+            onPressed: () => _showAiExplanationDialog(context, currentLesson.titleVi),
           ),
         ],
         bottom: PreferredSize(
@@ -174,9 +177,10 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
           ),
         ),
       ),
-      body: _buildCurrentStep(safeIndex, flowNotifier),
+      body: _buildCurrentStep(safeIndex, flowNotifier, currentLesson),
       bottomNavigationBar: SafeArea(
         child: Container(
+          height: 64,
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
           decoration: const BoxDecoration(
             color: AppColors.cardBackground,
