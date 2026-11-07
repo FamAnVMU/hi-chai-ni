@@ -6,25 +6,26 @@ HI Chinese hoạt động theo mô hình **Offline-First**, lưu trữ toàn b�
 
 ---
 
-## 📦 Tải Ứng Dụng (Download Release APK v1.0.15)
+## 📦 Tải Ứng Dụng (Download Release APK v1.0.16)
 
 Ứng dụng được tối ưu hóa chuyên biệt cho các thiết bị Android hiện đại với kiến trúc đa chip (Split APKs):
 
 | Phiên Bản APK | Kích Thước | Cấu Trúc Khuyên Dùng | Tải Về Trực Tiếp |
 | :--- | :---: | :--- | :--- |
-| **`hi-chinese-v1.0.15-arm64-v8a.apk`** | **44.2 MB** | **64-bit ARM64 (arm64-v8a)** - Chuẩn cho 99% smartphone Android hiện đại | [⬇️ Tải APK ARM64](release-apk/hi-chinese-v1.0.15-arm64-v8a.apk) |
-| **`hi-chinese-v1.0.15-armeabi-v7a.apk`** | **42.1 MB** | **32-bit ARM (armeabi-v7a)** - Tương thích máy Android đời cũ hoặc cấu hình thấp | [⬇️ Tải APK ARM32](release-apk/hi-chinese-v1.0.15-armeabi-v7a.apk) |
-| **`app-release.apk`** | **44.2 MB** | Tệp cài đặt Release mặc định (arm64-v8a) | [⬇️ Tải APK Release](release-apk/app-release.apk) |
+| **`hi-chinese-v1.0.16-arm64-v8a.apk`** | **44.3 MB** | **64-bit ARM64 (arm64-v8a)** - Chuẩn cho 99% smartphone Android hiện đại | [⬇️ Tải APK ARM64](release-apk/hi-chinese-v1.0.16-arm64-v8a.apk) |
+| **`hi-chinese-v1.0.16-armeabi-v7a.apk`** | **42.1 MB** | **32-bit ARM (armeabi-v7a)** - Tương thích máy Android đời cũ hoặc cấu hình thấp | [⬇️ Tải APK ARM32](release-apk/hi-chinese-v1.0.16-armeabi-v7a.apk) |
+| **`app-release.apk`** | **44.3 MB** | Tệp cài đặt Release mặc định (arm64-v8a) | [⬇️ Tải APK Release](release-apk/app-release.apk) |
 
-> 🚀 **Điểm mới ở bản v1.0.15:**
-> - 🛡️ **Khắc phục triệt để màn hình bài học trắng (Blank Screen)**:
->   - **Tự động phục hồi học liệu (Self-Healing Ingestion)**: Cơ chế khởi động tự động kiểm tra và phục hồi trọn vẹn 90 segments cho HSK 1 & HSK 2 nếu bản cài đặt nâng cấp trước đó bị thiếu segments, bảo toàn 100% dữ liệu tiến độ của người dùng.
->   - **Sửa lỗi thanh điều hướng tràn chiều cao**: Đặt chiều cao cố định `64px` cho `bottomNavigationBar`, giải phóng toàn bộ không gian hiển thị cho thân bài học.
->   - **Đồng bộ học liệu phản ứng (Reactive Lesson Detail)**: `lessonDetailProvider` truy vấn và làm mới danh sách segments trực tiếp từ SQLite theo thời gian thực.
->   - **Bọc Error Boundary an toàn**: Từng chặng học được bảo vệ bởi `LessonStepErrorBoundary`, cung cấp nút "Bỏ qua bước này" hoặc "Thử lại", ngăn chặn hoàn toàn việc rơi vào màn hình trắng.
->   - **Khởi tạo đúng chặng & độ tương phản cao**: Luôn tự động đưa người học về chặng Khởi động (Step 0) khi bắt đầu bài học mới và tối ưu độ tương phản văn bản AppBar theo chuẩn WCAG.
-> - 📥 **Thẻ kêu gọi tải học liệu HSK 3 - HSK 6**: Hiển thị thông báo tải và quản lý dung lượng trực quan ngay đầu màn hình giáo trình.
-> - 🎯 **Hỗ trợ Onboarding thông minh**: Hướng dẫn tải gói nội dung HSK tương ứng khi người dùng lựa chọn xuất phát điểm từ HSK 3 trở lên.
+> 🚀 **Điểm mới ở bản v1.0.16:**
+> - 🎮 **Trình học tương tác vi mô Gamified Micro-Learning (Chuẩn HelloChinese / Duolingo)**:
+>   - Chuyển đổi mỗi bài học thành hành trình 5–7 phút liền mạch gồm 15–18 thẻ tương tác vi mô (`GamifiedLessonPlayer` & `LessonMicroCardAdapter`).
+>   - **5 dạng tương tác sinh động**: Thẻ khám phá từ mới có âm Hán-Việt (`Reveal`), Nghe & chọn chữ Hán (`InteractiveAudioChoice`), Chạm từ ghép câu hoàn chỉnh (`InteractiveWordTileBuilder`), Nối cặp từ Hán - Việt (`InteractiveMatchingPairs`) và Trắc nghiệm nhanh (`MiniQuiz`).
+>   - **Cơ chế học tích cực (Zero-Penalty Retry Queue)**: Trả lời đúng tăng chuỗi `🔥 Combo`; trả lời sai không trừ tim mà tự động đưa thẻ về cuối bài để ôn lại cho đến khi thuộc lòng.
+> - 📖 **Cẩm nang tra cứu bài học nhanh (`LessonQuickNotesSheet`)**: Nút Sổ tay ngay trên thanh tiêu đề cho phép tra cứu tức thì 3 tab: *Từ vựng trọng tâm* (kèm phát âm chuẩn), *Bí kíp ngữ pháp* (công thức đóng khung) và *Hội thoại mẫu* bất cứ lúc nào.
+> - 🔄 **Khắc phục triệt để lỗi không lưu tiến độ học tập & chuỗi Streak**:
+>   - Ghi nhận tức thì phiên học vào bảng `learning_activities` khi hoàn thành bài học, cập nhật chuỗi ngày học liên tiếp (`Streak 🔥`) và thống kê tuần trên trang chủ.
+>   - Tự động tính điểm hoàn thành chuẩn ($\ge 85\%$) cho luồng tự học để mở khóa bài học tiếp theo và làm mới tức thì (`ref.invalidate`) giao diện Giáo trình & Trang chủ.
+> - 🎉 **Màn hình ăn mừng hoàn thành bài học (`LessonCelebrationView`)**: Hiệu ứng huy hiệu chiến thắng, thưởng `+25 XP`, cập nhật chuỗi Streak 🔥 và thông báo mở khóa bài học kế tiếp.
 
 ---
 

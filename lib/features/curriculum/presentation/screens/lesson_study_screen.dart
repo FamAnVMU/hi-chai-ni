@@ -13,15 +13,19 @@ import '../widgets/lesson_practice_view.dart';
 import '../widgets/lesson_mastery_view.dart';
 import '../widgets/lesson_step_error_boundary.dart';
 import '../widgets/ai_tutor_helper_sheet.dart';
+import '../widgets/gamified_lesson_player.dart';
+import '../widgets/lesson_quick_notes_sheet.dart';
 
 class LessonStudyScreen extends ConsumerStatefulWidget {
   final CurriculumLesson lesson;
   final LessonStep? resumeStep;
+  final bool? useGamifiedPlayer;
 
   const LessonStudyScreen({
     super.key,
     required this.lesson,
     this.resumeStep,
+    this.useGamifiedPlayer,
   });
 
   @override
@@ -48,6 +52,16 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
     'Luyện tập thích ứng',
     'Đánh giá hoàn thành',
   ];
+
+  bool _isGamified(CurriculumLesson currentLesson) {
+    if (widget.useGamifiedPlayer != null) return widget.useGamifiedPlayer!;
+    if (widget.resumeStep != null) return false;
+    final vocabSeg = _getSegment(currentLesson, 'vocabulary');
+    final words = vocabSeg?.contentPayload?['words'];
+    if (words is! List) return false;
+    final validWords = words.whereType<Map>().length;
+    return validWords >= 3;
+  }
 
   LessonSegment? _getSegment(CurriculumLesson lesson, String type) {
     try {
@@ -150,6 +164,57 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
     final currentLesson = reactiveLessonAsync.value ?? widget.lesson;
     final theme = Theme.of(context);
 
+    // MODE 1: GAMIFIED MICRO-LEARNING PLAYER (5–7 minute continuous journey)
+    if (_isGamified(currentLesson)) {
+      return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.close_rounded),
+            tooltip: 'Đóng',
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          title: Text(
+            currentLesson.titleVi,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: AppColors.primaryText,
+            ),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.auto_stories_rounded),
+              tooltip: 'Cẩm nang bài học',
+              onPressed: () => LessonQuickNotesSheet.show(context, lesson: currentLesson),
+            ),
+            IconButton(
+              icon: const Icon(Icons.smart_toy_outlined),
+              tooltip: 'Hỏi trợ giảng AI',
+              onPressed: () => _showAiExplanationDialog(context, currentLesson.titleVi),
+            ),
+          ],
+        ),
+        body: LessonStepErrorBoundary(
+          stepName: currentLesson.titleVi,
+          onSkip: () => Navigator.of(context).pop(true),
+          onRetry: () => setState(() {}),
+          child: GamifiedLessonPlayer(
+            lesson: currentLesson,
+            onAnswerRecorded: (cardId, ans) {
+              flowNotifier.recordAnswer(cardId, ans);
+            },
+            onFinishLesson: () async {
+              final nav = Navigator.of(context);
+              await flowNotifier.completeLesson();
+              if (mounted) {
+                nav.pop(true);
+              }
+            },
+          ),
+        ),
+      );
+    }
+
+    // MODE 2: CLASSIC 6-STEP FLOW
     final currentIndex = flowState.currentStep.index;
     final safeIndex = currentIndex.clamp(0, _stepTitles.length - 1);
 
@@ -175,6 +240,11 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
           ],
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.menu_book_rounded),
+            tooltip: 'Cẩm nang bài học',
+            onPressed: () => LessonQuickNotesSheet.show(context, lesson: currentLesson),
+          ),
           IconButton(
             icon: const Icon(Icons.smart_toy_outlined),
             tooltip: 'Hỏi trợ giảng AI',

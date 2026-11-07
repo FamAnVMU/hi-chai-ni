@@ -279,7 +279,10 @@ class CurriculumSyllabusScreen extends ConsumerWidget {
             } else {
               final result = await Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (_) => LessonStudyScreen(lesson: lesson),
+                  builder: (_) => LessonStudyScreen(
+                    lesson: lesson,
+                    useGamifiedPlayer: true,
+                  ),
                 ),
               );
               if (result == true) {
