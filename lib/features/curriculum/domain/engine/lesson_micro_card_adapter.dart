@@ -64,13 +64,13 @@ class LessonMicroCardAdapter {
     final revealCount = math.min(5, words.isNotEmpty ? words.length : 0);
     for (int i = 0; i < revealCount; i++) {
       final w = words[i];
-      final hanzi = (w['hanzi'] ?? w['zh'] ?? '').toString().trim();
+      final hanzi = (w['simplified'] ?? w['hanzi'] ?? w['zh'] ?? '').toString().trim();
       if (hanzi.isEmpty) continue;
 
       final pinyin = (w['pinyin'] ?? w['py'] ?? '').toString().trim();
-      final meaning = (w['meaning'] ?? w['vi'] ?? '').toString().trim();
-      final hanViet = (w['han_viet'] ?? w['hanViet'] ?? '').toString().trim();
-      final audioUrl = w['audio_url']?.toString();
+      final meaning = (w['meaning_vi'] ?? w['meaning'] ?? w['vi'] ?? '').toString().trim();
+      final hanViet = (w['han_viet'] ?? w['hanviet'] ?? w['hanViet'] ?? '').toString().trim();
+      final audioUrl = (w['audio_uri'] ?? w['audio_url'])?.toString();
 
       String? exampleText;
       if (w['example'] is Map) {
@@ -101,16 +101,16 @@ class LessonMicroCardAdapter {
     final audioCount = math.min(4, words.isNotEmpty ? words.length : 0);
     for (int i = 0; i < audioCount; i++) {
       final w = words[i];
-      final targetHanzi = (w['hanzi'] ?? w['zh'] ?? '').toString().trim();
+      final targetHanzi = (w['simplified'] ?? w['hanzi'] ?? w['zh'] ?? '').toString().trim();
       if (targetHanzi.isEmpty) continue;
 
       final pinyin = (w['pinyin'] ?? w['py'] ?? '').toString().trim();
-      final meaning = (w['meaning'] ?? w['vi'] ?? '').toString().trim();
+      final meaning = (w['meaning_vi'] ?? w['meaning'] ?? w['vi'] ?? '').toString().trim();
 
       // Gather distinct distractors
       final optionsSet = <String>{targetHanzi};
       for (final other in words) {
-        final otherHanzi = (other['hanzi'] ?? other['zh'] ?? '').toString().trim();
+        final otherHanzi = (other['simplified'] ?? other['hanzi'] ?? other['zh'] ?? '').toString().trim();
         if (otherHanzi.isNotEmpty && otherHanzi != targetHanzi) {
           optionsSet.add(otherHanzi);
           if (optionsSet.length >= 4) break;
@@ -134,7 +134,7 @@ class LessonMicroCardAdapter {
           hanzi: targetHanzi,
           pinyin: pinyin,
           audioText: targetHanzi,
-          audioUrl: w['audio_url']?.toString(),
+          audioUrl: (w['audio_uri'] ?? w['audio_url'])?.toString(),
           prompt: 'Nghe phát âm và chọn chữ Hán chính xác:',
           options: optionsList,
           correctIndex: correctIndex,
@@ -242,8 +242,8 @@ class LessonMicroCardAdapter {
       if (words.length >= 8) {
         final pairs2 = <String, String>{};
         for (int i = 4; i < math.min(8, words.length); i++) {
-          final zh = (words[i]['hanzi'] ?? words[i]['zh'] ?? '').toString().trim();
-          final vi = (words[i]['meaning'] ?? words[i]['vi'] ?? '').toString().trim();
+          final zh = (words[i]['simplified'] ?? words[i]['hanzi'] ?? words[i]['zh'] ?? '').toString().trim();
+          final vi = (words[i]['meaning_vi'] ?? words[i]['meaning'] ?? words[i]['vi'] ?? '').toString().trim();
           if (zh.isNotEmpty && vi.isNotEmpty) {
             pairs2[zh] = vi;
           }
@@ -265,8 +265,8 @@ class LessonMicroCardAdapter {
     } else if (words.length >= 2) {
       final pairs = <String, String>{};
       for (final w in words) {
-        final zh = (w['hanzi'] ?? w['zh'] ?? '').toString().trim();
-        final vi = (w['meaning'] ?? w['vi'] ?? '').toString().trim();
+        final zh = (w['simplified'] ?? w['hanzi'] ?? w['zh'] ?? '').toString().trim();
+        final vi = (w['meaning_vi'] ?? w['meaning'] ?? w['vi'] ?? '').toString().trim();
         if (zh.isNotEmpty && vi.isNotEmpty) {
           pairs[zh] = vi;
         }
@@ -326,13 +326,13 @@ class LessonMicroCardAdapter {
     if (quizIndex < 3 && words.isNotEmpty) {
       for (int i = 0; i < words.length && quizIndex < 4; i++) {
         final targetWord = words[i];
-        final hanzi = (targetWord['hanzi'] ?? targetWord['zh'] ?? '').toString().trim();
-        final correctMeaning = (targetWord['meaning'] ?? targetWord['vi'] ?? '').toString().trim();
+        final hanzi = (targetWord['simplified'] ?? targetWord['hanzi'] ?? targetWord['zh'] ?? '').toString().trim();
+        final correctMeaning = (targetWord['meaning_vi'] ?? targetWord['meaning'] ?? targetWord['vi'] ?? '').toString().trim();
         if (hanzi.isEmpty || correctMeaning.isEmpty) continue;
 
         final optionsSet = <String>{correctMeaning};
         for (final other in words) {
-          final otherMeaning = (other['meaning'] ?? other['vi'] ?? '').toString().trim();
+          final otherMeaning = (other['meaning_vi'] ?? other['meaning'] ?? other['vi'] ?? '').toString().trim();
           if (otherMeaning.isNotEmpty && otherMeaning != correctMeaning) {
             optionsSet.add(otherMeaning);
             if (optionsSet.length >= 4) break;
