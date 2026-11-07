@@ -4,6 +4,7 @@ import '../../../../core/theme/theme.dart';
 import '../../domain/models/curriculum_models.dart';
 import '../providers/curriculum_providers.dart';
 import '../../../content_packs/presentation/screens/content_pack_manager_screen.dart';
+import '../../../home/presentation/providers/home_providers.dart';
 import 'lesson_study_screen.dart';
 import 'level_exit_exam_screen.dart';
 
@@ -188,7 +189,7 @@ class CurriculumSyllabusScreen extends ConsumerWidget {
               if (unit.lessons.isEmpty)
                 _UnitLessonsAsyncLoader(unitId: unit.id)
               else
-                ...unit.lessons.map((lesson) => _buildLessonItem(context, lesson)),
+                ...unit.lessons.map((lesson) => _buildLessonItem(context, ref, lesson)),
               const SizedBox(height: AppSpacing.md),
             ],
           );
@@ -255,7 +256,7 @@ class CurriculumSyllabusScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildLessonItem(BuildContext context, CurriculumLesson lesson) {
+  Widget _buildLessonItem(BuildContext context, WidgetRef ref, CurriculumLesson lesson) {
     final theme = Theme.of(context);
     final isLocked = lesson.isLocked;
 
@@ -265,7 +266,7 @@ class CurriculumSyllabusScreen extends ConsumerWidget {
         backgroundColor: AppColors.cardBackground,
         borderColor: AppColors.border,
         child: InkWell(
-          onTap: () {
+          onTap: () async {
             if (isLocked) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -276,11 +277,17 @@ class CurriculumSyllabusScreen extends ConsumerWidget {
                 ),
               );
             } else {
-              Navigator.of(context).push(
+              final result = await Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => LessonStudyScreen(lesson: lesson),
                 ),
               );
+              if (result == true) {
+                ref.invalidate(curriculumUnitsProvider);
+                ref.invalidate(curriculumLessonsProvider);
+                ref.invalidate(curriculumUnitsWithLessonsProvider);
+                ref.invalidate(homeDashboardProvider);
+              }
             }
           },
           child: Row(
@@ -368,7 +375,7 @@ class _UnitLessonsAsyncLoader extends ConsumerWidget {
       data: (lessons) => Column(
         children: lessons.map((l) {
           final parent = context.findAncestorWidgetOfExactType<CurriculumSyllabusScreen>();
-          return parent?._buildLessonItem(context, l) ?? const SizedBox.shrink();
+          return parent?._buildLessonItem(context, ref, l) ?? const SizedBox.shrink();
         }).toList(),
       ),
     );

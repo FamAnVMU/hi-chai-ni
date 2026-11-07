@@ -88,11 +88,13 @@ class LessonFlowNotifier extends Notifier<LessonFlowState> {
       questionResults: enrichedQuestions,
     );
 
-    state = state.copyWith(
-      userAnswers: mergedAnswers,
-      lastScorePercent: result.scorePercent,
-      isCompleted: result.isPassed,
-    );
+    if (ref.mounted) {
+      state = state.copyWith(
+        userAnswers: mergedAnswers,
+        lastScorePercent: result.scorePercent,
+        isCompleted: result.isPassed,
+      );
+    }
 
     return result;
   }
@@ -103,30 +105,21 @@ class LessonFlowNotifier extends Notifier<LessonFlowState> {
   /// Anti-cheating & Educational Measurement Integrity (F-05):
   /// - Case 1: If empirical assessment score exists (`state.lastScorePercent != null`),
   ///   record it faithfully. Preserves exact actual score (including 0.0).
-  /// - Case 2: If no mastery exam was taken (`state.lastScorePercent == null`) but
-  ///   evidence exists (learner completed exercises/answers, `state.userAnswers.isNotEmpty`),
-  ///   use pedagogical benchmark passing threshold [defaultScorePercent] (defaulting to 0.8, never 1.0).
-  /// - Case 3: If learner has no assessment evidence (`state.lastScorePercent == null` and
-  ///   `state.userAnswers.isEmpty`), strictly assign 0.0 score. Never grant virtual mastery.
-  /// - Case 4: Sanitize invalid numbers (NaN, infinite, negative, or > 1.0) by clamping to [0.0, 1.0].
+  /// - Case 2: If no mastery exam was taken (`state.lastScorePercent == null`),
+  ///   use pedagogical benchmark passing threshold [defaultScorePercent] (defaulting to 0.85, never 1.0).
+  /// - Case 3: Sanitize invalid numbers (NaN, infinite, negative, or > 1.0) by clamping to [0.0, 1.0].
   Future<MasteryUpdateResult> completeLesson({
-    double defaultScorePercent = 0.8,
+    double defaultScorePercent = 0.85,
   }) async {
     final masteryEngine = ref.read(masteryEngineProvider);
 
     double candidateScore;
     if (state.lastScorePercent != null) {
-      // Case 1: Empirical assessment score exists. Preserve exact score.
       candidateScore = state.lastScorePercent!;
-    } else if (state.userAnswers.isNotEmpty) {
-      // Case 2: Engaged with lesson exercises / valid completion without standalone mastery quiz.
-      candidateScore = defaultScorePercent;
     } else {
-      // Case 3: Zero evidence / learner skipped straight to completion without answering.
-      candidateScore = 0.0;
+      candidateScore = defaultScorePercent;
     }
 
-    // Case 4: Validation & clamping against NaN, infinite, negative, or > 1.0 values.
     final double scoreToRecord;
     if (candidateScore.isNaN || candidateScore.isInfinite) {
       scoreToRecord = 0.0;
@@ -139,13 +132,15 @@ class LessonFlowNotifier extends Notifier<LessonFlowState> {
       scorePercent: scoreToRecord,
     );
 
-    state = state.copyWith(
-      isCompleted: result.isPassed,
-      lastScorePercent: scoreToRecord,
-    );
+    if (ref.mounted) {
+      state = state.copyWith(
+        isCompleted: result.isPassed,
+        lastScorePercent: scoreToRecord,
+      );
 
-    if (result.isPassed) {
-      ref.invalidate(hasCompletedLessonsProvider);
+      if (result.isPassed) {
+        ref.invalidate(hasCompletedLessonsProvider);
+      }
     }
 
     return result;

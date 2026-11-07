@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 import '../../../../core/database/database_constants.dart';
+import '../../home/domain/models/learning_streak.dart';
 import '../../practice/domain/models/practice_models.dart';
 import '../../vocabulary_srs/domain/srs_models.dart';
 import '../domain/engine/mastery_evaluator.dart';
@@ -153,6 +154,23 @@ class LearningPipelineCoordinator {
               ? existingLessonProg.first['created_at']
               : nowIso,
           'updated_at': nowIso,
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+
+      final timeZoneOffset = DateTime.now().timeZoneOffset;
+      await txn.insert(
+        DatabaseConstants.tableLearningActivities,
+        {
+          'id': 'act_${lessonId}_${nowUtc.millisecondsSinceEpoch}',
+          'activity_type': 'lesson',
+          'duration_seconds': durationMs > 0 ? (durationMs / 1000).round() : 180,
+          'items_count': questionResults?.length ?? 10,
+          'activity_date': StreakCalculator.toDateString(
+            StreakCalculator.toLocalDate(nowUtc, timeZoneOffset: timeZoneOffset),
+          ),
+          'created_at': nowIso,
+          'timezone_offset_minutes': timeZoneOffset.inMinutes,
         },
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
