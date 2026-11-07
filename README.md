@@ -44,6 +44,8 @@ HI Chinese hoạt động theo mô hình **Offline-First**, lưu trữ toàn b�
 
 ## 🏛️ Kiến Trúc Hệ Thống
 
+> 📖 **Tài liệu đặc tả kiến trúc toàn diện 100%:** Xem chi tiết tại [SYSTEM_ARCHITECTURE_AND_SPECIFICATION.md](docs/SYSTEM_ARCHITECTURE_AND_SPECIFICATION.md).
+
 HI Chinese tuân thủ triệt để kiến trúc:
 - **Clean Architecture kết hợp Feature-First:** Tách biệt rõ ràng giữa Core foundation và các tính năng nghiệp vụ.
 - **Content Management System (CMS) v9:** 8 bảng SQLite độc lập quản lý giáo trình, học liệu, bài tập và tiến độ hoàn thành.
