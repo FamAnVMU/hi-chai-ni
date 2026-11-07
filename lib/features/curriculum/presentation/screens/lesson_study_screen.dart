@@ -10,6 +10,7 @@ import '../widgets/lesson_dialogue_view.dart';
 import '../widgets/lesson_practice_view.dart';
 import '../widgets/lesson_mastery_view.dart';
 import '../widgets/ai_tutor_helper_sheet.dart';
+import '../widgets/lesson_quick_notes_sheet.dart';
 
 class LessonStudyScreen extends ConsumerStatefulWidget {
   final CurriculumLesson lesson;
@@ -133,6 +134,11 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
           ],
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.menu_book_rounded),
+            tooltip: 'Cẩm nang bài học',
+            onPressed: () => LessonQuickNotesSheet.show(context, lesson: widget.lesson),
+          ),
           IconButton(
             icon: const Icon(Icons.smart_toy_outlined),
             tooltip: 'Hỏi trợ giảng AI',
