@@ -345,12 +345,37 @@ class VocabularyDao {
         );
       } else {
         final clean = PinyinHelper.removeTones(trimmed).toLowerCase().replaceAll(RegExp(r'\s+'), '');
-        return await _db.query(
-          DatabaseConstants.tableDictionaryEntries,
-          where: 'pinyin_clean = ? OR pinyin_clean LIKE ? OR LOWER(meaning_vi) LIKE ?',
-          whereArgs: [clean, '$clean%', '%${trimmed.toLowerCase()}%'],
-          limit: limit,
-        );
+        final Map<String, Map<String, dynamic>> dictResults = {};
+
+        // Step 1: Fast indexed lookup on pinyin_clean (avoids OR full-table scan)
+        if (clean.isNotEmpty) {
+          final pinyinMatches = await _db.query(
+            DatabaseConstants.tableDictionaryEntries,
+            where: 'pinyin_clean = ? OR pinyin_clean LIKE ?',
+            whereArgs: [clean, '$clean%'],
+            limit: limit,
+          );
+          for (final row in pinyinMatches) {
+            final key = (row['id'] ?? row['simplified']).toString();
+            dictResults[key] = row;
+          }
+        }
+
+        // Step 2: Only query meaning_vi if additional slots remain
+        if (dictResults.length < limit) {
+          final meaningMatches = await _db.query(
+            DatabaseConstants.tableDictionaryEntries,
+            where: 'LOWER(meaning_vi) LIKE ?',
+            whereArgs: ['%${trimmed.toLowerCase()}%'],
+            limit: limit - dictResults.length,
+          );
+          for (final row in meaningMatches) {
+            final key = (row['id'] ?? row['simplified']).toString();
+            dictResults.putIfAbsent(key, () => row);
+          }
+        }
+
+        return dictResults.values.toList();
       }
     } catch (_) {
       return [];

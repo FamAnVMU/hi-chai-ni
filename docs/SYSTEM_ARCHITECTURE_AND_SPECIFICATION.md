@@ -45,9 +45,9 @@
 
 ---
 
-## 3. CƠ SỞ DỮ LIỆU SQLITE SCHEMA v20 (CHI TIẾT 47 BẢNG DỮ LIỆU)
+## 3. CƠ SỞ DỮ LIỆU SQLITE SCHEMA v20 (CHI TIẾT 48 BẢNG DỮ LIỆU)
 
-Ứng dụng sử dụng tệp SQLite `hi_chinese.db`, quản lý thông qua [`AppDatabase`](file:///C:/Users/phama/Downloads/hi_chinese/lib/core/database/app_database.dart) và chuỗi di chuyển [`MigrationEngine`](file:///C:/Users/phama/Downloads/hi_chinese/lib/core/database/migrations/migration_engine.dart). Dưới đây là danh sách đầy đủ **47 bảng dữ liệu** (khớp 100% giữa `DatabaseConstants`, `onCreate` và `MigrationEngine` v1 -> v20):
+Ứng dụng sử dụng tệp SQLite `hi_chinese.db`, quản lý thông qua [`AppDatabase`](file:///C:/Users/phama/Downloads/hi_chinese/lib/core/database/app_database.dart) và chuỗi di chuyển [`MigrationEngine`](file:///C:/Users/phama/Downloads/hi_chinese/lib/core/database/migrations/migration_engine.dart). Dưới đây là danh sách đầy đủ **48 bảng dữ liệu** (được kiểm chứng tự động 100% giữa `DatabaseConstants`, `onCreate(0 -> v20)` và `onUpgrade(v1 -> v20)` trong `database_migration_test.dart`):
 
 ### 3.1. Phân hệ Giáo trình & Nội dung HSK (Schema v9)
 1. **`curriculums`**: Quản lý cấp độ giáo trình tổng thể (`curr_hsk1` đến `curr_hsk6`).
@@ -70,61 +70,62 @@
     - Các cột: `id`, `activity_type` (`lesson_completion`, `srs_review`, `practice_session`, `reading`, v.v.), `duration_seconds`, `items_count`, `activity_date` (định dạng `YYYY-MM-DD` theo giờ địa phương), `timezone_offset_minutes` (Schema v16), `created_at` (Schema v17 index).
     - Đây là bảng nguồn duy nhất quyết định việc tính chuỗi ngày học liên tục (**Streak 🔥**) trên Trang chủ.
 13. **`lesson_progress`**: Lưu tiến trình chi tiết của từng bài học: `lesson_id`, `step_index`, `score`, `is_passed`, `completed_at`, `source` (`curriculum_self_study`, `placement_test_unlock` - Schema v18).
-14. **`learner_evidence`**: Lưu vết chi tiết từng câu trả lời đúng/sai của người học làm bằng chứng cho Mastery Engine.
-15. **`mastery_snapshots`**: Ảnh chụp trạng thái năng lực tổng thể theo từng mốc thời gian.
-16. **`roadmap_snapshots`**: Lưu ảnh chụp cây lộ trình cá nhân hóa của học viên.
-17. **`seed_history`**: Lưu vết các tệp học liệu mẫu đã được nạp tự động (idempotent seed tracker - Schema v2).
+14. **`learner_goals`**: Lưu cấu hình mục tiêu học tập cá nhân hóa của học viên (mục tiêu HSK, thời lượng mỗi ngày, lộ trình ưu tiên - Schema v5).
+15. **`learner_evidence`**: Lưu vết chi tiết từng câu trả lời đúng/sai của người học làm bằng chứng cho Mastery Engine.
+16. **`mastery_snapshots`**: Ảnh chụp trạng thái năng lực tổng thể theo từng mốc thời gian.
+17. **`roadmap_snapshots`**: Lưu ảnh chụp cây lộ trình cá nhân hóa của học viên.
+18. **`seed_history`**: Lưu vết các tệp học liệu mẫu đã được nạp tự động (idempotent seed tracker - Schema v2).
 
 ### 3.4. Phân hệ Ôn tập Lặp lại Ngắt quãng (SRS SM-2)
-18. **`srs_items`**: Quản lý từng thẻ từ vựng trong hàng đợi ôn tập SM-2.
+19. **`srs_items`**: Quản lý từng thẻ từ vựng trong hàng đợi ôn tập SM-2.
     - Các cột: `id`, `word_id`, `hanzi`, `pinyin`, `meaning_vi`, `interval_days`, `repetition_count`, `ease_factor` (mặc định 2.5, sàn 1.3), `due_date`, `last_reviewed_at`, `state` (`newCard`, `learning`, `review`, `relearning`).
 
 ### 3.5. Phân hệ Khảo sát Đầu vào (CAT Placement Test - Schema v3)
-19. **`placement_test_sessions`**: Lưu phiên thi phân lớp: năng lực ước lượng ban đầu ($\theta$), độ sai số chuẩn $SE$, cấp độ khuyến nghị.
-20. **`placement_test_responses`**: Từng câu trả lời của thí sinh, độ khó câu hỏi ($b$), phân biệt câu hỏi ($a$), thời gian phản hồi.
+20. **`placement_test_sessions`**: Lưu phiên thi phân lớp: năng lực ước lượng ban đầu ($\theta$), độ sai số chuẩn $SE$, cấp độ khuyến nghị.
+21. **`placement_test_responses`**: Từng câu trả lời của thí sinh, độ khó câu hỏi ($b$), phân biệt câu hỏi ($a$), thời gian phản hồi.
 
 ### 3.6. Phân hệ Từ vựng & Từ điển Tra cứu (Dictionary)
-21. **`vocabularies`**: Bảng từ vựng trung tâm (Hán tự, Pinyin, nghĩa chính, âm Hán-Việt, cấp độ HSK).
-22. **`vocabulary_senses`**: Các tầng nghĩa mở rộng của từ vựng theo từng ngữ cảnh.
-23. **`vocabulary_examples`**: Câu ví dụ mẫu đi kèm từ vựng (Hán tự, Pinyin, nghĩa tiếng Việt, audio URI).
-24. **`dictionary_entries`**: Dữ liệu từ điển tra cứu offline (đánh chỉ mục Pinyin và chữ Phồn thể - Schema v19).
-25. **`dictionary_history`**: Lịch sử các từ người dùng đã tra cứu gần đây (Schema v4).
-26. **`user_saved_words`**: Sổ tay từ vựng yêu thích/cần ghi nhớ được người học đánh dấu sao (Schema v4).
+22. **`vocabularies`**: Bảng từ vựng trung tâm (Hán tự, Pinyin, nghĩa chính, âm Hán-Việt, cấp độ HSK).
+23. **`vocabulary_senses`**: Các tầng nghĩa mở rộng của từ vựng theo từng ngữ cảnh.
+24. **`vocabulary_examples`**: Câu ví dụ mẫu đi kèm từ vựng (Hán tự, Pinyin, nghĩa tiếng Việt, audio URI).
+25. **`dictionary_entries`**: Dữ liệu từ điển tra cứu offline (đánh chỉ mục Pinyin và chữ Phồn thể - Schema v19; truy vấn tách bước ưu tiên index `pinyin_clean` trước khi fallback sang `meaning_vi`).
+26. **`dictionary_history`**: Lịch sử các từ người dùng đã tra cứu gần đây (Schema v4).
+27. **`user_saved_words`**: Sổ tay từ vựng yêu thích/cần ghi nhớ được người học đánh dấu sao (Schema v4).
 
 ### 3.7. Phân hệ Ngữ pháp Tiếng Trung (Grammar - Schema v6 & v13)
-27. **`grammar_items`**: Điểm ngữ pháp (Tên, cấu trúc công thức, giải thích lý thuyết, đối chiếu L1 tiếng Việt).
-28. **`grammar_examples`**: Câu ví dụ khẳng định, phủ định, nghi vấn cho từng điểm ngữ pháp.
-29. **`grammar_topics`**: Phân loại ngữ pháp theo chủ đề chuyên đề.
-30. **`grammar_progress`**: Tiến độ học và điểm làm chủ từng cấu trúc ngữ pháp.
+28. **`grammar_items`**: Điểm ngữ pháp (Tên, cấu trúc công thức, giải thích lý thuyết, đối chiếu L1 tiếng Việt).
+29. **`grammar_examples`**: Câu ví dụ khẳng định, phủ định, nghi vấn cho từng điểm ngữ pháp.
+30. **`grammar_topics`**: Phân loại ngữ pháp theo chủ đề chuyên đề.
+31. **`grammar_progress`**: Tiến độ học và điểm làm chủ từng cấu trúc ngữ pháp.
 
 ### 3.8. Phân hệ Đọc hiểu & Đoạn văn (Reading - Schema v4 & v20)
-31. **`reading_passages`**: Đoạn văn đọc hiểu phân cấp (Hán tự, tokenized words, pinyin, bản dịch tiếng Việt, audio). Đã tối ưu hóa chỉ mục kép - Schema v20.
-32. **`reading_progress`**: Lưu trữ câu hỏi đã trả lời, điểm đọc hiểu và trạng thái đọc của người học.
+32. **`reading_passages`**: Đoạn văn đọc hiểu phân cấp (Hán tự, tokenized words, pinyin, bản dịch tiếng Việt, audio). Đã tối ưu hóa chỉ mục kép - Schema v20.
+33. **`reading_progress`**: Lưu trữ câu hỏi đã trả lời, điểm đọc hiểu và trạng thái đọc của người học.
 
 ### 3.9. Phân hệ Luyện tập Thực hành (Practice Engine - Schema v7)
-33. **`practice_exercises`**: Ngân hàng bài tập 7 loại hình.
-34. **`practice_sessions`**: Phiên làm bài tập luyện tập.
-35. **`practice_attempts`**: Lịch sử chi tiết từng lần thử chọn đáp án.
+34. **`practice_exercises`**: Ngân hàng bài tập 7 loại hình.
+35. **`practice_sessions`**: Phiên làm bài tập luyện tập.
+36. **`practice_attempts`**: Lịch sử chi tiết từng lần thử chọn đáp án.
 
 ### 3.10. Phân hệ Chữ Hán & Bút Thuận (Hanzi Stroke Engine - Schema v14)
-36. **`hanzi_characters`**: Dữ liệu vector tọa độ các nét vẽ chuẩn của chữ Hán, số nét, bộ thủ.
-37. **`hanzi_writing_progress`**: Lịch sử luyện viết, điểm số đánh giá độ chuẩn nét vẽ của học viên.
+37. **`hanzi_characters`**: Dữ liệu vector tọa độ các nét vẽ chuẩn của chữ Hán, số nét, bộ thủ.
+38. **`hanzi_writing_progress`**: Lịch sử luyện viết, điểm số đánh giá độ chuẩn nét vẽ của học viên.
 
 ### 3.11. Phân hệ Câu Đàm Thoại & Luyện Nói Đuổi (Sentences & Shadowing - Schema v15)
-38. **`sentences`**: Kho mẫu câu đàm thoại giao tiếp thực tế.
-39. **`sentence_audio`**: Ánh xạ audio giọng đọc bản ngữ cho từng câu mẫu.
-40. **`sentence_practice_progress`**: Lịch sử luyện nói đuổi (Shadowing) và độ khớp nhịp điệu.
+39. **`sentences`**: Kho mẫu câu đàm thoại giao tiếp thực tế.
+40. **`sentence_audio`**: Ánh xạ audio giọng đọc bản ngữ cho từng câu mẫu.
+41. **`sentence_practice_progress`**: Lịch sử luyện nói đuổi (Shadowing) và độ khớp nhịp điệu.
 
 ### 3.12. Phân hệ Âm vị Pinyin & Quản lý Audio Asset (Schema v11)
-41. **`audio_assets`**: Quản lý tập tin âm thanh offline (đường dẫn lưu trữ, mã hash, kích thước).
-42. **`pinyin_progress`**: Tiến độ làm chủ hệ thống thanh mẫu, vận mẫu và thanh điệu Pinyin.
+42. **`audio_assets`**: Quản lý tập tin âm thanh offline (đường dẫn lưu trữ, mã hash, kích thước).
+43. **`pinyin_progress`**: Tiến độ làm chủ hệ thống thanh mẫu, vận mẫu và thanh điệu Pinyin.
 
 ### 3.13. Phân hệ Hồ sơ Người dùng, Trợ giảng AI & Cài đặt (Schema v8)
-43. **`user_profiles`**: Thông tin học viên: Tên, avatar emoji, mục tiêu học tập hàng ngày, cấp độ HSK mục tiêu.
-44. **`goal_history`**: Lịch sử các lần thay đổi mục tiêu học tập.
-45. **`app_settings`**: Cài đặt ứng dụng không nhạy cảm: Chế độ sáng/tối, hiển thị Pinyin, cỡ chữ Hán, tốc độ đọc TTS. *(Lưu ý bảo mật AUD-001: Gemini API Key tuyệt đối KHÔNG lưu trong `app_settings` mà chỉ lưu duy nhất trong `AiCredentialStorage` qua `flutter_secure_storage` / Android Keystore; `DatabaseBackupHelper` cũng tự động lọc sạch mọi khóa nhạy cảm trước khi tạo bản sao lưu).*
-46. **`chat_sessions`**: Quản lý danh sách các phiên hội thoại với AI Tutor.
-47. **`chat_messages`**: Lưu trữ chi tiết các tin nhắn văn bản trong từng phiên hội thoại với AI Tutor.
+44. **`user_profiles`**: Thông tin học viên: Tên, avatar emoji, mục tiêu học tập hàng ngày, cấp độ HSK mục tiêu.
+45. **`goal_history`**: Lịch sử các lần thay đổi mục tiêu học tập.
+46. **`app_settings`**: Cài đặt ứng dụng không nhạy cảm: Chế độ sáng/tối, hiển thị Pinyin, cỡ chữ Hán, tốc độ đọc TTS. *(Lưu ý bảo mật AUD-001: Gemini API Key tuyệt đối KHÔNG lưu trong `app_settings` mà chỉ lưu duy nhất trong `AiCredentialStorage` qua `flutter_secure_storage` / Android Keystore; `DatabaseBackupHelper` cũng tự động lọc sạch mọi khóa nhạy cảm trước khi tạo bản sao lưu).*
+47. **`chat_sessions`**: Quản lý danh sách các phiên hội thoại với AI Tutor.
+48. **`chat_messages`**: Lưu trữ chi tiết các tin nhắn văn bản trong từng phiên hội thoại với AI Tutor.
 
 ---
 

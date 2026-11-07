@@ -57,8 +57,12 @@ void main() {
     });
 
     tearDown(() async {
-      if (await tempDir.exists()) {
-        await tempDir.delete(recursive: true);
+      try {
+        if (await tempDir.exists()) {
+          await tempDir.delete(recursive: true);
+        }
+      } catch (_) {
+        // Ignore transient Windows file handle release delay on FFI failure tests
       }
     });
 
@@ -180,6 +184,80 @@ void main() {
       expect(safeRows.first['simplified'], equals('北京'));
 
       await db.close();
+    });
+
+    test('Schema v20 Symmetry: onCreate(0 -> v20) produces identical 48 tables and indexes as incremental onUpgrade(v1 -> v20)', () async {
+      final freshDbPath = '${tempDir.path}/fresh_v20.db';
+      final upgradedDbPath = '${tempDir.path}/upgraded_v20.db';
+      final prodEngine = MigrationEngine();
+      const targetVer = DatabaseConstants.currentDatabaseVersion;
+
+      // 1. Fresh install at v20 (onCreate: 0 -> v20)
+      final freshDb = await databaseFactoryFfi.openDatabase(
+        freshDbPath,
+        options: OpenDatabaseOptions(
+          version: targetVer,
+          onCreate: (db, ver) async {
+            await prodEngine.executeMigrations(db, 0, ver);
+          },
+        ),
+      );
+
+      // 2. Legacy v1 install upgraded step-by-step to v20 (onUpgrade: 1 -> v20)
+      var upgradedDb = await databaseFactoryFfi.openDatabase(
+        upgradedDbPath,
+        options: OpenDatabaseOptions(
+          version: 1,
+          onCreate: (db, ver) async {
+            await prodEngine.executeMigrations(db, 0, 1);
+          },
+        ),
+      );
+      await upgradedDb.close();
+
+      upgradedDb = await databaseFactoryFfi.openDatabase(
+        upgradedDbPath,
+        options: OpenDatabaseOptions(
+          version: targetVer,
+          onUpgrade: (db, oldVer, newVer) async {
+            await prodEngine.executeMigrations(db, oldVer, newVer);
+          },
+        ),
+      );
+
+      // Compare user-defined tables (excluding sqlite_sequence internal table)
+      final freshTables = (await freshDb.rawQuery(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name ASC",
+      ))
+          .map((r) => r['name'] as String)
+          .toList();
+
+      final upgradedTables = (await upgradedDb.rawQuery(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name ASC",
+      ))
+          .map((r) => r['name'] as String)
+          .toList();
+
+      expect(freshTables, equals(upgradedTables));
+      expect(freshTables.length, equals(48));
+
+      // Compare indexes
+      final freshIndexes = (await freshDb.rawQuery(
+        "SELECT name FROM sqlite_master WHERE type='index' AND name NOT LIKE 'sqlite_autoindex_%' ORDER BY name ASC",
+      ))
+          .map((r) => r['name'] as String)
+          .toList();
+
+      final upgradedIndexes = (await upgradedDb.rawQuery(
+        "SELECT name FROM sqlite_master WHERE type='index' AND name NOT LIKE 'sqlite_autoindex_%' ORDER BY name ASC",
+      ))
+          .map((r) => r['name'] as String)
+          .toList();
+
+      expect(freshIndexes, equals(upgradedIndexes));
+
+      await freshDb.close();
+      await upgradedDb.close();
     });
   });
 }

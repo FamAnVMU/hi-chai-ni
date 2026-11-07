@@ -8,15 +8,21 @@ import 'package:path_provider/path_provider.dart';
 class AudioTempCleaner {
   AudioTempCleaner._();
 
-  /// Deletes stale temporary audio files (e.g. older than [olderThan]).
+  /// Maximum allowed temporary audio cache size (50 MB).
+  static const int maxTotalTempBytes = 50 * 1024 * 1024;
+
+  /// Deletes stale temporary audio files (e.g. older than [olderThan]) and enforces
+  /// an LRU cap of [maxTotalBytes] (default 50 MB).
   /// Scans both the app temporary directory and system temp.
   /// Returns the count of deleted files.
   static Future<int> cleanupTempAudioFiles({
     Duration olderThan = const Duration(hours: 1),
+    int maxTotalBytes = maxTotalTempBytes,
     Directory? directoryOverride,
   }) async {
     int deletedCount = 0;
     final now = DateTime.now();
+    final remainingFiles = <({File file, FileStat stat})>[];
 
     List<Directory> targetDirs = [];
     if (directoryOverride != null) {
@@ -57,6 +63,8 @@ class AudioTempCleaner {
               entity.deleteSync();
               deletedCount++;
               debugPrint('[AudioTempCleaner] Deleted stale recording: ${entity.path} (age: ${age.inMinutes}m)');
+            } else {
+              remainingFiles.add((file: entity, stat: stat));
             }
           } catch (e) {
             debugPrint('[AudioTempCleaner] Failed to delete file ${entity.path}: $e');
@@ -64,6 +72,24 @@ class AudioTempCleaner {
         }
       } catch (e) {
         debugPrint('[AudioTempCleaner] Error scanning directory ${dir.path}: $e');
+      }
+    }
+
+    // Enforce LRU storage cap (default 50 MB) across remaining temp audio files
+    int totalBytes = remainingFiles.fold<int>(0, (sum, item) => sum + item.stat.size);
+    if (totalBytes > maxTotalBytes) {
+      // Sort oldest-modified first (LRU eviction)
+      remainingFiles.sort((a, b) => a.stat.modified.compareTo(b.stat.modified));
+      for (final item in remainingFiles) {
+        if (totalBytes <= maxTotalBytes) break;
+        try {
+          item.file.deleteSync();
+          totalBytes -= item.stat.size;
+          deletedCount++;
+          debugPrint('[AudioTempCleaner] LRU evicted recording: ${item.file.path}');
+        } catch (e) {
+          debugPrint('[AudioTempCleaner] Failed LRU eviction for ${item.file.path}: $e');
+        }
       }
     }
 

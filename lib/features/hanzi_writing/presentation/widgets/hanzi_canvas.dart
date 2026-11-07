@@ -75,14 +75,16 @@ class HanziCanvas extends StatelessWidget {
                 child: Stack(
                   children: [
                     Positioned.fill(
-                      child: CustomPaint(
-                        painter: MizigePainter(
-                          borderColor: isDark
-                              ? AppColors.darkForestBorder
-                              : theme.colorScheme.outlineVariant,
-                          guidelineColor: isDark
-                              ? AppColors.darkForestBorder.withAlpha(80)
-                              : theme.colorScheme.outlineVariant.withAlpha(90),
+                      child: RepaintBoundary(
+                        child: CustomPaint(
+                          painter: MizigePainter(
+                            borderColor: isDark
+                                ? AppColors.darkForestBorder
+                                : theme.colorScheme.outlineVariant,
+                            guidelineColor: isDark
+                                ? AppColors.darkForestBorder.withAlpha(80)
+                                : theme.colorScheme.outlineVariant.withAlpha(90),
+                          ),
                         ),
                       ),
                     ),
