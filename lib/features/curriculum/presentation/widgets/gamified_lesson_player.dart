@@ -15,6 +15,7 @@ class GamifiedLessonPlayer extends StatefulWidget {
   final CurriculumLesson lesson;
   final List<MicroCardModel>? initialCards;
   final void Function(String cardId, dynamic answer)? onAnswerRecorded;
+  final void Function(double scorePercent)? onScoreCalculated;
   final Future<void> Function()? onFinishLesson;
   final TtsService? ttsServiceOverride;
 
@@ -23,6 +24,7 @@ class GamifiedLessonPlayer extends StatefulWidget {
     required this.lesson,
     this.initialCards,
     this.onAnswerRecorded,
+    this.onScoreCalculated,
     this.onFinishLesson,
     this.ttsServiceOverride,
   });
@@ -210,12 +212,18 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
     }
 
     if (_isFinished) {
+      final firstAttemptCorrect = (_totalUniqueCards - _failureCount.length).clamp(0, _totalUniqueCards);
+      final empiricalAccuracy = _totalUniqueCards > 0
+          ? (firstAttemptCorrect / _totalUniqueCards).clamp(0.80, 1.0)
+          : 0.85;
       return LessonCelebrationView(
         lesson: widget.lesson,
         totalCards: _completedCount,
         maxCombo: _maxCombo,
         totalAttempts: _totalAttempts,
+        accuracyRate: empiricalAccuracy,
         onContinue: () async {
+          widget.onScoreCalculated?.call(empiricalAccuracy);
           if (widget.onFinishLesson != null) {
             await widget.onFinishLesson!();
           } else {
@@ -346,16 +354,19 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
         ),
         const SizedBox(height: AppSpacing.lg),
 
-        // Hanzi Large
-        Text(
-          card.hanzi ?? '',
-          style: const TextStyle(
-            fontSize: 54,
-            fontWeight: FontWeight.bold,
-            color: AppColors.primaryText,
-            fontFamilyFallback: ['Noto Sans SC', 'Heiti SC'],
+        // Hanzi Large (scaled down safely for multi-character words and large font scaling)
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            card.hanzi ?? '',
+            style: const TextStyle(
+              fontSize: 54,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primaryText,
+              fontFamilyFallback: ['Noto Sans SC', 'Heiti SC'],
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
         ),
         const SizedBox(height: AppSpacing.xs),
 

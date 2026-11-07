@@ -76,7 +76,7 @@ class _LearningScreenState extends ConsumerState<LearningScreen>
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: ['HSK 1', 'HSK 2', 'HSK 3', 'HSK 4', 'HSK 5'].map((level) {
+                children: ['HSK 1', 'HSK 2', 'HSK 3', 'HSK 4', 'HSK 5', 'HSK 6'].map((level) {
                   return Padding(
                     padding: const EdgeInsets.only(right: AppSpacing.sm),
                     child: HiChip(

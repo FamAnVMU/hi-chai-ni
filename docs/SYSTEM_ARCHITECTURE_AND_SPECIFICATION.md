@@ -45,9 +45,9 @@
 
 ---
 
-## 3. CƠ SỞ DỮ LIỆU SQLITE SCHEMA v20 (CHI TIẾT 44 BẢNG DỮ LIỆU)
+## 3. CƠ SỞ DỮ LIỆU SQLITE SCHEMA v20 (CHI TIẾT 47 BẢNG DỮ LIỆU)
 
-Ứng dụng sử dụng tệp SQLite `hi_chinese.db`, quản lý thông qua [`AppDatabase`](file:///C:/Users/phama/Downloads/hi_chinese/lib/core/database/app_database.dart) và chuỗi di chuyển [`MigrationEngine`](file:///C:/Users/phama/Downloads/hi_chinese/lib/core/database/migrations/migration_engine.dart). Dưới đây là danh sách đầy đủ 44 bảng dữ liệu và vai trò kỹ thuật:
+Ứng dụng sử dụng tệp SQLite `hi_chinese.db`, quản lý thông qua [`AppDatabase`](file:///C:/Users/phama/Downloads/hi_chinese/lib/core/database/app_database.dart) và chuỗi di chuyển [`MigrationEngine`](file:///C:/Users/phama/Downloads/hi_chinese/lib/core/database/migrations/migration_engine.dart). Dưới đây là danh sách đầy đủ **47 bảng dữ liệu** (khớp 100% giữa `DatabaseConstants`, `onCreate` và `MigrationEngine` v1 -> v20):
 
 ### 3.1. Phân hệ Giáo trình & Nội dung HSK (Schema v9)
 1. **`curriculums`**: Quản lý cấp độ giáo trình tổng thể (`curr_hsk1` đến `curr_hsk6`).
@@ -122,8 +122,9 @@
 ### 3.13. Phân hệ Hồ sơ Người dùng, Trợ giảng AI & Cài đặt (Schema v8)
 43. **`user_profiles`**: Thông tin học viên: Tên, avatar emoji, mục tiêu học tập hàng ngày, cấp độ HSK mục tiêu.
 44. **`goal_history`**: Lịch sử các lần thay đổi mục tiêu học tập.
-45. **`app_settings`**: Cài đặt ứng dụng: Chế độ sáng/tối, hiển thị Pinyin, tốc độ đọc TTS, API Key.
-46. **`chat_sessions` & `chat_messages`**: Lưu trữ toàn bộ lịch sử đối thoại văn bản giữa học viên và AI Tutor.
+45. **`app_settings`**: Cài đặt ứng dụng không nhạy cảm: Chế độ sáng/tối, hiển thị Pinyin, cỡ chữ Hán, tốc độ đọc TTS. *(Lưu ý bảo mật AUD-001: Gemini API Key tuyệt đối KHÔNG lưu trong `app_settings` mà chỉ lưu duy nhất trong `AiCredentialStorage` qua `flutter_secure_storage` / Android Keystore; `DatabaseBackupHelper` cũng tự động lọc sạch mọi khóa nhạy cảm trước khi tạo bản sao lưu).*
+46. **`chat_sessions`**: Quản lý danh sách các phiên hội thoại với AI Tutor.
+47. **`chat_messages`**: Lưu trữ chi tiết các tin nhắn văn bản trong từng phiên hội thoại với AI Tutor.
 
 ---
 
@@ -147,7 +148,7 @@ Nếu người dùng chưa hoàn thành Onboarding, `AppRouteGuard` sẽ tự đ
    - Tiếp tục bài học giáo trình dang dở (`HomeLessonAccessCard`).
    - Thẻ nhắc nhở từ vựng đến hạn ôn tập SRS (`HomeSrsDueCard`).
    - Lưới phím tắt nhanh (`HomeQuickActionsGrid`) và Lịch sử hoạt động gần đây (`HomeRecentActivitiesCard`).
-2. **Tab 2 - Lộ trình học tập (`LearningScreen`):** Trung tâm học tập mở rộng, chuyển đổi giữa các cấp độ HSK 1–5, truy cập cẩm nang giáo trình và 8 phòng thực hành kỹ năng.
+2. **Tab 2 - Lộ trình học tập (`LearningScreen`):** Trung tâm học tập mở rộng, chuyển đổi đầy đủ giữa các cấp độ **HSK 1–6**, truy cập cẩm nang giáo trình và 8 phòng thực hành kỹ năng.
 3. **Tab 3 - Trợ giảng AI (`AiTutorTabScreen`):** Trung tâm đàm thoại văn bản và giọng nói thời gian thực với các Persona giảng viên AI.
 4. **Tab 4 - Ôn tập ngắt quãng (`ReviewScreen`):** Hàng đợi ôn tập Flashcard SM-2.
 5. **Tab 5 - Cá nhân (`ProfileScreen`):** Quản lý hồ sơ, điều chỉnh mục tiêu, cài đặt âm thanh, giao diện và sao lưu cơ sở dữ liệu.
@@ -206,15 +207,18 @@ Nếu người dùng chưa hoàn thành Onboarding, `AppRouteGuard` sẽ tự đ
 
 ### 5.2. ĐỒNG BỘ TIẾN ĐỘ & ĐỘNG CƠ THÀNH THẠO (LEARNING PIPELINE)
 
-- **Quy trình hoàn thành bài học nguyên tử:**
-  Khi người học hoàn thành bài học qua [`LessonFlowNotifier.completeLesson()`](file:///C:/Users/phama/Downloads/hi_chinese/lib/features/curriculum/presentation/providers/lesson_flow_providers.dart):
-  1. Tự động tính điểm đạt chuẩn mặc định (`0.85`) cho luồng tự học.
+- **Quy trình hoàn thành bài học nguyên tử (Single SQLite Transaction):**
+  Khi người học hoàn thành bài học qua [`LessonFlowNotifier.completeLesson()`](file:///C:/Users/phama/Downloads/hi_chinese/lib/features/curriculum/presentation/providers/lesson_flow_providers.dart) -> [`LearningPipelineCoordinator.recordLessonCompletion()`](file:///C:/Users/phama/Downloads/hi_chinese/lib/features/learning_pipeline/data/learning_pipeline_coordinator.dart), toàn bộ các bước cập nhật dưới đây được thực thi bên trong **một `db.transaction((txn) async { ... })` nguyên tử duy nhất**:
+  1. Tính điểm hoàn thành thực nghiệm (`empiricalAccuracy = (totalUniqueCards - firstAttemptFailures) / totalUniqueCards`, nằm trong khoảng `[0.80, 1.0]`, hoặc dùng ngưỡng chuẩn `0.85` nếu bài học không có thẻ đánh giá).
   2. Ghi nhận cập nhật bảng `curriculum_lessons` (chuyển sang `completed` hoặc `mastered`).
   3. Ghi nhận bảng `lesson_progress` và `curriculum_mastery`.
-  4. Ghi nhận 1 bản ghi vào bảng `learning_activities` với `activity_type = 'lesson_completion'` và ngày cục bộ `YYYY-MM-DD`.
+  4. Ghi nhận 1 bản ghi vào bảng `learning_activities` với `activity_type = 'lesson'`, `created_at` (UTC) và `timezone_offset_minutes` kèm `activity_date` cục bộ `YYYY-MM-DD`.
   5. Kích hoạt [`SrsIntakeRules`](file:///C:/Users/phama/Downloads/hi_chinese/lib/features/learning_pipeline/domain/engine/srs_intake_rules.dart) tự động nạp toàn bộ từ mới vào bảng `srs_items` để xếp lịch ôn tập ngắt quãng vào ngày mai.
   6. Tự động mở khóa bài học kế tiếp thỏa mãn điều kiện tiên quyết (`prerequisites`).
   7. Làm mới tức thì các Riverpod Providers (`ref.invalidate`) của Giáo trình và Trang chủ.
+
+- **Giải nén Content Packs an toàn không khóa Database (`ContentPackLoader`):**
+  Background Isolate (`Isolate.run`) chỉ thực hiện giải nén và phân tích cú pháp (JSON parsing) trên bộ nhớ RAM, sau đó trả đối tượng Dart về Main Isolate để ghi thông qua **kết nối SQLite duy nhất** bên trong một `db.transaction` + `Batch`, loại bỏ hoàn toàn nguy cơ lỗi `SQLiteDatabaseLockedException`.
 
 - **Động cơ đánh giá nhận thức 6 bậc (`MasteryEvaluator`):**
   - `unseen`: Chưa từng học.

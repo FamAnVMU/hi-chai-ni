@@ -33,6 +33,8 @@ class LessonStudyScreen extends ConsumerStatefulWidget {
 }
 
 class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
+  double? _gamifiedScorePercent;
+
   @override
   void initState() {
     super.initState();
@@ -202,9 +204,14 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
             onAnswerRecorded: (cardId, ans) {
               flowNotifier.recordAnswer(cardId, ans);
             },
+            onScoreCalculated: (score) {
+              _gamifiedScorePercent = score;
+            },
             onFinishLesson: () async {
               final nav = Navigator.of(context);
-              await flowNotifier.completeLesson();
+              await flowNotifier.completeLesson(
+                defaultScorePercent: _gamifiedScorePercent ?? 0.85,
+              );
               if (mounted) {
                 nav.pop(true);
               }

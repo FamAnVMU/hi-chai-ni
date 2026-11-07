@@ -50,7 +50,16 @@ class DatabaseBackupHelper {
       );
     }
 
-    // 2. Perform safe WAL checkpoint to flush pending transactions
+    // 2. Sanitize any accidental sensitive keys from app_settings before backup
+    try {
+      await db.execute(
+        "DELETE FROM app_settings WHERE LOWER(key) LIKE '%api_key%' OR LOWER(key) LIKE '%token%' OR LOWER(key) LIKE '%secret%';",
+      );
+    } catch (_) {
+      // Table may not exist in minimal test schemas
+    }
+
+    // 3. Perform safe WAL checkpoint to flush pending transactions
     try {
       await db.rawQuery('PRAGMA wal_checkpoint(TRUNCATE);');
       debugPrint('[DatabaseBackup] WAL checkpoint completed successfully.');
