@@ -157,13 +157,58 @@ class CurriculumDao {
   }
 
   Future<List<Map<String, dynamic>>> getSegmentsByLessonId(String lessonId) async {
-    return _db.rawQuery('''
+    final rows = await _db.rawQuery('''
       SELECT ls.*, ci.content_json AS content_payload
       FROM ${DatabaseConstants.tableLessonSegments} ls
       LEFT JOIN ${DatabaseConstants.tableContentItems} ci ON ls.content_ref_id = ci.content_id
       WHERE ls.lesson_id = ?
       ORDER BY ls.step_order ASC
     ''', [lessonId]);
+
+    // Fallback only when a non-empty content_ref_id misses the exact indexed join
+    // (e.g. legacy mixed-case or whitespace-padded refs).
+    final unresolvedKeys = <String>{};
+    for (final row in rows) {
+      final ref = row['content_ref_id'] as String?;
+      if (ref != null && ref.trim().isNotEmpty && row['content_payload'] == null) {
+        unresolvedKeys.add(ref.trim().toUpperCase());
+      }
+    }
+    if (unresolvedKeys.isEmpty) {
+      return rows;
+    }
+
+    final fallbackMap = <String, String?>{};
+    for (final chunk in DaoUtils.chunkList(unresolvedKeys.toList())) {
+      final placeholders = List.filled(chunk.length, '?').join(',');
+      final fallbackRows = await _db.rawQuery('''
+        SELECT UPPER(TRIM(content_id)) AS norm_id, content_json
+        FROM ${DatabaseConstants.tableContentItems}
+        WHERE UPPER(TRIM(content_id)) IN ($placeholders)
+      ''', chunk);
+      for (final f in fallbackRows) {
+        final normId = f['norm_id'] as String?;
+        if (normId != null) {
+          fallbackMap.putIfAbsent(normId, () => f['content_json'] as String?);
+        }
+      }
+    }
+
+    if (fallbackMap.isEmpty) {
+      return rows;
+    }
+
+    return rows.map((row) {
+      final ref = row['content_ref_id'] as String?;
+      if (ref == null || row['content_payload'] != null) {
+        return row;
+      }
+      final key = ref.trim().toUpperCase();
+      if (!fallbackMap.containsKey(key)) {
+        return row;
+      }
+      return Map<String, dynamic>.of(row)..['content_payload'] = fallbackMap[key];
+    }).toList();
   }
 
   // Level Exit Exams
