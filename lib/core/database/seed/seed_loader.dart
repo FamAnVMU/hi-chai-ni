@@ -34,7 +34,7 @@ class SeedLoader {
     String assetPath, {
     AssetBundle? bundle,
     void Function(SeedProgress progress)? onProgress,
-    int batchSize = 50,
+    int batchSize = 500,
   }) async {
     final stopwatch = Stopwatch()..start();
     final assetBundle = bundle ?? rootBundle;
@@ -61,7 +61,7 @@ class SeedLoader {
   Future<SeedResult> seedFromJsonString(
     String rawJson, {
     void Function(SeedProgress progress)? onProgress,
-    int batchSize = 50,
+    int batchSize = 500,
     Stopwatch? stopwatch,
   }) async {
     final sw = stopwatch ?? (Stopwatch()..start());
@@ -100,7 +100,7 @@ class SeedLoader {
     SeedBundle bundle, {
     required String checksum,
     void Function(SeedProgress progress)? onProgress,
-    int batchSize = 50,
+    int batchSize = 500,
     Stopwatch? stopwatch,
   }) async {
     final sw = stopwatch ?? (Stopwatch()..start());
@@ -211,10 +211,13 @@ class SeedLoader {
               now,
             ]);
 
-            // Upsert into knowledge_registry for seamless learning pipeline integration
-            final knowId = v.pinyinClean != null
-                ? 'KNOW_VOCAB_${v.simplified}_${v.pinyinClean}'
-                : 'KNOW_VOCAB_${v.simplified}';
+            // Upsert into knowledge_registry with polyphone-safe canonical_id
+            final cleanKey = (v.pinyinClean != null && v.pinyinClean!.isNotEmpty)
+                ? v.pinyinClean!
+                : v.pinyin.trim().toLowerCase().replaceAll(RegExp(r'\s+'), '');
+            final canonicalId =
+                cleanKey.isNotEmpty ? '${v.simplified}_$cleanKey' : v.simplified;
+            final knowId = 'KNOW_VOCAB_$canonicalId';
             batch.rawInsert('''
               INSERT INTO ${DatabaseConstants.tableKnowledgeRegistry} (
                 id, entity_type, canonical_id, hsk_level, title,
@@ -226,7 +229,7 @@ class SeedLoader {
                 updated_at = excluded.updated_at;
             ''', [
               knowId,
-              v.simplified,
+              canonicalId,
               v.hskLevel,
               v.simplified,
               bundle.bundleName,
@@ -326,23 +329,34 @@ class SeedLoader {
 
             batch.rawInsert('''
               INSERT INTO ${DatabaseConstants.tableGrammarItems} (
-                id, hsk_level, code, pattern, title_vi,
+                id, grammar_id, hsk_level, hsk_level_mapped, code, pattern,
+                title, structure, title_vi, meaning_vi,
                 explanation_vi, examples_json, created_at, updated_at
-              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
               ON CONFLICT(id) DO UPDATE SET
+                grammar_id = excluded.grammar_id,
                 hsk_level = excluded.hsk_level,
+                hsk_level_mapped = excluded.hsk_level_mapped,
                 code = excluded.code,
                 pattern = excluded.pattern,
+                title = excluded.title,
+                structure = excluded.structure,
                 title_vi = excluded.title_vi,
+                meaning_vi = excluded.meaning_vi,
                 explanation_vi = excluded.explanation_vi,
                 examples_json = excluded.examples_json,
                 updated_at = excluded.updated_at;
             ''', [
               g.id,
+              g.id,
+              g.hskLevel,
               g.hskLevel,
               g.code,
               g.pattern,
               g.title,
+              g.pattern,
+              g.title,
+              g.explanationVi,
               g.explanationVi,
               examplesJson,
               now,
@@ -485,7 +499,7 @@ class SeedLoader {
       }
 
       final jsonString = rawJson ?? await (bundle ?? rootBundle).loadString(assetPath);
-      final checksum = computeChecksum(jsonString);
+      final checksum = await Isolate.run(() => computeChecksum(jsonString));
 
       if (!forceReload) {
         final existing = await _historyDao.getEntry(bundleName);

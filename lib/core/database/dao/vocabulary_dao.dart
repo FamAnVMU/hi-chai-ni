@@ -2,53 +2,26 @@ import 'package:sqflite/sqflite.dart';
 import '../../../features/dictionary/domain/models/dictionary_models.dart';
 import '../../../features/dictionary/domain/utils/pinyin_helper.dart';
 import '../database_constants.dart';
+import 'dao_utils.dart';
 
 class VocabularyDao {
   final DatabaseExecutor _db;
 
   VocabularyDao(this._db);
 
-  Future<void> _safeUpsert(
-    DatabaseExecutor executor,
-    String table,
-    Map<String, dynamic> row, {
-    String primaryKey = 'id',
-  }) async {
-    final pkVal = row[primaryKey];
-    if (pkVal != null) {
-      final existing = await executor.query(
-        table,
-        columns: [primaryKey],
-        where: '$primaryKey = ?',
-        whereArgs: [pkVal],
-        limit: 1,
-      );
-      if (existing.isNotEmpty) {
-        await executor.update(
-          table,
-          row,
-          where: '$primaryKey = ?',
-          whereArgs: [pkVal],
-        );
-        return;
-      }
-    }
-    await executor.insert(table, row, conflictAlgorithm: ConflictAlgorithm.ignore);
-  }
-
   Future<void> insertVocabulary(Map<String, dynamic> row, {Transaction? txn}) async {
     final executor = txn ?? _db;
-    await _safeUpsert(executor, DatabaseConstants.tableVocabularies, row);
+    await DaoUtils.safeUpsert(executor, DatabaseConstants.tableVocabularies, row);
   }
 
   Future<void> insertSense(Map<String, dynamic> row, {Transaction? txn}) async {
     final executor = txn ?? _db;
-    await _safeUpsert(executor, DatabaseConstants.tableVocabularySenses, row);
+    await DaoUtils.safeUpsert(executor, DatabaseConstants.tableVocabularySenses, row);
   }
 
   Future<void> insertExample(Map<String, dynamic> row, {Transaction? txn}) async {
     final executor = txn ?? _db;
-    await _safeUpsert(executor, DatabaseConstants.tableVocabularyExamples, row);
+    await DaoUtils.safeUpsert(executor, DatabaseConstants.tableVocabularyExamples, row);
   }
 
   Future<Map<String, dynamic>?> getVocabularyById(String id) async {
@@ -102,48 +75,49 @@ class VocabularyDao {
     }
   }
 
-  /// Batch fetches senses for multiple vocabulary IDs in a single query.
-  /// Eliminates the N+1 query problem during multi-result search operations.
+  /// Batch fetches senses for multiple vocabulary IDs in chunked queries (<= 500 args).
   Future<Map<String, List<Map<String, dynamic>>>> getSensesByVocabularyIds(
     List<String> vocabIds,
   ) async {
     if (vocabIds.isEmpty) return const {};
 
-    final placeholders = List.filled(vocabIds.length, '?').join(',');
-    final rows = await _db.query(
-      DatabaseConstants.tableVocabularySenses,
-      where: 'vocabulary_id IN ($placeholders) AND deleted_at IS NULL',
-      whereArgs: vocabIds,
-      orderBy: 'order_index ASC',
-    );
-
     final map = <String, List<Map<String, dynamic>>>{};
-    for (final row in rows) {
-      final vid = row['vocabulary_id'] as String;
-      map.putIfAbsent(vid, () => []).add(row);
+    for (final chunk in DaoUtils.chunkList(vocabIds)) {
+      final placeholders = List.filled(chunk.length, '?').join(',');
+      final rows = await _db.query(
+        DatabaseConstants.tableVocabularySenses,
+        where: 'vocabulary_id IN ($placeholders) AND deleted_at IS NULL',
+        whereArgs: chunk,
+        orderBy: 'order_index ASC',
+      );
+      for (final row in rows) {
+        final vid = row['vocabulary_id'] as String;
+        map.putIfAbsent(vid, () => []).add(row);
+      }
     }
     return map;
   }
 
-  /// Batch fetches verified examples for multiple vocabulary IDs.
+  /// Batch fetches verified examples for multiple vocabulary IDs in chunked queries (<= 500 args).
   Future<Map<String, List<Map<String, dynamic>>>> getExamplesByVocabularyIds(
     List<String> vocabIds,
   ) async {
     if (vocabIds.isEmpty) return const {};
 
     try {
-      final placeholders = List.filled(vocabIds.length, '?').join(',');
-      final rows = await _db.query(
-        DatabaseConstants.tableVocabularyExamples,
-        where: 'vocabulary_id IN ($placeholders)',
-        whereArgs: vocabIds,
-        orderBy: 'order_index ASC',
-      );
-
       final map = <String, List<Map<String, dynamic>>>{};
-      for (final row in rows) {
-        final vid = row['vocabulary_id'] as String;
-        map.putIfAbsent(vid, () => []).add(row);
+      for (final chunk in DaoUtils.chunkList(vocabIds)) {
+        final placeholders = List.filled(chunk.length, '?').join(',');
+        final rows = await _db.query(
+          DatabaseConstants.tableVocabularyExamples,
+          where: 'vocabulary_id IN ($placeholders)',
+          whereArgs: chunk,
+          orderBy: 'order_index ASC',
+        );
+        for (final row in rows) {
+          final vid = row['vocabulary_id'] as String;
+          map.putIfAbsent(vid, () => []).add(row);
+        }
       }
       return map;
     } catch (_) {
@@ -151,7 +125,11 @@ class VocabularyDao {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getVocabulariesByHsk(int hskLevel, {int limit = 50, int offset = 0}) async {
+  Future<List<Map<String, dynamic>>> getVocabulariesByHsk(
+    int hskLevel, {
+    int limit = 50,
+    int offset = 0,
+  }) async {
     return await _db.query(
       DatabaseConstants.tableVocabularies,
       where: 'hsk_level = ? AND deleted_at IS NULL',
@@ -184,6 +162,8 @@ class VocabularyDao {
     final isChinese = RegExp(r'[\u4e00-\u9fa5]').hasMatch(trimmed);
 
     if (isChinese) {
+      final escaped = DaoUtils.escapeLikePattern(trimmed);
+
       // 1. Exact match Hanzi
       final exact = await _db.query(
         DatabaseConstants.tableVocabularies,
@@ -198,8 +178,8 @@ class VocabularyDao {
       if (resultMap.length < limit) {
         final prefix = await _db.query(
           DatabaseConstants.tableVocabularies,
-          where: '(simplified LIKE ? OR traditional LIKE ?) AND deleted_at IS NULL',
-          whereArgs: ['$trimmed%', '$trimmed%'],
+          where: r"(simplified LIKE ? ESCAPE '\' OR traditional LIKE ? ESCAPE '\') AND deleted_at IS NULL",
+          whereArgs: ['$escaped%', '$escaped%'],
           limit: limit - resultMap.length,
         );
         for (final row in prefix) {
@@ -211,8 +191,8 @@ class VocabularyDao {
       if (resultMap.length < limit) {
         final sub = await _db.query(
           DatabaseConstants.tableVocabularies,
-          where: '(simplified LIKE ? OR traditional LIKE ?) AND deleted_at IS NULL',
-          whereArgs: ['%$trimmed%', '%$trimmed%'],
+          where: r"(simplified LIKE ? ESCAPE '\' OR traditional LIKE ? ESCAPE '\') AND deleted_at IS NULL",
+          whereArgs: ['%$escaped%', '%$escaped%'],
           limit: limit - resultMap.length,
         );
         for (final row in sub) {
@@ -220,14 +200,17 @@ class VocabularyDao {
         }
       }
     } else {
+      final lowerTrimmed = trimmed.toLowerCase();
+      final escapedLower = DaoUtils.escapeLikePattern(lowerTrimmed);
       final cleanQuery = PinyinHelper.removeTones(trimmed).toLowerCase().replaceAll(RegExp(r'\s+'), '');
-      
+      final escapedClean = DaoUtils.escapeLikePattern(cleanQuery);
+
       // 1. Exact Pinyin match
       try {
         final exactPinyin = await _db.query(
           DatabaseConstants.tableVocabularies,
           where: '(LOWER(pinyin) = ? OR pinyin_clean = ?) AND deleted_at IS NULL',
-          whereArgs: [trimmed.toLowerCase(), cleanQuery],
+          whereArgs: [lowerTrimmed, cleanQuery],
         );
         for (final row in exactPinyin) {
           resultMap[row['id'] as String] = row;
@@ -236,7 +219,7 @@ class VocabularyDao {
         final exactPinyin = await _db.query(
           DatabaseConstants.tableVocabularies,
           where: 'LOWER(pinyin) = ? AND deleted_at IS NULL',
-          whereArgs: [trimmed.toLowerCase()],
+          whereArgs: [lowerTrimmed],
         );
         for (final row in exactPinyin) {
           resultMap[row['id'] as String] = row;
@@ -248,8 +231,8 @@ class VocabularyDao {
         try {
           final prefixClean = await _db.query(
             DatabaseConstants.tableVocabularies,
-            where: 'pinyin_clean LIKE ? AND deleted_at IS NULL',
-            whereArgs: ['$cleanQuery%'],
+            where: r"pinyin_clean LIKE ? ESCAPE '\' AND deleted_at IS NULL",
+            whereArgs: ['$escapedClean%'],
             limit: limit - resultMap.length,
           );
           for (final row in prefixClean) {
@@ -276,13 +259,13 @@ class VocabularyDao {
         }
       }
 
-      // 3. Exact & Prefix Han-Viet match
+      // 3b. Exact & Prefix Han-Viet match
       if (resultMap.length < limit) {
         try {
           final hvMatches = await _db.query(
             DatabaseConstants.tableVocabularies,
-            where: '(LOWER(hanviet) = ? OR LOWER(hanviet) LIKE ?) AND deleted_at IS NULL',
-            whereArgs: [trimmed.toLowerCase(), '${trimmed.toLowerCase()}%'],
+            where: r"(LOWER(hanviet) = ? OR LOWER(hanviet) LIKE ? ESCAPE '\') AND deleted_at IS NULL",
+            whereArgs: [lowerTrimmed, '$escapedLower%'],
             limit: limit - resultMap.length,
           );
           for (final row in hvMatches) {
@@ -295,8 +278,8 @@ class VocabularyDao {
       if (resultMap.length < limit) {
         final prefixPinyin = await _db.query(
           DatabaseConstants.tableVocabularies,
-          where: '(LOWER(pinyin) LIKE ? OR LOWER(pinyin) LIKE ?) AND deleted_at IS NULL',
-          whereArgs: ['${trimmed.toLowerCase()}%', '%${trimmed.toLowerCase()}%'],
+          where: r"(LOWER(pinyin) LIKE ? ESCAPE '\' OR LOWER(pinyin) LIKE ? ESCAPE '\') AND deleted_at IS NULL",
+          whereArgs: ['$escapedLower%', '%$escapedLower%'],
           limit: limit - resultMap.length,
         );
         for (final row in prefixPinyin) {
@@ -304,29 +287,84 @@ class VocabularyDao {
         }
       }
 
-      // 5. Vietnamese meaning match from senses
+      // 5. Vietnamese meaning match from senses (single batched WHERE id IN instead of N+1)
       if (resultMap.length < limit) {
         final senses = await _db.query(
           DatabaseConstants.tableVocabularySenses,
           columns: ['vocabulary_id'],
-          where: 'LOWER(meaning_vi) LIKE ? AND deleted_at IS NULL',
-          whereArgs: ['%${trimmed.toLowerCase()}%'],
+          where: r"LOWER(meaning_vi) LIKE ? ESCAPE '\' AND deleted_at IS NULL",
+          whereArgs: ['%$escapedLower%'],
           limit: (limit - resultMap.length) * 2,
         );
 
-        final vocabIds = senses.map((s) => s['vocabulary_id'] as String).toSet();
-        for (final id in vocabIds) {
-          if (!resultMap.containsKey(id) && resultMap.length < limit) {
-            final vocab = await getVocabularyById(id);
-            if (vocab != null) {
-              resultMap[id] = vocab;
+        final missingIds = senses
+            .map((s) => s['vocabulary_id'] as String)
+            .where((id) => !resultMap.containsKey(id))
+            .toSet()
+            .toList();
+
+        if (missingIds.isNotEmpty) {
+          for (final chunk in DaoUtils.chunkList(missingIds)) {
+            final placeholders = List.filled(chunk.length, '?').join(',');
+            final vocabRows = await _db.query(
+              DatabaseConstants.tableVocabularies,
+              where: 'id IN ($placeholders) AND deleted_at IS NULL',
+              whereArgs: chunk,
+            );
+            for (final vocab in vocabRows) {
+              if (resultMap.length >= limit) break;
+              resultMap.putIfAbsent(vocab['id'] as String, () => vocab);
             }
+            if (resultMap.length >= limit) break;
           }
         }
       }
     }
 
     return resultMap.values.toList();
+  }
+
+  /// Queries the offline comprehensive dictionary via SQLite FTS5 prefix matching + BM25 ranking,
+  /// falling back safely to [searchDictionaryEntries] on non-FTS schemas or empty CJK substrings.
+  Future<List<Map<String, dynamic>>> searchDictionaryFts(
+    String query, {
+    int limit = 30,
+  }) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) return [];
+
+    final sanitized = trimmed.replaceAll(RegExp(r'["*^():+\-\\]'), ' ').trim();
+    final tokens = sanitized
+        .split(RegExp(r'\s+'))
+        .where((t) => t.isNotEmpty)
+        .where((t) {
+          final up = t.toUpperCase();
+          return up != 'AND' && up != 'OR' && up != 'NOT' && up != 'NEAR';
+        })
+        .map((t) => '"$t"*')
+        .toList();
+
+    if (tokens.isEmpty) {
+      return searchDictionaryEntries(trimmed, limit: limit);
+    }
+
+    final matchQuery = tokens.join(' ');
+    try {
+      final rows = await _db.rawQuery('''
+        SELECT d.*
+        FROM ${DatabaseConstants.tableDictionaryEntriesFts} f
+        JOIN ${DatabaseConstants.tableDictionaryEntries} d ON d.rowid = f.rowid
+        WHERE ${DatabaseConstants.tableDictionaryEntriesFts} MATCH ?
+        ORDER BY bm25(${DatabaseConstants.tableDictionaryEntriesFts})
+        LIMIT ?
+      ''', [matchQuery, limit]);
+      if (rows.isNotEmpty) {
+        return rows;
+      }
+    } catch (_) {
+      // Fallback to indexed LIKE search if FTS5 table is unavailable
+    }
+    return searchDictionaryEntries(trimmed, limit: limit);
   }
 
   /// Queries the offline comprehensive dictionary (122k words) for words not found in core HSK list.
@@ -337,22 +375,25 @@ class VocabularyDao {
     try {
       final isChinese = RegExp(r'[\u4e00-\u9fa5]').hasMatch(trimmed);
       if (isChinese) {
+        final escaped = DaoUtils.escapeLikePattern(trimmed);
         return await _db.query(
           DatabaseConstants.tableDictionaryEntries,
-          where: 'simplified = ? OR traditional = ? OR simplified LIKE ?',
-          whereArgs: [trimmed, trimmed, '$trimmed%'],
+          where: r"simplified = ? OR traditional = ? OR simplified LIKE ? ESCAPE '\'",
+          whereArgs: [trimmed, trimmed, '$escaped%'],
           limit: limit,
         );
       } else {
         final clean = PinyinHelper.removeTones(trimmed).toLowerCase().replaceAll(RegExp(r'\s+'), '');
+        final escapedClean = DaoUtils.escapeLikePattern(clean);
+        final escapedLower = DaoUtils.escapeLikePattern(trimmed.toLowerCase());
         final Map<String, Map<String, dynamic>> dictResults = {};
 
         // Step 1: Fast indexed lookup on pinyin_clean (avoids OR full-table scan)
         if (clean.isNotEmpty) {
           final pinyinMatches = await _db.query(
             DatabaseConstants.tableDictionaryEntries,
-            where: 'pinyin_clean = ? OR pinyin_clean LIKE ?',
-            whereArgs: [clean, '$clean%'],
+            where: r"pinyin_clean = ? OR pinyin_clean LIKE ? ESCAPE '\'",
+            whereArgs: [clean, '$escapedClean%'],
             limit: limit,
           );
           for (final row in pinyinMatches) {
@@ -365,8 +406,8 @@ class VocabularyDao {
         if (dictResults.length < limit) {
           final meaningMatches = await _db.query(
             DatabaseConstants.tableDictionaryEntries,
-            where: 'LOWER(meaning_vi) LIKE ?',
-            whereArgs: ['%${trimmed.toLowerCase()}%'],
+            where: r"LOWER(meaning_vi) LIKE ? ESCAPE '\'",
+            whereArgs: ['%$escapedLower%'],
             limit: limit - dictResults.length,
           );
           for (final row in meaningMatches) {
@@ -477,11 +518,25 @@ class VocabularyDao {
     }
 
     await executor.rawInsert('''
-      INSERT OR REPLACE INTO ${DatabaseConstants.tableVocabularies} (
+      INSERT INTO ${DatabaseConstants.tableVocabularies} (
         id, simplified, traditional, pinyin, pinyin_clean, hanviet, hsk_level,
         stroke_count, radicals, frequency_rank, source, license,
         verification_status, is_polyphone, created_at, updated_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        simplified = COALESCE(NULLIF(excluded.simplified, ''), ${DatabaseConstants.tableVocabularies}.simplified),
+        traditional = COALESCE(NULLIF(excluded.traditional, ''), ${DatabaseConstants.tableVocabularies}.traditional),
+        pinyin = COALESCE(NULLIF(excluded.pinyin, ''), ${DatabaseConstants.tableVocabularies}.pinyin),
+        pinyin_clean = COALESCE(NULLIF(excluded.pinyin_clean, ''), ${DatabaseConstants.tableVocabularies}.pinyin_clean),
+        hanviet = COALESCE(${DatabaseConstants.tableVocabularies}.hanviet, excluded.hanviet),
+        hsk_level = CASE
+          WHEN ${DatabaseConstants.tableVocabularies}.hsk_level > 0 THEN ${DatabaseConstants.tableVocabularies}.hsk_level
+          ELSE excluded.hsk_level
+        END,
+        stroke_count = COALESCE(${DatabaseConstants.tableVocabularies}.stroke_count, excluded.stroke_count),
+        radicals = COALESCE(${DatabaseConstants.tableVocabularies}.radicals, excluded.radicals),
+        frequency_rank = COALESCE(${DatabaseConstants.tableVocabularies}.frequency_rank, excluded.frequency_rank),
+        updated_at = excluded.updated_at
     ''', [
       id,
       simplified,
@@ -504,10 +559,18 @@ class VocabularyDao {
     if (senses != null && senses.isNotEmpty) {
       for (final s in senses) {
         await executor.rawInsert('''
-          INSERT OR REPLACE INTO ${DatabaseConstants.tableVocabularySenses} (
+          INSERT INTO ${DatabaseConstants.tableVocabularySenses} (
             id, vocabulary_id, part_of_speech, meaning_vi, meaning_en,
             example_cn, example_pinyin, example_vi, source, order_index, created_at, updated_at
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ON CONFLICT(id) DO UPDATE SET
+            part_of_speech = COALESCE(excluded.part_of_speech, ${DatabaseConstants.tableVocabularySenses}.part_of_speech),
+            meaning_vi = COALESCE(excluded.meaning_vi, ${DatabaseConstants.tableVocabularySenses}.meaning_vi),
+            meaning_en = COALESCE(excluded.meaning_en, ${DatabaseConstants.tableVocabularySenses}.meaning_en),
+            example_cn = COALESCE(excluded.example_cn, ${DatabaseConstants.tableVocabularySenses}.example_cn),
+            example_pinyin = COALESCE(excluded.example_pinyin, ${DatabaseConstants.tableVocabularySenses}.example_pinyin),
+            example_vi = COALESCE(excluded.example_vi, ${DatabaseConstants.tableVocabularySenses}.example_vi),
+            updated_at = excluded.updated_at
         ''', [
           s.id,
           id,
@@ -525,10 +588,13 @@ class VocabularyDao {
       }
     } else if (meaningVi != null && meaningVi.isNotEmpty) {
       await executor.rawInsert('''
-        INSERT OR REPLACE INTO ${DatabaseConstants.tableVocabularySenses} (
+        INSERT INTO ${DatabaseConstants.tableVocabularySenses} (
           id, vocabulary_id, part_of_speech, meaning_vi, meaning_en,
           example_cn, example_pinyin, example_vi, source, order_index, created_at, updated_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          meaning_vi = COALESCE(excluded.meaning_vi, ${DatabaseConstants.tableVocabularySenses}.meaning_vi),
+          updated_at = excluded.updated_at
       ''', [
         'sns_$id',
         id,

@@ -7,7 +7,32 @@ import 'database_backup_helper.dart';
 import 'database_constants.dart';
 import 'migrations/migration_engine.dart';
 
+class DatabaseGenerationNotifier extends Notifier<int> {
+  @override
+  int build() {
+    void listener() {
+      if (ref.mounted && state != AppDatabase.instance.generation) {
+        state = AppDatabase.instance.generation;
+      }
+    }
+
+    AppDatabase.instance.addGenerationListener(listener);
+    ref.onDispose(() => AppDatabase.instance.removeGenerationListener(listener));
+    return AppDatabase.instance.generation;
+  }
+
+  void bump() {
+    state = state + 1;
+  }
+}
+
+final databaseGenerationProvider =
+    NotifierProvider<DatabaseGenerationNotifier, int>(
+  DatabaseGenerationNotifier.new,
+);
+
 final appDatabaseProvider = Provider<AppDatabase>((ref) {
+  ref.watch(databaseGenerationProvider);
   return AppDatabase.instance;
 });
 
@@ -20,9 +45,30 @@ class AppDatabase {
   final MigrationEngine _migrationEngine;
   Database? _db;
   String? _databasePath;
+  Future<Database>? _openingFuture;
+  int _generation = 0;
+  final Set<VoidCallback> _generationListeners = {};
 
   bool get isOpen => _db != null && _db!.isOpen;
   String? get path => _databasePath;
+  int get generation => _generation;
+
+  void addGenerationListener(VoidCallback listener) {
+    _generationListeners.add(listener);
+  }
+
+  void removeGenerationListener(VoidCallback listener) {
+    _generationListeners.remove(listener);
+  }
+
+  void _notifyGenerationChanged() {
+    _generation++;
+    for (final cb in List<VoidCallback>.from(_generationListeners)) {
+      cb();
+    }
+  }
+
+  void notifyReopened() => _notifyGenerationChanged();
 
   /// Returns the active Database instance. Throws StateError if not initialized.
   Database get database {
@@ -31,6 +77,21 @@ class AppDatabase {
       throw StateError('Database is not open. Call AppDatabase.instance.open() first.');
     }
     return db;
+  }
+
+  Future<Database> ensureOpen({
+    String? customPath,
+    DatabaseFactory? customFactory,
+    int version = DatabaseConstants.currentDatabaseVersion,
+  }) async {
+    if (_db != null && _db!.isOpen) {
+      return _db!;
+    }
+    return open(
+      customPath: customPath,
+      customFactory: customFactory,
+      version: version,
+    );
   }
 
   /// Initializes and opens the SQLite database.
@@ -47,7 +108,27 @@ class AppDatabase {
     if (_db != null && _db!.isOpen) {
       return _db!;
     }
+    if (_openingFuture != null) {
+      return _openingFuture!;
+    }
 
+    _openingFuture = _openInternal(
+      customPath: customPath,
+      customFactory: customFactory,
+      version: version,
+    );
+    try {
+      return await _openingFuture!;
+    } finally {
+      _openingFuture = null;
+    }
+  }
+
+  Future<Database> _openInternal({
+    String? customPath,
+    DatabaseFactory? customFactory,
+    int version = DatabaseConstants.currentDatabaseVersion,
+  }) async {
     final factory = customFactory ?? databaseFactory;
 
     if (customPath != null) {
@@ -98,7 +179,21 @@ class AppDatabase {
       ),
     );
 
+    _notifyGenerationChanged();
     return _db!;
+  }
+
+  Future<T> traceQuery<T>(String label, Future<T> Function() action) async {
+    if (!kDebugMode) return action();
+    final sw = Stopwatch()..start();
+    try {
+      return await action();
+    } finally {
+      sw.stop();
+      if (sw.elapsedMilliseconds > 16) {
+        debugPrint('[AppDatabase:SlowQuery] $label took ${sw.elapsedMilliseconds}ms');
+      }
+    }
   }
 
   /// Executes an operation inside a database transaction.

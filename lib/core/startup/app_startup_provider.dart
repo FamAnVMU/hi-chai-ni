@@ -4,11 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../features/content_packs/data/content_pack_manager.dart';
 import '../audio/audio_temp_cleaner.dart';
+import '../../features/roadmap/domain/models/roadmap_models.dart';
 import '../../features/settings/presentation/providers/settings_providers.dart';
 import '../database/app_database.dart';
 import '../database/dao/app_settings_dao.dart';
 import '../database/database_constants.dart';
 import '../database/seed/seed_loader.dart';
+import '../network/ai/ai_service.dart';
 import '../network/ai/security/ai_credential_storage.dart';
 import '../theme/theme.dart';
 import 'app_startup_state.dart';
@@ -103,6 +105,9 @@ class AppStartupNotifier extends Notifier<AppStartupState> {
       );
       debugPrint('[AppStartup] 2/10: Mở cơ sở dữ liệu SQLite...');
       final Database db = databaseOverride ?? await AppDatabase.instance.open();
+      if (ref.mounted && databaseOverride == null) {
+        ref.invalidate(appSettingsDaoProvider);
+      }
 
       // Bước 3: Kiểm tra và thực hiện migration
       state = state.copyWith(
@@ -350,7 +355,7 @@ class AppStartupNotifier extends Notifier<AppStartupState> {
     Database db, {
     AiCredentialStorage? credentialStorage,
   }) async {
-    // 1. Run idempotent legacy credential migration from SQLite app_settings to FlutterSecureStorage
+    // 1. Run idempotent legacy credential migration and preload selected AI model
     try {
       final storage = credentialStorage ?? AiCredentialStorage();
       final migrationResult = await storage.migrateLegacyCredentials(db);
@@ -360,22 +365,30 @@ class AppStartupNotifier extends Notifier<AppStartupState> {
           'khóa nhạy cảm sang bộ nhớ bảo mật an toàn.',
         );
       }
+      final savedModel = await storage.getSelectedModel();
+      if (savedModel.isNotEmpty && ref.mounted) {
+        ref.read(aiModelRegistryProvider).setDefaultModel(savedModel);
+      }
     } catch (e) {
-      debugPrint('[AppStartup] Cảnh báo: Di chuyển bảo mật credential thất bại: $e');
+      debugPrint('[AppStartup] Cảnh báo: Di chuyển bảo mật credential / nạp model thất bại: $e');
     }
 
     // 2. Ensure default user profile exists for learning analytics and progress recording
-    final profiles = await db.query(DatabaseConstants.tableUserProfiles, limit: 1);
+    final profiles = await db.query(
+      DatabaseConstants.tableUserProfiles,
+      orderBy: 'updated_at DESC',
+      limit: 1,
+    );
     if (profiles.isEmpty) {
       final nowUtc = DateTime.now().toUtc().toIso8601String();
       await db.insert(
         DatabaseConstants.tableUserProfiles,
         {
-          'id': 'user_default',
+          'id': DatabaseConstants.defaultProfileId,
           'display_name': 'Học viên HI Chinese',
           'current_hsk_level': 1,
           'target_hsk_level': 1,
-          'purpose': 'daily_communication',
+          'purpose': LearnerPurpose.dailyCommunication.name,
           'timeframe': 'standard',
           'daily_minutes': 15,
           'start_date': nowUtc,
@@ -392,18 +405,17 @@ class AppStartupNotifier extends Notifier<AppStartupState> {
     try {
       final settingsDao = AppSettingsDao(db);
       final map = await settingsDao.getAllSettings();
-      if (map.isNotEmpty) {
+      if (map.isNotEmpty && ref.mounted) {
         ThemeMode themeMode = ThemeMode.light;
         if (map['theme_mode'] == 'dark') themeMode = ThemeMode.dark;
         if (map['theme_mode'] == 'system') themeMode = ThemeMode.system;
         if (map['theme_mode'] == 'light') themeMode = ThemeMode.light;
 
-        // Synchronize themeModeProvider to avoid visual flashing
         ref.read(themeModeProvider.notifier).setThemeMode(themeMode);
-
-        // Synchronize AppSettings state
-        await ref.read(appSettingsProvider.notifier).reloadSettings();
         debugPrint('[AppStartup] Đã đồng bộ cài đặt người dùng: ThemeMode=$themeMode');
+      }
+      if (ref.mounted) {
+        await ref.read(appSettingsProvider.notifier).reloadSettings(daoOverride: settingsDao);
       }
     } catch (e) {
       debugPrint('[AppStartup] Cảnh báo: Tải cài đặt người dùng ban đầu thất bại: $e');

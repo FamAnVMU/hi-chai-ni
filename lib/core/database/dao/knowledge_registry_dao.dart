@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import '../database_constants.dart';
+import 'dao_utils.dart';
 
 class KnowledgeRegistryDao {
   final DatabaseExecutor _db;
@@ -7,34 +8,6 @@ class KnowledgeRegistryDao {
   const KnowledgeRegistryDao(this._db);
 
   DatabaseExecutor _getExecutor(DatabaseExecutor? custom) => custom ?? _db;
-
-  Future<void> _safeUpsert(
-    DatabaseExecutor executor,
-    String table,
-    Map<String, dynamic> row, {
-    String primaryKey = 'id',
-  }) async {
-    final pkVal = row[primaryKey];
-    if (pkVal != null) {
-      final existing = await executor.query(
-        table,
-        columns: [primaryKey],
-        where: '$primaryKey = ?',
-        whereArgs: [pkVal],
-        limit: 1,
-      );
-      if (existing.isNotEmpty) {
-        await executor.update(
-          table,
-          row,
-          where: '$primaryKey = ?',
-          whereArgs: [pkVal],
-        );
-        return;
-      }
-    }
-    await executor.insert(table, row, conflictAlgorithm: ConflictAlgorithm.ignore);
-  }
 
   Future<void> upsertKnowledgeItem(
     Map<String, dynamic> row, {
@@ -64,7 +37,7 @@ class KnowledgeRegistryDao {
         return;
       }
     }
-    await _safeUpsert(exec, DatabaseConstants.tableKnowledgeRegistry, row);
+    await DaoUtils.safeUpsert(exec, DatabaseConstants.tableKnowledgeRegistry, row);
   }
 
   Future<void> upsertKnowledgeItemsBatch(
@@ -73,8 +46,37 @@ class KnowledgeRegistryDao {
   }) async {
     if (rows.isEmpty) return;
     final exec = _getExecutor(executor);
-    for (final row in rows) {
-      await upsertKnowledgeItem(row, executor: exec);
+
+    Future<void> executeBatch(DatabaseExecutor target) async {
+      final batch = target.batch();
+      for (final row in rows) {
+        if (row.isEmpty) continue;
+        final cols = row.keys.toList();
+        final colNames = cols.join(', ');
+        final placeholders = List.filled(cols.length, '?').join(', ');
+        final args = cols.map((k) => row[k]).toList();
+        final updatableCols = cols
+            .where((k) =>
+                k != 'id' &&
+                k != 'entity_type' &&
+                k != 'canonical_id' &&
+                k != 'created_at')
+            .toList();
+        final conflictClause = updatableCols.isEmpty
+            ? 'ON CONFLICT(entity_type, canonical_id) DO NOTHING'
+            : 'ON CONFLICT(entity_type, canonical_id) DO UPDATE SET ${updatableCols.map((k) => '$k = excluded.$k').join(', ')}';
+        batch.rawInsert(
+          'INSERT INTO ${DatabaseConstants.tableKnowledgeRegistry} ($colNames) VALUES ($placeholders) $conflictClause',
+          args,
+        );
+      }
+      await batch.commit(noResult: true);
+    }
+
+    if (exec is Database) {
+      await exec.transaction((txn) => executeBatch(txn));
+    } else {
+      await executeBatch(exec);
     }
   }
 
@@ -141,7 +143,7 @@ class KnowledgeRegistryDao {
     DatabaseExecutor? executor,
   }) async {
     final exec = _getExecutor(executor);
-    await _safeUpsert(exec, DatabaseConstants.tableLessonKnowledgeItems, row);
+    await DaoUtils.safeUpsert(exec, DatabaseConstants.tableLessonKnowledgeItems, row);
   }
 
   Future<void> insertLessonKnowledgeItemsBatch(
@@ -150,8 +152,31 @@ class KnowledgeRegistryDao {
   }) async {
     if (rows.isEmpty) return;
     final exec = _getExecutor(executor);
-    for (final row in rows) {
-      await _safeUpsert(exec, DatabaseConstants.tableLessonKnowledgeItems, row);
+
+    Future<void> executeBatch(DatabaseExecutor target) async {
+      final batch = target.batch();
+      for (final row in rows) {
+        if (row.isEmpty) continue;
+        final cols = row.keys.toList();
+        final colNames = cols.join(', ');
+        final placeholders = List.filled(cols.length, '?').join(', ');
+        final args = cols.map((k) => row[k]).toList();
+        final updatableCols = cols.where((k) => k != 'id' && k != 'created_at').toList();
+        final conflictClause = updatableCols.isEmpty
+            ? 'ON CONFLICT(id) DO NOTHING'
+            : 'ON CONFLICT(id) DO UPDATE SET ${updatableCols.map((k) => '$k = excluded.$k').join(', ')}';
+        batch.rawInsert(
+          'INSERT INTO ${DatabaseConstants.tableLessonKnowledgeItems} ($colNames) VALUES ($placeholders) $conflictClause',
+          args,
+        );
+      }
+      await batch.commit(noResult: true);
+    }
+
+    if (exec is Database) {
+      await exec.transaction((txn) => executeBatch(txn));
+    } else {
+      await executeBatch(exec);
     }
   }
 
@@ -179,7 +204,7 @@ class KnowledgeRegistryDao {
     DatabaseExecutor? executor,
   }) async {
     final exec = _getExecutor(executor);
-    await _safeUpsert(exec, DatabaseConstants.tableContentIdMappings, row);
+    await DaoUtils.safeUpsert(exec, DatabaseConstants.tableContentIdMappings, row);
   }
 
   /// Resolves the latest active target content ID by following any historical mapping hops.

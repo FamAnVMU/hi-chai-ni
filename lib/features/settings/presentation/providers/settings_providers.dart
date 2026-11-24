@@ -22,21 +22,40 @@ final dataManagementServiceProvider = Provider<DataManagementService>((ref) {
 class AppSettingsNotifier extends Notifier<AppSettings> {
   @override
   AppSettings build() {
-    // Read cached values or defaults
-    _loadSettingsAsync();
+    ref.watch(databaseGenerationProvider);
+    Future.microtask(_loadSettingsAsync);
     return const AppSettings();
   }
 
-  /// Synchronously or asynchronously re-syncs state from the database
-  Future<void> reloadSettings() async {
-    await _loadSettingsAsync();
+  Future<AppSettingsDao> _resolveDao({AppSettingsDao? daoOverride}) async {
+    if (daoOverride != null) return daoOverride;
+    AppSettingsDao? existingDao;
+    try {
+      existingDao = ref.read(appSettingsDaoProvider);
+    } on StateError {
+      existingDao = null;
+    }
+    if (existingDao != null) return existingDao;
+
+    final db = await ref.read(appDatabaseProvider).ensureOpen();
+    if (ref.mounted) {
+      ref.invalidate(appSettingsDaoProvider);
+    }
+    return AppSettingsDao(db);
   }
 
-  Future<void> _loadSettingsAsync() async {
+  /// Synchronously or asynchronously re-syncs state from the database.
+  Future<void> reloadSettings({AppSettingsDao? daoOverride}) async {
+    await _loadSettingsAsync(daoOverride: daoOverride);
+  }
+
+  Future<void> _loadSettingsAsync({AppSettingsDao? daoOverride}) async {
+    if (!ref.mounted) return;
     try {
-      final dao = ref.read(appSettingsDaoProvider);
+      final dao = await _resolveDao(daoOverride: daoOverride);
+      if (!ref.mounted) return;
       final map = await dao.getAllSettings();
-      if (map.isEmpty) return;
+      if (!ref.mounted || map.isEmpty) return;
 
       ThemeMode themeMode = ThemeMode.light;
       if (map['theme_mode'] == 'dark') themeMode = ThemeMode.dark;
@@ -64,82 +83,65 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
         hapticFeedback: haptic,
       );
 
-      // Keep themeModeProvider in sync
       ref.read(themeModeProvider.notifier).setThemeMode(themeMode);
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('[AppSettingsNotifier] Failed to load settings: $e\n$st');
+    }
+  }
+
+  Future<void> _persistSetting(String key, String value) async {
+    try {
+      final dao = await _resolveDao();
+      await dao.setSetting(key, value);
+    } catch (e, st) {
+      debugPrint('[AppSettingsNotifier] Failed to persist "$key": $e\n$st');
+    }
   }
 
   Future<void> setThemeMode(ThemeMode mode) async {
     state = state.copyWith(themeMode: mode);
     ref.read(themeModeProvider.notifier).setThemeMode(mode);
-    try {
-      final dao = ref.read(appSettingsDaoProvider);
-      await dao.setSetting('theme_mode', mode.name);
-    } catch (_) {}
+    await _persistSetting('theme_mode', mode.name);
   }
 
   Future<void> setFontScale(double scale) async {
     state = state.copyWith(fontScale: scale);
-    try {
-      final dao = ref.read(appSettingsDaoProvider);
-      await dao.setSetting('font_scale', scale.toString());
-    } catch (_) {}
+    await _persistSetting('font_scale', scale.toString());
   }
 
   Future<void> toggleShowPinyin(bool value) async {
     state = state.copyWith(showPinyinByDefault: value);
-    try {
-      final dao = ref.read(appSettingsDaoProvider);
-      await dao.setSetting('show_pinyin', value.toString());
-    } catch (_) {}
+    await _persistSetting('show_pinyin', value.toString());
   }
 
   Future<void> toggleShowRuby(bool value) async {
     state = state.copyWith(showRubyAnnotation: value);
-    try {
-      final dao = ref.read(appSettingsDaoProvider);
-      await dao.setSetting('show_ruby', value.toString());
-    } catch (_) {}
+    await _persistSetting('show_ruby', value.toString());
   }
 
   Future<void> togglePinyinToneColors(bool value) async {
     state = state.copyWith(pinyinToneColors: value);
-    try {
-      final dao = ref.read(appSettingsDaoProvider);
-      await dao.setSetting('pinyin_tone_colors', value.toString());
-    } catch (_) {}
+    await _persistSetting('pinyin_tone_colors', value.toString());
   }
 
   Future<void> setSpeechRate(double rate) async {
     state = state.copyWith(speechRate: rate);
-    try {
-      final dao = ref.read(appSettingsDaoProvider);
-      await dao.setSetting('speech_rate', rate.toString());
-    } catch (_) {}
+    await _persistSetting('speech_rate', rate.toString());
   }
 
   Future<void> toggleAutoPlayAudio(bool value) async {
     state = state.copyWith(autoPlayAudio: value);
-    try {
-      final dao = ref.read(appSettingsDaoProvider);
-      await dao.setSetting('auto_play_audio', value.toString());
-    } catch (_) {}
+    await _persistSetting('auto_play_audio', value.toString());
   }
 
   Future<void> toggleHapticFeedback(bool value) async {
     state = state.copyWith(hapticFeedback: value);
-    try {
-      final dao = ref.read(appSettingsDaoProvider);
-      await dao.setSetting('haptic_feedback', value.toString());
-    } catch (_) {}
+    await _persistSetting('haptic_feedback', value.toString());
   }
 
   Future<void> setUiLanguage(String lang) async {
     state = state.copyWith(uiLanguage: lang);
-    try {
-      final dao = ref.read(appSettingsDaoProvider);
-      await dao.setSetting('ui_language', lang);
-    } catch (_) {}
+    await _persistSetting('ui_language', lang);
   }
 }
 
@@ -159,6 +161,11 @@ final storageBreakdownProvider = FutureProvider.autoDispose<StorageBreakdown>((r
 final backupListProvider = FutureProvider.autoDispose<List<File>>((ref) async {
   final service = ref.watch(dataManagementServiceProvider);
   return await service.listBackups();
+});
+
+final backupFileInfosProvider = FutureProvider.autoDispose<List<BackupFileInfo>>((ref) async {
+  final service = ref.watch(dataManagementServiceProvider);
+  return await service.listBackupInfos();
 });
 
 final microphoneStatusProvider = FutureProvider.autoDispose<PermissionStatus>((ref) async {

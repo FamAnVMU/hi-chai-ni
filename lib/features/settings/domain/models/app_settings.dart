@@ -77,7 +77,7 @@ class AppSettings {
   final bool hapticFeedback;
 
   const AppSettings({
-    this.themeMode = ThemeMode.dark,
+    this.themeMode = ThemeMode.light,
     this.fontScale = 1.0,
     this.showPinyinByDefault = true,
     this.showRubyAnnotation = true,

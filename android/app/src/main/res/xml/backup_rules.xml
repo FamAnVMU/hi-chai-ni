@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <full-backup-content>
-    <!-- Exclude SQLite databases -->
     <exclude domain="database" path="." />
-    <!-- Exclude any backup archives in files directory -->
-    <exclude domain="file" path="*.hibak" />
+    <exclude domain="file" path="backups" />
+    <exclude domain="root" path="app_flutter/backups" />
+    <exclude domain="sharedpref" path="FlutterSecureStorage.xml" />
 </full-backup-content>

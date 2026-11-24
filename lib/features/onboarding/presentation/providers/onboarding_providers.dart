@@ -398,7 +398,7 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
             await txn.insert(
               DatabaseConstants.tableUserProfiles,
               {
-                'id': 'profile_default',
+                'id': DatabaseConstants.defaultProfileId,
                 'display_name': 'Học viên',
                 'current_hsk_level': currentHsk,
                 'target_hsk_level': (currentHsk < 6) ? currentHsk + 1 : 6,

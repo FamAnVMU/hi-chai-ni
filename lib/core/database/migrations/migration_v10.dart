@@ -209,7 +209,7 @@ class MigrationV10 implements Migration {
               conflictAlgorithm: ConflictAlgorithm.ignore,
             );
 
-            // Register in knowledge_registry
+            // Register in knowledge_registry without destroying existing ID / FK links
             await db.insert(
               DatabaseConstants.tableKnowledgeRegistry,
               {
@@ -225,7 +225,19 @@ class MigrationV10 implements Migration {
                 'created_at': nowUtc,
                 'updated_at': nowUtc,
               },
-              conflictAlgorithm: ConflictAlgorithm.replace,
+              conflictAlgorithm: ConflictAlgorithm.ignore,
+            );
+            await db.update(
+              DatabaseConstants.tableKnowledgeRegistry,
+              {
+                'hsk_level': hskLevel,
+                'title': simplified,
+                'package_id': currId,
+                'metadata_json': json.encode({'pinyin': pinyin, 'meaning_vi': meaningVi}),
+                'updated_at': nowUtc,
+              },
+              where: "entity_type = 'vocabulary' AND canonical_id = ?",
+              whereArgs: [simplified],
             );
 
             // Link to lessons
@@ -282,7 +294,7 @@ class MigrationV10 implements Migration {
               conflictAlgorithm: ConflictAlgorithm.ignore,
             );
 
-            // Register in knowledge_registry
+            // Register in knowledge_registry without destroying existing ID / FK links
             await db.insert(
               DatabaseConstants.tableKnowledgeRegistry,
               {
@@ -298,7 +310,19 @@ class MigrationV10 implements Migration {
                 'created_at': nowUtc,
                 'updated_at': nowUtc,
               },
-              conflictAlgorithm: ConflictAlgorithm.replace,
+              conflictAlgorithm: ConflictAlgorithm.ignore,
+            );
+            await db.update(
+              DatabaseConstants.tableKnowledgeRegistry,
+              {
+                'hsk_level': hskLevel,
+                'title': title,
+                'package_id': currId,
+                'metadata_json': json.encode({'structure': structure, 'explanation': explanation}),
+                'updated_at': nowUtc,
+              },
+              where: "entity_type = 'grammar' AND canonical_id = ?",
+              whereArgs: [gramCode],
             );
 
             // Link to lessons

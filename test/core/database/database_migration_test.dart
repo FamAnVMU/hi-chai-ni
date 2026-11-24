@@ -186,13 +186,13 @@ void main() {
       await db.close();
     });
 
-    test('Schema v20 Symmetry: onCreate(0 -> v20) produces identical 48 tables and indexes as incremental onUpgrade(v1 -> v20)', () async {
-      final freshDbPath = '${tempDir.path}/fresh_v20.db';
-      final upgradedDbPath = '${tempDir.path}/upgraded_v20.db';
+    test('Schema v21 Symmetry: onCreate(0 -> v21) produces identical tables, FTS5 virtual table, and indexes as incremental onUpgrade(v1 -> v21)', () async {
+      final freshDbPath = '${tempDir.path}/fresh_v21.db';
+      final upgradedDbPath = '${tempDir.path}/upgraded_v21.db';
       final prodEngine = MigrationEngine();
       const targetVer = DatabaseConstants.currentDatabaseVersion;
 
-      // 1. Fresh install at v20 (onCreate: 0 -> v20)
+      // 1. Fresh install at v21 (onCreate: 0 -> v21)
       final freshDb = await databaseFactoryFfi.openDatabase(
         freshDbPath,
         options: OpenDatabaseOptions(
@@ -203,7 +203,7 @@ void main() {
         ),
       );
 
-      // 2. Legacy v1 install upgraded step-by-step to v20 (onUpgrade: 1 -> v20)
+      // 2. Legacy v1 install upgraded step-by-step to v21 (onUpgrade: 1 -> v21)
       var upgradedDb = await databaseFactoryFfi.openDatabase(
         upgradedDbPath,
         options: OpenDatabaseOptions(
@@ -225,21 +225,22 @@ void main() {
         ),
       );
 
-      // Compare user-defined tables (excluding sqlite_sequence internal table)
+      // Compare user-defined tables (excluding sqlite_* and FTS5 shadow tables)
       final freshTables = (await freshDb.rawQuery(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name ASC",
+        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '%_fts_%' ORDER BY name ASC",
       ))
           .map((r) => r['name'] as String)
           .toList();
 
       final upgradedTables = (await upgradedDb.rawQuery(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name ASC",
+        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '%_fts_%' ORDER BY name ASC",
       ))
           .map((r) => r['name'] as String)
           .toList();
 
       expect(freshTables, equals(upgradedTables));
-      expect(freshTables.length, equals(48));
+      expect(freshTables, contains(DatabaseConstants.tableDictionaryEntriesFts));
+      expect(freshTables.length, equals(49));
 
       // Compare indexes
       final freshIndexes = (await freshDb.rawQuery(
@@ -255,6 +256,7 @@ void main() {
           .toList();
 
       expect(freshIndexes, equals(upgradedIndexes));
+      expect(freshIndexes, contains('uq_srs_content_active'));
 
       await freshDb.close();
       await upgradedDb.close();

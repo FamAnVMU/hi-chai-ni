@@ -26,9 +26,16 @@ class TimezoneDataMigrator {
     DatabaseExecutor db, {
     Duration assumedOffset = const Duration(hours: 7),
   }) async {
+    final tableInfo = await db.rawQuery('PRAGMA table_info(${DatabaseConstants.tableLearningActivities});');
+    final hasTzCol = tableInfo.any((c) => c['name'] == 'timezone_offset_minutes');
+
+    final selectCols = hasTzCol
+        ? 'id, activity_date, created_at, timezone_offset_minutes'
+        : 'id, activity_date, created_at';
+
     final rows = await db.rawQuery(
       '''
-      SELECT id, activity_date, created_at
+      SELECT $selectCols
       FROM ${DatabaseConstants.tableLearningActivities}
       ORDER BY created_at ASC
       ''',
@@ -40,9 +47,6 @@ class TimezoneDataMigrator {
     int potentiallyShifted = 0;
     int indeterminate = 0;
     final shiftedIds = <String>[];
-
-    final tableInfo = await db.rawQuery('PRAGMA table_info(${DatabaseConstants.tableLearningActivities});');
-    final hasTzCol = tableInfo.any((c) => c['name'] == 'timezone_offset_minutes');
 
     for (final row in rows) {
       final id = row['id'] as String? ?? '';

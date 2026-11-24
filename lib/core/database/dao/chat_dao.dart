@@ -8,10 +8,21 @@ class ChatDao {
 
   Future<void> insertSession(Map<String, dynamic> session, {Transaction? txn}) async {
     final executor = txn ?? _db;
-    await executor.insert(
-      DatabaseConstants.tableChatSessions,
-      session,
-      conflictAlgorithm: ConflictAlgorithm.replace,
+    if (session.isEmpty) return;
+
+    final cols = session.keys.toList();
+    final colNames = cols.join(', ');
+    final placeholders = List.filled(cols.length, '?').join(', ');
+    final args = cols.map((k) => session[k]).toList();
+    final updatableCols = cols.where((k) => k != 'id' && k != 'created_at').toList();
+
+    final conflictClause = updatableCols.isEmpty
+        ? 'ON CONFLICT(id) DO NOTHING'
+        : 'ON CONFLICT(id) DO UPDATE SET ${updatableCols.map((k) => '$k = excluded.$k').join(', ')}';
+
+    await executor.rawInsert(
+      'INSERT INTO ${DatabaseConstants.tableChatSessions} ($colNames) VALUES ($placeholders) $conflictClause',
+      args,
     );
   }
 
@@ -97,6 +108,11 @@ class ChatDao {
   Future<void> deleteSession(String sessionId, {Transaction? txn}) async {
     final executor = txn ?? _db;
     final nowUtc = DateTime.now().toUtc().toIso8601String();
+    await executor.delete(
+      DatabaseConstants.tableChatMessages,
+      where: 'session_id = ?',
+      whereArgs: [sessionId],
+    );
     await executor.update(
       DatabaseConstants.tableChatSessions,
       {
