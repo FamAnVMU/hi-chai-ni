@@ -2,13 +2,15 @@ class DatabaseConstants {
   DatabaseConstants._();
 
   static const String databaseName = 'hi_chinese.db';
-  static const int currentDatabaseVersion = 20;
+  static const int currentDatabaseVersion = 21;
+  static const String defaultProfileId = 'default_learner';
 
   // Table names
   static const String tableVocabularies = 'vocabularies';
   static const String tableVocabularySenses = 'vocabulary_senses';
   static const String tableVocabularyExamples = 'vocabulary_examples';
   static const String tableDictionaryEntries = 'dictionary_entries';
+  static const String tableDictionaryEntriesFts = 'dictionary_entries_fts';
   static const String tableGrammarItems = 'grammar_items';
   static const String tableGrammarProgress = 'grammar_progress';
   static const String tableGrammarExamples = 'grammar_examples';

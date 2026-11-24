@@ -1,10 +1,18 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/database/app_database.dart';
 import '../../../../core/theme/theme.dart';
-import '../providers/settings_providers.dart';
+import '../../../ai_tutor/domain/context/learner_context_service.dart';
+import '../../../ai_tutor/presentation/providers/ai_tutor_providers.dart';
+import '../../../curriculum/presentation/providers/curriculum_providers.dart';
+import '../../../home/presentation/providers/home_providers.dart';
 import '../../../profile/presentation/providers/profile_providers.dart';
+import '../../../vocabulary_srs/presentation/providers/srs_providers.dart';
+import '../../data/services/data_management_service.dart';
+import '../providers/settings_providers.dart';
 
 class DataManagementSheet extends ConsumerStatefulWidget {
   const DataManagementSheet({super.key});
@@ -25,15 +33,38 @@ class DataManagementSheet extends ConsumerStatefulWidget {
 class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
   bool _isProcessing = false;
 
+  Future<void> _invalidateAllProvidersAfterDataChange() async {
+    LearnerContextService.invalidateCache();
+    ref.read(currentChatSessionIdProvider.notifier).selectSession(null);
+    ref.read(databaseGenerationProvider.notifier).bump();
+    ref.invalidate(appDatabaseProvider);
+    await ref.read(appSettingsProvider.notifier).reloadSettings();
+
+    ref.invalidate(userProfileProvider);
+    ref.invalidate(goalHistoryProvider);
+    ref.invalidate(storageBreakdownProvider);
+    ref.invalidate(backupListProvider);
+    ref.invalidate(backupFileInfosProvider);
+    ref.invalidate(recentChatSessionsProvider);
+    ref.invalidate(homeDashboardProvider);
+    ref.invalidate(curriculumUnitsWithLessonsProvider);
+    ref.invalidate(srsDueCountProvider);
+    ref.invalidate(srsStudySessionProvider);
+  }
+
   Future<void> _handleBackup() async {
     setState(() => _isProcessing = true);
     try {
       final service = ref.read(dataManagementServiceProvider);
       final file = await service.createBackup();
       ref.invalidate(backupListProvider);
+      ref.invalidate(backupFileInfosProvider);
       ref.invalidate(storageBreakdownProvider);
       if (mounted) {
-        HiSnackBar.showSuccess(context, 'Sao lưu CSDL thành công: ${file.path.split(Platform.pathSeparator).last}');
+        HiSnackBar.showSuccess(
+          context,
+          'Sao lưu CSDL thành công: ${file.path.split(Platform.pathSeparator).last}',
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -49,13 +80,61 @@ class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
     try {
       final service = ref.read(dataManagementServiceProvider);
       final jsonStr = await service.exportUserDataJson();
-      await Clipboard.setData(ClipboardData(text: jsonStr));
-      if (mounted) {
-        HiSnackBar.showSuccess(context, 'Đã xuất dữ liệu cá nhân ra JSON & sao chép vào Clipboard!');
+      final byteLength = utf8.encode(jsonStr).length;
+      if (byteLength > DataManagementService.maxClipboardJsonBytes) {
+        final exportedFile = await service.exportUserDataToFile();
+        if (mounted) {
+          HiSnackBar.showSuccess(
+            context,
+            'Dữ liệu lớn (${(byteLength / 1024).toStringAsFixed(0)} KB), đã xuất ra file: ${exportedFile.path.split(Platform.pathSeparator).last}',
+          );
+        }
+      } else {
+        await Clipboard.setData(ClipboardData(text: jsonStr));
+        if (mounted) {
+          HiSnackBar.showSuccess(
+            context,
+            'Đã xuất dữ liệu cá nhân ra JSON & sao chép vào Clipboard!',
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
         HiSnackBar.showError(context, 'Lỗi xuất JSON: $e');
+      }
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
+  }
+
+  Future<void> _showImportJsonDialog() async {
+    final importedJson = await showDialog<String>(
+      context: context,
+      builder: (_) => const _ImportJsonDialog(),
+    );
+
+    if (importedJson == null || importedJson.isEmpty) return;
+
+    setState(() => _isProcessing = true);
+    try {
+      final service = ref.read(dataManagementServiceProvider);
+      final ok = await service.importUserDataJson(importedJson);
+      if (ok) {
+        await _invalidateAllProvidersAfterDataChange();
+        if (mounted) {
+          HiSnackBar.showSuccess(context, 'Đã nhập dữ liệu JSON thành công!');
+        }
+      } else {
+        if (mounted) {
+          HiSnackBar.showError(
+            context,
+            'Định dạng JSON không hợp lệ hoặc không phải bản xuất từ HI Chinese.',
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        HiSnackBar.showError(context, 'Lỗi nhập JSON: $e');
       }
     } finally {
       if (mounted) setState(() => _isProcessing = false);
@@ -83,7 +162,7 @@ class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
     }
   }
 
-  Future<void> _showBackupListDialog(List<File> backups) async {
+  Future<void> _showBackupListDialog(List<BackupFileInfo> backups) async {
     final theme = Theme.of(context);
     await showDialog(
       context: context,
@@ -97,20 +176,17 @@ class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
                   shrinkWrap: true,
                   itemCount: backups.length,
                   itemBuilder: (context, i) {
-                    final file = backups[i];
-                    final name = file.path.split(Platform.pathSeparator).last;
-                    final size = file.lengthSync();
-                    final sizeStr = (size / 1024).toStringAsFixed(1);
+                    final info = backups[i];
                     return ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: const Icon(Icons.inventory_2_outlined, color: AppColors.primaryBlueDark),
-                      title: Text(name, style: theme.textTheme.bodyMedium?.copyWith(fontSize: 13)),
-                      subtitle: Text('$sizeStr KB • ${file.lastModifiedSync().toLocal()}'),
+                      title: Text(info.name, style: theme.textTheme.bodyMedium?.copyWith(fontSize: 13)),
+                      subtitle: Text('${info.formattedSize} • ${info.modifiedAt.toLocal()}'),
                       trailing: TextButton(
                         child: const Text('Khôi phục'),
                         onPressed: () async {
                           Navigator.of(ctx).pop();
-                          await _confirmRestore(file);
+                          await _confirmRestore(info.file);
                         },
                       ),
                     );
@@ -144,10 +220,7 @@ class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
     try {
       final service = ref.read(dataManagementServiceProvider);
       await service.restoreBackup(backupFile);
-      ref.invalidate(userProfileProvider);
-      ref.invalidate(goalHistoryProvider);
-      ref.invalidate(storageBreakdownProvider);
-      ref.invalidate(backupListProvider);
+      await _invalidateAllProvidersAfterDataChange();
       if (mounted) {
         HiSnackBar.showSuccess(context, 'Đã khôi phục cơ sở dữ liệu thành công!');
       }
@@ -161,89 +234,19 @@ class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
   }
 
   Future<void> _showDestructiveResetDialog() async {
-    final codeController = TextEditingController();
-
-    final confirmed = await showDialog<bool>(
+    final confirmationCode = await showDialog<String>(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            final isCodeValid = codeController.text.trim().toUpperCase() == 'XOA' ||
-                codeController.text.trim().toUpperCase() == 'RESET';
-
-            return AlertDialog(
-              backgroundColor: AppColors.errorContainerLight,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppRadius.lg),
-                side: const BorderSide(color: Colors.redAccent, width: 1.5),
-              ),
-              title: Row(
-                children: const [
-                  Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
-                  SizedBox(width: AppSpacing.sm),
-                  Text('VÙNG NGUY HIỂM: ĐẶT LẠI', style: TextStyle(color: Colors.white, fontSize: 16)),
-                ],
-              ),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Thao tác này sẽ xóa toàn bộ tiến trình học tập, lịch sử SRS, bài tập và phiên chat AI Tutor trên máy này.\n\n'
-                      '• Hệ thống sẽ TỰ ĐỘNG tạo bản sao lưu snapshot trước khi xóa.\n'
-                      '• Chỉ xóa dữ liệu cục bộ; dữ liệu cloud (nếu có liên kết) hoàn toàn KHÔNG bị ảnh hưởng.\n\n'
-                      'Để xác nhận, vui lòng nhập chữ "XOA" hoặc "RESET":',
-                      style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    TextField(
-                      controller: codeController,
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                      decoration: InputDecoration(
-                        hintText: 'Nhập XOA hoặc RESET',
-                        hintStyle: TextStyle(color: Colors.white.withAlpha(100)),
-                        fillColor: AppColors.cardBackground,
-                        filled: true,
-                        border: const OutlineInputBorder(borderSide: BorderSide(color: Colors.redAccent)),
-                      ),
-                      onChanged: (_) => setDialogState(() {}),
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(false),
-                  child: const Text('Hủy bỏ', style: TextStyle(color: Colors.white70)),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: Colors.red.withAlpha(80),
-                  ),
-                  onPressed: isCodeValid ? () => Navigator.of(ctx).pop(true) : null,
-                  child: const Text('Xác nhận XÓA CỤC BỘ'),
-                ),
-              ],
-            );
-          },
-        );
-      },
+      builder: (_) => const _DestructiveResetDialog(),
     );
 
-    if (confirmed != true) return;
+    if (confirmationCode == null || confirmationCode.isEmpty) return;
 
     setState(() => _isProcessing = true);
     try {
       final service = ref.read(dataManagementServiceProvider);
-      await service.clearAllUserData(confirmationCode: codeController.text);
-      ref.invalidate(userProfileProvider);
-      ref.invalidate(goalHistoryProvider);
-      ref.invalidate(storageBreakdownProvider);
-      ref.invalidate(backupListProvider);
+      await service.clearAllUserData(confirmationCode: confirmationCode);
+      await _invalidateAllProvidersAfterDataChange();
       if (mounted) {
         HiSnackBar.showSuccess(context, 'Đã đặt lại dữ liệu học tập cục bộ về mặc định.');
         Navigator.of(context).pop();
@@ -261,7 +264,7 @@ class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final storageAsync = ref.watch(storageBreakdownProvider);
-    final backupsAsync = ref.watch(backupListProvider);
+    final backupsAsync = ref.watch(backupFileInfosProvider);
 
     return Container(
       constraints: BoxConstraints(
@@ -304,7 +307,6 @@ class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            // Dung lượng lưu trữ
             Text('Dung Lượng Bộ Nhớ', style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: AppSpacing.xs),
             HiCard(
@@ -325,7 +327,6 @@ class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            // Các thao tác sao lưu & kiểm tra
             Text('Sao Lưu & Kiểm Tra Toàn Vẹn', style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: AppSpacing.xs),
             HiCard(
@@ -356,9 +357,17 @@ class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
                   ListTile(
                     leading: const Icon(Icons.download_for_offline_rounded, color: AppColors.primaryBlueDark),
                     title: const Text('Xuất dữ liệu cá nhân ra JSON'),
-                    subtitle: const Text('Sao chép JSON tiến trình & hồ sơ vào Clipboard'),
+                    subtitle: const Text('Sao chép Clipboard hoặc lưu tệp đối với dữ liệu lớn'),
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: _isProcessing ? null : _handleExportJson,
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.upload_file_rounded, color: AppColors.primaryBlueDark),
+                    title: const Text('Nhập dữ liệu từ JSON'),
+                    subtitle: const Text('Khôi phục hồ sơ & tiến trình từ chuỗi JSON đã xuất'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: _isProcessing ? null : _showImportJsonDialog,
                   ),
                   const Divider(height: 1),
                   ListTile(
@@ -373,7 +382,6 @@ class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
             ),
             const SizedBox(height: AppSpacing.xl),
 
-            // Vùng nguy hiểm (Danger Zone)
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
@@ -425,6 +433,161 @@ class _DataManagementSheetState extends ConsumerState<DataManagementSheet> {
         Expanded(child: Text(label, style: style)),
         const SizedBox(width: AppSpacing.sm),
         Text(value, style: style.copyWith(color: AppColors.primaryBlueDark)),
+      ],
+    );
+  }
+}
+
+class _ImportJsonDialog extends StatefulWidget {
+  const _ImportJsonDialog();
+
+  @override
+  State<_ImportJsonDialog> createState() => _ImportJsonDialogState();
+}
+
+class _ImportJsonDialogState extends State<_ImportJsonDialog> {
+  final TextEditingController _jsonController = TextEditingController();
+
+  @override
+  void dispose() {
+    _jsonController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Nhập Dữ Liệu Từ JSON'),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'Dán nội dung JSON đã xuất từ HI Chinese. Hệ thống sẽ tạo bản sao lưu an toàn trước khi nhập.',
+              style: TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: () async {
+                  final data = await Clipboard.getData(Clipboard.kTextPlain);
+                  if (!mounted) return;
+                  if (data?.text != null && data!.text!.isNotEmpty) {
+                    _jsonController.text = data.text!;
+                    setState(() {});
+                  }
+                },
+                icon: const Icon(Icons.paste_rounded, size: 16),
+                label: const Text('Dán từ Clipboard'),
+              ),
+            ),
+            TextField(
+              controller: _jsonController,
+              maxLines: 6,
+              decoration: const InputDecoration(
+                hintText: '{"metadata": {"app_name": "HI Chinese", ...}}',
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (_) => setState(() {}),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(null),
+          child: const Text('Hủy'),
+        ),
+        ElevatedButton(
+          onPressed: _jsonController.text.trim().isEmpty
+              ? null
+              : () => Navigator.of(context).pop(_jsonController.text.trim()),
+          child: const Text('Nhập dữ liệu'),
+        ),
+      ],
+    );
+  }
+}
+
+class _DestructiveResetDialog extends StatefulWidget {
+  const _DestructiveResetDialog();
+
+  @override
+  State<_DestructiveResetDialog> createState() => _DestructiveResetDialogState();
+}
+
+class _DestructiveResetDialogState extends State<_DestructiveResetDialog> {
+  final TextEditingController _codeController = TextEditingController();
+
+  @override
+  void dispose() {
+    _codeController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final trimmedUpper = _codeController.text.trim().toUpperCase();
+    final isCodeValid = trimmedUpper == 'XOA' || trimmedUpper == 'RESET';
+
+    return AlertDialog(
+      backgroundColor: AppColors.errorContainerLight,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        side: const BorderSide(color: Colors.redAccent, width: 1.5),
+      ),
+      title: Row(
+        children: const [
+          Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
+          SizedBox(width: AppSpacing.sm),
+          Text('VÙNG NGUY HIỂM: ĐẶT LẠI', style: TextStyle(color: Colors.white, fontSize: 16)),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Thao tác này sẽ xóa toàn bộ tiến trình học tập, lịch sử SRS, bài tập và phiên chat AI Tutor trên máy này.\n\n'
+              '• Hệ thống sẽ TỰ ĐỘNG tạo bản sao lưu snapshot trước khi xóa.\n'
+              '• Chỉ xóa dữ liệu cục bộ; dữ liệu cloud (nếu có liên kết) hoàn toàn KHÔNG bị ảnh hưởng.\n\n'
+              'Để xác nhận, vui lòng nhập chữ "XOA" hoặc "RESET":',
+              style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            TextField(
+              controller: _codeController,
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              decoration: InputDecoration(
+                hintText: 'Nhập XOA hoặc RESET',
+                hintStyle: TextStyle(color: Colors.white.withAlpha(100)),
+                fillColor: AppColors.cardBackground,
+                filled: true,
+                border: const OutlineInputBorder(borderSide: BorderSide(color: Colors.redAccent)),
+              ),
+              onChanged: (_) => setState(() {}),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(null),
+          child: const Text('Hủy bỏ', style: TextStyle(color: Colors.white70)),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.redAccent,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: Colors.red.withAlpha(80),
+          ),
+          onPressed: isCodeValid ? () => Navigator.of(context).pop(_codeController.text) : null,
+          child: const Text('Xác nhận XÓA CỤC BỘ'),
+        ),
       ],
     );
   }

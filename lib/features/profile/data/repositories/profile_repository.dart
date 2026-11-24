@@ -24,6 +24,7 @@ class DefaultProfileRepository implements ProfileRepository {
   Future<UserProfile> getProfile() async {
     final rows = await _db.query(
       DatabaseConstants.tableUserProfiles,
+      orderBy: 'updated_at DESC',
       limit: 1,
     );
 

@@ -13,8 +13,12 @@ class MigrationV18 implements Migration {
 
   @override
   Future<void> up(DatabaseExecutor db) async {
-    await db.execute(
-      'ALTER TABLE ${DatabaseConstants.tableLessonProgress} ADD COLUMN source TEXT;',
-    );
+    final tableInfo = await db.rawQuery('PRAGMA table_info(${DatabaseConstants.tableLessonProgress});');
+    final hasSource = tableInfo.any((col) => col['name'] == 'source');
+    if (!hasSource) {
+      await db.execute(
+        'ALTER TABLE ${DatabaseConstants.tableLessonProgress} ADD COLUMN source TEXT;',
+      );
+    }
   }
 }

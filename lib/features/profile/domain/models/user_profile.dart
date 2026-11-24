@@ -1,4 +1,5 @@
 import 'dart:convert';
+import '../../../../core/database/database_constants.dart';
 import '../../../roadmap/domain/models/roadmap_models.dart';
 
 /// Pre-defined Chinese learning interests.
@@ -59,7 +60,7 @@ class UserProfile {
   factory UserProfile.defaultProfile({DateTime? now}) {
     final timestamp = now ?? DateTime.now();
     return UserProfile(
-      id: 'default_learner',
+      id: DatabaseConstants.defaultProfileId,
       displayName: 'Người học HI Chinese',
       currentHskLevel: 1,
       targetHskLevel: 3,
@@ -134,7 +135,7 @@ class UserProfile {
     }
 
     return UserProfile(
-      id: map['id'] as String? ?? 'default_learner',
+      id: map['id'] as String? ?? DatabaseConstants.defaultProfileId,
       displayName: map['display_name'] as String? ?? 'Người học HI Chinese',
       currentHskLevel: (map['current_hsk_level'] as num?)?.toInt() ?? 1,
       targetHskLevel: (map['target_hsk_level'] as num?)?.toInt() ?? 3,

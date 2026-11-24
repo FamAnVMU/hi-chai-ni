@@ -132,7 +132,7 @@ void main() {
       // Verify default user profile
       final profiles = await db.query(DatabaseConstants.tableUserProfiles);
       expect(profiles, isNotEmpty);
-      expect(profiles.first['id'], equals('user_default'));
+      expect(profiles.first['id'], equals(DatabaseConstants.defaultProfileId));
     });
 
     test('2. Idempotent re-initialization executes in < 50ms without duplicate rows', () async {

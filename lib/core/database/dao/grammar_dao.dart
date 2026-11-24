@@ -1,65 +1,48 @@
 import 'package:sqflite/sqflite.dart';
 import '../database_constants.dart';
+import 'dao_utils.dart';
 
 class GrammarDao {
   final DatabaseExecutor _db;
 
   GrammarDao(this._db);
 
-  Future<void> _safeUpsert(
-    DatabaseExecutor executor,
-    String table,
-    Map<String, dynamic> row, {
-    String primaryKey = 'id',
-  }) async {
-    final pkVal = row[primaryKey];
+  Future<void> insertGrammar(Map<String, dynamic> row, {Transaction? txn}) async {
+    final executor = txn ?? _db;
+    final pkVal = row['id'];
     if (pkVal != null) {
       final existing = await executor.query(
-        table,
-        columns: [primaryKey],
-        where: '$primaryKey = ?',
+        DatabaseConstants.tableGrammarItems,
+        columns: ['id'],
+        where: 'id = ?',
         whereArgs: [pkVal],
         limit: 1,
       );
       if (existing.isNotEmpty) {
         await executor.update(
-          table,
+          DatabaseConstants.tableGrammarItems,
           row,
-          where: '$primaryKey = ?',
+          where: 'id = ?',
           whereArgs: [pkVal],
         );
         return;
       }
     }
-    // Also check code unique constraint
-    final codeVal = row['code'];
-    if (codeVal != null) {
-      final existingByCode = await executor.query(
-        table,
-        columns: [primaryKey],
-        where: 'code = ?',
-        whereArgs: [codeVal],
-        limit: 1,
+    if (row['code'] != null) {
+      await DaoUtils.safeUpsert(
+        executor,
+        DatabaseConstants.tableGrammarItems,
+        row,
+        conflictKey: 'code',
+        preservePrimaryKey: true,
       );
-      if (existingByCode.isNotEmpty) {
-        final existingId = existingByCode.first[primaryKey];
-        final updatedRow = Map<String, dynamic>.from(row);
-        updatedRow[primaryKey] = existingId;
-        await executor.update(
-          table,
-          updatedRow,
-          where: '$primaryKey = ?',
-          whereArgs: [existingId],
-        );
-        return;
-      }
+      return;
     }
-    await executor.insert(table, row, conflictAlgorithm: ConflictAlgorithm.ignore);
-  }
-
-  Future<void> insertGrammar(Map<String, dynamic> row, {Transaction? txn}) async {
-    final executor = txn ?? _db;
-    await _safeUpsert(executor, DatabaseConstants.tableGrammarItems, row);
+    await executor.insert(
+      DatabaseConstants.tableGrammarItems,
+      row,
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
   }
 
   Future<Map<String, dynamic>?> getGrammarById(String id) async {

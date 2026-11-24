@@ -1,44 +1,20 @@
 import 'package:sqflite/sqflite.dart';
 import '../database_constants.dart';
+import 'dao_utils.dart';
 
 class MasteryDao {
   final DatabaseExecutor _db;
 
   const MasteryDao(this._db);
 
-  Future<void> _safeUpsert(
-    DatabaseExecutor executor,
-    String table,
-    Map<String, dynamic> row, {
-    String uniqueKey = 'item_id',
-  }) async {
-    final keyVal = row[uniqueKey];
-    if (keyVal != null) {
-      final existing = await executor.query(
-        table,
-        columns: ['id', uniqueKey],
-        where: '$uniqueKey = ?',
-        whereArgs: [keyVal],
-        limit: 1,
-      );
-      if (existing.isNotEmpty) {
-        final existingId = existing.first['id'];
-        final updatedRow = Map<String, dynamic>.from(row);
-        updatedRow['id'] = existingId;
-        await executor.update(
-          table,
-          updatedRow,
-          where: '$uniqueKey = ?',
-          whereArgs: [keyVal],
-        );
-        return;
-      }
-    }
-    await executor.insert(table, row, conflictAlgorithm: ConflictAlgorithm.ignore);
-  }
-
   Future<void> upsertMastery(Map<String, dynamic> row) async {
-    await _safeUpsert(_db, DatabaseConstants.tableCurriculumMastery, row);
+    await DaoUtils.safeUpsert(
+      _db,
+      DatabaseConstants.tableCurriculumMastery,
+      row,
+      conflictKey: 'item_id',
+      preservePrimaryKey: true,
+    );
   }
 
   Future<Map<String, dynamic>?> getMastery(String itemId) async {

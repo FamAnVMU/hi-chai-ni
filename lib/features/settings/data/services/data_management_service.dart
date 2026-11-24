@@ -7,6 +7,7 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../core/database/app_database.dart';
 import '../../../../core/database/database_backup_helper.dart';
 import '../../../../core/database/database_constants.dart';
+import '../../../ai_tutor/domain/context/learner_context_service.dart';
 import '../../domain/models/app_settings.dart';
 import '../../../profile/domain/models/user_profile.dart';
 
@@ -17,7 +18,41 @@ class DestructiveActionException implements Exception {
   String toString() => 'DestructiveActionException: $message';
 }
 
+class BackupFileInfo {
+  final File file;
+  final String name;
+  final int sizeBytes;
+  final DateTime modifiedAt;
+
+  const BackupFileInfo({
+    required this.file,
+    required this.name,
+    required this.sizeBytes,
+    required this.modifiedAt,
+  });
+
+  String get formattedSize {
+    if (sizeBytes < 1024) return '$sizeBytes B';
+    if (sizeBytes < 1024 * 1024) return '${(sizeBytes / 1024).toStringAsFixed(1)} KB';
+    return '${(sizeBytes / (1024 * 1024)).toStringAsFixed(2)} MB';
+  }
+}
+
 class DataManagementService {
+  static const int maxClipboardJsonBytes = 200 * 1024;
+  static const List<int> _sqliteMagicHeader = [
+    0x53, 0x51, 0x4C, 0x69, 0x74, 0x65, 0x20, 0x66,
+    0x6F, 0x72, 0x6D, 0x61, 0x74, 0x20, 0x33, 0x00,
+  ];
+  static const Set<String> _requiredCoreTables = {
+    DatabaseConstants.tableVocabularies,
+    DatabaseConstants.tableUserProfiles,
+    DatabaseConstants.tableAppSettings,
+    DatabaseConstants.tableSrsItems,
+    DatabaseConstants.tableCurriculumLessons,
+    DatabaseConstants.tableLearningActivities,
+  };
+
   Database _db;
   final String _dbPath;
 
@@ -48,7 +83,6 @@ class DataManagementService {
         shmSize = await shmFile.length();
       }
 
-      // Check cache directory if available
       final cacheDir = Directory(p.join(p.dirname(_dbPath), 'cache'));
       if (await cacheDir.exists()) {
         await for (final file in cacheDir.list(recursive: true, followLinks: false)) {
@@ -79,7 +113,8 @@ class DataManagementService {
   /// Creates a safe backup file in the backups folder.
   Future<File> createBackup({String? customName}) async {
     final now = DateTime.now().toUtc();
-    final timestampStr = '${now.year}${_twoDigits(now.month)}${_twoDigits(now.day)}_${_twoDigits(now.hour)}${_twoDigits(now.minute)}${_twoDigits(now.second)}';
+    final timestampStr =
+        '${now.year}${_twoDigits(now.month)}${_twoDigits(now.day)}_${_twoDigits(now.hour)}${_twoDigits(now.minute)}${_twoDigits(now.second)}';
     final backupFileName = customName ?? 'hi_chinese_backup_$timestampStr.hibak';
 
     final backupDir = Directory(p.join(p.dirname(_dbPath), 'backups'));
@@ -95,29 +130,65 @@ class DataManagementService {
     );
   }
 
-  /// Lists all created `.hibak` backup files sorted by creation date descending.
-  Future<List<File>> listBackups() async {
+  /// Asynchronously retrieves metadata for all `.hibak` backups sorted newest first.
+  Future<List<BackupFileInfo>> listBackupInfos() async {
     final backupDir = Directory(p.join(p.dirname(_dbPath), 'backups'));
     if (!await backupDir.exists()) {
       return [];
     }
 
-    final files = <File>[];
+    final infos = <BackupFileInfo>[];
     await for (final entity in backupDir.list(followLinks: false)) {
       if (entity is File && entity.path.endsWith('.hibak')) {
-        files.add(entity);
+        final stat = await FileStat.stat(entity.path);
+        infos.add(
+          BackupFileInfo(
+            file: entity,
+            name: p.basename(entity.path),
+            sizeBytes: stat.size,
+            modifiedAt: stat.modified,
+          ),
+        );
       }
     }
 
-    files.sort((a, b) => b.lastModifiedSync().compareTo(a.lastModifiedSync()));
-    return files;
+    infos.sort((a, b) => b.modifiedAt.compareTo(a.modifiedAt));
+    return infos;
   }
 
-  /// Safely restores database from a backup file with pre-destruction safety snapshot,
-  /// safe WAL checkpoint, connection closure, atomic file replacement, and clean reconnection.
+  /// Lists all created `.hibak` backup files sorted by modification time descending (async stat).
+  Future<List<File>> listBackups() async {
+    final infos = await listBackupInfos();
+    return infos.map((i) => i.file).toList();
+  }
+
+  Future<bool> _hasValidSqliteHeader(File file) async {
+    try {
+      final raf = await file.open();
+      try {
+        final header = await raf.read(_sqliteMagicHeader.length);
+        if (header.length < _sqliteMagicHeader.length) return false;
+        for (int i = 0; i < _sqliteMagicHeader.length; i++) {
+          if (header[i] != _sqliteMagicHeader[i]) return false;
+        }
+        return true;
+      } finally {
+        await raf.close();
+      }
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Safely restores database from a backup file with strict SQLite validation,
+  /// pre-destruction safety snapshot, atomic file replacement, and clean reconnection.
   Future<void> restoreBackup(File backupFile) async {
     if (!await backupFile.exists()) {
       throw StateError('File sao lưu không tồn tại: ${backupFile.path}');
+    }
+
+    if (!await _hasValidSqliteHeader(backupFile)) {
+      throw StateError('Tệp sao lưu không phải định dạng SQLite hợp lệ.');
     }
 
     Database? tempCheckDb;
@@ -127,13 +198,41 @@ class DataManagementService {
         options: OpenDatabaseOptions(
           readOnly: true,
           onConfigure: (db) async {
+            await db.execute('PRAGMA trusted_schema = OFF;');
             await db.execute('PRAGMA query_only = ON;');
           },
         ),
       );
+
+      final versionRes = await tempCheckDb.rawQuery('PRAGMA user_version;');
+      final userVersion = Sqflite.firstIntValue(versionRes) ?? 0;
+      if (userVersion < 1 || userVersion > DatabaseConstants.currentDatabaseVersion) {
+        throw StateError(
+          'Phiên bản lược đồ sao lưu không hợp lệ (user_version=$userVersion, tối đa=${DatabaseConstants.currentDatabaseVersion}).',
+        );
+      }
+
+      final tableRows = await tempCheckDb.rawQuery(
+        "SELECT name FROM sqlite_master WHERE type = 'table';",
+      );
+      final existingTables = tableRows.map((r) => r['name'] as String).toSet();
+      final missingTables = _requiredCoreTables.difference(existingTables);
+      if (missingTables.isNotEmpty) {
+        throw StateError(
+          'Tệp sao lưu thiếu các bảng cốt lõi: ${missingTables.join(', ')}',
+        );
+      }
+
       final preCheckIssues = await DatabaseBackupHelper.checkIntegrity(tempCheckDb);
       if (preCheckIssues.isNotEmpty) {
         throw StateError('Tệp sao lưu không hợp lệ hoặc bị lỗi toàn vẹn: ${preCheckIssues.join(', ')}');
+      }
+
+      final fkIssues = await tempCheckDb.rawQuery('PRAGMA foreign_key_check;');
+      if (fkIssues.isNotEmpty) {
+        throw StateError(
+          'Tệp sao lưu vi phạm ràng buộc khóa ngoại (${fkIssues.length} lỗi).',
+        );
       }
     } catch (e) {
       if (e is StateError) rethrow;
@@ -145,7 +244,9 @@ class DataManagementService {
     }
 
     try {
-      await createBackup(customName: 'pre_restore_safety_snapshot_${DateTime.now().millisecondsSinceEpoch}.hibak');
+      await createBackup(
+        customName: 'pre_restore_safety_snapshot_${DateTime.now().millisecondsSinceEpoch}.hibak',
+      );
     } catch (e) {
       debugPrint('[DataManagement] Warning: Could not create pre-restore snapshot: $e');
     }
@@ -237,9 +338,12 @@ class DataManagementService {
       }
 
       _db = await AppDatabase.instance.open(customPath: _dbPath);
-      throw StateError('Khôi phục thất bại: tệp sao lưu không vượt qua kiểm tra toàn vẹn ($e). Đã phục hồi dữ liệu gốc.');
+      throw StateError(
+        'Khôi phục thất bại: tệp sao lưu không vượt qua kiểm tra toàn vẹn ($e). Đã phục hồi dữ liệu gốc.',
+      );
     }
 
+    LearnerContextService.invalidateCache();
     debugPrint('[DataManagement] Restore completed from ${backupFile.path}');
   }
 
@@ -283,27 +387,54 @@ class DataManagementService {
     return const JsonEncoder.withIndent('  ').convert(exportMap);
   }
 
+  /// Writes exported user JSON to a standalone file under backups directory (safe for >200KB payloads).
+  Future<File> exportUserDataToFile() async {
+    final jsonStr = await exportUserDataJson();
+    final now = DateTime.now().toUtc();
+    final timestampStr =
+        '${now.year}${_twoDigits(now.month)}${_twoDigits(now.day)}_${_twoDigits(now.hour)}${_twoDigits(now.minute)}${_twoDigits(now.second)}';
+    final exportDir = Directory(p.join(p.dirname(_dbPath), 'backups'));
+    if (!await exportDir.exists()) {
+      await exportDir.create(recursive: true);
+    }
+    final outFile = File(p.join(exportDir.path, 'hi_chinese_export_$timestampStr.json'));
+    await outFile.writeAsString(jsonStr, flush: true);
+    return outFile;
+  }
+
   /// Imports personal learner data from JSON string.
   Future<bool> importUserDataJson(String jsonString) async {
     try {
       final decoded = jsonDecode(jsonString) as Map<String, dynamic>;
       final metadata = decoded['metadata'] as Map<String, dynamic>?;
       if (metadata == null || metadata['app_name'] != 'HI Chinese') {
-        throw FormatException('File JSON không phải dữ liệu xuất từ HI Chinese');
+        throw const FormatException('File JSON không phải dữ liệu xuất từ HI Chinese');
       }
 
-      // Create pre-import snapshot
-      await createBackup(customName: 'pre_json_import_snapshot_${DateTime.now().millisecondsSinceEpoch}.hibak');
+      await createBackup(
+        customName: 'pre_json_import_snapshot_${DateTime.now().millisecondsSinceEpoch}.hibak',
+      );
 
       await _db.transaction((txn) async {
         if (decoded['user_profiles'] is List) {
-          for (final row in decoded['user_profiles'] as List) {
-            if (row is Map<String, dynamic>) {
-              await txn.insert(
-                DatabaseConstants.tableUserProfiles,
-                row,
-                conflictAlgorithm: ConflictAlgorithm.replace,
-              );
+          final profiles = decoded['user_profiles'] as List;
+          if (profiles.isNotEmpty) {
+            await txn.delete(DatabaseConstants.tableUserProfiles);
+            for (final row in profiles) {
+              if (row is Map<String, dynamic>) {
+                final normalized = Map<String, dynamic>.from(row);
+                final rawId = normalized['id'] as String? ?? '';
+                if (rawId.isEmpty ||
+                    rawId == 'user_default' ||
+                    rawId == 'profile_default') {
+                  normalized['id'] = DatabaseConstants.defaultProfileId;
+                }
+                await txn.insert(
+                  DatabaseConstants.tableUserProfiles,
+                  normalized,
+                  conflictAlgorithm: ConflictAlgorithm.replace,
+                );
+              }
             }
           }
         }
@@ -387,6 +518,7 @@ class DataManagementService {
         }
       });
 
+      LearnerContextService.invalidateCache();
       return true;
     } catch (e) {
       debugPrint('[DataManagement] Import JSON failed: $e');
@@ -404,7 +536,6 @@ class DataManagementService {
       );
     }
 
-    // 1. Mandatory automated pre-destruction safety snapshot
     try {
       await createBackup(
         customName: 'pre_destruction_safety_snapshot_${DateTime.now().millisecondsSinceEpoch}.hibak',
@@ -414,7 +545,6 @@ class DataManagementService {
       debugPrint('[DataManagement] Warning: Pre-destruction backup failed ($e), proceeding cautiously.');
     }
 
-    // 2. Clear user-generated and progress tables in transaction
     await _db.transaction((txn) async {
       await txn.delete(DatabaseConstants.tableChatMessages);
       await txn.delete(DatabaseConstants.tableChatSessions);
@@ -426,6 +556,7 @@ class DataManagementService {
       await txn.delete(DatabaseConstants.tableSrsItems);
       await txn.delete(DatabaseConstants.tableLearnerEvidence);
       await txn.delete(DatabaseConstants.tableLearningActivities);
+      await txn.delete(DatabaseConstants.tableMasterySnapshots);
       await txn.delete(DatabaseConstants.tablePlacementTestResponses);
       await txn.delete(DatabaseConstants.tablePlacementTestSessions);
       await txn.delete(DatabaseConstants.tableGrammarProgress);
@@ -437,6 +568,11 @@ class DataManagementService {
       await txn.delete(DatabaseConstants.tableLearnerGoals);
       await txn.delete(DatabaseConstants.tableRoadmapSnapshots);
       await txn.delete(DatabaseConstants.tableGoalHistory);
+      await txn.delete(
+        DatabaseConstants.tableAppSettings,
+        where:
+            "key LIKE 'onboarding_%' OR key LIKE 'key_%' OR key IN ('learning_purpose', 'priority_focus_skill', 'learning_path_type', 'daily_goal_minutes', 'target_hsk_level', 'starting_hsk_level')",
+      );
       await txn.delete(DatabaseConstants.tableUserProfiles);
 
       final cleanProfile = UserProfile.defaultProfile();
@@ -475,6 +611,7 @@ class DataManagementService {
       );
     });
 
+    LearnerContextService.invalidateCache();
     debugPrint('[DataManagement] All local user progress data cleared successfully. Seeded content & cloud data unaffected.');
   }
 

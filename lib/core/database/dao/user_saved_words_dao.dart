@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import '../database_constants.dart';
+import 'dao_utils.dart';
 
 class UserSavedWordsDao {
   final DatabaseExecutor _db;
@@ -18,20 +19,27 @@ class UserSavedWordsDao {
     final executor = txn ?? _db;
     final nowUtc = DateTime.now().toUtc().toIso8601String();
 
-    await executor.insert(
-      DatabaseConstants.tableUserSavedWords,
-      {
-        'id': id,
-        'vocabulary_id': vocabularyId,
-        'simplified': simplified,
-        'pinyin': pinyin,
-        'custom_note': customNote,
-        'is_favorite': isFavorite ? 1 : 0,
-        'created_at': nowUtc,
-        'updated_at': nowUtc,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await executor.rawInsert('''
+      INSERT INTO ${DatabaseConstants.tableUserSavedWords} (
+        id, vocabulary_id, simplified, pinyin, custom_note,
+        is_favorite, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(vocabulary_id) DO UPDATE SET
+        simplified = excluded.simplified,
+        pinyin = excluded.pinyin,
+        custom_note = COALESCE(excluded.custom_note, ${DatabaseConstants.tableUserSavedWords}.custom_note),
+        is_favorite = excluded.is_favorite,
+        updated_at = excluded.updated_at
+    ''', [
+      id,
+      vocabularyId,
+      simplified,
+      pinyin,
+      customNote,
+      isFavorite ? 1 : 0,
+      nowUtc,
+      nowUtc,
+    ]);
   }
 
   Future<int> removeSavedWord(String vocabularyId, {Transaction? txn}) async {
@@ -78,23 +86,23 @@ class UserSavedWordsDao {
     return result.isNotEmpty ? result.first : null;
   }
 
-  /// Batch fetches saved status for multiple vocabulary IDs in a single query.
-  /// Eliminates sequential queries during search result mapping.
+  /// Batch fetches saved status for multiple vocabulary IDs in chunked queries (<= 500 args).
   Future<Map<String, Map<String, dynamic>>> getSavedWordsByIds(
     List<String> vocabIds,
   ) async {
     if (vocabIds.isEmpty) return const {};
 
-    final placeholders = List.filled(vocabIds.length, '?').join(',');
-    final rows = await _db.query(
-      DatabaseConstants.tableUserSavedWords,
-      where: 'vocabulary_id IN ($placeholders)',
-      whereArgs: vocabIds,
-    );
-
     final map = <String, Map<String, dynamic>>{};
-    for (final row in rows) {
-      map[row['vocabulary_id'] as String] = row;
+    for (final chunk in DaoUtils.chunkList(vocabIds)) {
+      final placeholders = List.filled(chunk.length, '?').join(',');
+      final rows = await _db.query(
+        DatabaseConstants.tableUserSavedWords,
+        where: 'vocabulary_id IN ($placeholders)',
+        whereArgs: chunk,
+      );
+      for (final row in rows) {
+        map[row['vocabulary_id'] as String] = row;
+      }
     }
     return map;
   }

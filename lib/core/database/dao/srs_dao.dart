@@ -1,21 +1,19 @@
 import 'package:sqflite/sqflite.dart';
 import '../database_constants.dart';
+import 'dao_utils.dart';
 
 class SrsDao {
   final DatabaseExecutor _db;
 
   SrsDao(this._db);
 
-  Future<void> _safeUpsert(
-    DatabaseExecutor executor,
-    String table,
-    Map<String, dynamic> item,
-  ) async {
+  Future<void> upsertSrsItem(Map<String, dynamic> item, {Transaction? txn}) async {
+    final executor = txn ?? _db;
     final contentId = item['content_id'];
     final contentType = item['content_type'];
     if (contentId != null && contentType != null) {
       final existing = await executor.query(
-        table,
+        DatabaseConstants.tableSrsItems,
         columns: ['id'],
         where: 'content_id = ? AND content_type = ? AND deleted_at IS NULL',
         whereArgs: [contentId, contentType],
@@ -26,7 +24,7 @@ class SrsDao {
         final updatedRow = Map<String, dynamic>.from(item);
         updatedRow['id'] = existingId;
         await executor.update(
-          table,
+          DatabaseConstants.tableSrsItems,
           updatedRow,
           where: 'id = ?',
           whereArgs: [existingId],
@@ -34,32 +32,7 @@ class SrsDao {
         return;
       }
     }
-    // Also check primary key 'id'
-    final id = item['id'];
-    if (id != null) {
-      final existingById = await executor.query(
-        table,
-        columns: ['id'],
-        where: 'id = ?',
-        whereArgs: [id],
-        limit: 1,
-      );
-      if (existingById.isNotEmpty) {
-        await executor.update(
-          table,
-          item,
-          where: 'id = ?',
-          whereArgs: [id],
-        );
-        return;
-      }
-    }
-    await executor.insert(table, item, conflictAlgorithm: ConflictAlgorithm.ignore);
-  }
-
-  Future<void> upsertSrsItem(Map<String, dynamic> item, {Transaction? txn}) async {
-    final executor = txn ?? _db;
-    await _safeUpsert(executor, DatabaseConstants.tableSrsItems, item);
+    await DaoUtils.safeUpsert(executor, DatabaseConstants.tableSrsItems, item);
   }
 
   Future<Map<String, dynamic>?> getSrsItemByContent(String contentId, String contentType) async {

@@ -1,42 +1,15 @@
 import 'package:sqflite/sqflite.dart';
 import '../database_constants.dart';
+import 'dao_utils.dart';
 
 class ReadingDao {
   final DatabaseExecutor _db;
 
   ReadingDao(this._db);
 
-  Future<void> _safeUpsert(
-    DatabaseExecutor executor,
-    String table,
-    Map<String, dynamic> row, {
-    String primaryKey = 'id',
-  }) async {
-    final pkVal = row[primaryKey];
-    if (pkVal != null) {
-      final existing = await executor.query(
-        table,
-        columns: [primaryKey],
-        where: '$primaryKey = ?',
-        whereArgs: [pkVal],
-        limit: 1,
-      );
-      if (existing.isNotEmpty) {
-        await executor.update(
-          table,
-          row,
-          where: '$primaryKey = ?',
-          whereArgs: [pkVal],
-        );
-        return;
-      }
-    }
-    await executor.insert(table, row, conflictAlgorithm: ConflictAlgorithm.ignore);
-  }
-
   Future<void> insertPassage(Map<String, dynamic> row, {Transaction? txn}) async {
     final executor = txn ?? _db;
-    await _safeUpsert(executor, DatabaseConstants.tableReadingPassages, row);
+    await DaoUtils.safeUpsert(executor, DatabaseConstants.tableReadingPassages, row);
   }
 
   Future<Map<String, dynamic>?> getPassageById(String id) async {
@@ -76,29 +49,17 @@ class ReadingDao {
   // Reading Progress methods
   Future<void> saveProgress(Map<String, dynamic> row, {Transaction? txn}) async {
     final executor = txn ?? _db;
-    final passageId = row['passage_id'];
-    if (passageId != null) {
-      final existing = await executor.query(
+    if (row['passage_id'] != null) {
+      await DaoUtils.safeUpsert(
+        executor,
         DatabaseConstants.tableReadingProgress,
-        columns: ['id'],
-        where: 'passage_id = ?',
-        whereArgs: [passageId],
-        limit: 1,
+        row,
+        conflictKey: 'passage_id',
+        preservePrimaryKey: true,
       );
-      if (existing.isNotEmpty) {
-        final existingId = existing.first['id'];
-        final updatedRow = Map<String, dynamic>.from(row);
-        updatedRow['id'] = existingId;
-        await executor.update(
-          DatabaseConstants.tableReadingProgress,
-          updatedRow,
-          where: 'id = ?',
-          whereArgs: [existingId],
-        );
-        return;
-      }
+      return;
     }
-    await _safeUpsert(executor, DatabaseConstants.tableReadingProgress, row);
+    await DaoUtils.safeUpsert(executor, DatabaseConstants.tableReadingProgress, row);
   }
 
   Future<Map<String, dynamic>?> getProgressByPassageId(String passageId) async {
