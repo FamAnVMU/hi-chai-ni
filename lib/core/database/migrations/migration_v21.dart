@@ -374,6 +374,37 @@ class MigrationV21 implements Migration {
         );
       ''');
 
+      await createDictionaryFtsTriggers(db);
+      await rebuildDictionaryFts(db);
+    } catch (e) {
+      debugPrint('[MigrationV21] FTS5 setup skipped or unavailable: $e');
+      rethrow;
+    }
+  }
+
+  static const dictionaryFtsTriggerNames = [
+    'trg_dict_entries_ai',
+    'trg_dict_entries_ad',
+    'trg_dict_entries_au',
+  ];
+
+  /// Drops FTS sync triggers so bulk seeding avoids per-row FTS writes; pair with
+  /// [createDictionaryFtsTriggers] + [rebuildDictionaryFts] afterwards.
+  static Future<void> dropDictionaryFtsTriggers(DatabaseExecutor db) async {
+    for (final name in dictionaryFtsTriggerNames) {
+      await db.execute('DROP TRIGGER IF EXISTS $name;');
+    }
+  }
+
+  static Future<void> rebuildDictionaryFts(DatabaseExecutor db) async {
+    await db.execute('''
+      INSERT INTO ${DatabaseConstants.tableDictionaryEntriesFts}(
+        ${DatabaseConstants.tableDictionaryEntriesFts}
+      ) VALUES('rebuild');
+    ''');
+  }
+
+  static Future<void> createDictionaryFtsTriggers(DatabaseExecutor db) async {
       await db.execute('''
         CREATE TRIGGER IF NOT EXISTS trg_dict_entries_ai
         AFTER INSERT ON ${DatabaseConstants.tableDictionaryEntries}
@@ -414,15 +445,5 @@ class MigrationV21 implements Migration {
           );
         END;
       ''');
-
-      await db.execute('''
-        INSERT INTO ${DatabaseConstants.tableDictionaryEntriesFts}(
-          ${DatabaseConstants.tableDictionaryEntriesFts}
-        ) VALUES('rebuild');
-      ''');
-    } catch (e) {
-      debugPrint('[MigrationV21] FTS5 setup skipped or unavailable: $e');
-      rethrow;
-    }
   }
 }
