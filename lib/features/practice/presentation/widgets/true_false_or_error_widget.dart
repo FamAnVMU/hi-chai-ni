@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/models/practice_models.dart';
 
-class TrueFalseOrErrorWidget extends StatelessWidget {
+class TrueFalseOrErrorWidget extends StatefulWidget {
   final ExerciseDefinition definition;
   final bool? userBool;
   final String? selectedErrorToken;
@@ -19,6 +19,29 @@ class TrueFalseOrErrorWidget extends StatelessWidget {
     required this.onSelectBool,
     required this.onSelectErrorToken,
   });
+
+  @override
+  State<TrueFalseOrErrorWidget> createState() => _TrueFalseOrErrorWidgetState();
+}
+
+class _TrueFalseOrErrorWidgetState extends State<TrueFalseOrErrorWidget> {
+  int? _selectedTokenIndex;
+
+  @override
+  void didUpdateWidget(covariant TrueFalseOrErrorWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.definition.id != widget.definition.id ||
+        widget.selectedErrorToken == null) {
+      _selectedTokenIndex = null;
+    }
+  }
+
+  ExerciseDefinition get definition => widget.definition;
+  bool? get userBool => widget.userBool;
+  String? get selectedErrorToken => widget.selectedErrorToken;
+  ScoringResult? get result => widget.result;
+  ValueChanged<bool> get onSelectBool => widget.onSelectBool;
+  ValueChanged<String> get onSelectErrorToken => widget.onSelectErrorToken;
 
   @override
   Widget build(BuildContext context) {
@@ -153,6 +176,21 @@ class TrueFalseOrErrorWidget extends StatelessWidget {
     final punctuationRegex = RegExp(r'^[\p{P}\s]+$', unicode: true);
     final cleanTargetError = (definition.errorToken ?? '').replaceAll(RegExp(r'[\p{P}\s]', unicode: true), '');
     final cleanSelected = (selectedErrorToken ?? '').replaceAll(RegExp(r'[\p{P}\s]', unicode: true), '');
+    final explicitTargetIndex = (definition.metadata['error_token_index'] as num?)?.toInt();
+
+    int? fallbackSelectedIdx;
+    if (_selectedTokenIndex == null && selectedErrorToken != null) {
+      for (int i = 0; i < rawTokens.length; i++) {
+        if (punctuationRegex.hasMatch(rawTokens[i])) continue;
+        final cleanTok = rawTokens[i].replaceAll(RegExp(r'[\p{P}\s]', unicode: true), '');
+        if (rawTokens[i] == selectedErrorToken ||
+            (cleanSelected.isNotEmpty && cleanTok == cleanSelected)) {
+          fallbackSelectedIdx = i;
+          break;
+        }
+      }
+    }
+    final activeSelectedIndex = _selectedTokenIndex ?? fallbackSelectedIdx;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,7 +206,8 @@ class TrueFalseOrErrorWidget extends StatelessWidget {
           spacing: AppSpacing.xs,
           runSpacing: AppSpacing.xs,
           crossAxisAlignment: WrapCrossAlignment.center,
-          children: rawTokens.map((token) {
+          children: List.generate(rawTokens.length, (idx) {
+            final token = rawTokens[idx];
             final isPunctuation = punctuationRegex.hasMatch(token);
             if (isPunctuation) {
               return Text(
@@ -181,10 +220,11 @@ class TrueFalseOrErrorWidget extends StatelessWidget {
             }
 
             final cleanToken = token.replaceAll(RegExp(r'[\p{P}\s]', unicode: true), '');
-            final isSelected = selectedErrorToken == token ||
-                (cleanSelected.isNotEmpty && cleanToken == cleanSelected);
-            final isTargetError = definition.errorToken == token ||
-                (cleanTargetError.isNotEmpty && cleanToken == cleanTargetError);
+            final isSelected = activeSelectedIndex == idx;
+            final isTargetError = explicitTargetIndex != null
+                ? idx == explicitTargetIndex
+                : (definition.errorToken == token ||
+                    (cleanTargetError.isNotEmpty && cleanToken == cleanTargetError));
 
             Color chipBg = AppColors.cardBackground;
             Color chipBorder = AppColors.border;
@@ -212,9 +252,14 @@ class TrueFalseOrErrorWidget extends StatelessWidget {
               ),
               backgroundColor: chipBg,
               side: BorderSide(color: chipBorder),
-              onPressed: isSubmitted ? null : () => onSelectErrorToken(token),
+              onPressed: isSubmitted
+                  ? null
+                  : () {
+                      setState(() => _selectedTokenIndex = idx);
+                      onSelectErrorToken(token);
+                    },
             );
-          }).toList(),
+          }),
         ),
       ],
     );

@@ -7,5 +7,5 @@ export 'domain/models/hanzi_models.dart';
 export 'presentation/painters/hanzi_character_painter.dart';
 export 'presentation/painters/user_drawing_painter.dart';
 export 'presentation/screens/hanzi_character_list_screen.dart';
-export 'presentation/screens/hanzi_writing_screen.dart';
 export 'presentation/widgets/hanzi_writing_canvas.dart';
+export '../hanzi_writing/presentation/screens/hanzi_writing_screen.dart';

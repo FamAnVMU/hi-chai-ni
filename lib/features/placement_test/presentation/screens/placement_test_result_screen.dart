@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../app_shell/presentation/providers/app_shell_providers.dart';
+import '../../../curriculum/domain/constants/curriculum_constants.dart';
+import '../../../curriculum/presentation/providers/curriculum_providers.dart';
+import '../../../home/presentation/providers/home_providers.dart';
+import '../../../profile/presentation/providers/profile_providers.dart';
+import '../../../roadmap/presentation/providers/roadmap_providers.dart';
+import '../../../vocabulary_srs/presentation/providers/srs_providers.dart';
 import '../../domain/models/cat_assessment_result.dart';
 import '../widgets/cat_knowledge_gaps_card.dart';
 import '../widgets/cat_skill_radar_card.dart';
@@ -266,6 +272,17 @@ class PlacementTestResultScreen extends ConsumerWidget {
                       size: HiButtonSize.lg,
                       isFullWidth: true,
                       onPressed: () {
+                        ref.invalidate(userProfileProvider);
+                        ref.invalidate(homeDashboardProvider);
+                        ref.invalidate(adaptiveRoadmapProvider);
+                        ref.invalidate(srsDueCountProvider);
+                        for (var lvl = 1; lvl <= 6; lvl++) {
+                          ref.invalidate(
+                            curriculumUnitsProvider(
+                              CurriculumConstants.curriculumIdForLevel(lvl),
+                            ),
+                          );
+                        }
                         if (onContinue != null) {
                           onContinue!(result.recommendedHskLevel);
                           Navigator.of(context).pop();

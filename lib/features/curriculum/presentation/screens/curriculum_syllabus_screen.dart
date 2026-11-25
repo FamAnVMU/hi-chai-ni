@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
@@ -5,6 +6,9 @@ import '../../domain/models/curriculum_models.dart';
 import '../providers/curriculum_providers.dart';
 import '../../../content_packs/presentation/screens/content_pack_manager_screen.dart';
 import '../../../home/presentation/providers/home_providers.dart';
+import '../../../profile/presentation/providers/profile_providers.dart';
+import '../../../roadmap/presentation/providers/roadmap_providers.dart';
+import '../../../vocabulary_srs/presentation/providers/srs_providers.dart';
 import 'lesson_study_screen.dart';
 import 'level_exit_exam_screen.dart';
 
@@ -143,7 +147,7 @@ class CurriculumSyllabusScreen extends ConsumerWidget {
           const SizedBox(height: AppSpacing.md),
 
           // Banner Đề thi tốt nghiệp HSK
-          _buildExitExamCard(context, theme),
+          _buildExitExamCard(context, ref, theme),
         ],
       );
     }
@@ -153,7 +157,7 @@ class CurriculumSyllabusScreen extends ConsumerWidget {
       padding: AppSpacing.screenPadding,
       children: [
         // Banner Đề thi tốt nghiệp HSK
-        _buildExitExamCard(context, theme),
+        _buildExitExamCard(context, ref, theme),
         const SizedBox(height: AppSpacing.lg),
 
         // Units List
@@ -198,7 +202,48 @@ class CurriculumSyllabusScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildExitExamCard(BuildContext context, ThemeData theme) {
+  String _formatExitExamSubtitle(Map<String, dynamic>? examRow) {
+    if (examRow == null) {
+      final defaultQuestions = hskLevel >= 4 ? (hskLevel >= 6 ? 30 : (hskLevel == 5 ? 25 : 20)) : 40;
+      return 'Đề thi chuẩn • $defaultQuestions câu • 35 phút';
+    }
+    int durationMinutes = (examRow['duration_minutes'] as num?)?.round() ?? 35;
+    int questionCount = 0;
+    dynamic inner = examRow['exam_data_json'];
+    if (inner is String) {
+      try {
+        inner = jsonDecode(inner);
+      } catch (_) {
+        inner = null;
+      }
+    }
+    if (inner is Map<String, dynamic>) {
+      if (inner['duration_minutes'] is num) {
+        durationMinutes = (inner['duration_minutes'] as num).round();
+      }
+      if (inner['sections'] is List) {
+        for (final sec in (inner['sections'] as List)) {
+          if (sec is Map<String, dynamic> && sec['questions'] is List) {
+            questionCount += (sec['questions'] as List).length;
+          }
+        }
+      } else if (inner['questions'] is List) {
+        questionCount = (inner['questions'] as List).length;
+      }
+    }
+    if (questionCount <= 0) {
+      questionCount = (examRow['total_questions'] as num?)?.round() ?? (hskLevel >= 4 ? 20 : 40);
+    }
+    return 'Đề thi chuẩn • $questionCount câu • $durationMinutes phút';
+  }
+
+  Widget _buildExitExamCard(BuildContext context, WidgetRef ref, ThemeData theme) {
+    final examAsync = ref.watch(exitExamProvider(hskLevel));
+    final subtitle = examAsync.maybeWhen(
+      data: (row) => _formatExitExamSubtitle(row),
+      orElse: () => _formatExitExamSubtitle(null),
+    );
+
     return HiCard(
       backgroundColor: AppColors.primaryBlueLight,
       borderColor: AppColors.secondaryBlue,
@@ -230,7 +275,7 @@ class CurriculumSyllabusScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Đề thi chuẩn quốc tế 40 câu • 35 phút',
+                  subtitle,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: AppColors.secondaryText,
                   ),
@@ -243,12 +288,23 @@ class CurriculumSyllabusScreen extends ConsumerWidget {
             text: 'Thi ngay',
             size: HiButtonSize.sm,
             variant: HiButtonVariant.primary,
-            onPressed: () {
-              Navigator.of(context).push(
+            onPressed: () async {
+              final result = await Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => LevelExitExamScreen(level: hskLevel.toString()),
                 ),
               );
+              if (result == true) {
+                ref.invalidate(userProfileProvider);
+                ref.invalidate(homeDashboardProvider);
+                ref.invalidate(curriculumUnitsProvider);
+                ref.invalidate(curriculumUnitsWithLessonsProvider);
+                ref.invalidate(allCurriculumLessonsProvider);
+                ref.invalidate(curriculumLessonsProvider);
+                ref.invalidate(adaptiveRoadmapProvider);
+                ref.invalidate(srsDueCountProvider);
+                ref.invalidate(exitExamProvider);
+              }
             },
           ),
         ],

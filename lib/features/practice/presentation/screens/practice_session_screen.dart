@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../home/presentation/providers/home_providers.dart';
 import '../../domain/models/practice_models.dart';
 import '../providers/practice_providers.dart';
 import '../widgets/exercise_card_container.dart';
@@ -30,6 +31,8 @@ class PracticeSessionScreen extends ConsumerStatefulWidget {
 }
 
 class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
+  static int _attSeq = 0;
+
   PracticeSession? _session;
   List<ExerciseDefinition> _exercises = [];
   bool _isLoading = true;
@@ -48,6 +51,11 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
   DateTime _questionStartTime = DateTime.now();
   final Stopwatch _sessionStopwatch = Stopwatch();
 
+  int get _safeCurrentIndex {
+    if (_exercises.isEmpty || _session == null) return 0;
+    return _session!.currentIndex.clamp(0, _exercises.length - 1);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -58,8 +66,10 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
     final repo = ref.read(practiceRepositoryProvider);
 
     // 1. Check for custom exercises or load from DB
+    final bool hasCustomExercises =
+        widget.customExercises != null && widget.customExercises!.isNotEmpty;
     List<ExerciseDefinition> exercises;
-    if (widget.customExercises != null && widget.customExercises!.isNotEmpty) {
+    if (hasCustomExercises) {
       exercises = widget.customExercises!;
     } else {
       exercises = await repo.getExercises(
@@ -73,16 +83,53 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
       exercises = await repo.getExercises();
     }
 
-    // 2. Check for active session to resume
+    // 2. Check for active session to resume (ensuring HSK level & exercise list compatibility)
     PracticeSession? session;
     if (widget.initialSessionId != null) {
       session = await repo.getSessionById(widget.initialSessionId!);
     } else {
-      session = await repo.getActiveSession(skill: widget.skill == 'general' ? null : widget.skill);
+      session = await repo.getActiveSession(
+        skill: widget.skill == 'general' ? null : widget.skill,
+      );
     }
 
-    // 3. If no active session, create a new one
-    if (session == null || session.isCompleted) {
+    if (session != null && !session.isCompleted) {
+      if (widget.initialSessionId == null && session.hskLevel != widget.hskLevel) {
+        session = null;
+      } else if (hasCustomExercises) {
+        final expectedIds = exercises.map((e) => e.id).toList();
+        final matchesCustom = session.exerciseIds.length == expectedIds.length &&
+            List.generate(expectedIds.length, (i) => session!.exerciseIds[i] == expectedIds[i])
+                .every((ok) => ok);
+        if (!matchesCustom) {
+          session = null;
+        }
+      } else if (session.exerciseIds.isNotEmpty) {
+        final byId = {for (final e in exercises) e.id: e};
+        final rebuilt = <ExerciseDefinition>[];
+        for (final id in session.exerciseIds) {
+          final loaded = byId[id] ?? await repo.getExerciseById(id);
+          if (loaded != null) {
+            rebuilt.add(loaded);
+          }
+        }
+        if (rebuilt.isEmpty) {
+          session = null;
+        } else {
+          exercises = rebuilt;
+        }
+      }
+
+      if (session != null &&
+          (exercises.isEmpty ||
+              session.currentIndex < 0 ||
+              session.currentIndex >= exercises.length)) {
+        session = null;
+      }
+    }
+
+    // 3. If no valid active session, create a new one when exercises exist
+    if (exercises.isNotEmpty && (session == null || session.isCompleted)) {
       session = await repo.createSession(
         title: 'Luyện tập ${widget.skill.toUpperCase()} HSK ${widget.hskLevel}',
         skill: widget.skill,
@@ -106,7 +153,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
 
   void _loadExistingAttemptForCurrentQuestion() {
     if (_session == null || _exercises.isEmpty) return;
-    final currentEx = _exercises[_session!.currentIndex];
+    final currentEx = _exercises[_safeCurrentIndex];
 
     // Check if this exercise was already answered in the session
     final existingAttempt = _session!.attempts.cast<ExerciseAttempt?>().firstWhere(
@@ -146,7 +193,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
     if (_isSubmitting || _currentResult != null || _exercises.isEmpty || _session == null) {
       return false;
     }
-    final ex = _exercises[_session!.currentIndex];
+    final ex = _exercises[_safeCurrentIndex];
     switch (ex.type) {
       case ExerciseType.multipleChoice:
       case ExerciseType.selectMeaningOrPinyin:
@@ -171,7 +218,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
       _isSubmitting = true;
     });
 
-    final ex = _exercises[_session!.currentIndex];
+    final ex = _exercises[_safeCurrentIndex];
     final answer = ExerciseAnswer(
       exerciseId: ex.id,
       selectedOptionIndex: _selectedOptionIndex,
@@ -188,7 +235,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
 
     final durationMs = DateTime.now().difference(_questionStartTime).inMilliseconds;
     final attempt = ExerciseAttempt(
-      id: 'att_${DateTime.now().millisecondsSinceEpoch}',
+      id: 'att_${DateTime.now().microsecondsSinceEpoch}_${++_attSeq}',
       sessionId: _session!.id,
       exerciseId: ex.id,
       answer: answer,
@@ -217,7 +264,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
   Future<void> _goToNextQuestion() async {
     if (_session == null) return;
 
-    final nextIndex = _session!.currentIndex + 1;
+    final nextIndex = _safeCurrentIndex + 1;
     final repo = ref.read(practiceRepositoryProvider);
 
     if (nextIndex >= _exercises.length) {
@@ -227,6 +274,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
         sessionId: _session!.id,
         totalDurationMs: _sessionStopwatch.elapsedMilliseconds,
       );
+      ref.invalidate(homeDashboardProvider);
 
       if (!mounted) return;
       setState(() {
@@ -302,15 +350,16 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
       );
     }
 
-    if (_exercises.isEmpty) {
+    if (_exercises.isEmpty || _session == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Luyện Tập')),
         body: const Center(child: Text('Không có câu hỏi luyện tập nào khả dụng.')),
       );
     }
 
-    final currentEx = _exercises[_session!.currentIndex];
-    final progress = (_session!.currentIndex + 1) / _exercises.length;
+    final safeIdx = _safeCurrentIndex;
+    final currentEx = _exercises[safeIdx];
+    final progress = (safeIdx + 1) / _exercises.length;
 
     return Scaffold(
       appBar: AppBar(
@@ -337,7 +386,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Câu ${_session!.currentIndex + 1} / ${_exercises.length}',
+                        'Câu ${safeIdx + 1} / ${_exercises.length}',
                         style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       Text(
@@ -381,7 +430,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
                   else
                     Expanded(
                       child: HiButton(
-                        text: _session!.currentIndex + 1 >= _exercises.length
+                        text: safeIdx + 1 >= _exercises.length
                             ? 'Hoàn thành phiên'
                             : 'Câu tiếp theo',
                         onPressed: _goToNextQuestion,

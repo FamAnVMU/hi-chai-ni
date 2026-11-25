@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../content_packs/presentation/screens/content_pack_manager_screen.dart';
+import '../../../curriculum/domain/models/curriculum_models.dart' as curr;
+import '../../../curriculum/presentation/providers/curriculum_providers.dart';
+import '../../../curriculum/presentation/screens/lesson_study_screen.dart';
+import '../../../grammar/grammar.dart';
 import '../../../hanzi_writing/hanzi_writing.dart';
+import '../../../home/presentation/providers/home_providers.dart';
 import '../../../pronunciation/pronunciation.dart';
 import '../../../reading/reading.dart';
-import '../../../grammar/grammar.dart';
 import '../../../review/presentation/screens/review_screen.dart';
 import '../../domain/catalog/curriculum_catalog.dart';
 import '../../domain/models/roadmap_models.dart';
@@ -62,7 +67,8 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
           ),
           data: (state) {
             final activeGoal = state.activeGoal;
-            final curriculumLevel = CurriculumCatalog.getLevel(selectedLevel);
+            final curriculumLevel = state.levelsByHsk[selectedLevel] ??
+                CurriculumCatalog.getLevel(selectedLevel);
             final progressMap = state.lessonProgressMap;
 
             return ListView(
@@ -72,12 +78,12 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
                 _buildGoalHeader(context, activeGoal),
                 const SizedBox(height: AppSpacing.md),
 
-                // 2. Level Selector
+                // 2. Level Selector (HSK 1 .. HSK 6)
                 _buildLevelSelector(selectedLevel),
                 const SizedBox(height: AppSpacing.md),
 
                 // 3. Level Completion Progress
-                _buildLevelProgressBar(context, selectedLevel, state),
+                _buildLevelProgressBar(context, selectedLevel, curriculumLevel, progressMap),
                 const SizedBox(height: AppSpacing.lg),
 
                 // 4. Adaptive Recommendations (Top 3)
@@ -109,15 +115,54 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
                 const SizedBox(height: AppSpacing.md),
 
                 if (curriculumLevel.units.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.all(AppSpacing.xl),
-                    child: Center(
-                      child: Text(
-                        'Nội dung HSK $selectedLevel đang được biên soạn.',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+                  HiCard(
+                    backgroundColor: AppColors.primaryBlueLight.withAlpha(70),
+                    borderColor: AppColors.secondaryBlue,
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Column(
+                      children: [
+                        const Icon(
+                          Icons.cloud_download_outlined,
+                          size: 40,
+                          color: AppColors.primaryBlueDark,
                         ),
-                      ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          curriculumLevel.isPackInstalled
+                              ? 'Nội dung HSK $selectedLevel đang được cập nhật.'
+                              : 'Chưa tải gói HSK $selectedLevel',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryBlueDark,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          'Hãy tải gói học liệu HSK $selectedLevel để mở khóa toàn bộ bài học và đồng bộ tiến trình học tập.',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        HiButton(
+                          text: 'Tải gói HSK $selectedLevel',
+                          icon: const Icon(Icons.download_rounded, size: 18),
+                          isFullWidth: true,
+                          onPressed: () {
+                            Navigator.of(context)
+                                .push(
+                                  MaterialPageRoute(
+                                    builder: (_) => const ContentPackManagerScreen(),
+                                  ),
+                                )
+                                .then((_) {
+                              ref.invalidate(adaptiveRoadmapProvider);
+                            });
+                          },
+                        ),
+                      ],
                     ),
                   )
                 else
@@ -190,7 +235,7 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
-        children: [1, 2, 3, 4, 5].map((lvl) {
+        children: [1, 2, 3, 4, 5, 6].map((lvl) {
           final isSelected = currentSelectedLevel == lvl;
           return Padding(
             padding: const EdgeInsets.only(right: AppSpacing.sm),
@@ -210,12 +255,26 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
   Widget _buildLevelProgressBar(
     BuildContext context,
     int selectedLevel,
-    LearnerRoadmapState state,
+    CurriculumLevel curriculumLevel,
+    Map<String, LessonProgress> progressMap,
   ) {
     final theme = Theme.of(context);
-    final levelLessons = state.lessonProgressMap.values.where((p) => p.hskLevel == selectedLevel).toList();
-    final completedCount = levelLessons.where((p) => p.isCompleted).length;
-    final totalCount = levelLessons.length;
+    final levelLessons = curriculumLevel.allLessons;
+    final int totalCount;
+    final int completedCount;
+
+    if (levelLessons.isNotEmpty) {
+      totalCount = levelLessons.length;
+      completedCount = levelLessons
+          .where((l) => progressMap[l.id]?.isCompleted == true)
+          .length;
+    } else {
+      final fallbackRows = progressMap.values
+          .where((p) => p.hskLevel == selectedLevel)
+          .toList();
+      totalCount = fallbackRows.length;
+      completedCount = fallbackRows.where((p) => p.isCompleted).length;
+    }
     final double completionRate = totalCount == 0 ? 0.0 : (completedCount / totalCount);
 
     return HiCard(
@@ -340,7 +399,7 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
 
   Widget _buildUnitCard(
     BuildContext context,
-    CurriculumUnit unit,
+    RoadmapUnit unit,
     Map<String, LessonProgress> progressMap,
   ) {
     final theme = Theme.of(context);
@@ -395,34 +454,34 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
 
   Widget _buildLessonItem(
     BuildContext context,
-    CurriculumLesson lesson,
+    RoadmapLesson lesson,
     Map<String, LessonProgress> progressMap,
   ) {
     final theme = Theme.of(context);
     final progress = progressMap[lesson.id];
-    final status = progress?.status ?? LessonStatus.locked;
+    final status = progress?.status ?? RoadmapLessonStatus.locked;
 
     IconData statusIcon;
     Color statusColor;
 
     switch (status) {
-      case LessonStatus.completed:
+      case RoadmapLessonStatus.completed:
         statusIcon = Icons.check_circle_rounded;
         statusColor = AppColors.primaryBlueDark;
         break;
-      case LessonStatus.inProgress:
+      case RoadmapLessonStatus.inProgress:
         statusIcon = Icons.timelapse_rounded;
         statusColor = Colors.orange;
         break;
-      case LessonStatus.available:
+      case RoadmapLessonStatus.available:
         statusIcon = Icons.lock_open_rounded;
         statusColor = AppColors.primaryBlueDark;
         break;
-      case LessonStatus.skipped:
+      case RoadmapLessonStatus.skipped:
         statusIcon = Icons.skip_next_rounded;
         statusColor = theme.colorScheme.outline;
         break;
-      case LessonStatus.locked:
+      case RoadmapLessonStatus.locked:
         statusIcon = Icons.lock_outline_rounded;
         statusColor = theme.colorScheme.outlineVariant;
         break;
@@ -439,12 +498,12 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
             vertical: AppSpacing.sm,
           ),
           decoration: BoxDecoration(
-            color: status == LessonStatus.inProgress
+            color: status == RoadmapLessonStatus.inProgress
                 ? theme.colorScheme.primaryContainer.withAlpha(40)
                 : theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(
-              color: status == LessonStatus.inProgress
+              color: status == RoadmapLessonStatus.inProgress
                   ? AppColors.primaryBlueDark.withAlpha(120)
                   : theme.colorScheme.outlineVariant.withAlpha(60),
             ),
@@ -461,7 +520,7 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
                       lesson.title,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: status == LessonStatus.locked
+                        color: status == RoadmapLessonStatus.locked
                             ? theme.colorScheme.onSurfaceVariant
                             : null,
                       ),
@@ -499,7 +558,7 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
 
   void _onOpenLesson(
     BuildContext context,
-    CurriculumLesson lesson,
+    RoadmapLesson lesson,
     Map<String, LessonProgress> progressMap,
   ) {
     LessonDetailSheet.show(
@@ -511,9 +570,32 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
         // Start lesson explicitly (changes status to inProgress, NEVER marks completed!)
         await ref.read(adaptiveRoadmapProvider.notifier).startLesson(lesson.id);
 
+        curr.CurriculumLesson? fullLesson;
+        try {
+          final currRepo = ref.read(curriculumRepositoryProvider);
+          fullLesson = await currRepo.getLessonById(lesson.id);
+        } catch (_) {}
+
         if (!context.mounted) return;
 
-        // Navigate to appropriate skill practice screen
+        if (fullLesson != null) {
+          final completed = await Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => LessonStudyScreen(
+                lesson: fullLesson!,
+                useGamifiedPlayer: true,
+              ),
+            ),
+          );
+          if (completed == true) {
+            ref.invalidate(adaptiveRoadmapProvider);
+            ref.invalidate(curriculumUnitsWithLessonsProvider);
+            ref.invalidate(homeDashboardProvider);
+          }
+          return;
+        }
+
+        // Legacy fallback if lesson ID is a catalog-only item
         switch (lesson.primarySkill) {
           case SkillDimension.writing:
             Navigator.of(context).push(
@@ -567,7 +649,7 @@ class _RoadmapScreenState extends ConsumerState<RoadmapScreen> {
     );
   }
 
-  Future<void> _onSkipLesson(CurriculumLesson lesson) async {
+  Future<void> _onSkipLesson(RoadmapLesson lesson) async {
     await ref.read(adaptiveRoadmapProvider.notifier).skipLesson(lesson.id);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(

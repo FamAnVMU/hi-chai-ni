@@ -86,9 +86,15 @@ class HanziPainter extends CustomPainter {
       ..color = highlightStrokeColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 4.0
-      ..strokeCap = StrokeCap.round;
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
 
-    canvas.drawLine(start, end, guidePaint);
+    final path = Path()..moveTo(start.dx, start.dy);
+    for (final cp in stdStroke.controlPoints) {
+      path.lineTo(cp.dx * size.width, cp.dy * size.height);
+    }
+    path.lineTo(end.dx, end.dy);
+    canvas.drawPath(path, guidePaint);
 
     // Draw start dot indicator
     final dotPaint = Paint()
@@ -133,7 +139,10 @@ class HanziPainter extends CustomPainter {
     return oldDelegate.strokes.length != strokes.length ||
         oldDelegate.activeStroke != activeStroke ||
         oldDelegate.character != character ||
+        oldDelegate.strokeData != strokeData ||
         oldDelegate.mode != mode ||
-        oldDelegate.highlightedStrokeOrder != highlightedStrokeOrder;
+        oldDelegate.highlightedStrokeOrder != highlightedStrokeOrder ||
+        oldDelegate.watermarkColor != watermarkColor ||
+        oldDelegate.highlightStrokeColor != highlightStrokeColor;
   }
 }

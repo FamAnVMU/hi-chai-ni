@@ -183,8 +183,13 @@ class HomeRepository {
     final todayLocal = StreakCalculator.toLocalDate(refUtc, timeZoneOffset: timeZoneOffset);
     // Start of week: Monday 00:00:00 in local calendar day
     final startOfWeekLocal = todayLocal.subtract(Duration(days: todayLocal.weekday - 1));
+    final thirtyDaysAgoUtc = refUtc.subtract(const Duration(days: 30));
+    final weekStartUtc = startOfWeekLocal.toUtc().subtract(const Duration(days: 1));
+    final recentCutoffUtc =
+        weekStartUtc.isBefore(thirtyDaysAgoUtc) ? weekStartUtc : thirtyDaysAgoUtc;
+    final recentCutoffIso = recentCutoffUtc.toIso8601String();
 
-    // 1. Process learning_activities (Canonical Session Source)
+    // 1. Process learning_activities (Canonical Session Source) in recent window (no artificial row cap)
     final validActivities = <_ProcessedSession>[];
     final seenActivityKeys = <String>{};
 
@@ -193,11 +198,11 @@ class HomeRepository {
         '''
         SELECT id, activity_type, duration_seconds, items_count, activity_date, created_at
         FROM ${DatabaseConstants.tableLearningActivities}
-        WHERE activity_type NOT IN ('sample_data', 'seed')
-          AND created_at >= datetime('now', '-30 days')
+        WHERE COALESCE(activity_type, '') NOT IN ('sample_data', 'seed', 'cat_placement_test')
+          AND created_at >= ?
         ORDER BY created_at ASC
-        LIMIT 200
         ''',
+        [recentCutoffIso],
       );
 
       for (final row in activityRows) {
@@ -244,7 +249,7 @@ class HomeRepository {
       // Table might not exist in isolated tests
     }
 
-    // 2. Process learner_evidence (Granular Interaction Source)
+    // 2. Process learner_evidence (Granular Interaction Source) in recent window
     final orphanEvidence = <_ProcessedSession>[];
     final seenEvidenceKeys = <String>{};
 
@@ -253,11 +258,11 @@ class HomeRepository {
         '''
         SELECT id, content_id, source, duration_ms, created_at 
         FROM ${DatabaseConstants.tableLearnerEvidence}
-        WHERE source NOT IN ('sample_data', 'seed')
-          AND created_at >= datetime('now', '-30 days')
+        WHERE COALESCE(source, '') NOT IN ('sample_data', 'seed', 'cat_placement_test')
+          AND created_at >= ?
         ORDER BY created_at ASC
-        LIMIT 100
         ''',
+        [recentCutoffIso],
       );
 
       for (final row in evidenceRows) {
@@ -343,6 +348,117 @@ class HomeRepository {
       }
     }
 
+    // 4. Aggregate older-than-window history via SQL GROUP BY so all-time stats & multi-month streaks stay exact and O(days)
+    try {
+      final histActTotals = await _db.rawQuery(
+        '''
+        SELECT COALESCE(SUM(dur), 0) AS total_dur,
+               COALESCE(SUM(items), 0) AS total_items
+        FROM (
+          SELECT MIN(MAX(COALESCE(duration_seconds, 0), 0), ?) AS dur,
+                 MIN(MAX(COALESCE(items_count, 1), 0), 1000) AS items
+          FROM ${DatabaseConstants.tableLearningActivities}
+          WHERE COALESCE(activity_type, '') NOT IN ('sample_data', 'seed', 'cat_placement_test')
+            AND created_at < ?
+          GROUP BY COALESCE(activity_type, 'lesson'),
+                   MIN(MAX(COALESCE(duration_seconds, 0), 0), ?),
+                   MIN(MAX(COALESCE(items_count, 1), 0), 1000),
+                   CAST(strftime('%s', created_at) AS INTEGER) / 2
+        )
+        ''',
+        [maxSessionDurationSeconds, recentCutoffIso, maxSessionDurationSeconds],
+      );
+      if (histActTotals.isNotEmpty) {
+        totalDuration += (histActTotals.first['total_dur'] as num?)?.toInt() ?? 0;
+        totalItems += (histActTotals.first['total_items'] as num?)?.toInt() ?? 0;
+      }
+
+      final histActDays = await _db.rawQuery(
+        '''
+        SELECT activity_date, MIN(created_at) AS sample_created_at
+        FROM ${DatabaseConstants.tableLearningActivities}
+        WHERE COALESCE(activity_type, '') NOT IN ('sample_data', 'seed', 'cat_placement_test')
+          AND created_at < ?
+          AND (COALESCE(duration_seconds, 0) >= 30 OR COALESCE(items_count, 1) >= 1)
+        GROUP BY COALESCE(NULLIF(activity_date, ''), substr(created_at, 1, 10))
+        ''',
+        [recentCutoffIso],
+      );
+      for (final row in histActDays) {
+        final createdStr = row['sample_created_at'] as String?;
+        final parsedUtc = createdStr != null ? DateTime.tryParse(createdStr)?.toUtc() : null;
+        if (parsedUtc != null) {
+          eventTimestampsUtc.add(parsedUtc);
+        }
+        final dateStr = row['activity_date'] as String?;
+        if (dateStr != null && RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(dateStr)) {
+          final parts = dateStr.split('-');
+          activeLocalDates.add(
+            DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2])),
+          );
+        } else if (parsedUtc != null) {
+          activeLocalDates.add(
+            StreakCalculator.toLocalDate(parsedUtc, timeZoneOffset: timeZoneOffset),
+          );
+        }
+      }
+    } catch (_) {}
+
+    try {
+      final histEviTotals = await _db.rawQuery(
+        '''
+        SELECT COALESCE(SUM(dur), 0) AS total_dur,
+               COUNT(*) AS total_items
+        FROM (
+          SELECT MIN(MAX(CAST(ROUND(COALESCE(e.duration_ms, 0) / 1000.0) AS INTEGER), 0), ?) AS dur
+          FROM ${DatabaseConstants.tableLearnerEvidence} e
+          WHERE COALESCE(e.source, '') NOT IN ('sample_data', 'seed', 'cat_placement_test')
+            AND e.created_at < ?
+            AND NOT EXISTS (
+              SELECT 1 FROM ${DatabaseConstants.tableLearningActivities} la
+              WHERE COALESCE(la.activity_type, '') NOT IN ('sample_data', 'seed', 'cat_placement_test')
+                AND ABS(CAST(strftime('%s', e.created_at) AS INTEGER) - CAST(strftime('%s', la.created_at) AS INTEGER)) <= 30
+            )
+          GROUP BY COALESCE(e.source, 'srs'),
+                   COALESCE(e.content_id, ''),
+                   dur,
+                   CAST(strftime('%s', e.created_at) AS INTEGER) / 2
+        )
+        ''',
+        [maxSessionDurationSeconds, recentCutoffIso],
+      );
+      if (histEviTotals.isNotEmpty) {
+        totalDuration += (histEviTotals.first['total_dur'] as num?)?.toInt() ?? 0;
+        totalItems += (histEviTotals.first['total_items'] as num?)?.toInt() ?? 0;
+      }
+
+      final histEviDays = await _db.rawQuery(
+        '''
+        SELECT MIN(e.created_at) AS sample_created_at
+        FROM ${DatabaseConstants.tableLearnerEvidence} e
+        WHERE COALESCE(e.source, '') NOT IN ('sample_data', 'seed', 'cat_placement_test')
+          AND e.created_at < ?
+          AND NOT EXISTS (
+            SELECT 1 FROM ${DatabaseConstants.tableLearningActivities} la
+            WHERE COALESCE(la.activity_type, '') NOT IN ('sample_data', 'seed', 'cat_placement_test')
+              AND ABS(CAST(strftime('%s', e.created_at) AS INTEGER) - CAST(strftime('%s', la.created_at) AS INTEGER)) <= 30
+          )
+        GROUP BY substr(e.created_at, 1, 10)
+        ''',
+        [recentCutoffIso],
+      );
+      for (final row in histEviDays) {
+        final createdStr = row['sample_created_at'] as String?;
+        final parsedUtc = createdStr != null ? DateTime.tryParse(createdStr)?.toUtc() : null;
+        if (parsedUtc != null) {
+          eventTimestampsUtc.add(parsedUtc);
+          activeLocalDates.add(
+            StreakCalculator.toLocalDate(parsedUtc, timeZoneOffset: timeZoneOffset),
+          );
+        }
+      }
+    } catch (_) {}
+
     return (
       eventTimestampsUtc: eventTimestampsUtc,
       activeLocalDates: activeLocalDates,
@@ -393,15 +509,15 @@ class HomeRepository {
 
     final streak = streakCalculator.calculate(
       meaningfulEventTimesUtc: sessionData.eventTimestampsUtc,
+      meaningfulLocalDates: sessionData.activeLocalDates,
       referenceTimeUtc: nowUtc,
       timeZoneOffset: timeZoneOffset,
       todayDurationSeconds: sessionData.stats.todayDurationSeconds,
       todayItemsCompleted: sessionData.stats.todayItemsCompleted,
     );
 
-    // 5. Live SRS due count filtered strictly by the learner's active HSK level
+    // 5. Live SRS due count across all enrolled cards (never lock out lower HSK cards)
     final srsDue = await _srsRepository.getDueCardsCount(
-      hskLevel: activeHskLevel,
       asOf: nowUtc,
       forceRefresh: true,
     );
@@ -488,59 +604,105 @@ class HomeRepository {
 
   /// Calculates roadmap progress for the specified HSK level from actual SQLite data.
   Future<RoadmapProgress> getRoadmapProgress({int hskLevel = 1}) async {
-    // 1. Total vocab in this level from seed/database
+    // 1. Total distinct vocab in this level from seed/database
     final totalVocabRes = await _db.rawQuery(
-      'SELECT COUNT(id) as count FROM ${DatabaseConstants.tableVocabularies} '
+      'SELECT COUNT(DISTINCT simplified) as count FROM ${DatabaseConstants.tableVocabularies} '
       'WHERE hsk_level = ? AND deleted_at IS NULL',
       [hskLevel],
     );
     final totalVocab = (totalVocabRes.first['count'] as num?)?.toInt() ?? 0;
 
-    // 2. Count distinct vocabularies that have progressed beyond 'new' state
+    // 2. Count distinct vocabularies for this HSK level that have progressed beyond 'new' state
     final learnedRes = await _db.rawQuery(
       '''
-      SELECT COUNT(DISTINCT content_id) as count 
-      FROM ${DatabaseConstants.tableSrsItems}
-      WHERE content_type = 'vocabulary' 
-        AND state != 'new' 
-        AND deleted_at IS NULL
+      SELECT COUNT(DISTINCT v.simplified) as count 
+      FROM ${DatabaseConstants.tableSrsItems} s
+      INNER JOIN ${DatabaseConstants.tableVocabularies} v
+        ON (s.content_id = v.id OR s.content_id = v.simplified)
+      WHERE s.content_type = 'vocabulary' 
+        AND s.state != 'new' 
+        AND s.deleted_at IS NULL
+        AND v.deleted_at IS NULL
+        AND v.hsk_level = ?
       ''',
+      [hskLevel],
     );
     final learnedVocab = (learnedRes.first['count'] as num?)?.toInt() ?? 0;
 
-    // 3. Count mastered vocabularies
+    // 3. Count mastered vocabularies for this HSK level
     final masteredRes = await _db.rawQuery(
       '''
-      SELECT COUNT(DISTINCT content_id) as count 
-      FROM ${DatabaseConstants.tableSrsItems}
-      WHERE content_type = 'vocabulary' 
-        AND (state = 'mastered' OR interval_days >= 21) 
-        AND deleted_at IS NULL
+      SELECT COUNT(DISTINCT v.simplified) as count 
+      FROM ${DatabaseConstants.tableSrsItems} s
+      INNER JOIN ${DatabaseConstants.tableVocabularies} v
+        ON (s.content_id = v.id OR s.content_id = v.simplified)
+      WHERE s.content_type = 'vocabulary' 
+        AND (s.state = 'mastered' OR (s.repetitions >= 3 AND s.interval_days >= 21))
+        AND s.deleted_at IS NULL
+        AND v.deleted_at IS NULL
+        AND v.hsk_level = ?
       ''',
+      [hskLevel],
     );
     final masteredVocab = (masteredRes.first['count'] as num?)?.toInt() ?? 0;
 
-    // Determine current lesson based on progress
-    String nextLessonTitle;
-    String nextLessonSnippet;
+    // 4. Resolve real level title & next incomplete lesson from curriculum tables
+    String levelTitle = 'Lộ trình: HSK $hskLevel';
+    String nextLessonTitle = 'Bài 1 – HSK $hskLevel';
+    String nextLessonSnippet = hskLevel == 1
+        ? '你[nǐ]好[hǎo]，我[wǒ]叫[jiào]李[lǐ]华[huá]。'
+        : 'Khám phá từ vựng và mẫu câu trọng tâm HSK $hskLevel.';
 
-    if (learnedVocab == 0) {
-      nextLessonTitle = 'Bài 1: Chào hỏi & Pinyin cơ bản';
-      nextLessonSnippet = '你[nǐ]好[hǎo]，我[wǒ]叫[jiào]李[lǐ]华[huá]。';
-    } else if (learnedVocab < (totalVocab * 0.3).round()) {
-      nextLessonTitle = 'Bài 2: Con số & Đồ vật hàng ngày';
-      nextLessonSnippet = '一[yī]、二[èr]、三[sān]，这[zhè]是[shì]书[shū]。';
-    } else if (learnedVocab < (totalVocab * 0.7).round()) {
-      nextLessonTitle = 'Bài 3: Gia đình & Nghề nghiệp';
-      nextLessonSnippet = '我[wǒ]爱[ài]我[wǒ]的[de]家[jiā]人[rén]。';
-    } else {
-      nextLessonTitle = 'Bài 4: Mua sắm & Hỏi đường';
-      nextLessonSnippet = '这[zhè]个[ge]多[duō]少[shao]钱[qián]？';
+    try {
+      final currRows = await _db.rawQuery(
+        '''
+        SELECT standard_name
+        FROM ${DatabaseConstants.tableCurriculums}
+        WHERE hsk_level = ?
+        LIMIT 1
+        ''',
+        [hskLevel],
+      );
+      if (currRows.isNotEmpty) {
+        final stdName = (currRows.first['standard_name'] as String?)?.trim() ?? '';
+        if (stdName.isNotEmpty) {
+          levelTitle = 'Lộ trình: $stdName';
+        }
+      }
+
+      final lessonRows = await _db.rawQuery(
+        '''
+        SELECT cl.title_vi, cl.title_zh, cl.pinyin, cl.order_index
+        FROM ${DatabaseConstants.tableCurriculumLessons} cl
+        INNER JOIN ${DatabaseConstants.tableCurriculumUnits} cu ON cl.unit_id = cu.id
+        INNER JOIN ${DatabaseConstants.tableCurriculums} c ON cu.curriculum_id = c.id
+        WHERE c.hsk_level = ?
+        ORDER BY CASE WHEN COALESCE(cl.status, 'not_started') != 'completed' THEN 0 ELSE 1 END ASC,
+                 cu.order_index ASC,
+                 cl.order_index ASC
+        LIMIT 1
+        ''',
+        [hskLevel],
+      );
+      if (lessonRows.isNotEmpty) {
+        final row = lessonRows.first;
+        final titleVi = (row['title_vi'] as String?)?.trim() ?? '';
+        final titleZh = (row['title_zh'] as String?)?.trim() ?? '';
+        final pinyin = (row['pinyin'] as String?)?.trim() ?? '';
+        final orderIdx = (row['order_index'] as num?)?.toInt() ?? 1;
+
+        nextLessonTitle = titleVi.isNotEmpty ? titleVi : 'Bài $orderIdx – HSK $hskLevel';
+        if (titleZh.isNotEmpty) {
+          nextLessonSnippet = pinyin.isNotEmpty ? '$titleZh ($pinyin)' : titleZh;
+        }
+      }
+    } catch (_) {
+      // Curriculum tables may be unseeded in minimal unit tests; keep HSK-aware fallback.
     }
 
     return RoadmapProgress(
       currentHskLevel: hskLevel,
-      levelTitle: 'Lộ trình: HSK $hskLevel Cơ Bản',
+      levelTitle: levelTitle,
       totalVocabCount: totalVocab > 0 ? totalVocab : 150,
       learnedVocabCount: learnedVocab,
       masteredVocabCount: masteredVocab,
@@ -559,7 +721,7 @@ class HomeRepository {
       '''
       SELECT id, activity_type, duration_seconds, items_count, created_at 
       FROM ${DatabaseConstants.tableLearningActivities}
-      WHERE activity_type NOT IN ('sample_data', 'seed')
+      WHERE COALESCE(activity_type, '') NOT IN ('sample_data', 'seed', 'cat_placement_test')
       ORDER BY created_at DESC 
       LIMIT ?
       ''',
@@ -596,7 +758,7 @@ class HomeRepository {
         '''
         SELECT id, content_id, content_type, source, score, duration_ms, metadata_json, created_at
         FROM ${DatabaseConstants.tableLearnerEvidence}
-        WHERE source NOT IN ('sample_data', 'seed')
+        WHERE COALESCE(source, '') NOT IN ('sample_data', 'seed', 'cat_placement_test')
         ORDER BY created_at DESC
         LIMIT ?
         ''',

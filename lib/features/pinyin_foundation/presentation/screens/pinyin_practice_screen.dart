@@ -67,6 +67,8 @@ class _PinyinPracticeScreenState extends ConsumerState<PinyinPracticeScreen> {
       isCorrect: eval.isCorrect,
       score: eval.score,
     );
+    ref.invalidate(pinyinCompletionRateProvider);
+    ref.invalidate(pinyinProgressMapProvider);
   }
 
   void _nextQuestion() {
@@ -271,11 +273,13 @@ class _PinyinPracticeScreenState extends ConsumerState<PinyinPracticeScreen> {
                               color: _lastResult!.isCorrect ? const Color(0xFF22A06B) : const Color(0xFFE05D66),
                             ),
                             const SizedBox(width: 8),
-                            Text(
-                              _lastResult!.feedback,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: _lastResult!.isCorrect ? const Color(0xFF166534) : const Color(0xFF991B1B),
+                            Expanded(
+                              child: Text(
+                                _lastResult!.feedback,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: _lastResult!.isCorrect ? const Color(0xFF166534) : const Color(0xFF991B1B),
+                                ),
                               ),
                             ),
                           ],

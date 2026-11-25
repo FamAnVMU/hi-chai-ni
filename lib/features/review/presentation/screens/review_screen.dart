@@ -60,7 +60,9 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen>
             icon: const Icon(Icons.refresh_rounded),
             tooltip: 'Tải lại hàng đợi',
             onPressed: () {
-              ref.read(srsStudySessionProvider.notifier).loadMoreCards();
+              ref
+                  .read(srsStudySessionProvider.notifier)
+                  .loadMoreCards(limit: 25, includeUnlearned: false);
               ref.read(srsDueCountProvider.notifier).refreshCount();
             },
           ),

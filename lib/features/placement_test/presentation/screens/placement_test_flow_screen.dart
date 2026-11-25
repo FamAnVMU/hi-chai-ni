@@ -19,11 +19,53 @@ class PlacementTestFlowScreen extends ConsumerStatefulWidget {
 class _PlacementTestFlowScreenState
     extends ConsumerState<PlacementTestFlowScreen> {
   DateTime _questionStartTime = DateTime.now();
+  bool _isTransitioning = false;
 
   @override
   void initState() {
     super.initState();
     _questionStartTime = DateTime.now();
+  }
+
+  Future<void> _handleSubmitAnswer(dynamic answer) async {
+    if (_isTransitioning) return;
+    setState(() => _isTransitioning = true);
+    try {
+      final latency =
+          DateTime.now().difference(_questionStartTime).inMilliseconds;
+      await ref
+          .read(activeCatSessionProvider.notifier)
+          .submitAnswer(answer, latencyMs: latency);
+      _questionStartTime = DateTime.now();
+    } finally {
+      if (mounted) {
+        setState(() => _isTransitioning = false);
+      }
+    }
+  }
+
+  Future<void> _handleSkipQuestion() async {
+    if (_isTransitioning) return;
+    var confirm = false;
+    await HiDialog.show(
+      context: context,
+      title: 'Bỏ qua câu hỏi này?',
+      message:
+          'Câu hỏi sẽ được đánh dấu là bỏ qua và chuyển sang câu tiếp theo.',
+      confirmText: 'Bỏ qua',
+      onConfirm: () => confirm = true,
+      cancelText: 'Làm tiếp',
+    );
+    if (!confirm || !mounted || _isTransitioning) return;
+    setState(() => _isTransitioning = true);
+    try {
+      await ref.read(activeCatSessionProvider.notifier).skipCurrentQuestion();
+      _questionStartTime = DateTime.now();
+    } finally {
+      if (mounted) {
+        setState(() => _isTransitioning = false);
+      }
+    }
   }
 
   @override
@@ -124,38 +166,17 @@ class _PlacementTestFlowScreenState
                     CatProgressHeader(
                       skill: session.currentSkill,
                       stepIndex: session.stepIndex,
-                      onSkip: () async {
-                        var confirm = false;
-                        await HiDialog.show(
-                          context: context,
-                          title: 'Bỏ qua câu hỏi này?',
-                          message:
-                              'Câu hỏi sẽ được đánh dấu là bỏ qua và chuyển sang câu tiếp theo.',
-                          confirmText: 'Bỏ qua',
-                          onConfirm: () => confirm = true,
-                          cancelText: 'Làm tiếp',
-                        );
-                        if (confirm) {
-                          ref
-                              .read(activeCatSessionProvider.notifier)
-                              .skipCurrentQuestion();
-                          _questionStartTime = DateTime.now();
-                        }
-                      },
+                      onSkip: _isTransitioning ? () {} : _handleSkipQuestion,
                     ),
                     const SizedBox(height: AppSpacing.lg),
 
                     // Adaptive Question Card
-                    CatQuestionCard(
-                      item: activeItem,
-                      onAnswerSubmitted: (answer) {
-                        final latency =
-                            DateTime.now().difference(_questionStartTime).inMilliseconds;
-                        ref
-                            .read(activeCatSessionProvider.notifier)
-                            .submitAnswer(answer, latencyMs: latency);
-                        _questionStartTime = DateTime.now();
-                      },
+                    AbsorbPointer(
+                      absorbing: _isTransitioning,
+                      child: CatQuestionCard(
+                        item: activeItem,
+                        onAnswerSubmitted: _handleSubmitAnswer,
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.xl),
                   ],

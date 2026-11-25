@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import '../models/curriculum_models.dart';
 import '../models/micro_card_model.dart';
+import '../../presentation/widgets/interactive_word_tile_builder.dart';
 
 /// Adapts standard CurriculumLesson content payload into 15–18 micro-learning cards
 /// for the GamifiedLessonPlayer (Micro-Learning Journey: 5–7 minutes).
@@ -177,12 +178,28 @@ class LessonMicroCardAdapter {
 
     // Fallback: If no candidate sentences found, combine 2-3 vocabulary words
     if (candidateSentences.isEmpty && words.isNotEmpty) {
-      final combinedZh = words.take(3).map((w) => w['hanzi'] ?? '').join(' ');
-      final combinedVi = words.take(3).map((w) => w['meaning'] ?? '').join(', ');
+      final pickedWords = words.take(3).toList();
+      final zhParts = pickedWords
+          .map((w) => (w['simplified'] ?? w['hanzi'] ?? w['zh'] ?? '').toString().trim())
+          .where((s) => s.isNotEmpty)
+          .toList();
+      final viParts = pickedWords
+          .map((w) => (w['meaning_vi'] ?? w['meaning'] ?? w['vi'] ?? '').toString().trim())
+          .where((s) => s.isNotEmpty)
+          .toList();
+      final combinedZh = zhParts.join(' ');
+      final combinedVi = viParts.join(', ');
       if (combinedZh.isNotEmpty) {
         candidateSentences.add({'zh': combinedZh, 'vi': combinedVi});
       }
     }
+
+    final knownCompoundWords = <String>{
+      for (final w in words)
+        if ((w['simplified'] ?? w['hanzi'] ?? w['zh'] ?? '').toString().trim().length >= 2)
+          (w['simplified'] ?? w['hanzi'] ?? w['zh'] ?? '').toString().trim(),
+      '不是', '没有', '什么', '时候', '喜欢', '认识', '高兴', '工作', '学习', '朋友', '老师', '学生',
+    }.toList();
 
     final sentenceCount = math.min(3, candidateSentences.length);
     for (int i = 0; i < sentenceCount; i++) {
@@ -190,8 +207,8 @@ class LessonMicroCardAdapter {
       final targetZh = s['zh']!;
       final promptVi = s['vi']!.isNotEmpty ? s['vi']! : 'Ghép các từ thành câu hoàn chỉnh';
 
-      // Tokenize Chinese characters / words into chips
-      final chips = _tokenizeChineseSentence(targetZh);
+      // Tokenize Chinese characters / compound words safely without punctuation chips
+      final chips = _tokenizeChineseSentence(targetZh, knownWords: knownCompoundWords);
       if (chips.length >= 2) {
         final shuffledChips = List<String>.from(chips);
         if (shuffledChips.length > 1) {
@@ -219,8 +236,8 @@ class LessonMicroCardAdapter {
     if (words.length >= 4) {
       final pairs1 = <String, String>{};
       for (int i = 0; i < math.min(4, words.length); i++) {
-        final zh = (words[i]['hanzi'] ?? words[i]['zh'] ?? '').toString().trim();
-        final vi = (words[i]['meaning'] ?? words[i]['vi'] ?? '').toString().trim();
+        final zh = (words[i]['simplified'] ?? words[i]['hanzi'] ?? words[i]['zh'] ?? '').toString().trim();
+        final vi = (words[i]['meaning_vi'] ?? words[i]['meaning'] ?? words[i]['vi'] ?? '').toString().trim();
         if (zh.isNotEmpty && vi.isNotEmpty) {
           pairs1[zh] = vi;
         }
@@ -297,12 +314,16 @@ class LessonMicroCardAdapter {
       if (promptText.isNotEmpty && options.length >= 2) {
         int correctIdx = 0;
         if (ex['correct_index'] != null) {
-          correctIdx = (ex['correct_index'] as num).toInt();
+          correctIdx = (ex['correct_index'] as num).toInt().clamp(0, options.length - 1);
         } else if (ex['correct_answer'] != null) {
           final ans = ex['correct_answer'].toString().trim();
           final found = options.indexOf(ans);
           if (found != -1) correctIdx = found;
         }
+        final String correctValue = options[correctIdx];
+        final shuffledOptions = List<String>.from(options)
+          ..shuffle(math.Random(Object.hash(lesson.id, quizIndex, 31)));
+        final int newCorrectIdx = shuffledOptions.indexOf(correctValue);
 
         final explanation = (ex['explanation'] ?? ex['explanation_vi'] ?? '').toString();
 
@@ -312,8 +333,8 @@ class LessonMicroCardAdapter {
             type: MicroCardType.miniQuiz,
             title: 'Luyện tập trắc nghiệm',
             prompt: promptText,
-            options: options,
-            correctIndex: correctIdx,
+            options: shuffledOptions,
+            correctIndex: newCorrectIdx >= 0 ? newCorrectIdx : 0,
             explanation: explanation.isNotEmpty ? explanation : null,
             segmentType: 'practice',
           ),
@@ -376,21 +397,39 @@ class LessonMicroCardAdapter {
     return null;
   }
 
-  List<String> _tokenizeChineseSentence(String sentence) {
-    final clean = sentence.replaceAll(RegExp(r'[\s]'), '');
-    if (clean.isEmpty) return [];
+  List<String> _tokenizeChineseSentence(
+    String sentence, {
+    List<String> knownWords = const [],
+  }) {
+    final withoutPunct = sentence
+        .replaceAll(RegExp(r'[。，！？、；：“”‘’（）\(\)\[\]《》〈〉\.,!?;:"\x27]'), ' ')
+        .trim();
+    if (withoutPunct.isEmpty) return [];
 
-    final List<String> tokens = [];
-    final matches = RegExp(r'([\u4e00-\u9fa5]{1,2}|[^\u4e00-\u9fa5]+)').allMatches(clean);
-    for (final m in matches) {
-      final token = m.group(0)?.trim() ?? '';
-      if (token.isNotEmpty) {
-        tokens.add(token);
-      }
+    // Preserve explicit word spacing if already provided; otherwise apply compound tokenization
+    if (withoutPunct.contains(RegExp(r'\s+'))) {
+      final parts = withoutPunct
+          .split(RegExp(r'\s+'))
+          .where((s) => s.isNotEmpty)
+          .toList();
+      if (parts.length >= 2) return parts;
+      final singleWord = parts.first;
+      return InteractiveWordTileBuilder.tokenizePreservingCompounds(
+        singleWord,
+        knownWords: knownWords,
+      );
     }
 
-    if (tokens.isEmpty) {
-      return clean.split('').where((s) => s.trim().isNotEmpty).toList();
+    var tokens = InteractiveWordTileBuilder.tokenizePreservingCompounds(
+      withoutPunct,
+      knownWords: knownWords,
+    );
+
+    if (tokens.length < 2 && withoutPunct.runes.length >= 2) {
+      tokens = withoutPunct.runes
+          .map((r) => String.fromCharCode(r))
+          .where((s) => s.trim().isNotEmpty)
+          .toList();
     }
     return tokens;
   }

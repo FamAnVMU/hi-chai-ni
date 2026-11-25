@@ -23,12 +23,12 @@ void main() {
       // Lesson 1: Tones has no prerequisites, should be available
       final firstLessonProgress = state.lessonProgressMap['LES_HSK1_01_TONES'];
       expect(firstLessonProgress, isNotNull);
-      expect(firstLessonProgress!.status, LessonStatus.available);
+      expect(firstLessonProgress!.status, RoadmapLessonStatus.available);
 
       // Lesson 2: Writing Basics requires Lesson 1, should be locked
       final secondLessonProgress = state.lessonProgressMap['LES_HSK1_02_WRITING_BASICS'];
       expect(secondLessonProgress, isNotNull);
-      expect(secondLessonProgress!.status, LessonStatus.locked);
+      expect(secondLessonProgress!.status, RoadmapLessonStatus.locked);
 
       // Recommendations should feature the first available lesson
       expect(state.recommendations, isNotEmpty);
@@ -136,7 +136,7 @@ void main() {
         lessonId: 'LES_HSK1_01_TONES',
         unitId: 'UNIT_HSK1_01',
         hskLevel: 1,
-        status: LessonStatus.completed,
+        status: RoadmapLessonStatus.completed,
         completionScore: 0.88,
         evidenceCount: 3,
         updatedAt: now,
@@ -155,7 +155,7 @@ void main() {
       // LES_HSK1_02_WRITING_BASICS required LES_HSK1_01_TONES, now should be available!
       final secondLessonProgress = state.lessonProgressMap['LES_HSK1_02_WRITING_BASICS'];
       expect(secondLessonProgress, isNotNull);
-      expect(secondLessonProgress!.status, LessonStatus.available);
+      expect(secondLessonProgress!.status, RoadmapLessonStatus.available);
 
       // Recommendation should advance to Lesson 2
       expect(state.recommendations.any((r) => r.lesson.id == 'LES_HSK1_02_WRITING_BASICS'), isTrue);
@@ -179,7 +179,7 @@ void main() {
         lessonId: 'LES_HSK1_06_SHADOWING_GREETING',
         unitId: 'UNIT_HSK1_02',
         hskLevel: 1,
-        status: LessonStatus.completed,
+        status: RoadmapLessonStatus.completed,
         updatedAt: DateTime.now().toUtc(),
       );
 
@@ -196,7 +196,7 @@ void main() {
       expect(state.currentLevel, 2);
       expect(state.activeGoal.targetHskLevel, 2);
       // HSK 2 first lesson available
-      expect(state.lessonProgressMap['LES_HSK2_01_RESTAURANT_VOCAB']?.status, LessonStatus.available);
+      expect(state.lessonProgressMap['LES_HSK2_01_RESTAURANT_VOCAB']?.status, RoadmapLessonStatus.available);
     });
 
     test('7. Cognitive overload guard: recommendations never exceed top 3 items', () {
@@ -219,7 +219,7 @@ void main() {
         lessonId: 'LES_HSK1_01_TONES',
         unitId: 'UNIT_HSK1_01',
         hskLevel: 1,
-        status: LessonStatus.inProgress, // Learner only opened it
+        status: RoadmapLessonStatus.inProgress, // Learner only opened it
         evidenceCount: 0,
         updatedAt: DateTime.now().toUtc(),
       );

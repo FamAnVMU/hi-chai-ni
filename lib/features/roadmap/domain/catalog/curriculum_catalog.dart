@@ -11,14 +11,14 @@ class CurriculumCatalog {
       title: 'Pinyin Foundation: Ngữ Âm Nền Tảng',
       description: 'Dành riêng cho người mới bắt đầu từ số 0. Làm chủ 21 thanh mẫu, 36 vận mẫu, 4 thanh điệu và các quy tắc biến điệu then chốt.',
       units: [
-        CurriculumUnit(
+        RoadmapUnit(
           id: 'UNIT_PINYIN_01',
           level: 0,
           unitNumber: 1,
           title: 'Khởi động & Cấu tạo âm tiết',
           description: 'Bản chất Pinyin và phân biệt với chữ Quốc ngữ tiếng Việt.',
           lessons: [
-            CurriculumLesson(
+            RoadmapLesson(
               id: 'LES_PINYIN_01_ANATOMY',
               unitId: 'UNIT_PINYIN_01',
               level: 0,
@@ -31,14 +31,14 @@ class CurriculumCatalog {
             ),
           ],
         ),
-        CurriculumUnit(
+        RoadmapUnit(
           id: 'UNIT_PINYIN_02',
           level: 0,
           unitNumber: 2,
           title: 'Thanh mẫu & Vận mẫu cốt lõi',
           description: 'Kỹ thuật đặt môi, lưỡi, bật hơi và ghép vần.',
           lessons: [
-            CurriculumLesson(
+            RoadmapLesson(
               id: 'LES_PINYIN_02_INITIALS',
               unitId: 'UNIT_PINYIN_02',
               level: 0,
@@ -59,14 +59,14 @@ class CurriculumCatalog {
       title: 'HSK 1: Nhập Môn & Khởi Đầu',
       description: 'Nắm vững ngữ âm Pinyin, 150 từ vựng cốt lõi và các mẫu câu cơ bản nhất.',
       units: [
-        CurriculumUnit(
+        RoadmapUnit(
           id: 'UNIT_HSK1_01',
           level: 1,
           unitNumber: 1,
           title: 'Chương 1: Ngữ Âm & Chào Hỏi',
           description: 'Học 4 thanh điệu chuẩn, âm đầu, vận mẫu và cách chào hỏi tự nhiên.',
           lessons: [
-            CurriculumLesson(
+            RoadmapLesson(
               id: 'LES_HSK1_01_TONES',
               unitId: 'UNIT_HSK1_01',
               level: 1,
@@ -78,7 +78,7 @@ class CurriculumCatalog {
               prerequisiteSkills: [],
               contentReferences: {'pronunciation_category': 'tone'},
             ),
-            CurriculumLesson(
+            RoadmapLesson(
               id: 'LES_HSK1_02_WRITING_BASICS',
               unitId: 'UNIT_HSK1_01',
               level: 1,
@@ -90,7 +90,7 @@ class CurriculumCatalog {
               prerequisiteSkills: ['tones_basic'],
               contentReferences: {'hanzi_list': ['一', '二', '三', '人']},
             ),
-            CurriculumLesson(
+            RoadmapLesson(
               id: 'LES_HSK1_03_GREETINGS',
               unitId: 'UNIT_HSK1_01',
               level: 1,
@@ -104,14 +104,14 @@ class CurriculumCatalog {
             ),
           ],
         ),
-        CurriculumUnit(
+        RoadmapUnit(
           id: 'UNIT_HSK1_02',
           level: 1,
           unitNumber: 2,
           title: 'Chương 2: Bản Thân & Gia Đình',
           description: 'Giới thiệu tên tuổi, quốc tịch và các mối quan hệ thân thiết.',
           lessons: [
-            CurriculumLesson(
+            RoadmapLesson(
               id: 'LES_HSK1_04_GRAMMAR_SHI',
               unitId: 'UNIT_HSK1_02',
               level: 1,
@@ -123,7 +123,7 @@ class CurriculumCatalog {
               prerequisiteSkills: ['vocab_greetings'],
               contentReferences: {'grammar_code': 'HSK1_GR_01_SHI'},
             ),
-            CurriculumLesson(
+            RoadmapLesson(
               id: 'LES_HSK1_05_READING_FRIEND',
               unitId: 'UNIT_HSK1_02',
               level: 1,
@@ -135,7 +135,7 @@ class CurriculumCatalog {
               prerequisiteSkills: ['grammar_shi'],
               contentReferences: {'passage_id': 'RDG_1_reading_hsk1_friend'},
             ),
-            CurriculumLesson(
+            RoadmapLesson(
               id: 'LES_HSK1_06_SHADOWING_GREETING',
               unitId: 'UNIT_HSK1_02',
               level: 1,
@@ -158,14 +158,14 @@ class CurriculumCatalog {
       title: 'HSK 2: Đời Sống & Sinh Hoạt',
       description: 'Mở rộng 300 từ vựng, giao tiếp tự tin khi đi ăn, mua sắm và hỏi đường.',
       units: [
-        CurriculumUnit(
+        RoadmapUnit(
           id: 'UNIT_HSK2_01',
           level: 2,
           unitNumber: 1,
           title: 'Chương 1: Ẩm Thực & Mua Sắm',
           description: 'Gọi món tại nhà hàng và mặc cả giá cả.',
           lessons: [
-            CurriculumLesson(
+            RoadmapLesson(
               id: 'LES_HSK2_01_RESTAURANT_VOCAB',
               unitId: 'UNIT_HSK2_01',
               level: 2,
@@ -177,7 +177,7 @@ class CurriculumCatalog {
               prerequisiteSkills: ['hsk1_mastery'],
               contentReferences: {'vocab_category': 'food'},
             ),
-            CurriculumLesson(
+            RoadmapLesson(
               id: 'LES_HSK2_02_READING_ORDERING',
               unitId: 'UNIT_HSK2_01',
               level: 2,
@@ -198,7 +198,13 @@ class CurriculumCatalog {
   static CurriculumLevel getLevel(int level) {
     return levels.firstWhere(
       (l) => l.level == level,
-      orElse: () => levels.first,
+      orElse: () => CurriculumLevel(
+        level: level,
+        title: 'Giáo trình HSK $level',
+        description: 'Chưa có học liệu HSK $level trên thiết bị.',
+        units: const [],
+        isPackInstalled: false,
+      ),
     );
   }
 
@@ -231,16 +237,12 @@ class CurriculumCatalog {
     'lesson_hsk2_u1_l1': 'LES_HSK2_01_RESTAURANT_VOCAB',
     'c_hsk2_l1': 'LES_HSK2_01_RESTAURANT_VOCAB',
 
-    'lesson_2_2': 'LES_HSK2_02_GRAMMAR_LE',
-    'lesson_hsk2_u1_l2': 'LES_HSK2_02_GRAMMAR_LE',
-    'c_hsk2_l2': 'LES_HSK2_02_GRAMMAR_LE',
-
-    'lesson_2_3': 'LES_HSK2_03_READING_RESTAURANT',
-    'lesson_hsk2_u1_l3': 'LES_HSK2_03_READING_RESTAURANT',
-    'c_hsk2_l3': 'LES_HSK2_03_READING_RESTAURANT',
+    'lesson_2_2': 'LES_HSK2_02_READING_ORDERING',
+    'lesson_hsk2_u1_l2': 'LES_HSK2_02_READING_ORDERING',
+    'c_hsk2_l2': 'LES_HSK2_02_READING_ORDERING',
   };
 
-  static CurriculumLesson? findLessonById(String id) {
+  static RoadmapLesson? findLessonById(String id) {
     final cleanId = id.trim();
     for (final lvl in levels) {
       for (final unit in lvl.units) {

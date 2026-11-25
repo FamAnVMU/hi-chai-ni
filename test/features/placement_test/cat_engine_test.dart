@@ -547,5 +547,63 @@ void main() {
       expect(result.referenceHskBand, isNotEmpty);
       expect(result.recommendedHskLevel, inInclusiveRange(1, 6));
     });
+
+    test('17. Extreme theta-difficulty gap never yields NaN or Infinity and computes independent per-skill theta', () {
+      const extremeItem = CatItem(
+        id: 'EXTREME_ITEM_01',
+        skill: CatSkill.vocabulary,
+        type: CatItemType.multipleChoice,
+        difficulty: 20.0,
+        discrimination: 2.5,
+        hskLevel: 6,
+        prompt: 'Extreme item',
+        options: ['A', 'B'],
+        correctOptionIndex: 0,
+        explanationVi: 'Test',
+        knowledgeGapTag: 'extreme',
+        knowledgeGapLabelVi: 'Extreme',
+      );
+
+      var state = CatSessionState.initial('SESSION_EXTREME', initialTheta: -3.0);
+      state = state.copyWith(activeItem: extremeItem);
+      final next = engine.processTurn(
+        currentState: state,
+        userAnswer: 1,
+        latencyMs: 1000,
+      );
+      expect(next.currentTheta.isNaN, isFalse);
+      expect(next.currentTheta.isInfinite, isFalse);
+      expect(next.currentStandardError.isNaN, isFalse);
+
+      final mixedResponses = [
+        CatResponseRecord(
+          itemId: 'VOCAB_001',
+          skill: CatSkill.vocabulary,
+          itemDifficulty: 1.0,
+          hskTarget: 3,
+          isCorrect: true,
+          timestamp: DateTime.now().toUtc(),
+        ),
+        CatResponseRecord(
+          itemId: 'LIST_001',
+          skill: CatSkill.listening,
+          itemDifficulty: -1.5,
+          hskTarget: 1,
+          isCorrect: false,
+          timestamp: DateTime.now().toUtc(),
+        ),
+      ];
+      final res = engine.generateAssessmentResult(
+        sessionId: 'SESSION_PER_SKILL',
+        overallTheta: 0.0,
+        overallStandardError: 0.5,
+        responses: mixedResponses,
+        completedAt: DateTime.now().toUtc(),
+      );
+      expect(
+        res.skillScores[CatSkill.vocabulary]!.estimatedTheta!,
+        greaterThan(res.skillScores[CatSkill.listening]!.estimatedTheta!),
+      );
+    });
   });
 }

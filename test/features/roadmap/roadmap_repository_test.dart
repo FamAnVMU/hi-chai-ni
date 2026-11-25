@@ -82,7 +82,7 @@ void main() {
       final progress = progressMap[lessonId];
 
       expect(progress, isNotNull);
-      expect(progress!.status, LessonStatus.inProgress);
+      expect(progress!.status, RoadmapLessonStatus.inProgress);
       expect(progress.isCompleted, isFalse);
       expect(progress.completionScore, isNull);
       expect(progress.startedAt, isNotNull);
@@ -99,7 +99,7 @@ void main() {
       final progress = progressMap[lessonId];
 
       expect(progress, isNotNull);
-      expect(progress!.status, LessonStatus.completed);
+      expect(progress!.status, RoadmapLessonStatus.completed);
       expect(progress.isCompleted, isTrue);
       expect(progress.completionScore, 0.95);
       expect(progress.evidenceCount, 1);
@@ -132,7 +132,7 @@ void main() {
       final progress = progressMap[lessonId];
 
       expect(progress, isNotNull);
-      expect(progress!.status, LessonStatus.skipped);
+      expect(progress!.status, RoadmapLessonStatus.skipped);
       expect(progress.isCompleted, isFalse);
       expect(progress.completionScore, 0.0);
       expect(progress.completedAt, isNull);
@@ -159,7 +159,7 @@ void main() {
       final progress = progressMap[lessonId];
 
       expect(progress, isNotNull);
-      expect(progress!.status, LessonStatus.inProgress);
+      expect(progress!.status, RoadmapLessonStatus.inProgress);
       expect(progress.isCompleted, isFalse);
       expect(progress.completionScore, 0.0);
       expect(progress.completedAt, isNull);
@@ -175,20 +175,17 @@ void main() {
       expect(rows.first['completed_at'], isNull);
     });
 
-    test('6. getAdaptiveRoadmapState calculates and snapshots state to SQLite', () async {
+    test('6. getAdaptiveRoadmapState computes state cleanly without writing junk roadmap_snapshots (PERF-07)', () async {
       final state = await repository.getAdaptiveRoadmapState();
+      await repository.getAdaptiveRoadmapState();
 
       expect(state.activeGoal, isNotNull);
       expect(state.currentLevel, 1);
       expect(state.recommendations, isNotEmpty);
 
-      // Verify snapshot recorded
-      final snapshotRows = await db.query(
-        DatabaseConstants.tableRoadmapSnapshots,
-        orderBy: 'updated_at DESC',
-      );
-      expect(snapshotRows, isNotEmpty);
-      expect(snapshotRows.first['current_level'], 1);
+      // Verify PERF-07: repeated reads do NOT pollute roadmap_snapshots
+      final snapshotRows = await db.query(DatabaseConstants.tableRoadmapSnapshots);
+      expect(snapshotRows, isEmpty);
     });
   });
 }

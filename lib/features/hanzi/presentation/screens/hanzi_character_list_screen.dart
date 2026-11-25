@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../../hanzi_writing/presentation/screens/hanzi_writing_screen.dart';
 import '../../data/hanzi_repository.dart';
 import '../../domain/models/hanzi_models.dart';
-import 'hanzi_writing_screen.dart';
 
 /// Screen for browsing, searching, and practicing Chinese characters across HSK 1–6
 class HanziCharacterListScreen extends StatefulWidget {
@@ -90,7 +90,6 @@ class _HanziCharacterListScreenState extends State<HanziCharacterListScreen> {
       MaterialPageRoute(
         builder: (_) => HanziWritingScreen(
           initialCharacter: c.character,
-          repository: widget.repository,
         ),
       ),
     ).then((_) => _loadCharacters());

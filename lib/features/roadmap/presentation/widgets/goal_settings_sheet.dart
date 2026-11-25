@@ -123,7 +123,7 @@ class _GoalSettingsSheetState extends State<GoalSettingsSheet> {
             Wrap(
               spacing: AppSpacing.xs,
               runSpacing: AppSpacing.xs,
-              children: [1, 2, 3, 4, 5].map((lvl) {
+              children: [1, 2, 3, 4, 5, 6].map((lvl) {
                 final isSelected = _targetHskLevel == lvl;
                 return HiChip(
                   label: 'HSK $lvl',

@@ -436,7 +436,7 @@ void main() {
         'updated_at': nowUtc.toIso8601String(),
       });
 
-      // 1. When querying for HSK 1: should return ONLY 1 card (srs_001)
+      // 1. Explicit HSK 1 filter returns ONLY 1 card (srs_001)
       final hsk1DueCount = await srsRepo.getDueCardsCount(
         hskLevel: 1,
         asOf: nowUtc,
@@ -444,14 +444,7 @@ void main() {
       );
       expect(hsk1DueCount, 1);
 
-      // Dashboard with targetHskLevel = 1
-      final dataHsk1 = await homeRepo.getDashboardData(
-        targetHskLevel: 1,
-        evaluationTime: nowUtc,
-      );
-      expect(dataHsk1.srsDueCount, 1);
-
-      // 2. When querying for HSK 2: should return ONLY 1 card (srs_003)
+      // 2. Explicit HSK 2 filter returns ONLY 1 card (srs_003)
       final hsk2DueCount = await srsRepo.getDueCardsCount(
         hskLevel: 2,
         asOf: nowUtc,
@@ -459,14 +452,7 @@ void main() {
       );
       expect(hsk2DueCount, 1);
 
-      // Dashboard with targetHskLevel = 2
-      final dataHsk2 = await homeRepo.getDashboardData(
-        targetHskLevel: 2,
-        evaluationTime: nowUtc,
-      );
-      expect(dataHsk2.srsDueCount, 1);
-
-      // 3. When querying for HSK 3: should return 0 cards
+      // 3. Explicit HSK 3 filter returns 0 cards
       final hsk3DueCount = await srsRepo.getDueCardsCount(
         hskLevel: 3,
         asOf: nowUtc,
@@ -474,15 +460,21 @@ void main() {
       );
       expect(hsk3DueCount, 0);
 
-      // 4. When hskLevel is null (unfiltered): returns all 3 due cards (srs_001, srs_003, srs_orphan)
+      // 4. Unfiltered count & Home dashboard count ALL enrolled non-orphan due cards (2, excluding srs_orphan)
       final allDueCount = await srsRepo.getDueCardsCount(
         asOf: nowUtc,
         forceRefresh: true,
       );
-      expect(allDueCount, 3);
+      expect(allDueCount, 2);
+
+      final dataHsk2 = await homeRepo.getDashboardData(
+        targetHskLevel: 2,
+        evaluationTime: nowUtc,
+      );
+      expect(dataHsk2.srsDueCount, 2);
     });
 
-    test('2. Changing active HSK level dynamically switches dashboard SRS count', () async {
+    test('2. Advancing active HSK level updates roadmap while keeping enrolled SRS due cards visible', () async {
       final nowUtc = DateTime.utc(2026, 11, 4, 8, 0);
 
       // Seed learner profile at HSK 1
@@ -501,18 +493,18 @@ void main() {
         'updated_at': nowUtc.toIso8601String(),
       });
 
-      // Add HSK 2 vocabulary and due card
+      // Add HSK 1 due card (must not be locked out when advancing to HSK 2)
       await db.insert(DatabaseConstants.tableVocabularies, {
-        'id': 'voc_hsk2_100',
+        'id': 'voc_hsk1_100',
         'simplified': '准备',
         'pinyin': 'zhǔnbèi',
-        'hsk_level': 2,
+        'hsk_level': 1,
         'created_at': nowUtc.toIso8601String(),
         'updated_at': nowUtc.toIso8601String(),
       });
       await db.insert(DatabaseConstants.tableSrsItems, {
-        'id': 'srs_hsk2_100',
-        'content_id': 'voc_hsk2_100',
+        'id': 'srs_hsk1_100',
+        'content_id': 'voc_hsk1_100',
         'content_type': 'vocabulary',
         'state': 'review',
         'interval_days': 1,
@@ -524,12 +516,11 @@ void main() {
         'updated_at': nowUtc.toIso8601String(),
       });
 
-      // At HSK 1, SRS count is 0 because the due card is for HSK 2
       var dashboard = await homeRepo.getDashboardData(evaluationTime: nowUtc);
-      expect(dashboard.srsDueCount, 0);
+      expect(dashboard.srsDueCount, 1);
       expect(dashboard.roadmap.currentHskLevel, 1);
 
-      // Learner advances to HSK 2
+      // Learner advances to HSK 2 — HSK 1 enrolled due card stays reviewable!
       await db.update(
         DatabaseConstants.tableUserProfiles,
         {'current_hsk_level': 2, 'updated_at': nowUtc.toIso8601String()},
@@ -537,7 +528,6 @@ void main() {
         whereArgs: ['user_active'],
       );
 
-      // At HSK 2, SRS count is 1
       dashboard = await homeRepo.getDashboardData(evaluationTime: nowUtc);
       expect(dashboard.srsDueCount, 1);
       expect(dashboard.roadmap.currentHskLevel, 2);

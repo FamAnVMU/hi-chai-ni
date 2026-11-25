@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hi_chinese/features/roadmap/roadmap.dart';
 
 void main() {
-  const sampleLesson = CurriculumLesson(
+  const sampleLesson = RoadmapLesson(
     id: 'LES_TEST_01',
     unitId: 'UNIT_01',
     level: 1,
@@ -49,7 +49,7 @@ void main() {
         lessonId: sampleLesson.id,
         unitId: 'UNIT_01',
         hskLevel: 1,
-        status: LessonStatus.inProgress,
+        status: RoadmapLessonStatus.inProgress,
         updatedAt: DateTime.now().toUtc(),
       );
 
@@ -69,7 +69,7 @@ void main() {
         lessonId: sampleLesson.id,
         unitId: 'UNIT_01',
         hskLevel: 1,
-        status: LessonStatus.available,
+        status: RoadmapLessonStatus.available,
         updatedAt: DateTime.now().toUtc(),
       );
 
@@ -84,7 +84,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Completed
-      final completed = available.copyWith(status: LessonStatus.completed);
+      final completed = available.copyWith(status: RoadmapLessonStatus.completed);
       await tester.pumpWidget(buildSheetHarness(progress: completed));
       await tester.tap(find.text('Open Sheet'));
       await tester.pumpAndSettle();
@@ -96,7 +96,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Locked
-      final locked = available.copyWith(status: LessonStatus.locked);
+      final locked = available.copyWith(status: RoadmapLessonStatus.locked);
       await tester.pumpWidget(buildSheetHarness(progress: locked));
       await tester.tap(find.text('Open Sheet'));
       await tester.pumpAndSettle();
@@ -113,7 +113,7 @@ void main() {
         lessonId: sampleLesson.id,
         unitId: 'UNIT_01',
         hskLevel: 1,
-        status: LessonStatus.inProgress,
+        status: RoadmapLessonStatus.inProgress,
         updatedAt: DateTime.now().toUtc(),
       );
 
@@ -147,7 +147,7 @@ void main() {
         lessonId: sampleLesson.id,
         unitId: 'UNIT_01',
         hskLevel: 1,
-        status: LessonStatus.inProgress,
+        status: RoadmapLessonStatus.inProgress,
         completionScore: 0.95,
         updatedAt: DateTime.now().toUtc(),
       );
@@ -178,7 +178,7 @@ void main() {
         lessonId: sampleLesson.id,
         unitId: 'UNIT_01',
         hskLevel: 1,
-        status: LessonStatus.inProgress,
+        status: RoadmapLessonStatus.inProgress,
         updatedAt: DateTime.now().toUtc(),
       );
 

@@ -38,6 +38,12 @@ class LearningPipelineCoordinator {
   final MasteryEvaluator evaluator;
   final SrsIntakeRules intakeRules;
 
+  static int _eviSeq = 0;
+  static String _nextEvidenceId(String suffix) {
+    final seq = ++_eviSeq;
+    return 'EVI_${DateTime.now().microsecondsSinceEpoch}_${seq}_$suffix';
+  }
+
   const LearningPipelineCoordinator(
     this._db, {
     this.evaluator = const MasteryEvaluator(),
@@ -110,15 +116,17 @@ class LearningPipelineCoordinator {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
 
-      // Step B2: Sync with tableLessonProgress (Eliminates Roadmap & Curriculum Split-Brain)
-      final lessonRows = await txn.query(
-        DatabaseConstants.tableCurriculumLessons,
-        where: 'id = ?',
-        whereArgs: [lessonId],
-        limit: 1,
-      );
+      // Step B2: Sync with tableLessonProgress (Join curriculum_units -> curriculums for real hsk_level)
+      final lessonRows = await txn.rawQuery('''
+        SELECT l.unit_id, c.hsk_level
+        FROM ${DatabaseConstants.tableCurriculumLessons} l
+        LEFT JOIN ${DatabaseConstants.tableCurriculumUnits} u ON l.unit_id = u.id
+        LEFT JOIN ${DatabaseConstants.tableCurriculums} c ON u.curriculum_id = c.id
+        WHERE l.id = ?
+        LIMIT 1
+      ''', [lessonId]);
       final unitId = lessonRows.isNotEmpty ? (lessonRows.first['unit_id'] as String? ?? 'unit_1') : 'unit_1';
-      final hskLevel = lessonRows.isNotEmpty ? ((lessonRows.first['level'] as num?)?.toInt() ?? 1) : 1;
+      final hskLevel = lessonRows.isNotEmpty ? ((lessonRows.first['hsk_level'] as num?)?.toInt() ?? 1) : 1;
 
       final existingLessonProg = await txn.query(
         DatabaseConstants.tableLessonProgress,
@@ -158,13 +166,16 @@ class LearningPipelineCoordinator {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
 
+      final actualDurationSeconds = durationMs > 0
+          ? (durationMs / 1000).round().clamp(1, 7200)
+          : 180;
       final timeZoneOffset = DateTime.now().timeZoneOffset;
       await txn.insert(
         DatabaseConstants.tableLearningActivities,
         {
-          'id': 'act_${lessonId}_${nowUtc.millisecondsSinceEpoch}',
+          'id': 'act_${lessonId}_${nowUtc.microsecondsSinceEpoch}_${++_eviSeq}',
           'activity_type': 'lesson',
-          'duration_seconds': durationMs > 0 ? (durationMs / 1000).round() : 180,
+          'duration_seconds': actualDurationSeconds,
           'items_count': questionResults?.length ?? 10,
           'activity_date': StreakCalculator.toDateString(
             StreakCalculator.toLocalDate(nowUtc, timeZoneOffset: timeZoneOffset),
@@ -174,6 +185,19 @@ class LearningPipelineCoordinator {
         },
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
+
+      if (isPassed) {
+        try {
+          await txn.rawUpdate(
+            '''
+            UPDATE ${DatabaseConstants.tableUserProfiles}
+            SET total_xp = COALESCE(total_xp, 0) + ?,
+                updated_at = ?
+            ''',
+            [25, nowIso],
+          );
+        } catch (_) {}
+      }
 
       // Step C: Discover all knowledge items taught in this lesson
       final segments = await txn.query(
@@ -214,15 +238,16 @@ class LearningPipelineCoordinator {
 
       // Step D: Intake taught words into Evidence, Mastery, and SRS
       for (final w in taughtWords) {
-        final simplified = w['simplified'] as String? ?? '';
+        final simplified = (w['simplified'] ?? w['hanzi'] ?? w['zh'] ?? '').toString().trim();
         if (simplified.isEmpty) continue;
 
-        // Resolve canonical vocabulary ID
+        // Resolve canonical vocabulary ID (prefer VOC_% IDs and non-deleted records)
         final vocabRows = await txn.query(
           DatabaseConstants.tableVocabularies,
           columns: ['id'],
-          where: 'simplified = ?',
+          where: 'simplified = ? AND deleted_at IS NULL',
           whereArgs: [simplified],
+          orderBy: "CASE WHEN id LIKE 'VOC_%' THEN 0 ELSE 1 END, id ASC",
           limit: 1,
         );
         final canonicalId = vocabRows.isNotEmpty
@@ -266,7 +291,7 @@ class LearningPipelineCoordinator {
         }
 
         // 2. Emit Instruction Evidence (now srs_item_id is guaranteed to exist!)
-        final evidenceId = 'EVI_${DateTime.now().microsecondsSinceEpoch}_$canonicalId';
+        final evidenceId = _nextEvidenceId(canonicalId);
         await txn.insert(
           DatabaseConstants.tableLearnerEvidence,
           {
@@ -276,7 +301,7 @@ class LearningPipelineCoordinator {
             'content_type': 'vocabulary',
             'source': 'curriculum_lesson',
             'score': 1.0,
-            'duration_ms': durationMs,
+            'duration_ms': durationMs > 0 ? durationMs : 180000,
             'metadata_json': json.encode({
               'activity_type': ActivityType.instruction.value,
               'is_success': true,
@@ -349,12 +374,13 @@ class LearningPipelineCoordinator {
           }
 
           if (targetWord != null && targetWord.isNotEmpty) {
-            // Find canonical ID
+            // Find canonical ID (prefer VOC_% IDs)
             final vocabRows = await txn.query(
               DatabaseConstants.tableVocabularies,
               columns: ['id'],
-              where: 'simplified = ?',
+              where: 'simplified = ? AND deleted_at IS NULL',
               whereArgs: [targetWord],
+              orderBy: "CASE WHEN id LIKE 'VOC_%' THEN 0 ELSE 1 END, id ASC",
               limit: 1,
             );
             final targetId = vocabRows.isNotEmpty
@@ -372,7 +398,7 @@ class LearningPipelineCoordinator {
             final String? linkedSrsId = srsRows.isNotEmpty ? srsRows.first['id'] as String : null;
 
             // 1. Log Application Evidence
-            final appEvidenceId = 'EVI_${DateTime.now().microsecondsSinceEpoch}_$targetId';
+            final appEvidenceId = _nextEvidenceId(targetId);
             await txn.insert(
               DatabaseConstants.tableLearnerEvidence,
               {
@@ -382,7 +408,7 @@ class LearningPipelineCoordinator {
                 'content_type': 'vocabulary',
                 'source': 'curriculum_exercise',
                 'score': score,
-                'duration_ms': 0,
+                'duration_ms': durationMs > 0 ? durationMs : 0,
                 'metadata_json': json.encode({
                   'activity_type': ActivityType.application.value,
                   'is_success': isCorrect,
@@ -592,8 +618,9 @@ class LearningPipelineCoordinator {
         final vocabMatch = await txn.query(
           DatabaseConstants.tableVocabularies,
           columns: ['id'],
-          where: 'simplified = ?',
+          where: 'simplified = ? AND deleted_at IS NULL',
           whereArgs: [stimulus],
+          orderBy: "CASE WHEN id LIKE 'VOC_%' THEN 0 ELSE 1 END, id ASC",
           limit: 1,
         );
         if (vocabMatch.isNotEmpty) {
@@ -612,7 +639,7 @@ class LearningPipelineCoordinator {
       final String? linkedSrsId = srsRows.isNotEmpty ? srsRows.first['id'] as String : null;
 
       // 4. Append Application Learning Evidence
-      final evidenceId = 'EVI_${DateTime.now().microsecondsSinceEpoch}_$targetId';
+      final evidenceId = _nextEvidenceId(targetId);
       await txn.insert(
         DatabaseConstants.tableLearnerEvidence,
         {

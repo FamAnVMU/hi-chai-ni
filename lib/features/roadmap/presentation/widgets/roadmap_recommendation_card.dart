@@ -5,8 +5,8 @@ import '../../domain/models/roadmap_models.dart';
 /// Card rendering top adaptive recommendations with transparent pedagogical rationale.
 class RoadmapRecommendationCard extends StatelessWidget {
   final List<RoadmapRecommendation> recommendations;
-  final ValueChanged<CurriculumLesson> onSelectLesson;
-  final ValueChanged<CurriculumLesson> onSkipLesson;
+  final ValueChanged<RoadmapLesson> onSelectLesson;
+  final ValueChanged<RoadmapLesson> onSkipLesson;
 
   const RoadmapRecommendationCard({
     super.key,

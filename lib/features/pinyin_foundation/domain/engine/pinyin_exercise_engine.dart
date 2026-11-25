@@ -52,8 +52,10 @@ class PinyinExerciseEngine {
         );
 
       case PinyinExerciseType.listenInputPinyin:
-        // Text-based input evaluation (normalizes whitespace and accents)
-        final isMatch = cleanSubmission == cleanCorrect;
+        // Text-based input evaluation (normalizes whitespace, preserves tone marks)
+        final compactSubmission = cleanSubmission.replaceAll(RegExp(r'\s+'), '');
+        final compactCorrect = cleanCorrect.replaceAll(RegExp(r'\s+'), '');
+        final isMatch = compactSubmission == compactCorrect;
         return PinyinExerciseEvaluationResult(
           isCorrect: isMatch,
           score: isMatch ? 1.0 : 0.0,

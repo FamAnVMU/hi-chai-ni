@@ -5,7 +5,7 @@ import '../../domain/models/roadmap_models.dart';
 
 /// Modal bottom sheet displaying deep pedagogical details for a curriculum lesson.
 class LessonDetailSheet extends StatefulWidget {
-  final CurriculumLesson lesson;
+  final RoadmapLesson lesson;
   final LessonProgress? progress;
   final Map<String, LessonProgress> allProgressMap;
   final VoidCallback onStart;
@@ -24,7 +24,7 @@ class LessonDetailSheet extends StatefulWidget {
 
   static Future<void> show({
     required BuildContext context,
-    required CurriculumLesson lesson,
+    required RoadmapLesson lesson,
     required LessonProgress? progress,
     required Map<String, LessonProgress> allProgressMap,
     required VoidCallback onStart,
@@ -59,34 +59,34 @@ class _LessonDetailSheetState extends State<LessonDetailSheet> {
     final lesson = widget.lesson;
     final progress = widget.progress;
     final allProgressMap = widget.allProgressMap;
-    final status = progress?.status ?? LessonStatus.locked;
+    final status = progress?.status ?? RoadmapLessonStatus.locked;
 
     Color statusColor;
     String statusText;
     IconData statusIcon;
 
     switch (status) {
-      case LessonStatus.locked:
+      case RoadmapLessonStatus.locked:
         statusColor = theme.colorScheme.outline;
         statusText = 'Đang khóa (Chưa đạt tiên quyết)';
         statusIcon = Icons.lock_outline_rounded;
         break;
-      case LessonStatus.available:
+      case RoadmapLessonStatus.available:
         statusColor = AppColors.primaryBlueDark;
         statusText = 'Có thể học ngay';
         statusIcon = Icons.lock_open_rounded;
         break;
-      case LessonStatus.inProgress:
+      case RoadmapLessonStatus.inProgress:
         statusColor = Colors.orange;
         statusText = 'Đang học dở';
         statusIcon = Icons.timelapse_rounded;
         break;
-      case LessonStatus.completed:
+      case RoadmapLessonStatus.completed:
         statusColor = AppColors.primaryBlueDark;
         statusText = 'Đã hoàn thành';
         statusIcon = Icons.check_circle_rounded;
         break;
-      case LessonStatus.skipped:
+      case RoadmapLessonStatus.skipped:
         statusColor = theme.colorScheme.onSurfaceVariant;
         statusText = 'Đã bỏ qua';
         statusIcon = Icons.skip_next_rounded;
@@ -285,10 +285,10 @@ class _LessonDetailSheetState extends State<LessonDetailSheet> {
             // Action Buttons
             Row(
               children: [
-                if (status != LessonStatus.locked) ...[
+                if (status != RoadmapLessonStatus.locked) ...[
                   Expanded(
                     child: HiButton(
-                      text: status == LessonStatus.completed ? 'Ôn lại' : 'Bắt đầu học',
+                      text: status == RoadmapLessonStatus.completed ? 'Ôn lại' : 'Bắt đầu học',
                       variant: HiButtonVariant.primary,
                       icon: const Icon(Icons.play_arrow_rounded, size: 18),
                       onPressed: () {
@@ -325,7 +325,7 @@ class _LessonDetailSheetState extends State<LessonDetailSheet> {
                 ],
               ],
             ),
-            if (status == LessonStatus.inProgress) ...[
+            if (status == RoadmapLessonStatus.inProgress) ...[
               const SizedBox(height: AppSpacing.sm),
               SizedBox(
                 width: double.infinity,

@@ -32,12 +32,14 @@ class MasteryEngine {
     required String lessonId,
     required double scorePercent,
     List<Map<String, dynamic>>? questionResults,
+    int durationMs = 0,
     double passingThreshold = 0.8,
   }) async {
     final pipelineResult = await _coordinator.recordLessonCompletion(
       lessonId: lessonId,
       scorePercent: scorePercent,
       questionResults: questionResults,
+      durationMs: durationMs,
       passingThreshold: passingThreshold,
     );
 

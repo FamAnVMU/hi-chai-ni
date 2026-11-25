@@ -172,5 +172,38 @@ void main() {
       final perm3 = def.getShuffledTokens(seed: 99999);
       expect(perm1, isNot(equals(perm3)), reason: 'Different seeds should produce different order');
     });
+
+    test('8. FillInTheBlank accepts spaceless and toneless Pinyin while rejecting wrong tone marks', () async {
+      final def = ExerciseDefinition(
+        id: 'EX_PINYIN_NORM_TEST',
+        type: ExerciseType.fillInTheBlank,
+        skill: 'vocabulary',
+        hskLevel: 1,
+        prompt: 'Điền phiên âm Pinyin cho "你好"',
+        sentenceWithBlank: '___',
+        blankAnswer: 'nǐ hǎo',
+        explanationVi: 'nǐ hǎo = xin chào',
+        createdAt: DateTime.now().toUtc(),
+        updatedAt: DateTime.now().toUtc(),
+      );
+
+      final spaceless = await engine.evaluate(
+        definition: def,
+        answer: const ExerciseAnswer(exerciseId: 'EX_PINYIN_NORM_TEST', filledBlank: 'nǐhǎo'),
+      );
+      expect(spaceless.isCorrect, isTrue);
+
+      final toneless = await engine.evaluate(
+        definition: def,
+        answer: const ExerciseAnswer(exerciseId: 'EX_PINYIN_NORM_TEST', filledBlank: 'nihao'),
+      );
+      expect(toneless.isCorrect, isTrue);
+
+      final wrongTone = await engine.evaluate(
+        definition: def,
+        answer: const ExerciseAnswer(exerciseId: 'EX_PINYIN_NORM_TEST', filledBlank: 'nì hào'),
+      );
+      expect(wrongTone.isCorrect, isFalse);
+    });
   });
 }

@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../../../core/theme/theme.dart';
+import '../../../../core/audio/audio_player_service.dart';
 import '../../../../core/audio/tts_service.dart';
+import '../../../../core/audio/unified_audio_playback_service.dart';
+import '../../../../core/theme/theme.dart';
 import '../../domain/models/curriculum_models.dart';
 import '../../domain/models/micro_card_model.dart';
 import '../../domain/engine/lesson_micro_card_adapter.dart';
@@ -17,6 +20,15 @@ class GamifiedLessonPlayer extends StatefulWidget {
   final void Function(String cardId, dynamic answer)? onAnswerRecorded;
   final void Function(double scorePercent)? onScoreCalculated;
   final Future<void> Function()? onFinishLesson;
+  final Future<void> Function(
+    double accuracy,
+    List<Map<String, dynamic>> questionResults,
+    int elapsedSeconds,
+  )? onLessonCompleted;
+  final int xpReward;
+  final int currentStreakDays;
+  final String? nextLessonTitle;
+  final AudioPlayerService? audioPlayerOverride;
   final TtsService? ttsServiceOverride;
 
   const GamifiedLessonPlayer({
@@ -26,6 +38,11 @@ class GamifiedLessonPlayer extends StatefulWidget {
     this.onAnswerRecorded,
     this.onScoreCalculated,
     this.onFinishLesson,
+    this.onLessonCompleted,
+    this.xpReward = 25,
+    this.currentStreakDays = 0,
+    this.nextLessonTitle,
+    this.audioPlayerOverride,
     this.ttsServiceOverride,
   });
 
@@ -36,10 +53,13 @@ class GamifiedLessonPlayer extends StatefulWidget {
 class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
   late final TtsService _ttsService;
   late final bool _ownsTts;
+  final Stopwatch _sessionStopwatch = Stopwatch();
 
   late List<MicroCardModel> _activeDeck;
   final List<MicroCardModel> _retryQueue = [];
   final Map<String, int> _failureCount = {};
+  final List<Map<String, dynamic>> _questionResults = [];
+  final Set<String> _recordedQuestionCardIds = {};
 
   int _totalUniqueCards = 0;
   int _completedCount = 0;
@@ -47,6 +67,7 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
   int _maxCombo = 0;
   int _totalAttempts = 0;
   bool _isFinished = false;
+  bool _isCompleting = false;
 
   // Feedback banner state for current card
   bool? _isCurrentAnswerCorrect;
@@ -59,8 +80,10 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
 
   // State for Matching Pairs Card
   String? _selectedHanzi;
-  String? _selectedMeaning;
+  int? _selectedRightIndex;
+  List<MapEntry<String, String>> _shuffledRightPairs = [];
   final Set<String> _matchedPairs = {};
+  final Set<int> _matchedRightIndices = {};
 
   // State for Choice / Quiz selection
   int? _selectedOptionIndex;
@@ -70,6 +93,7 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
     super.initState();
     _ownsTts = widget.ttsServiceOverride == null;
     _ttsService = widget.ttsServiceOverride ?? DefaultTtsService();
+    _sessionStopwatch.start();
 
     final cards = widget.initialCards ?? const LessonMicroCardAdapter().adapt(widget.lesson);
     _activeDeck = List<MicroCardModel>.from(cards);
@@ -97,6 +121,7 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
 
   @override
   void dispose() {
+    _sessionStopwatch.stop();
     _ttsService.stop();
     if (_ownsTts) {
       _ttsService.dispose();
@@ -110,19 +135,58 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
     _feedbackText = null;
     _selectedOptionIndex = null;
     _selectedHanzi = null;
-    _selectedMeaning = null;
+    _selectedRightIndex = null;
+    _shuffledRightPairs = [];
     _matchedPairs.clear();
+    _matchedRightIndices.clear();
 
     if (_activeDeck.isNotEmpty) {
       final currentCard = _activeDeck.first;
       if (currentCard.type == MicroCardType.sentenceBuilder) {
         _assembledChips = [];
         _availableChips = List<String>.from(currentCard.sentenceChips);
+      } else if (currentCard.type == MicroCardType.matchingPairs) {
+        final entries = currentCard.pairs.entries.toList();
+        _shuffledRightPairs = List<MapEntry<String, String>>.from(entries);
+        if (_shuffledRightPairs.length > 1) {
+          _shuffledRightPairs.shuffle(math.Random(currentCard.id.hashCode));
+          final allSameOrder = List.generate(
+            entries.length,
+            (i) => entries[i].key == _shuffledRightPairs[i].key,
+          ).every((eq) => eq);
+          if (allSameOrder) {
+            final first = _shuffledRightPairs.removeAt(0);
+            _shuffledRightPairs.add(first);
+          }
+        }
       }
     }
   }
 
+  Future<void> _playCardAudio(MicroCardModel card) async {
+    final audioUrl = card.audioUrl?.trim() ?? '';
+    final fallbackText = (card.audioText ?? card.hanzi ?? '').trim();
+
+    if (audioUrl.isNotEmpty) {
+      try {
+        if (widget.audioPlayerOverride != null) {
+          await widget.audioPlayerOverride!.play(audioUrl);
+        } else {
+          await UnifiedAudioPlaybackService.instance.playAudio(audioUrl);
+        }
+        return;
+      } catch (_) {
+        // Fallback immediately to TTS if file missing / playback error
+      }
+    }
+
+    if (fallbackText.isNotEmpty) {
+      await _speak(fallbackText);
+    }
+  }
+
   Future<void> _speak(String text) async {
+    if (text.trim().isEmpty) return;
     try {
       await _ttsService.speak(text, language: 'zh-CN');
     } catch (_) {}
@@ -134,6 +198,28 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
     final currentCard = _activeDeck.first;
     _totalAttempts++;
     widget.onAnswerRecorded?.call(currentCard.id, answerPayload);
+
+    // Record card outcome once for downstream SRS/Pipeline evaluation
+    if (currentCard.type != MicroCardType.reveal &&
+        !_recordedQuestionCardIds.contains(currentCard.id)) {
+      _recordedQuestionCardIds.add(currentCard.id);
+      _questionResults.add({
+        'id': currentCard.id,
+        'target_word': currentCard.hanzi,
+        'prompt': currentCard.prompt ?? currentCard.hanzi ?? '',
+        'user_answer': answerPayload?.toString(),
+        'selected_option': answerPayload?.toString(),
+        'is_correct': isCorrect,
+        'score': isCorrect ? 1.0 : 0.0,
+      });
+    } else if (!isCorrect && currentCard.type != MicroCardType.reveal) {
+      // Update existing entry if retried and failed
+      final idx = _questionResults.indexWhere((r) => r['id'] == currentCard.id);
+      if (idx != -1) {
+        _questionResults[idx]['is_correct'] = false;
+        _questionResults[idx]['score'] = 0.0;
+      }
+    }
 
     setState(() {
       _isAnswerSubmitted = true;
@@ -190,6 +276,7 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
     }
 
     if (_activeDeck.isEmpty) {
+      _sessionStopwatch.stop();
       setState(() {
         _isFinished = true;
       });
@@ -214,22 +301,43 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
     if (_isFinished) {
       final firstAttemptCorrect = (_totalUniqueCards - _failureCount.length).clamp(0, _totalUniqueCards);
       final empiricalAccuracy = _totalUniqueCards > 0
-          ? (firstAttemptCorrect / _totalUniqueCards).clamp(0.80, 1.0)
-          : 0.85;
+          ? (firstAttemptCorrect / _totalUniqueCards).clamp(0.0, 1.0)
+          : 0.0;
+      final elapsedSeconds = _sessionStopwatch.elapsed.inSeconds.clamp(1, 7200);
+
       return LessonCelebrationView(
         lesson: widget.lesson,
+        xpGained: empiricalAccuracy >= 0.8 ? widget.xpReward : 0,
+        streakDays: widget.currentStreakDays,
+        nextLessonTitle: widget.nextLessonTitle,
         totalCards: _completedCount,
         maxCombo: _maxCombo,
         totalAttempts: _totalAttempts,
         accuracyRate: empiricalAccuracy,
-        onContinue: () async {
-          widget.onScoreCalculated?.call(empiricalAccuracy);
-          if (widget.onFinishLesson != null) {
-            await widget.onFinishLesson!();
-          } else {
-            Navigator.of(context).pop(true);
-          }
-        },
+        isSubmitting: _isCompleting,
+        onContinue: _isCompleting
+            ? null
+            : () async {
+                setState(() => _isCompleting = true);
+                try {
+                  widget.onScoreCalculated?.call(empiricalAccuracy);
+                  if (widget.onLessonCompleted != null) {
+                    await widget.onLessonCompleted!(
+                      empiricalAccuracy,
+                      List<Map<String, dynamic>>.from(_questionResults),
+                      elapsedSeconds,
+                    );
+                  } else if (widget.onFinishLesson != null) {
+                    await widget.onFinishLesson!();
+                  } else if (mounted) {
+                    Navigator.of(context).pop(true);
+                  }
+                } finally {
+                  if (mounted) {
+                    setState(() => _isCompleting = false);
+                  }
+                }
+              },
       );
     }
 
@@ -399,7 +507,7 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
             const SizedBox(width: 6),
             IconButton(
               icon: const Icon(Icons.volume_up_rounded, color: AppColors.primaryBlueDark, size: 24),
-              onPressed: () => _speak(card.audioText ?? card.hanzi ?? ''),
+              onPressed: () => _playCardAudio(card),
             ),
           ],
         ),
@@ -464,7 +572,7 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
 
         // Large Audio Button
         GestureDetector(
-          onTap: () => _speak(card.audioText ?? card.hanzi ?? ''),
+          onTap: () => _playCardAudio(card),
           child: Container(
             width: 72,
             height: 72,
@@ -668,8 +776,9 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
             onPressed: _assembledChips.isEmpty
                 ? null
                 : () {
-                    final assembledStr = _assembledChips.join('').replaceAll(RegExp(r'[\s]'), '');
-                    final targetStr = (card.targetSentence ?? '').replaceAll(RegExp(r'[\s]'), '');
+                    final punctRegex = RegExp(r'[\s。，！？、；：“”‘’（）\(\)\[\]《》〈〉\.,!?;:"\x27]');
+                    final assembledStr = _assembledChips.join('').replaceAll(punctRegex, '');
+                    final targetStr = (card.targetSentence ?? '').replaceAll(punctRegex, '');
                     final isCorrect = assembledStr == targetStr;
                     _handleAnswer(isCorrect, assembledStr);
                   },
@@ -682,7 +791,9 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
   Widget _buildMatchingPairsCard(MicroCardModel card) {
     final pairs = card.pairs;
     final hanzis = pairs.keys.toList();
-    final meanings = pairs.values.toList();
+    final rightEntries = _shuffledRightPairs.isNotEmpty
+        ? _shuffledRightPairs
+        : pairs.entries.toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -713,7 +824,7 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
                           : () {
                               setState(() {
                                 _selectedHanzi = hz;
-                                _checkMatchingAttempt(card);
+                                _checkMatchingAttempt(card, rightEntries);
                               });
                             },
                       borderRadius: BorderRadius.circular(AppRadius.md),
@@ -749,16 +860,13 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
             ),
             const SizedBox(width: AppSpacing.md),
 
-            // Right Column: Meanings
+            // Right Column: Meanings (shuffled independently by index to prevent duplicate-meaning deadlocks)
             Expanded(
               child: Column(
-                children: meanings.map((mn) {
-                  final matchedEntry = pairs.entries.firstWhere(
-                    (e) => e.value == mn,
-                    orElse: () => const MapEntry('', ''),
-                  );
-                  final isMatched = _matchedPairs.contains(matchedEntry.key);
-                  final isSelected = _selectedMeaning == mn;
+                children: List.generate(rightEntries.length, (rightIdx) {
+                  final entry = rightEntries[rightIdx];
+                  final isMatched = _matchedRightIndices.contains(rightIdx);
+                  final isSelected = _selectedRightIndex == rightIdx;
 
                   return Container(
                     margin: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -768,8 +876,8 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
                           ? null
                           : () {
                               setState(() {
-                                _selectedMeaning = mn;
-                                _checkMatchingAttempt(card);
+                                _selectedRightIndex = rightIdx;
+                                _checkMatchingAttempt(card, rightEntries);
                               });
                             },
                       borderRadius: BorderRadius.circular(AppRadius.md),
@@ -789,7 +897,7 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
                           ),
                         ),
                         child: Text(
-                          mn,
+                          entry.value,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -802,7 +910,7 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
                       ),
                     ),
                   );
-                }).toList(),
+                }),
               ),
             ),
           ],
@@ -811,14 +919,23 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
     );
   }
 
-  void _checkMatchingAttempt(MicroCardModel card) {
-    if (_selectedHanzi == null || _selectedMeaning == null) return;
+  void _checkMatchingAttempt(
+    MicroCardModel card,
+    List<MapEntry<String, String>> rightEntries,
+  ) {
+    if (_selectedHanzi == null || _selectedRightIndex == null) return;
+    if (_selectedRightIndex! < 0 || _selectedRightIndex! >= rightEntries.length) return;
 
-    final expectedMeaning = card.pairs[_selectedHanzi];
-    if (expectedMeaning == _selectedMeaning) {
-      _matchedPairs.add(_selectedHanzi!);
+    final chosenHanzi = _selectedHanzi!;
+    final chosenRightIdx = _selectedRightIndex!;
+    final rightEntry = rightEntries[chosenRightIdx];
+    final expectedMeaning = card.pairs[chosenHanzi];
+
+    if (expectedMeaning != null && rightEntry.value == expectedMeaning) {
+      _matchedPairs.add(chosenHanzi);
+      _matchedRightIndices.add(chosenRightIdx);
       _selectedHanzi = null;
-      _selectedMeaning = null;
+      _selectedRightIndex = null;
       HapticFeedback.lightImpact();
 
       if (_matchedPairs.length >= card.pairs.length) {
@@ -830,7 +947,7 @@ class _GamifiedLessonPlayerState extends State<GamifiedLessonPlayer> {
         if (mounted) {
           setState(() {
             _selectedHanzi = null;
-            _selectedMeaning = null;
+            _selectedRightIndex = null;
           });
         }
       });

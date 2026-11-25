@@ -13,6 +13,8 @@ import '../domain/models/cat_skill.dart';
 /// Repository managing SQLite persistence for adaptive placement test sessions,
 /// item responses, and syncing verified diagnostic evidence into `learner_evidence`.
 class PlacementTestRepository {
+  static int _catEviSeq = 0;
+
   final Database _db;
   final CatEngine _engine;
 
@@ -249,7 +251,8 @@ class PlacementTestRepository {
       // 2. Persist verified evidence in learner_evidence (source: 'cat_placement_test')
       for (final resp in sessionState.responses) {
         if (!resp.isSkipped && resp.isCorrect != null) {
-          final evidenceId = 'EVI_CAT_${nowUtc.microsecondsSinceEpoch}_${resp.itemId}';
+          final evidenceId =
+              'EVI_CAT_${nowUtc.microsecondsSinceEpoch}_${++_catEviSeq}_${resp.itemId}';
           await txn.insert(
             DatabaseConstants.tableLearnerEvidence,
             {
@@ -299,6 +302,38 @@ class PlacementTestRepository {
         await unlockHandler.unlockForRecommendedLevel(result.recommendedHskLevel);
       } catch (e) {
         debugPrint('[PlacementTestRepository] Warning: PlacementUnlockHandler failed: $e');
+      }
+
+      // 5. Synchronize user_profiles & active learner_goals with placed HSK level
+      final recLevel = result.recommendedHskLevel.clamp(1, 6);
+      final targetGoalLevel = recLevel < 6 ? recLevel + 1 : 6;
+      try {
+        await txn.rawUpdate(
+          '''
+          UPDATE ${DatabaseConstants.tableUserProfiles}
+          SET current_hsk_level = ?,
+              target_hsk_level = CASE
+                WHEN COALESCE(target_hsk_level, 1) <= ? THEN ?
+                ELSE target_hsk_level
+              END,
+              updated_at = ?
+          ''',
+          [recLevel, recLevel, targetGoalLevel, nowUtcStr],
+        );
+        await txn.rawUpdate(
+          '''
+          UPDATE ${DatabaseConstants.tableLearnerGoals}
+          SET target_hsk_level = CASE
+                WHEN target_hsk_level <= ? THEN ?
+                ELSE target_hsk_level
+              END,
+              updated_at = ?
+          WHERE is_active = 1
+          ''',
+          [recLevel, targetGoalLevel, nowUtcStr],
+        );
+      } catch (e) {
+        debugPrint('[PlacementTestRepository] Warning: Profile/goal sync failed: $e');
       }
     });
   }

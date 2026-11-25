@@ -11,7 +11,7 @@ class FakeRoadmapRepository implements RoadmapRepository {
       lessonId: 'LES_HSK1_01_TONES',
       unitId: 'UNIT_HSK1_01',
       hskLevel: 1,
-      status: LessonStatus.available,
+      status: RoadmapLessonStatus.available,
       evidenceCount: 0,
       updatedAt: DateTime.utc(2026, 11, 1),
     ),
@@ -39,7 +39,7 @@ class FakeRoadmapRepository implements RoadmapRepository {
               hskLevel: 1,
               updatedAt: DateTime.now().toUtc(),
             ))
-        .copyWith(status: LessonStatus.inProgress);
+        .copyWith(status: RoadmapLessonStatus.inProgress);
   }
 
   @override
@@ -54,7 +54,7 @@ class FakeRoadmapRepository implements RoadmapRepository {
               updatedAt: DateTime.now().toUtc(),
             ))
         .copyWith(
-      status: LessonStatus.completed,
+      status: RoadmapLessonStatus.completed,
       completionScore: score,
     );
   }
@@ -70,7 +70,7 @@ class FakeRoadmapRepository implements RoadmapRepository {
               hskLevel: 1,
               updatedAt: DateTime.now().toUtc(),
             ))
-        .copyWith(status: LessonStatus.skipped);
+        .copyWith(status: RoadmapLessonStatus.skipped);
   }
 
   @override
@@ -187,7 +187,7 @@ void main() {
 
       // Put lesson in inProgress status
       fakeRepo.progressMap['LES_HSK1_01_TONES'] = fakeRepo.progressMap['LES_HSK1_01_TONES']!.copyWith(
-        status: LessonStatus.inProgress,
+        status: RoadmapLessonStatus.inProgress,
         completionScore: 0.85,
       );
 
@@ -211,7 +211,7 @@ void main() {
 
       // Verify repository updated to completed
       final updated = fakeRepo.progressMap['LES_HSK1_01_TONES']!;
-      expect(updated.status, equals(LessonStatus.completed));
+      expect(updated.status, equals(RoadmapLessonStatus.completed));
       expect(updated.completionScore, equals(0.85));
       expect(updated.isCompleted, isTrue);
     });

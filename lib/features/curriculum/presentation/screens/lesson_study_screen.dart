@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../home/presentation/providers/home_providers.dart';
 import '../../domain/models/curriculum_models.dart';
 import '../../domain/models/lesson_flow_state.dart';
 import '../providers/curriculum_providers.dart';
@@ -33,17 +34,26 @@ class LessonStudyScreen extends ConsumerStatefulWidget {
 }
 
 class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
+  final Stopwatch _lessonStopwatch = Stopwatch();
   double? _gamifiedScorePercent;
+  bool _isCompleting = false;
 
   @override
   void initState() {
     super.initState();
+    _lessonStopwatch.start();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         final targetStep = widget.resumeStep ?? LessonStep.warmup;
         ref.read(lessonFlowNotifierProvider(widget.lesson.id).notifier).resetToStep(targetStep);
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _lessonStopwatch.stop();
+    super.dispose();
   }
 
   static const List<String> _stepTitles = [
@@ -133,11 +143,26 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
           lesson: currentLesson,
           segment: _getSegment(currentLesson, 'masteryCheck'),
           onAnswerRecorded: (qId, ans) => flowNotifier.recordAnswer(qId, ans),
-          onSubmit: (questions) => flowNotifier.submitPractice(questions),
+          onSubmit: (questions) {
+            _lessonStopwatch.stop();
+            return flowNotifier.submitPractice(
+              questions,
+              durationMs: _lessonStopwatch.elapsedMilliseconds,
+            );
+          },
           onFinishLesson: () async {
-            await flowNotifier.completeLesson();
-            if (!mounted) return;
-            Navigator.of(context).pop(true);
+            if (_isCompleting) return;
+            _isCompleting = true;
+            _lessonStopwatch.stop();
+            try {
+              await flowNotifier.completeLesson(
+                durationMs: _lessonStopwatch.elapsedMilliseconds,
+              );
+              if (!mounted) return;
+              Navigator.of(context).pop(true);
+            } finally {
+              _isCompleting = false;
+            }
           },
         );
       default:
@@ -151,11 +176,34 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
 
     return LessonStepErrorBoundary(
       stepName: _stepTitles[safeIndex],
-      onSkip: safeIndex < 5 ? () => flowNotifier.nextStep() : () => Navigator.of(context).pop(true),
+      onSkip: safeIndex < 5 ? () => flowNotifier.nextStep() : () => Navigator.of(context).pop(false),
       onRetry: () => setState(() {}),
       child: stepWidget,
       builder: (ctx) => _buildStepContent(safeIndex, flowNotifier, currentLesson),
     );
+  }
+
+  String? _resolveNextLessonTitle(CurriculumLesson currentLesson) {
+    try {
+      final unitLessons = ref.watch(curriculumLessonsProvider(currentLesson.unitId)).value;
+      if (unitLessons == null || unitLessons.isEmpty) return null;
+      final upcoming = unitLessons
+          .where((l) => l.orderIndex > currentLesson.orderIndex)
+          .toList()
+        ..sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
+      if (upcoming.isNotEmpty) {
+        return upcoming.first.titleVi;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  int _resolveStreakDays() {
+    try {
+      return ref.watch(homeDashboardProvider).value?.streak.currentStreak ?? 0;
+    } catch (_) {
+      return 0;
+    }
   }
 
   @override
@@ -166,14 +214,24 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
     final currentLesson = reactiveLessonAsync.value ?? widget.lesson;
     final theme = Theme.of(context);
 
+    if (reactiveLessonAsync.isLoading && widget.lesson.segments.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(title: Text(widget.lesson.titleVi)),
+        body: const Center(child: HiLoadingIndicator()),
+      );
+    }
+
     // MODE 1: GAMIFIED MICRO-LEARNING PLAYER (5–7 minute continuous journey)
     if (_isGamified(currentLesson)) {
+      final realStreakDays = _resolveStreakDays();
+      final nextTitle = _resolveNextLessonTitle(currentLesson);
+
       return Scaffold(
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(Icons.close_rounded),
             tooltip: 'Đóng',
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(context).pop(false),
           ),
           title: Text(
             currentLesson.titleVi,
@@ -197,23 +255,54 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
         ),
         body: LessonStepErrorBoundary(
           stepName: currentLesson.titleVi,
-          onSkip: () => Navigator.of(context).pop(true),
+          onSkip: () => Navigator.of(context).pop(false),
           onRetry: () => setState(() {}),
           child: GamifiedLessonPlayer(
             lesson: currentLesson,
+            xpReward: 25,
+            currentStreakDays: realStreakDays,
+            nextLessonTitle: nextTitle,
             onAnswerRecorded: (cardId, ans) {
               flowNotifier.recordAnswer(cardId, ans);
             },
             onScoreCalculated: (score) {
               _gamifiedScorePercent = score;
             },
+            onLessonCompleted: (accuracy, questionResults, elapsedSeconds) async {
+              if (_isCompleting) return;
+              _isCompleting = true;
+              _lessonStopwatch.stop();
+              try {
+                final nav = Navigator.of(context);
+                await flowNotifier.completeLesson(
+                  defaultScorePercent: accuracy,
+                  questionResults: questionResults,
+                  durationMs: elapsedSeconds > 0
+                      ? elapsedSeconds * 1000
+                      : _lessonStopwatch.elapsedMilliseconds,
+                );
+                if (mounted) {
+                  nav.pop(true);
+                }
+              } finally {
+                _isCompleting = false;
+              }
+            },
             onFinishLesson: () async {
-              final nav = Navigator.of(context);
-              await flowNotifier.completeLesson(
-                defaultScorePercent: _gamifiedScorePercent ?? 0.85,
-              );
-              if (mounted) {
-                nav.pop(true);
+              if (_isCompleting) return;
+              _isCompleting = true;
+              _lessonStopwatch.stop();
+              try {
+                final nav = Navigator.of(context);
+                await flowNotifier.completeLesson(
+                  defaultScorePercent: _gamifiedScorePercent ?? 0.85,
+                  durationMs: _lessonStopwatch.elapsedMilliseconds,
+                );
+                if (mounted) {
+                  nav.pop(true);
+                }
+              } finally {
+                _isCompleting = false;
               }
             },
           ),
@@ -310,7 +399,7 @@ class _LessonStudyScreenState extends ConsumerState<LessonStudyScreen> {
                   text: 'Tiếp theo',
                   variant: HiButtonVariant.primary,
                   size: HiButtonSize.sm,
-                  onPressed: () => flowNotifier.nextStep(),
+                  onPressed: flowState.canProceed ? () => flowNotifier.nextStep() : null,
                 )
               else
                 const SizedBox(width: 80),

@@ -232,7 +232,7 @@ void main() {
       );
     });
 
-    test('8. Query optimization excludes activities older than 30 days and sample_data', () async {
+    test('8. All-time totals include activities older than 30 days while excluding sample_data, seed, and cat_placement_test', () async {
       final nowUtc = DateTime.now().toUtc();
       final oldDate = nowUtc.subtract(const Duration(days: 35));
       final recentDate = nowUtc.subtract(const Duration(days: 5));
@@ -265,6 +265,15 @@ void main() {
       });
 
       await db.insert(DatabaseConstants.tableLearningActivities, {
+        'id': 'act_cat',
+        'activity_type': 'cat_placement_test',
+        'duration_seconds': 500,
+        'items_count': 12,
+        'activity_date': '${recentDate.year}-${recentDate.month.toString().padLeft(2, '0')}-${recentDate.day.toString().padLeft(2, '0')}',
+        'created_at': recentDate.toIso8601String(),
+      });
+
+      await db.insert(DatabaseConstants.tableLearningActivities, {
         'id': 'act_valid',
         'activity_type': 'lesson',
         'duration_seconds': 600,
@@ -273,67 +282,44 @@ void main() {
         'created_at': recentDate.toIso8601String(),
       });
 
-      final sessions = await homeRepo.getSanitizedStudySessionsAndStats();
-      expect(sessions.stats.totalDurationSeconds, equals(600));
-      expect(sessions.stats.totalItemsCompleted, equals(10));
+      final sessions = await homeRepo.getSanitizedStudySessionsAndStats(referenceTimeUtc: nowUtc);
+      expect(sessions.stats.totalDurationSeconds, equals(900));
+      expect(sessions.stats.totalItemsCompleted, equals(15));
+
+      final recent = await homeRepo.getRecentActivities(limit: 10);
+      expect(recent.any((a) => a.type == ActivityType.placementTest), isFalse);
     });
 
-    test('9. Query limits cap learning_activities at 200 and learner_evidence at 100', () async {
-      final nowUtc = DateTime.now().toUtc();
+    test('9. High-volume 350 rows across 14 consecutive days preserves full 14-day streak without row-cap truncation', () async {
+      final nowUtc = DateTime.utc(2026, 11, 14, 12, 0);
       final batch = db.batch();
 
-      for (int i = 0; i < 250; i++) {
-        final d = nowUtc.subtract(Duration(minutes: i + 1));
-        batch.insert(DatabaseConstants.tableLearningActivities, {
-          'id': 'act_cap_$i',
-          'activity_type': 'srs_review',
-          'duration_seconds': 10,
-          'items_count': 1,
-          'activity_date': '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}',
-          'created_at': d.toIso8601String(),
-        });
-      }
-
-      for (int i = 0; i < 150; i++) {
-        final d = nowUtc.subtract(Duration(hours: 10, minutes: i + 1));
-        batch.insert(DatabaseConstants.tableLearnerEvidence, {
-          'id': 'evi_cap_$i',
-          'content_id': 'content_$i',
-          'content_type': 'vocabulary',
-          'source': 'srs_flashcard',
-          'score': 1.0,
-          'duration_ms': 5000,
-          'metadata_json': '{}',
-          'created_at': d.toIso8601String(),
-        });
+      // 25 activities/day * 14 days = 350 rows (> old LIMIT 200 cap)
+      int idx = 0;
+      for (int day = 0; day < 14; day++) {
+        for (int n = 0; n < 25; n++) {
+          final d = nowUtc.subtract(Duration(days: day, minutes: n * 5));
+          final dateStr =
+              '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+          batch.insert(DatabaseConstants.tableLearningActivities, {
+            'id': 'act_vol_${idx++}',
+            'activity_type': 'srs_review',
+            'duration_seconds': 30,
+            'items_count': 1,
+            'activity_date': dateStr,
+            'created_at': d.toIso8601String(),
+          });
+        }
       }
 
       await batch.commit(noResult: true);
 
-      final actCountRows = await db.rawQuery('''
-        SELECT COUNT(*) as cnt FROM (
-          SELECT id FROM ${DatabaseConstants.tableLearningActivities}
-          WHERE activity_type NOT IN ('sample_data', 'seed')
-            AND created_at >= datetime('now', '-30 days')
-          ORDER BY created_at ASC
-          LIMIT 200
-        )
-      ''');
-      expect(actCountRows.first['cnt'], equals(200));
-
-      final eviCountRows = await db.rawQuery('''
-        SELECT COUNT(*) as cnt FROM (
-          SELECT id FROM ${DatabaseConstants.tableLearnerEvidence}
-          WHERE source NOT IN ('sample_data', 'seed')
-            AND created_at >= datetime('now', '-30 days')
-          ORDER BY created_at ASC
-          LIMIT 100
-        )
-      ''');
-      expect(eviCountRows.first['cnt'], equals(100));
-
-      final dashboard = await homeRepo.getDashboardData();
-      expect(dashboard, isNotNull);
+      final dashboard = await homeRepo.getDashboardData(
+        evaluationTime: nowUtc,
+        timeZoneOffset: Duration.zero,
+      );
+      expect(dashboard.streak.currentStreak, equals(14));
+      expect(dashboard.streak.hasStudiedToday, isTrue);
     });
 
     test('10. Migration v17 index idx_learning_activities_created_at exists and is active', () async {

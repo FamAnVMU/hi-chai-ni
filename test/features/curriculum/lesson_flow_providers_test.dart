@@ -15,6 +15,7 @@ class FakeMasteryEngine implements MasteryEngine {
   Future<MasteryUpdateResult> recordLessonAttempt({
     required String lessonId,
     required double scorePercent,
+    int durationMs = 0,
     List<Map<String, dynamic>>? questionResults,
     double passingThreshold = 0.8,
   }) async {

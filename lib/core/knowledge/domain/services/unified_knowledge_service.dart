@@ -301,6 +301,21 @@ class DefaultUnifiedKnowledgeService implements UnifiedKnowledgeService {
     );
   }
 
+  String _resolveEntityType(String knowledgeId) {
+    if (knowledgeId.startsWith('KNOW_GRAM_') || knowledgeId.startsWith('GRAM_')) {
+      return 'grammar';
+    }
+    if (knowledgeId.startsWith('KNOW_HANZI_')) {
+      return 'hanzi';
+    }
+    if (knowledgeId.startsWith('KNOW_SENT_')) {
+      return 'sentence';
+    }
+    return 'vocabulary';
+  }
+
+  static int _knowledgeEviSeq = 0;
+
   @override
   Future<void> recordPracticeEvidence({
     required String knowledgeId,
@@ -313,9 +328,27 @@ class DefaultUnifiedKnowledgeService implements UnifiedKnowledgeService {
     final nowIso = now.toIso8601String();
     final clampedScore = score.clamp(0.0, 1.0);
     final srsId = 'srs_$knowledgeId';
-    final evidenceId = 'evid_${now.microsecondsSinceEpoch}_${knowledgeId.hashCode.abs()}';
+    final evidenceId =
+        'evid_${now.microsecondsSinceEpoch}_${++_knowledgeEviSeq}_${knowledgeId.hashCode.abs()}';
 
     await _db.transaction((txn) async {
+      String entityType = _resolveEntityType(knowledgeId);
+      try {
+        final regRows = await txn.query(
+          DatabaseConstants.tableKnowledgeRegistry,
+          columns: ['entity_type'],
+          where: 'id = ?',
+          whereArgs: [knowledgeId],
+          limit: 1,
+        );
+        if (regRows.isNotEmpty) {
+          final regType = regRows.first['entity_type'] as String?;
+          if (regType != null && regType.isNotEmpty) {
+            entityType = regType;
+          }
+        }
+      } catch (_) {}
+
       // 1. Schedule / update SRS item FIRST so learner_evidence.srs_item_id FK is satisfied
       final initialIntervalDays = clampedScore >= 0.8 ? 3 : 1;
       final existingSrs = await txn.query(
@@ -352,15 +385,18 @@ class DefaultUnifiedKnowledgeService implements UnifiedKnowledgeService {
         }
       }
 
+      final isMastered = nextIntervalDays >= 21 && nextRepetitions >= 3;
+      final srsState = isMastered ? 'mastered' : 'review';
       final dueAt = now.add(Duration(days: nextIntervalDays)).toIso8601String();
 
       await txn.rawInsert('''
         INSERT INTO ${DatabaseConstants.tableSrsItems} (
           id, content_id, content_type, state, interval_days, ease_factor,
           repetitions, lapses, due_at, last_reviewed_at, created_at, updated_at
-        ) VALUES (?, ?, 'knowledge', 'review', ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(id) DO UPDATE SET
-          state = 'review',
+          content_type = excluded.content_type,
+          state = excluded.state,
           interval_days = excluded.interval_days,
           ease_factor = excluded.ease_factor,
           repetitions = excluded.repetitions,
@@ -371,6 +407,8 @@ class DefaultUnifiedKnowledgeService implements UnifiedKnowledgeService {
       ''', [
         srsId,
         knowledgeId,
+        entityType,
+        srsState,
         nextIntervalDays,
         nextEaseFactor,
         nextRepetitions,
@@ -381,18 +419,29 @@ class DefaultUnifiedKnowledgeService implements UnifiedKnowledgeService {
         nowIso,
       ]);
 
-      // 2. Update mastery state in curriculum_mastery
+      // 2. Update mastery state in curriculum_mastery (preserve 'mastered' against single low scores)
       final masteryScore = clampedScore >= 0.8 ? 1.0 : (clampedScore >= 0.5 ? 0.7 : 0.4);
-      final masteryState = clampedScore >= 0.8 ? 'completed' : 'in_progress';
+      final masteryState = isMastered
+          ? 'mastered'
+          : (clampedScore >= 0.8 ? 'completed' : 'in_progress');
 
       await txn.rawInsert('''
         INSERT INTO ${DatabaseConstants.tableCurriculumMastery} (
           id, item_id, item_type, mastery_state, score,
           attempts_count, last_attempt_at, due_review_at, created_at, updated_at
-        ) VALUES (?, ?, 'knowledge', ?, ?, 1, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?)
         ON CONFLICT(item_id) DO UPDATE SET
-          mastery_state = excluded.mastery_state,
-          score = excluded.score,
+          item_type = excluded.item_type,
+          mastery_state = CASE
+            WHEN ${DatabaseConstants.tableCurriculumMastery}.mastery_state = 'mastered'
+              THEN 'mastered'
+            ELSE excluded.mastery_state
+          END,
+          score = CASE
+            WHEN ${DatabaseConstants.tableCurriculumMastery}.mastery_state = 'mastered'
+              THEN ${DatabaseConstants.tableCurriculumMastery}.score
+            ELSE excluded.score
+          END,
           attempts_count = ${DatabaseConstants.tableCurriculumMastery}.attempts_count + 1,
           last_attempt_at = excluded.last_attempt_at,
           due_review_at = excluded.due_review_at,
@@ -400,6 +449,7 @@ class DefaultUnifiedKnowledgeService implements UnifiedKnowledgeService {
       ''', [
         'mastery_$knowledgeId',
         knowledgeId,
+        entityType,
         masteryState,
         masteryScore,
         nowIso,
@@ -415,7 +465,7 @@ class DefaultUnifiedKnowledgeService implements UnifiedKnowledgeService {
           'id': evidenceId,
           'srs_item_id': srsId,
           'content_id': knowledgeId,
-          'content_type': 'knowledge',
+          'content_type': entityType,
           'source': activityType,
           'score': clampedScore,
           'duration_ms': durationMs,

@@ -36,8 +36,8 @@ class Sm2Configuration {
     this.secondIntervalDays = 6,
     this.hardIntervalMultiplier = 1.2,
     this.easyBonusMultiplier = 1.3,
-    this.masteryRepetitionThreshold = 6,
-    this.masteryIntervalThreshold = 90,
+    this.masteryRepetitionThreshold = 3,
+    this.masteryIntervalThreshold = 21,
   });
 }
 

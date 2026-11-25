@@ -1,8 +1,10 @@
+import '../../../curriculum/domain/constants/curriculum_constants.dart';
 import '../../../curriculum/presentation/screens/curriculum_syllabus_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../app_shell/presentation/providers/app_shell_providers.dart';
+import '../../../vocabulary_srs/presentation/providers/srs_providers.dart';
 import '../providers/home_providers.dart';
 import '../widgets/home_quick_actions_grid.dart';
 import '../widgets/home_recent_activities_card.dart';
@@ -76,12 +78,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   // 2. Lesson Access Card (Truy cập bài học HSK)
                   HomeLessonAccessCard(
                     roadmap: data.roadmap,
-                    onNavigateLearning: () {
-                      Navigator.of(context).push(
+                    onNavigateLearning: () async {
+                      final lvl = data.roadmap.currentHskLevel.clamp(1, 6);
+                      await Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (_) => const CurriculumSyllabusScreen(),
+                          builder: (_) => CurriculumSyllabusScreen(
+                            curriculumId: CurriculumConstants.curriculumIdForLevel(lvl),
+                            curriculumTitle: 'Giáo trình HSK $lvl Chuẩn',
+                          ),
                         ),
                       );
+                      if (context.mounted) {
+                        ref.read(homeDashboardProvider.notifier).refresh();
+                        ref.read(srsDueCountProvider.notifier).refreshCount();
+                      }
                     },
                   ),
                   const SizedBox(height: AppSpacing.lg),
@@ -89,6 +99,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   // 3. Quick Actions Grid (Học tập, Ôn tập, Từ điển, AI Tutor)
                   HomeQuickActionsGrid(
                     hasCompletedLessons: data.hasCompletedLessons,
+                    hasSrsCards: data.srsDueCount > 0,
                     onNavigateLearning: () {
                       ref
                           .read(selectedTabProvider.notifier)
@@ -107,8 +118,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   ),
                   const SizedBox(height: AppSpacing.lg),
 
-                  // 4. SRS Due Card (chỉ hiển thị khi có lesson đã hoàn thành)
-                  if (data.hasCompletedLessons && data.srsDueCount > 0) ...[
+                  // 4. SRS Due Card (hiển thị khi có thẻ đến hạn cần ôn tập)
+                  if (data.srsDueCount > 0) ...[
                     HomeSrsDueCard(
                       dueCount: data.srsDueCount,
                       onStartReview: () {

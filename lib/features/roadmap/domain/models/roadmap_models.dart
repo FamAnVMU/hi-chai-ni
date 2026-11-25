@@ -107,8 +107,8 @@ extension LearningPathTypeExtension on LearningPathType {
   }
 }
 
-/// Progression status of a curriculum lesson
-enum LessonStatus {
+/// Progression status of a roadmap curriculum lesson
+enum RoadmapLessonStatus {
   locked,
   available,
   inProgress,
@@ -205,8 +205,8 @@ class LearnerGoal {
   }
 }
 
-/// An immutable curriculum lesson catalog item
-class CurriculumLesson {
+/// An immutable roadmap curriculum lesson item
+class RoadmapLesson {
   final String id;
   final String unitId;
   final int level;
@@ -218,7 +218,7 @@ class CurriculumLesson {
   final List<String> prerequisiteSkills;
   final Map<String, dynamic> contentReferences;
 
-  const CurriculumLesson({
+  const RoadmapLesson({
     required this.id,
     required this.unitId,
     required this.level,
@@ -232,16 +232,16 @@ class CurriculumLesson {
   });
 }
 
-/// An immutable curriculum unit containing structured lessons
-class CurriculumUnit {
+/// An immutable roadmap curriculum unit containing structured lessons
+class RoadmapUnit {
   final String id;
   final int level;
   final int unitNumber;
   final String title;
   final String description;
-  final List<CurriculumLesson> lessons;
+  final List<RoadmapLesson> lessons;
 
-  const CurriculumUnit({
+  const RoadmapUnit({
     required this.id,
     required this.level,
     required this.unitNumber,
@@ -256,16 +256,18 @@ class CurriculumLevel {
   final int level;
   final String title;
   final String description;
-  final List<CurriculumUnit> units;
+  final List<RoadmapUnit> units;
+  final bool isPackInstalled;
 
   const CurriculumLevel({
     required this.level,
     required this.title,
     required this.description,
     this.units = const [],
+    this.isPackInstalled = true,
   });
 
-  List<CurriculumLesson> get allLessons =>
+  List<RoadmapLesson> get allLessons =>
       units.expand((u) => u.lessons).toList();
 }
 
@@ -275,7 +277,7 @@ class LessonProgress {
   final String lessonId;
   final String unitId;
   final int hskLevel;
-  final LessonStatus status;
+  final RoadmapLessonStatus status;
   final double? completionScore;
   final int evidenceCount;
   final String? source;
@@ -289,7 +291,7 @@ class LessonProgress {
     required this.lessonId,
     required this.unitId,
     required this.hskLevel,
-    this.status = LessonStatus.locked,
+    this.status = RoadmapLessonStatus.locked,
     this.completionScore,
     this.evidenceCount = 0,
     this.source,
@@ -299,23 +301,28 @@ class LessonProgress {
     required this.updatedAt,
   });
 
-  bool get isCompleted => status == LessonStatus.completed;
-  bool get isAvailable => status == LessonStatus.available;
-  bool get isLocked => status == LessonStatus.locked;
+  bool get isCompleted => status == RoadmapLessonStatus.completed;
+  bool get isAvailable => status == RoadmapLessonStatus.available;
+  bool get isLocked => status == RoadmapLessonStatus.locked;
   double? get score => completionScore;
 
   factory LessonProgress.fromMap(Map<String, dynamic> map) {
+    final rawStatus = (map['status'] as String? ?? '').trim();
     return LessonProgress(
       id: map['id'] as String,
       lessonId: map['lesson_id'] as String,
       unitId: map['unit_id'] as String,
-      hskLevel: map['hsk_level'] as int? ?? 1,
-      status: LessonStatus.values.firstWhere(
-        (e) => e.name == map['status'],
-        orElse: () => LessonStatus.locked,
+      hskLevel: (map['hsk_level'] as num?)?.toInt() ?? 1,
+      status: RoadmapLessonStatus.values.firstWhere(
+        (e) =>
+            e.name == rawStatus ||
+            (rawStatus == 'in_progress' && e == RoadmapLessonStatus.inProgress) ||
+            (rawStatus == 'not_started' && e == RoadmapLessonStatus.available) ||
+            (rawStatus == 'mastered' && e == RoadmapLessonStatus.completed),
+        orElse: () => RoadmapLessonStatus.locked,
       ),
       completionScore: (map['completion_score'] as num?)?.toDouble(),
-      evidenceCount: map['evidence_count'] as int? ?? 0,
+      evidenceCount: (map['evidence_count'] as num?)?.toInt() ?? 0,
       source: map['source'] as String?,
       startedAt: map['started_at'] != null ? DateTime.tryParse(map['started_at'] as String) : null,
       completedAt: map['completed_at'] != null ? DateTime.tryParse(map['completed_at'] as String) : null,
@@ -344,7 +351,7 @@ class LessonProgress {
     String? lessonId,
     String? unitId,
     int? hskLevel,
-    LessonStatus? status,
+    RoadmapLessonStatus? status,
     double? completionScore,
     int? evidenceCount,
     String? source,
@@ -413,7 +420,7 @@ enum RecommendationPriority {
 
 /// An individual recommendation with transparent pedagogical rationale
 class RoadmapRecommendation {
-  final CurriculumLesson lesson;
+  final RoadmapLesson lesson;
   final RecommendationPriority priority;
   final String reason;
   final List<String> supportingEvidence;
@@ -443,6 +450,7 @@ class LearnerRoadmapState {
   final Map<String, LessonProgress> lessonProgressMap;
   final Map<SkillDimension, SkillMastery> skillMasteryMap;
   final List<RoadmapRecommendation> recommendations;
+  final Map<int, CurriculumLevel> levelsByHsk;
 
   const LearnerRoadmapState({
     required this.activeGoal,
@@ -450,9 +458,17 @@ class LearnerRoadmapState {
     this.lessonProgressMap = const {},
     this.skillMasteryMap = const {},
     this.recommendations = const [],
+    this.levelsByHsk = const {},
   });
 
   double get overallLevelCompletion {
+    final levelData = levelsByHsk[currentLevel];
+    if (levelData != null && levelData.units.isNotEmpty) {
+      final lessons = levelData.allLessons;
+      if (lessons.isEmpty) return 0.0;
+      final completed = lessons.where((l) => lessonProgressMap[l.id]?.isCompleted == true).length;
+      return completed / lessons.length;
+    }
     if (lessonProgressMap.isEmpty) return 0.0;
     final levelLessons = lessonProgressMap.values.where((p) => p.hskLevel == currentLevel);
     if (levelLessons.isEmpty) return 0.0;

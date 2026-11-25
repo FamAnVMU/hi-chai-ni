@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../../../../core/audio/tts_service.dart';
+import '../../../../core/audio/unified_audio_playback_service.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/models/practice_models.dart';
 
@@ -14,6 +17,40 @@ class ExerciseCardContainer extends StatelessWidget {
     this.result,
     required this.child,
   });
+
+  Future<void> _playStimulusAudio(BuildContext context) async {
+    final uri = definition.stimulusAudioUri;
+    if (uri != null && uri.isNotEmpty) {
+      try {
+        if (uri.startsWith('assets/')) {
+          await rootBundle.load(uri);
+        }
+        await UnifiedAudioPlaybackService.instance.playAudio(uri);
+        return;
+      } catch (_) {}
+    }
+
+    final text = (definition.stimulus ??
+            definition.targetSentence ??
+            definition.sentenceWithBlank ??
+            definition.prompt)
+        .replaceAll('___', '')
+        .trim();
+    if (text.isEmpty) return;
+
+    try {
+      await DefaultTtsService().speak(text, language: 'zh-CN');
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Không thể phát âm thanh lúc này.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,8 +154,26 @@ class ExerciseCardContainer extends StatelessWidget {
                       ),
                     ),
                   ],
+                  if ((definition.stimulusAudioUri != null &&
+                          definition.stimulusAudioUri!.isNotEmpty) ||
+                      definition.skill == 'listening') ...[
+                    const SizedBox(height: AppSpacing.xs),
+                    TextButton.icon(
+                      icon: const Icon(Icons.volume_up_rounded, size: 18),
+                      label: const Text('Nghe phát âm'),
+                      onPressed: () => _playStimulusAudio(context),
+                    ),
+                  ],
                 ],
               ),
+            ),
+          ] else if (definition.stimulusAudioUri != null &&
+              definition.stimulusAudioUri!.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.sm),
+            OutlinedButton.icon(
+              icon: const Icon(Icons.volume_up_rounded, size: 18),
+              label: const Text('Nghe câu hỏi âm thanh'),
+              onPressed: () => _playStimulusAudio(context),
             ),
           ],
           const SizedBox(height: AppSpacing.md),

@@ -147,5 +147,44 @@ void main() {
       expect(result.scorePercent, equals(0));
       expect(result.overallVerdict, contains('Khung vẽ trống'));
     });
+
+    test('6. Extra drawn strokes penalize accuracy below 100%', () {
+      final shiData = bank.getStrokeData('十')!;
+      final stroke1 = createTestStroke(start: const Offset(64, 144), end: const Offset(256, 144));
+      final stroke2 = createTestStroke(start: const Offset(160, 64), end: const Offset(160, 256));
+      final extra = createTestStroke(start: const Offset(80, 220), end: const Offset(240, 220));
+
+      final result = evaluator.evaluate(
+        drawnStrokes: [stroke1, stroke2, extra],
+        canvasSize: canvasSize,
+        strokeData: shiData,
+        mode: WritingMode.tracing,
+      );
+
+      expect(result.strokeOrderAccuracy, closeTo(2 / 3, 0.01));
+      expect(result.scorePercent, lessThan(100));
+    });
+
+    test('7. Compound stroke (横折) rejects inverted bend path even with matching start and end', () {
+      final zhongData = bank.getStrokeData('中')!;
+      final s1 = createTestStroke(start: const Offset(80, 112), end: const Offset(80, 208));
+      // Inverted L-bend (down then right) instead of right then down (control point at (0.75, 0.35))
+      final wrongBend = DrawnStroke(points: [
+        StrokePoint(offset: const Offset(80, 112), timestamp: DateTime.now()),
+        StrokePoint(offset: const Offset(80, 208), timestamp: DateTime.now()),
+        StrokePoint(offset: const Offset(240, 208), timestamp: DateTime.now()),
+      ]);
+      final s3 = createTestStroke(start: const Offset(80, 208), end: const Offset(240, 208));
+      final s4 = createTestStroke(start: const Offset(160, 64), end: const Offset(160, 272));
+
+      final result = evaluator.evaluate(
+        drawnStrokes: [s1, wrongBend, s3, s4],
+        canvasSize: canvasSize,
+        strokeData: zhongData,
+        mode: WritingMode.tracing,
+      );
+
+      expect(result.correctStrokeCount, lessThan(4));
+    });
   });
 }
