@@ -56,10 +56,15 @@ void main() {
         expect((item['pinyin'] as String).isNotEmpty, isTrue);
         expect((item['translation_vi'] as String).isNotEmpty, isTrue);
         expect((item['audio_file'] as String).isNotEmpty, isTrue);
+        expect((item['audio_uri'] as String).startsWith('assets/audio/curriculum/'), isTrue);
 
+        // Silent 4,180-byte curriculum stubs were removed so AudioPlayerService
+        // falls back cleanly to TTS (`item['hanzi']`); if a real clip is bundled,
+        // verify it is non-empty and exceeds the silent stub size.
         final audioFile = File('assets/audio/curriculum/${item['audio_file']}');
-        expect(audioFile.existsSync(), isTrue);
-        expect(audioFile.lengthSync(), greaterThan(0));
+        if (audioFile.existsSync()) {
+          expect(audioFile.lengthSync(), greaterThan(4500));
+        }
       }
     });
 

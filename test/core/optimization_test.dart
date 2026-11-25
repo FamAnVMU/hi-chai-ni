@@ -95,9 +95,17 @@ void main() {
       final initialCount = await srsRepository.getDueCardsCount();
       expect(initialCount, equals(0));
 
-      // 2. Insert a due card directly into SQLite
+      // 2. Insert a matching vocabulary + due card directly into SQLite
       final nowUtc = DateTime.now().toUtc();
       final db = appDatabase.database;
+      await db.insert(DatabaseConstants.tableVocabularies, {
+        'id': 'v_test1',
+        'simplified': '试',
+        'pinyin': 'shì',
+        'hsk_level': 1,
+        'created_at': nowUtc.toIso8601String(),
+        'updated_at': nowUtc.toIso8601String(),
+      });
       await db.insert(DatabaseConstants.tableSrsItems, {
         'id': 'SRS_VOCAB_test1',
         'content_id': 'v_test1',
