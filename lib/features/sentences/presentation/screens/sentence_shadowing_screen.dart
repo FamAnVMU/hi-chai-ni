@@ -4,6 +4,8 @@ import '../../../../core/audio/audio_models.dart';
 import '../../../../core/audio/audio_player_service.dart';
 import '../../../../core/audio/audio_recorder_service.dart';
 import '../../../../core/audio/audio_temp_cleaner.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../settings/presentation/providers/settings_providers.dart';
 import '../../data/sentence_repository.dart';
 import '../../domain/models/sentence_models.dart';
 import '../../domain/services/sentence_audio_manager.dart';
@@ -42,6 +44,9 @@ class _SentenceShadowingScreenState extends State<SentenceShadowingScreen> {
   String? _recordedFilePath;
   double _currentAmplitude = 0.0;
   double? _evaluatedScore;
+  bool _showPinyin = true;
+  bool _didInitFromSettings = false;
+  double _speechRate = 1.0;
 
   @override
   void initState() {
@@ -65,9 +70,19 @@ class _SentenceShadowingScreenState extends State<SentenceShadowingScreen> {
     _userPlayerStatusSub = _userAudioPlayer.statusStream.listen((status) {
       if (mounted) setState(() => _isUserAudioPlaying = status == AudioPlaybackStatus.playing);
     });
+  }
 
-    if (widget.autoPlay) {
-      _playModel();
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_didInitFromSettings) {
+      _didInitFromSettings = true;
+      final settings = readAppSettingsOrDefault(context);
+      _showPinyin = settings.showPinyinByDefault;
+      _speechRate = settings.speechRate;
+      if (widget.autoPlay && settings.autoPlayAudio) {
+        _playModel();
+      }
     }
   }
 
@@ -88,7 +103,7 @@ class _SentenceShadowingScreenState extends State<SentenceShadowingScreen> {
 
   Future<void> _playModel() async {
     await _userAudioPlayer.stop();
-    await _audioManager.playSentence(widget.sentence);
+    await _audioManager.playSentence(widget.sentence, speed: _speechRate);
   }
 
   Future<void> _toggleRecording() async {
@@ -155,11 +170,15 @@ class _SentenceShadowingScreenState extends State<SentenceShadowingScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.hiCardSurface,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(color: context.hiBorderColor),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withAlpha(8), blurRadius: 10, offset: const Offset(0, 3)),
+                  BoxShadow(
+                    color: Colors.black.withAlpha(context.isDarkMode ? 24 : 8),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
                 ],
               ),
               child: Column(
@@ -167,19 +186,29 @@ class _SentenceShadowingScreenState extends State<SentenceShadowingScreen> {
                   Text(
                     s.chinese,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: context.hiPrimaryText,
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    s.pinyin,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 16, color: Color(0xFF2563EB), fontWeight: FontWeight.w600),
-                  ),
+                  if (_showPinyin) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      s.pinyin,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: context.hiAccentColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 12),
                   Text(
                     s.translationVi.isNotEmpty ? s.translationVi : s.translationEn,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    style: TextStyle(fontSize: 14, color: context.hiSecondaryText),
                   ),
                 ],
               ),
@@ -190,8 +219,8 @@ class _SentenceShadowingScreenState extends State<SentenceShadowingScreen> {
             // Model Playback Button
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2563EB),
-                foregroundColor: Colors.white,
+                backgroundColor: context.hiAccentColor,
+                foregroundColor: context.isDarkMode ? AppColors.darkForestBg : Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
               ),
@@ -207,9 +236,9 @@ class _SentenceShadowingScreenState extends State<SentenceShadowingScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: _isRecording ? Colors.red.shade50 : Colors.grey.shade50,
+                color: _isRecording ? context.hiErrorBg : context.hiSecondarySurface,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: _isRecording ? Colors.red : Colors.grey.shade300),
+                border: Border.all(color: _isRecording ? context.hiErrorFg : context.hiBorderColor),
               ),
               child: Column(
                 children: [
@@ -219,7 +248,7 @@ class _SentenceShadowingScreenState extends State<SentenceShadowingScreen> {
                         : (_recordedFilePath != null ? 'Đã thu âm xong' : 'Nhấn nút mic để bắt đầu thu âm'),
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: _isRecording ? Colors.red : Colors.black87,
+                      color: _isRecording ? context.hiErrorFg : context.hiPrimaryText,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -231,7 +260,7 @@ class _SentenceShadowingScreenState extends State<SentenceShadowingScreen> {
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
-                        color: _isRecording ? Colors.red : Colors.blueGrey.shade100,
+                        color: _isRecording ? context.hiErrorFg : context.hiAccentBg,
                         shape: BoxShape.circle,
                         boxShadow: _isRecording
                             ? [
@@ -245,7 +274,7 @@ class _SentenceShadowingScreenState extends State<SentenceShadowingScreen> {
                       ),
                       child: Icon(
                         _isRecording ? Icons.stop : Icons.mic,
-                        color: _isRecording ? Colors.white : Colors.blueGrey.shade800,
+                        color: _isRecording ? Colors.white : context.hiAccentColor,
                         size: 36,
                       ),
                     ),

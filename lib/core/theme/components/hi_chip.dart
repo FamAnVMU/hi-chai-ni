@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import '../tokens/app_colors.dart';
 import '../tokens/app_dimensions.dart';
 import '../tokens/app_radius.dart';
@@ -82,76 +83,88 @@ class HiChip extends StatelessWidget {
         break;
     }
 
-    final chipWidget = AnimatedContainer(
+    final visualChip = AnimatedContainer(
       duration: const Duration(milliseconds: 150),
       curve: Curves.easeOut,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm + 2,
+        vertical: AppSpacing.xs + 2,
+      ),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: AppRadius.borderSm,
         border: borderSide != BorderSide.none ? Border.fromBorderSide(borderSide) : null,
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: AppRadius.borderSm,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm + 2,
-              vertical: AppSpacing.xs + 2,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            IconTheme(
+              data: IconThemeData(
+                color: textColor,
+                size: AppDimensions.iconXs,
+              ),
+              child: icon!,
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (icon != null) ...[
-                  IconTheme(
-                    data: IconThemeData(
-                      color: textColor,
-                      size: AppDimensions.iconXs,
-                    ),
-                    child: icon!,
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                ],
-                Text(
-                  label,
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: textColor,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  ),
-                ),
-                if (onDeleted != null) ...[
-                  const SizedBox(width: AppSpacing.xs),
-                  GestureDetector(
-                    onTap: onDeleted,
-                    child: deleteIcon ??
-                        Icon(
-                          Icons.close,
-                          size: AppDimensions.iconXs,
-                          color: textColor,
-                        ),
-                  ),
-                ],
-              ],
+            const SizedBox(width: AppSpacing.xs),
+          ],
+          Text(
+            label,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: textColor,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             ),
           ),
-        ),
+          if (onDeleted != null) ...[
+            const SizedBox(width: AppSpacing.xs),
+            ExcludeSemantics(
+              child: GestureDetector(
+                onTap: onDeleted,
+                child: deleteIcon ??
+                    Icon(
+                      Icons.close,
+                      size: AppDimensions.iconXs,
+                      color: textColor,
+                    ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
 
-    // If clickable, wrap in minimum touch target boundary
+    // If clickable, wrap InkWell outside minimum 48x48dp touch target boundary
     if (onTap != null || onDeleted != null) {
-      return ConstrainedBox(
-        constraints: const BoxConstraints(
-          minHeight: AppDimensions.minTouchTarget,
-        ),
-        child: Center(
-          widthFactor: 1.0,
-          child: chipWidget,
+      return Semantics(
+        button: true,
+        selected: isSelected,
+        customSemanticsActions: onDeleted != null
+            ? {
+                CustomSemanticsAction(label: 'Xóa $label'): onDeleted!,
+              }
+            : null,
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: AppRadius.borderSm,
+          child: InkWell(
+            onTap: onTap ?? onDeleted,
+            borderRadius: AppRadius.borderSm,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                minHeight: AppDimensions.minTouchTarget,
+                minWidth: AppDimensions.minTouchTarget,
+              ),
+              child: Center(
+                widthFactor: 1.0,
+                heightFactor: 1.0,
+                child: visualChip,
+              ),
+            ),
+          ),
         ),
       );
     }
 
-    return chipWidget;
+    return visualChip;
   }
 }

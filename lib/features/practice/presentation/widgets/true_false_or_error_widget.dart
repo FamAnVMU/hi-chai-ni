@@ -100,24 +100,24 @@ class _TrueFalseOrErrorWidgetState extends State<TrueFalseOrErrorWidget> {
   }) {
     final theme = Theme.of(context);
 
-    Color border = AppColors.border;
-    Color bg = AppColors.cardBackground;
-    Color textColor = AppColors.primaryText;
+    Color border = context.hiBorderColor;
+    Color bg = context.hiCardSurface;
+    Color textColor = context.hiPrimaryText;
 
     if (isSubmitted) {
       if (isTarget) {
-        border = AppColors.success;
-        bg = AppColors.successContainerLight;
-        textColor = AppColors.success;
+        border = context.hiSuccessFg;
+        bg = context.hiSuccessBg;
+        textColor = context.hiSuccessFg;
       } else if (isSelected && !result!.isCorrect) {
-        border = AppColors.error;
-        bg = AppColors.errorContainerLight;
-        textColor = AppColors.error;
+        border = context.hiErrorFg;
+        bg = context.hiErrorBg;
+        textColor = context.hiErrorFg;
       }
     } else if (isSelected) {
-      border = AppColors.primaryBlueDark;
-      bg = AppColors.primaryBlueLight;
-      textColor = AppColors.primaryBlueDark;
+      border = context.hiAccentColor;
+      bg = context.hiAccentBg;
+      textColor = context.hiAccentColor;
     }
 
     return InkWell(
@@ -226,26 +226,31 @@ class _TrueFalseOrErrorWidgetState extends State<TrueFalseOrErrorWidget> {
                 : (definition.errorToken == token ||
                     (cleanTargetError.isNotEmpty && cleanToken == cleanTargetError));
 
-            Color chipBg = AppColors.cardBackground;
-            Color chipBorder = AppColors.border;
+            Color chipBg = context.hiCardSurface;
+            Color chipBorder = context.hiBorderColor;
+            Color chipText = context.hiPrimaryText;
 
             if (isSubmitted) {
               if (isTargetError) {
-                chipBg = AppColors.successContainerLight;
-                chipBorder = AppColors.success;
+                chipBg = context.hiSuccessBg;
+                chipBorder = context.hiSuccessFg;
+                chipText = context.hiSuccessFg;
               } else if (isSelected && !result!.isCorrect) {
-                chipBg = AppColors.errorContainerLight;
-                chipBorder = AppColors.error;
+                chipBg = context.hiErrorBg;
+                chipBorder = context.hiErrorFg;
+                chipText = context.hiErrorFg;
               }
             } else if (isSelected) {
-              chipBg = AppColors.primaryBlueLight;
-              chipBorder = AppColors.primaryBlueDark;
+              chipBg = context.hiAccentBg;
+              chipBorder = context.hiAccentColor;
+              chipText = context.hiAccentColor;
             }
 
             return ActionChip(
               label: Text(
                 token,
                 style: TextStyle(
+                  color: chipText,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   decoration: isSelected ? TextDecoration.underline : TextDecoration.none,
                 ),

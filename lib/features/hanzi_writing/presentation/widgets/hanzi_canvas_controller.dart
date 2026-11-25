@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/tokens/app_colors.dart';
 import '../../domain/models/stroke_models.dart';
 
 /// Highly optimized controller managing stroke collection, touch/stylus events,
@@ -7,7 +8,8 @@ class HanziCanvasController extends ChangeNotifier {
   final List<DrawnStroke> _strokes = [];
   DrawnStroke? _activeStroke;
   double _strokeWidth = 7.0;
-  Color _strokeColor = const Color(0xFF1E293B);
+  Color _strokeColor = AppColors.primaryText;
+  bool _hasCustomStrokeColor = false;
   WritingMode _mode = WritingMode.tracing;
   Size _canvasSize = const Size(320.0, 320.0);
 
@@ -20,6 +22,13 @@ class HanziCanvasController extends ChangeNotifier {
 
   bool get canUndo => _strokes.isNotEmpty;
   int get strokeCount => _strokes.length;
+
+  /// Automatically adapts default stroke ink color to Light/Dark canvas surface
+  /// unless an explicit custom ink color was configured via [setStrokeColor].
+  void syncStrokeColorForBrightness(bool isDark) {
+    if (_hasCustomStrokeColor) return;
+    _strokeColor = isDark ? AppColors.darkTextPrimary : AppColors.primaryText;
+  }
 
   void setCanvasSize(Size size) {
     if (_canvasSize != size) {
@@ -35,6 +44,7 @@ class HanziCanvasController extends ChangeNotifier {
   }
 
   void setStrokeColor(Color color) {
+    _hasCustomStrokeColor = true;
     if (_strokeColor != color) {
       _strokeColor = color;
       notifyListeners();

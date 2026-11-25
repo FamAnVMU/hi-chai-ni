@@ -5,6 +5,7 @@ import '../../../../core/network/ai/ai.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../hanzi/hanzi.dart';
 import '../../../sentences/sentences.dart';
+import '../../../settings/presentation/providers/settings_providers.dart';
 import '../../../settings/presentation/screens/ai_settings_screen.dart';
 import '../../data/dictionary_repository.dart';
 import '../../domain/models/dictionary_models.dart';
@@ -17,6 +18,7 @@ class DictionaryDetailSheet extends StatefulWidget {
   final DictionaryRepository repository;
   final String? contextSentence;
   final TtsService? ttsService;
+  final AudioPlayerService? audioPlayer;
 
   const DictionaryDetailSheet({
     super.key,
@@ -24,6 +26,7 @@ class DictionaryDetailSheet extends StatefulWidget {
     required this.repository,
     this.contextSentence,
     this.ttsService,
+    this.audioPlayer,
   });
 
   static Future<void> show(
@@ -32,6 +35,7 @@ class DictionaryDetailSheet extends StatefulWidget {
     required DictionaryRepository repository,
     String? contextSentence,
     TtsService? ttsService,
+    AudioPlayerService? audioPlayer,
   }) {
     return showModalBottomSheet(
       context: context,
@@ -42,6 +46,7 @@ class DictionaryDetailSheet extends StatefulWidget {
         repository: repository,
         contextSentence: contextSentence,
         ttsService: ttsService,
+        audioPlayer: audioPlayer,
       ),
     );
   }
@@ -57,52 +62,92 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
   String? _aiError;
   bool _isAiAuthError = false;
   bool _isLoadingAi = false;
-  final AudioPlayerService _audioPlayer = DefaultAudioPlayerService();
+  late final AudioPlayerService _audioPlayer;
+  late final bool _ownsAudioPlayer;
   late final TtsService _ttsService;
   late final bool _ownsTts;
+  bool _didAutoPlay = false;
 
   @override
   void initState() {
     super.initState();
     _entry = widget.entry;
+    _ownsAudioPlayer = widget.audioPlayer == null;
+    _audioPlayer = widget.audioPlayer ?? DefaultAudioPlayerService();
     _ownsTts = widget.ttsService == null;
     _ttsService = widget.ttsService ?? DefaultTtsService();
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_didAutoPlay) {
+      _didAutoPlay = true;
+      final settings = readAppSettingsOrDefault(context);
+      if (settings.autoPlayAudio) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _handlePlayAudio(
+              silentOnError: true,
+              speechRate: settings.speechRate,
+              showLoadingIndicator: false,
+            );
+          }
+        });
+      }
+    }
+  }
+
+  @override
   void dispose() {
-    _audioPlayer.dispose();
+    if (_ownsAudioPlayer) {
+      _audioPlayer.dispose();
+    }
     if (_ownsTts) {
       _ttsService.dispose();
     }
     super.dispose();
   }
 
-  Future<void> _speakTtsFallback() async {
-    await _ttsService.speak(_entry.simplified, language: 'zh-CN');
+  Future<void> _speakTtsFallback({double? speechRate}) async {
+    final rate = speechRate ?? readAppSettingsOrDefault(context).speechRate;
+    await _ttsService.speak(
+      _entry.simplified,
+      language: 'zh-CN',
+      rate: DefaultTtsService.toTtsRate(rate),
+    );
   }
 
-  Future<void> _handlePlayAudio() async {
-    setState(() => _isAudioPlaying = true);
+  Future<void> _handlePlayAudio({
+    bool silentOnError = false,
+    double? speechRate,
+    bool showLoadingIndicator = true,
+  }) async {
+    if (showLoadingIndicator) {
+      setState(() => _isAudioPlaying = true);
+    }
+    final effectiveRate = speechRate ?? readAppSettingsOrDefault(context).speechRate;
     try {
       final uri = _entry.audioUri;
       if (uri == null || uri.isEmpty) {
-        await _speakTtsFallback();
+        await _speakTtsFallback(speechRate: effectiveRate);
         return;
       }
       try {
-        await _audioPlayer.play(uri);
+        await _audioPlayer.play(uri, speed: effectiveRate);
       } catch (_) {
-        await _speakTtsFallback();
+        await _speakTtsFallback(speechRate: effectiveRate);
       }
     } catch (_) {
-      if (mounted) {
+      if (mounted && !silentOnError) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Không thể phát audio lúc này.')),
         );
       }
     } finally {
-      if (mounted) setState(() => _isAudioPlaying = false);
+      if (showLoadingIndicator && mounted) {
+        setState(() => _isAudioPlaying = false);
+      }
     }
   }
 
@@ -205,6 +250,7 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final settings = readAppSettingsOrDefault(context);
 
     return Container(
       constraints: BoxConstraints(
@@ -250,6 +296,7 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         RubyText(
+                          showPinyin: settings.showPinyinByDefault && settings.showRubyAnnotation,
                           segments: [
                             RubySegment.word(
                               hanzi: _entry.simplified,
@@ -258,31 +305,33 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                           ],
                           hanziStyle: theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary,
+                            color: theme.colorScheme.primary,
                           ),
                           pinyinStyle: theme.textTheme.titleMedium?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
                         const SizedBox(height: 4),
-                        Row(
+                        Wrap(
+                          spacing: AppSpacing.sm,
+                          runSpacing: 4,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: AppColors.primaryBlueDark.withAlpha(isDark ? 60 : 35),
+                                color: context.hiAccentBg,
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
                                 _entry.hskLevel > 0 ? 'HSK ${_entry.hskLevel}' : 'Từ điển',
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: isDark ? AppColors.primaryBlueDark : AppColors.primaryBlueDark,
+                                  color: context.hiAccentColor,
                                 ),
                               ),
                             ),
-                            if (_entry.hanviet != null && _entry.hanviet!.isNotEmpty) ...[
-                              const SizedBox(width: AppSpacing.sm),
+                            if (_entry.hanviet != null && _entry.hanviet!.isNotEmpty)
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
@@ -297,16 +346,13 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                                   ),
                                 ),
                               ),
-                            ],
-                            if (_entry.traditional != null && _entry.traditional != _entry.simplified) ...[
-                              const SizedBox(width: AppSpacing.sm),
+                            if (_entry.traditional != null && _entry.traditional != _entry.simplified)
                               Text(
                                 'Phồn thể: ${_entry.traditional}',
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: theme.colorScheme.onSurfaceVariant,
                                 ),
                               ),
-                            ],
                           ],
                         ),
                       ],
@@ -326,7 +372,7 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                                 ? Icons.volume_up_rounded
                                 : Icons.volume_off_rounded,
                             color: _entry.audioUri != null
-                                ? AppColors.primaryBlueDark
+                                ? context.hiAccentColor
                                 : theme.colorScheme.onSurfaceVariant.withAlpha(100),
                           ),
                     onPressed: _handlePlayAudio,
@@ -347,9 +393,9 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
 
                   // Handwriting / Stroke Order Button
                   IconButton.filledTonal(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.draw_rounded,
-                      color: Color(0xFF2563EB),
+                      color: context.hiAccentColor,
                     ),
                     onPressed: _handleOpenWriting,
                     tooltip: 'Luyện viết chữ Hán',
@@ -478,7 +524,7 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                                   borderRadius: BorderRadius.circular(AppRadius.sm),
                                   border: Border(
                                     left: BorderSide(
-                                      color: isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary,
+                                      color: theme.colorScheme.primary,
                                       width: 3,
                                     ),
                                   ),
@@ -492,7 +538,7 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                    if (sense.examplePinyin != null)
+                                    if (settings.showPinyinByDefault && sense.examplePinyin != null)
                                       Text(
                                         sense.examplePinyin!,
                                         style: theme.textTheme.bodySmall?.copyWith(
@@ -507,7 +553,9 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                                         ),
                                       ),
                                     const SizedBox(height: 6),
-                                    Row(
+                                    Wrap(
+                                      spacing: 8,
+                                      runSpacing: 4,
                                       children: [
                                         TextButton.icon(
                                           icon: const Icon(Icons.headphones_rounded, size: 14),
@@ -541,7 +589,6 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                                             }
                                           },
                                         ),
-                                        const SizedBox(width: 8),
                                         TextButton.icon(
                                           icon: const Icon(Icons.record_voice_over_rounded, size: 14),
                                           label: const Text('Shadowing', style: TextStyle(fontSize: 11)),
@@ -589,22 +636,20 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                   // AI Explanation Section
                   if (_aiExplanation != null) ...[
                     HiCard(
-                      backgroundColor: isDark
-                          ? AppColors.cardBackground
-                          : theme.colorScheme.primaryContainer.withAlpha(60),
+                      backgroundColor: context.hiInfoBg,
                       padding: const EdgeInsets.all(AppSpacing.md),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
-                              const Icon(Icons.auto_awesome_rounded, size: 16, color: AppColors.primaryBlueDark),
+                              Icon(Icons.auto_awesome_rounded, size: 16, color: context.hiAccentColor),
                               const SizedBox(width: 6),
                               Text(
                                 'AI Tutor Phân Tích Bổ Sung',
                                 style: theme.textTheme.labelMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary,
+                                  color: context.hiAccentColor,
                                 ),
                               ),
                             ],
@@ -694,9 +739,9 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surfaceContainerHighest.withAlpha(50),
                             borderRadius: BorderRadius.circular(AppRadius.sm),
-                            border: const Border(
+                            border: Border(
                               left: BorderSide(
-                                color: AppColors.primaryBlueDark,
+                                color: context.hiAccentColor,
                                 width: 3,
                               ),
                             ),
@@ -710,12 +755,13 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              Text(
-                                ex.examplePinyin,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
+                              if (settings.showPinyinByDefault)
+                                Text(
+                                  ex.examplePinyin,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
                                 ),
-                              ),
                               if (ex.exampleVi != null && ex.exampleVi!.isNotEmpty)
                                 Text(
                                   ex.exampleVi!,

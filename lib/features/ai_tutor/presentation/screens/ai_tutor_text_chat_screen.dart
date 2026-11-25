@@ -4,16 +4,25 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/network/ai/models/cancel_token.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../settings/presentation/providers/settings_providers.dart';
 import '../../domain/models/tutor_chat_turn.dart';
 import '../../domain/models/tutor_correction.dart';
 import '../../domain/models/tutor_persona.dart';
 import '../../domain/models/tutor_scenario.dart';
 import '../providers/ai_tutor_providers.dart';
+import 'ai_tutor_tab_screen.dart';
 
 /// Screen implementing AI Tutor Text Chat with full streaming, cancellation,
 /// controlled retry, session management, and RubyText rendering.
 class AiTutorTextChatScreen extends ConsumerStatefulWidget {
-  const AiTutorTextChatScreen({super.key});
+  final bool embeddedInTab;
+  final VoidCallback? onSelectPersona;
+
+  const AiTutorTextChatScreen({
+    super.key,
+    this.embeddedInTab = false,
+    this.onSelectPersona,
+  });
 
   @override
   ConsumerState<AiTutorTextChatScreen> createState() => _AiTutorTextChatScreenState();
@@ -293,12 +302,12 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
                       return ListTile(
                         selected: isSelected,
                         selectedTileColor: isDark
-                            ? AppColors.cardBackground
+                            ? theme.colorScheme.primaryContainer.withAlpha(80)
                             : theme.colorScheme.primaryContainer.withAlpha(80),
                         shape: RoundedRectangleBorder(borderRadius: AppRadius.borderSm),
                         leading: Icon(
                           isSelected ? Icons.chat_rounded : Icons.chat_bubble_outline_rounded,
-                          color: isSelected ? AppColors.primaryBlueDark : theme.colorScheme.onSurfaceVariant,
+                          color: isSelected ? sheetContext.hiAccentColor : theme.colorScheme.onSurfaceVariant,
                         ),
                         title: Text(
                           title,
@@ -419,6 +428,168 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
     );
   }
 
+  void _handleSelectPersona() {
+    if (widget.onSelectPersona != null) {
+      widget.onSelectPersona!();
+    } else {
+      AiTutorTabScreen.showPersonaSelectorSheet(context, ref);
+    }
+  }
+
+  Widget _buildPersonaSelectorTrigger(
+    ThemeData theme,
+    TutorPersona persona,
+    TutorScenario scenario,
+  ) {
+    return InkWell(
+      onTap: _handleSelectPersona,
+      borderRadius: AppRadius.borderSm,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: AppDimensions.minTouchTarget),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: 14,
+                backgroundColor: context.hiAccentBg,
+                child: Text(
+                  persona.avatarLabel,
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            persona.nameZh,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(width: 2),
+                        const Icon(Icons.arrow_drop_down_rounded, size: 18),
+                      ],
+                    ),
+                    Text(
+                      scenario.titleVi,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontSize: 10,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChatBody(
+    BuildContext context,
+    ThemeData theme,
+    String? sessionId,
+    TutorScenario scenario,
+  ) {
+    return Column(
+      children: [
+        // Top Context Bar
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xs),
+          decoration: BoxDecoration(
+            color: context.hiAccentBg,
+            border: Border(bottom: BorderSide(color: context.hiBorderColor)),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.lightbulb_outline_rounded, size: 14, color: context.hiAccentColor),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  'Mục tiêu: ${scenario.objectiveVi}',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontSize: 11,
+                    color: context.hiAccentColor,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Messages View
+        Expanded(
+          child: sessionId == null
+              ? const Center(child: HiLoadingIndicator())
+              : ref.watch(sessionMessagesProvider(sessionId)).when(
+                    data: (turns) => _buildMessagesList(turns),
+                    loading: () => const Center(child: HiLoadingIndicator()),
+                    error: (err, _) => Center(
+                      child: Text('Lỗi tải tin nhắn: $err'),
+                    ),
+                  ),
+        ),
+
+        // Suggested prompt chips (AI follow-up suggestions take priority over static scenario prompts)
+        Builder(
+          builder: (context) {
+            if (_isStreaming) return const SizedBox.shrink();
+            final turns = sessionId != null
+                ? ref.watch(sessionMessagesProvider(sessionId)).asData?.value
+                : null;
+            final lastFollowUps =
+                (turns != null && turns.isNotEmpty && turns.last.isAssistant)
+                    ? turns.last.followUpSuggestions
+                    : const <String>[];
+            final promptChips = lastFollowUps.isNotEmpty
+                ? lastFollowUps
+                : scenario.suggestedUserPrompts;
+            if (promptChips.isEmpty) return const SizedBox.shrink();
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 4.0),
+              child: Row(
+                children: promptChips.map((prompt) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: AppSpacing.xs),
+                    child: HiChip(
+                      label: prompt,
+                      onTap: () {
+                        _textController.text = prompt;
+                        _textController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: prompt.length),
+                        );
+                      },
+                    ),
+                  );
+                }).toList(),
+              ),
+            );
+          },
+        ),
+
+        // Bottom Control / Input Bar
+        _buildInputBar(),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -427,58 +598,43 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
     final persona = ref.watch(activePersonaProvider);
     final scenario = ref.watch(activeScenarioProvider);
 
+    if (widget.embeddedInTab) {
+      return SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+              decoration: BoxDecoration(
+                color: context.hiCardSurface,
+                border: Border(bottom: BorderSide(color: context.hiBorderColor)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(child: _buildPersonaSelectorTrigger(theme, persona, scenario)),
+                  IconButton(
+                    icon: const Icon(Icons.history_rounded),
+                    tooltip: 'Danh sách phiên',
+                    onPressed: _showSessionDrawer,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add_comment_outlined),
+                    tooltip: 'Phiên mới',
+                    onPressed: _createNewSession,
+                  ),
+                ],
+              ),
+            ),
+            Expanded(child: _buildChatBody(context, theme, sessionId, scenario)),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 0,
-        title: InkWell(
-          onTap: _showSessionDrawer,
-          borderRadius: AppRadius.borderSm,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircleAvatar(
-                  radius: 14,
-                  backgroundColor: AppColors.primaryBlueDark.withAlpha(40),
-                  child: Text(
-                    persona.avatarLabel,
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Flexible(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            persona.nameZh,
-                            style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(width: 4),
-                          const Icon(Icons.arrow_drop_down_rounded, size: 18),
-                        ],
-                      ),
-                      Text(
-                        scenario.titleVi,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          fontSize: 10,
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        title: _buildPersonaSelectorTrigger(theme, persona, scenario),
         actions: [
           IconButton(
             icon: const Icon(Icons.history_rounded),
@@ -493,86 +649,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
         ],
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            // Top Context Bar
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xs),
-              decoration: const BoxDecoration(
-                color: AppColors.primaryBlueLight,
-                border: Border(bottom: BorderSide(color: AppColors.border)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.lightbulb_outline_rounded, size: 14, color: AppColors.primaryBlueDark),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      'Mục tiêu: ${scenario.objectiveVi}',
-                      style: theme.textTheme.bodySmall?.copyWith(fontSize: 11, color: AppColors.primaryBlueDark, fontWeight: FontWeight.w500),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Messages View
-            Expanded(
-              child: sessionId == null
-                  ? const Center(child: HiLoadingIndicator())
-                  : ref.watch(sessionMessagesProvider(sessionId)).when(
-                        data: (turns) => _buildMessagesList(turns),
-                        loading: () => const Center(child: HiLoadingIndicator()),
-                        error: (err, _) => Center(
-                          child: Text('Lỗi tải tin nhắn: $err'),
-                        ),
-                      ),
-            ),
-
-            // Suggested prompt chips (AI follow-up suggestions take priority over static scenario prompts)
-            Builder(
-              builder: (context) {
-                if (_isStreaming) return const SizedBox.shrink();
-                final turns = sessionId != null
-                    ? ref.watch(sessionMessagesProvider(sessionId)).asData?.value
-                    : null;
-                final lastFollowUps =
-                    (turns != null && turns.isNotEmpty && turns.last.isAssistant)
-                        ? turns.last.followUpSuggestions
-                        : const <String>[];
-                final promptChips = lastFollowUps.isNotEmpty
-                    ? lastFollowUps
-                    : scenario.suggestedUserPrompts;
-                if (promptChips.isEmpty) return const SizedBox.shrink();
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 4.0),
-                  child: Row(
-                    children: promptChips.map((prompt) {
-                      return Padding(
-                        padding: const EdgeInsets.only(right: AppSpacing.xs),
-                        child: HiChip(
-                          label: prompt,
-                          onTap: () {
-                            _textController.text = prompt;
-                            _textController.selection = TextSelection.fromPosition(
-                              TextPosition(offset: prompt.length),
-                            );
-                          },
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                );
-              },
-            ),
-
-            // Bottom Control / Input Bar
-            _buildInputBar(),
-          ],
-        ),
+        child: _buildChatBody(context, theme, sessionId, scenario),
       ),
     );
   }
@@ -596,7 +673,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
 
   Widget _buildChatTurnItem(TutorChatTurn turn, {required bool isLast}) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final settings = ref.watch(appSettingsProvider);
 
     if (turn.isUser) {
       return Align(
@@ -654,7 +731,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
         margin: const EdgeInsets.only(bottom: AppSpacing.md, right: AppSpacing.xxl),
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: AppColors.cardBackground,
+          color: context.hiCardSurface,
           borderRadius: BorderRadius.only(
             topLeft: AppRadius.rMd,
             topRight: AppRadius.rMd,
@@ -662,7 +739,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
             bottomLeft: Radius.zero,
           ),
           border: Border.all(
-            color: AppColors.border,
+            color: context.hiBorderColor,
           ),
         ),
         child: Column(
@@ -671,7 +748,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
             // Hanzi + Ruby Pinyin
             RubyText.fromAnnotatedString(
               annotatedText: turn.content,
-              showPinyin: true,
+              showPinyin: settings.showPinyinByDefault && settings.showRubyAnnotation,
               onSegmentTap: (segment) {
                 if (segment.pinyin != null) {
                   HiSnackBar.showInfo(
@@ -682,12 +759,12 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
               },
             ),
 
-            if (!turn.content.contains('[') && hasPinyin) ...[
+            if (settings.showPinyinByDefault && !turn.content.contains('[') && hasPinyin) ...[
               const SizedBox(height: 4),
               Text(
                 turn.pinyin!,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary,
+                  color: context.hiAccentColor,
                   fontFamily: 'NotoSans',
                   fontSize: 12,
                 ),
@@ -707,9 +784,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? AppColors.cardBackground
-                        : theme.colorScheme.surfaceContainerHighest.withAlpha(90),
+                    color: context.hiSecondarySurface,
                     borderRadius: AppRadius.borderSm,
                   ),
                   child: Text(
@@ -732,7 +807,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
                     icon: Icon(
                       isTranslationExpanded ? Icons.translate_rounded : Icons.translate_outlined,
                       size: 16,
-                      color: isTranslationExpanded ? AppColors.primaryBlueDark : theme.colorScheme.onSurfaceVariant,
+                      color: isTranslationExpanded ? context.hiAccentColor : theme.colorScheme.onSurfaceVariant,
                     ),
                     tooltip: isTranslationExpanded ? 'Ẩn bản dịch' : 'Xem bản dịch tiếng Việt',
                     onPressed: () {
@@ -769,13 +844,12 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
 
   Widget _buildPedagogicalCorrectionCard(TutorEvaluation evaluation) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.cardBackground : const Color(0xFFFFF9E6),
-        border: Border.all(color: Colors.amber.shade400, width: 0.8),
+        color: context.hiWarningBg,
+        border: Border.all(color: context.hiWarningFg.withAlpha(140), width: 0.8),
         borderRadius: AppRadius.borderSm,
       ),
       child: Column(
@@ -783,13 +857,13 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.school_rounded, size: 14, color: Colors.amber),
+              Icon(Icons.school_rounded, size: 14, color: context.hiWarningFg),
               const SizedBox(width: 4),
               Text(
                 'Góp ý sư phạm (3 bước)',
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: Colors.amber.shade800,
+                  color: context.hiWarningFg,
                 ),
               ),
             ],
@@ -798,12 +872,18 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
           if (evaluation.encouragementVi.isNotEmpty)
             Text(
               '1. ${evaluation.encouragementVi}',
-              style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontSize: 11,
+                color: context.hiPrimaryText,
+              ),
             ),
           if (evaluation.gentleFeedbackVi.isNotEmpty)
             Text(
               '2. ${evaluation.gentleFeedbackVi}',
-              style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontSize: 11,
+                color: context.hiPrimaryText,
+              ),
             ),
           if (evaluation.modelCorrectionZh.isNotEmpty)
             Text(
@@ -811,7 +891,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
               style: theme.textTheme.bodySmall?.copyWith(
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
-                color: AppColors.primaryBlueDark,
+                color: context.hiAccentColor,
               ),
             ),
         ],
@@ -821,6 +901,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
 
   Widget _buildStreamingBubble() {
     final theme = Theme.of(context);
+    final accent = context.hiAccentColor;
 
     return Align(
       alignment: Alignment.centerLeft,
@@ -828,7 +909,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
         margin: const EdgeInsets.only(bottom: AppSpacing.md, right: AppSpacing.xxl),
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: AppColors.cardBackground,
+          color: context.hiCardSurface,
           borderRadius: BorderRadius.only(
             topLeft: AppRadius.rMd,
             topRight: AppRadius.rMd,
@@ -836,7 +917,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
             bottomLeft: Radius.zero,
           ),
           border: Border.all(
-            color: AppColors.primaryBlueDark,
+            color: accent,
             width: 1.2,
           ),
         ),
@@ -846,16 +927,16 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(
+                SizedBox(
                   width: 12,
                   height: 12,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primaryBlueDark),
+                  child: CircularProgressIndicator(strokeWidth: 2, color: accent),
                 ),
                 const SizedBox(width: 8),
                 Text(
                   'AI Tutor đang trả lời...',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.primaryBlueDark,
+                    color: accent,
                     fontWeight: FontWeight.bold,
                     fontSize: 11,
                   ),

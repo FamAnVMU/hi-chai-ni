@@ -166,10 +166,12 @@ class HiButton extends StatelessWidget {
       );
     }
 
-    // Enforce minimum 48x48dp touch target standard
-    Widget buttonWidget = AnimatedContainer(
+    // Enforce minimum 48x48dp touch target standard around the InkWell itself
+    final visualButton = AnimatedContainer(
       duration: const Duration(milliseconds: 150),
       curve: Curves.easeOut,
+      height: buttonHeight,
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: AppRadius.borderMd,
@@ -177,6 +179,13 @@ class HiButton extends StatelessWidget {
             ? Border.fromBorderSide(borderSide)
             : null,
       ),
+      alignment: Alignment.center,
+      child: content,
+    );
+
+    Widget buttonWidget = Semantics(
+      button: true,
+      enabled: isEnabled,
       child: Material(
         color: Colors.transparent,
         borderRadius: AppRadius.borderMd,
@@ -185,28 +194,20 @@ class HiButton extends StatelessWidget {
           borderRadius: AppRadius.borderMd,
           splashColor: foregroundColor.withAlpha(20),
           highlightColor: foregroundColor.withAlpha(10),
-          child: Container(
-            height: buttonHeight,
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-            alignment: Alignment.center,
-            child: content,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              minHeight: AppDimensions.minTouchTarget,
+              minWidth: AppDimensions.minTouchTarget,
+            ),
+            child: Center(
+              widthFactor: isFullWidth ? null : 1.0,
+              heightFactor: 1.0,
+              child: visualButton,
+            ),
           ),
         ),
       ),
     );
-
-    // If button height is less than 48dp, ensure hit area is wrapped in minimum touch target
-    if (buttonHeight < AppDimensions.minTouchTarget) {
-      buttonWidget = ConstrainedBox(
-        constraints: const BoxConstraints(
-          minHeight: AppDimensions.minTouchTarget,
-          minWidth: AppDimensions.minTouchTarget,
-        ),
-        child: Center(
-          child: buttonWidget,
-        ),
-      );
-    }
 
     if (isFullWidth) {
       return SizedBox(

@@ -13,8 +13,8 @@ class GrammarRuleCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return HiCard(
-      backgroundColor: AppColors.cardBackground,
-      borderColor: AppColors.border,
+      backgroundColor: context.hiCardSurface,
+      borderColor: context.hiBorderColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -23,13 +23,13 @@ class GrammarRuleCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryBlueLight,
+                  color: context.hiAccentBg,
                   borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: Text(
                   'HSK ${item.hskLevel}',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: AppColors.primaryBlueDark,
+                    color: context.hiAccentColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -40,7 +40,7 @@ class GrammarRuleCard extends StatelessWidget {
                   item.title,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.primaryText,
+                    color: context.hiPrimaryText,
                   ),
                 ),
               ),
@@ -56,10 +56,10 @@ class GrammarRuleCard extends StatelessWidget {
               vertical: AppSpacing.sm,
             ),
             decoration: BoxDecoration(
-              color: AppColors.primaryBlueLight,
+              color: context.hiAccentBg,
               borderRadius: BorderRadius.circular(AppRadius.md),
               border: Border.all(
-                color: AppColors.secondaryBlue,
+                color: context.hiAccentColor.withAlpha(110),
               ),
             ),
             child: Column(
@@ -68,7 +68,7 @@ class GrammarRuleCard extends StatelessWidget {
                 Text(
                   'Cấu trúc:',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: AppColors.secondaryText,
+                    color: context.hiSecondaryText,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -77,7 +77,7 @@ class GrammarRuleCard extends StatelessWidget {
                   item.structure,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.primaryBlueDark,
+                    color: context.hiAccentColor,
                     fontFamily: 'monospace',
                   ),
                 ),
@@ -122,17 +122,17 @@ class GrammarRuleCard extends StatelessWidget {
           // Source attribution
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.menu_book_rounded,
                 size: 14,
-                color: AppColors.mutedText,
+                color: context.hiSecondaryText,
               ),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
                   'Nguồn: ${item.source}',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: AppColors.mutedText,
+                    color: context.hiSecondaryText,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -155,18 +155,18 @@ class GrammarRuleCard extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 16, color: AppColors.primaryBlueDark),
+        Icon(icon, size: 16, color: context.hiAccentColor),
         const SizedBox(width: AppSpacing.xs),
         Expanded(
           child: Text.rich(
             TextSpan(
-              style: theme.textTheme.bodySmall?.copyWith(color: AppColors.primaryText),
+              style: theme.textTheme.bodySmall?.copyWith(color: context.hiPrimaryText),
               children: [
                 TextSpan(
                   text: '$title ',
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryText),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: context.hiPrimaryText),
                 ),
-                TextSpan(text: content, style: const TextStyle(color: AppColors.secondaryText)),
+                TextSpan(text: content, style: TextStyle(color: context.hiSecondaryText)),
               ],
             ),
           ),

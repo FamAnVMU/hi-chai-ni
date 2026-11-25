@@ -4,6 +4,7 @@ import '../../../../core/database/app_database.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../hanzi/hanzi.dart';
 import '../../../sentences/sentences.dart';
+import '../../../settings/presentation/providers/settings_providers.dart';
 import '../../data/dictionary_repository.dart';
 import '../../domain/models/dictionary_models.dart';
 import '../widgets/dictionary_detail_sheet.dart';
@@ -128,6 +129,7 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final showPinyin = readAppSettingsOrDefault(context).showPinyinByDefault;
 
     return Scaffold(
       appBar: AppBar(
@@ -173,9 +175,9 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
         ],
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: AppColors.primaryBlueDark,
-          labelColor: AppColors.primaryBlueDark,
-          unselectedLabelColor: AppColors.secondaryText,
+          indicatorColor: context.hiAccentColor,
+          labelColor: context.hiAccentColor,
+          unselectedLabelColor: context.hiSecondaryText,
           tabs: const [
             Tab(text: 'Tra cứu', icon: Icon(Icons.search_rounded)),
             Tab(text: 'Đã lưu', icon: Icon(Icons.bookmark_rounded)),
@@ -187,10 +189,10 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
         controller: _tabController,
         children: [
           // Tab 0: Search Tab
-          _buildSearchTab(theme, isDark),
+          _buildSearchTab(theme, isDark, showPinyin),
 
           // Tab 1: Saved Words Tab
-          _buildSavedWordsTab(theme, isDark),
+          _buildSavedWordsTab(theme, isDark, showPinyin),
 
           // Tab 2: History Tab
           _buildHistoryTab(theme, isDark),
@@ -199,7 +201,7 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
     );
   }
 
-  Widget _buildSearchTab(ThemeData theme, bool isDark) {
+  Widget _buildSearchTab(ThemeData theme, bool isDark, bool showPinyin) {
     return Column(
       children: [
         // Search Input Field
@@ -209,7 +211,7 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
             controller: _searchController,
             decoration: InputDecoration(
               hintText: 'Nhập chữ Hán, Pinyin (ni3 hao3 / nihao), nghĩa tiếng Việt...',
-              prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primaryBlueDark),
+              prefixIcon: Icon(Icons.search_rounded, color: context.hiAccentColor),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.clear_rounded),
@@ -220,19 +222,19 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
                     )
                   : null,
               filled: true,
-              fillColor: AppColors.inputBackground,
+              fillColor: context.hiInputSurface,
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: AppColors.border),
+                borderSide: BorderSide(color: context.hiBorderColor),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: AppColors.border),
+                borderSide: BorderSide(color: context.hiBorderColor),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: AppColors.primaryBlueDark, width: 1.5),
+                borderSide: BorderSide(color: context.hiAccentColor, width: 1.5),
               ),
             ),
             onChanged: _onSearchChanged,
@@ -277,67 +279,77 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
                             final entry = _searchResults[index];
                             final primarySense = entry.senses.isNotEmpty ? entry.senses.first : null;
 
-                            return ListTile(
-                              title: Row(
-                                children: [
-                                  Text(
-                                    entry.simplified,
-                                    style: theme.textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.primaryText,
+                            return Semantics(
+                              button: true,
+                              label: 'Xem chi tiết từ ${entry.simplified}, ${entry.pinyin}',
+                              child: ListTile(
+                                title: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Wrap(
+                                        spacing: AppSpacing.xs,
+                                        crossAxisAlignment: WrapCrossAlignment.center,
+                                        children: [
+                                          Text(
+                                            entry.simplified,
+                                            style: theme.textTheme.titleMedium?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                              color: context.hiPrimaryText,
+                                            ),
+                                          ),
+                                          if (showPinyin)
+                                            Text(
+                                              entry.pinyin,
+                                              style: theme.textTheme.bodyMedium?.copyWith(
+                                                color: context.hiAccentColor,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          if (entry.hanviet != null && entry.hanviet!.isNotEmpty)
+                                            Text(
+                                              '(${entry.hanviet})',
+                                              style: theme.textTheme.bodySmall?.copyWith(
+                                                color: context.hiWarningFg,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 11,
+                                              ),
+                                            ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: AppSpacing.sm),
-                                  Text(
-                                    entry.pinyin,
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: AppColors.primaryBlueDark,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  if (entry.hanviet != null && entry.hanviet!.isNotEmpty) ...[
                                     const SizedBox(width: AppSpacing.xs),
-                                    Text(
-                                      '(${entry.hanviet})',
-                                      style: theme.textTheme.bodySmall?.copyWith(
-                                        color: Colors.amber[800],
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 11,
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: context.hiAccentBg,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        entry.hskLevel > 0 ? 'HSK ${entry.hskLevel}' : 'Từ điển',
+                                        style: theme.textTheme.labelSmall?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: context.hiAccentColor,
+                                        ),
                                       ),
                                     ),
                                   ],
-                                  const Spacer(),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primaryBlueLight,
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      entry.hskLevel > 0 ? 'HSK ${entry.hskLevel}' : 'Từ điển',
-                                      style: theme.textTheme.labelSmall?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primaryBlueDark,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                ),
+                                subtitle: primarySense != null
+                                    ? Text(
+                                        '${primarySense.partOfSpeech}: ${primarySense.meaningVi}',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      )
+                                    : null,
+                                trailing: const Icon(Icons.chevron_right_rounded),
+                                onTap: () {
+                                  DictionaryDetailSheet.show(
+                                    context,
+                                    entry: entry,
+                                    repository: _repository,
+                                  );
+                                },
                               ),
-                              subtitle: primarySense != null
-                                  ? Text(
-                                      '${primarySense.partOfSpeech}: ${primarySense.meaningVi}',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    )
-                                  : null,
-                              trailing: const Icon(Icons.chevron_right_rounded),
-                              onTap: () {
-                                DictionaryDetailSheet.show(
-                                  context,
-                                  entry: entry,
-                                  repository: _repository,
-                                );
-                              },
                             );
                           },
                         ),
@@ -352,10 +364,10 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
       children: [
         Card(
           elevation: 0,
-          color: AppColors.primaryBlueLight.withAlpha(50),
+          color: context.hiAccentBg.withAlpha(context.isDarkMode ? 120 : 80),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: AppColors.primaryBlueDark.withAlpha(50)),
+            side: BorderSide(color: context.hiAccentColor.withAlpha(70)),
           ),
           child: ListTile(
             leading: const CircleAvatar(
@@ -428,7 +440,7 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
     );
   }
 
-  Widget _buildSavedWordsTab(ThemeData theme, bool isDark) {
+  Widget _buildSavedWordsTab(ThemeData theme, bool isDark, bool showPinyin) {
     if (_isLoadingSaved) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -468,27 +480,34 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
         separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.sm),
         itemBuilder: (context, index) {
           final word = _savedWords[index];
-          return HiCard(
-            child: ListTile(
-              title: Row(
-                children: [
-                  Text(
-                    word.simplified,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryText,
+          return Semantics(
+            button: true,
+            label: 'Từ đã lưu ${word.simplified}, ${word.pinyin}',
+            child: HiCard(
+              child: ListTile(
+                title: Row(
+                  children: [
+                    Text(
+                      word.simplified,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: context.hiPrimaryText,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Text(
-                    word.pinyin,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.primaryBlueDark,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
+                    if (showPinyin) ...[
+                      const SizedBox(width: AppSpacing.sm),
+                      Flexible(
+                        child: Text(
+                          word.pinyin,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: context.hiAccentColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               subtitle: word.customNote != null
                   ? Padding(
                       padding: const EdgeInsets.only(top: 4),
@@ -519,6 +538,7 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
                 }
               },
             ),
+          ),
           );
         },
       ),

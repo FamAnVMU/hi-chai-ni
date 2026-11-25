@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/app_clock.dart';
+import '../../../settings/presentation/providers/settings_providers.dart';
 import '../../data/sentence_repository.dart';
 import '../../domain/models/sentence_models.dart';
 import '../../domain/services/sentence_audio_manager.dart';
@@ -32,6 +34,9 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
   late final DateTime _screenOpenedAt;
   bool _isPlaying = false;
   bool _isCompleted = false;
+  bool _showPinyin = true;
+  bool _didInitFromSettings = false;
+  double _speechRate = 1.0;
 
   // Comprehension check state
   int? _selectedCheckOptionIndex;
@@ -46,6 +51,17 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
     _playingSub = _audioManager.isPlayingStream.listen((playing) {
       if (mounted) setState(() => _isPlaying = playing);
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_didInitFromSettings) {
+      _didInitFromSettings = true;
+      final settings = readAppSettingsOrDefault(context);
+      _showPinyin = settings.showPinyinByDefault;
+      _speechRate = settings.speechRate;
+    }
   }
 
   /// Calculates minimum required reading time based on standard beginner Chinese reading speed
@@ -90,12 +106,12 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
+                    color: ctx.hiAccentBg,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     'HSK ${token.hskLevel}',
-                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade700),
+                    style: TextStyle(fontWeight: FontWeight.bold, color: ctx.hiAccentColor),
                   ),
                 ),
               ],
@@ -103,7 +119,7 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
             const SizedBox(height: 6),
             Text(
               token.pinyin,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2563EB)),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: ctx.hiAccentColor),
             ),
             const SizedBox(height: 12),
             Text(
@@ -117,7 +133,7 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
                   child: OutlinedButton.icon(
                     icon: const Icon(Icons.volume_up),
                     label: const Text('Phát âm từ này'),
-                    onPressed: () => _audioManager.playTts(token.word),
+                    onPressed: () => _audioManager.playTts(token.word, speed: _speechRate),
                   ),
                 ),
               ],
@@ -136,6 +152,13 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
       appBar: AppBar(
         title: const Text('Luyện đọc & Phân tích câu'),
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(_showPinyin ? Icons.subtitles_rounded : Icons.subtitles_off_outlined),
+            tooltip: _showPinyin ? 'Ẩn Pinyin' : 'Hiện Pinyin',
+            onPressed: () => setState(() => _showPinyin = !_showPinyin),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -147,23 +170,33 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.hiCardSurface,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(color: context.hiBorderColor),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withAlpha(8), blurRadius: 10, offset: const Offset(0, 3)),
+                  BoxShadow(
+                    color: Colors.black.withAlpha(context.isDarkMode ? 24 : 8),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
                 ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   // Full Sentence Pinyin
-                  Text(
-                    s.pinyin,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 16, color: Color(0xFF2563EB), fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 12),
+                  if (_showPinyin) ...[
+                    Text(
+                      s.pinyin,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: context.hiAccentColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
 
                   // Interactive Tokenized Hanzi
                   Wrap(
@@ -178,19 +211,30 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: Colors.blue.shade50.withAlpha(80),
+                                  color: context.hiAccentBg.withAlpha(context.isDarkMode ? 140 : 120),
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.blue.shade200),
+                                  border: Border.all(color: context.hiAccentColor.withAlpha(110)),
                                 ),
                                 child: Text(
                                   token.word,
-                                  style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.bold,
+                                    color: context.hiPrimaryText,
+                                  ),
                                 ),
                               ),
                             );
                           }).toList()
                         : [
-                            Text(s.chinese, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+                            Text(
+                              s.chinese,
+                              style: TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                                color: context.hiPrimaryText,
+                              ),
+                            ),
                           ],
                   ),
                   const SizedBox(height: 16),
@@ -201,14 +245,18 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
                   Text(
                     s.translationVi.isNotEmpty ? s.translationVi : s.translationEn,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.black87),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: context.hiPrimaryText,
+                    ),
                   ),
                   if (s.translationEn.isNotEmpty && s.translationVi.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Text(
                       s.translationEn,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 13, color: Colors.grey),
+                      style: TextStyle(fontSize: 13, color: context.hiSecondaryText),
                     ),
                   ],
                 ],
@@ -221,14 +269,14 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
             Center(
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2563EB),
-                  foregroundColor: Colors.white,
+                  backgroundColor: context.hiAccentColor,
+                  foregroundColor: context.isDarkMode ? AppColors.darkForestBg : Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 ),
                 icon: Icon(_isPlaying ? Icons.pause : Icons.volume_up),
                 label: Text(_isPlaying ? 'Đang phát...' : 'Nghe phát âm'),
-                onPressed: () => _audioManager.playSentence(s),
+                onPressed: () => _audioManager.playSentence(s, speed: _speechRate),
               ),
             ),
 
@@ -242,9 +290,9 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.amber.shade50,
+                  color: context.hiWarningBg,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.amber.shade200),
+                  border: Border.all(color: context.hiWarningFg.withAlpha(110)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -253,12 +301,12 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: Row(
                         children: [
-                          const Icon(Icons.bookmark, size: 16, color: Colors.amber),
+                          Icon(Icons.bookmark, size: 16, color: context.hiWarningFg),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               g,
-                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.amber.shade900),
+                              style: TextStyle(fontWeight: FontWeight.bold, color: context.hiWarningFg),
                             ),
                           ),
                         ],
@@ -281,7 +329,7 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
                   child: ListTile(
                     title: Text(t.word, style: const TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Text('${t.pinyin} • ${t.meaningVi}'),
-                    trailing: Text('HSK ${t.hskLevel}', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                    trailing: Text('HSK ${t.hskLevel}', style: TextStyle(color: context.hiSecondaryText, fontSize: 12)),
                     onTap: () => _onTokenTapped(t),
                   ),
                 ),
@@ -294,23 +342,25 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade50.withAlpha(120),
+                  color: context.hiInfoBg,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.blue.shade200),
+                  border: Border.all(color: context.hiAccentColor.withAlpha(110)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.quiz_outlined, color: Colors.blue.shade700, size: 20),
+                        Icon(Icons.quiz_outlined, color: context.hiAccentColor, size: 20),
                         const SizedBox(width: 8),
-                        Text(
-                          'Câu hỏi đọc hiểu (Comprehension Check):',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                            color: Colors.blue.shade900,
+                        Expanded(
+                          child: Text(
+                            'Câu hỏi đọc hiểu (Comprehension Check):',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                              color: context.hiAccentColor,
+                            ),
                           ),
                         ),
                       ],
@@ -318,7 +368,11 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
                     const SizedBox(height: 10),
                     Text(
                       _effectiveCheck!.question,
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: context.hiPrimaryText,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     for (int i = 0; i < _effectiveCheck!.options.length; i++) ...[
@@ -338,24 +392,24 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
                           decoration: BoxDecoration(
                             color: _isAnswerSubmitted
                                 ? (i == _effectiveCheck!.correctOptionIndex
-                                    ? Colors.green.shade50
+                                    ? context.hiSuccessBg
                                     : (i == _selectedCheckOptionIndex
-                                        ? Colors.red.shade50
-                                        : Colors.white))
+                                        ? context.hiErrorBg
+                                        : context.hiCardSurface))
                                 : (_selectedCheckOptionIndex == i
-                                    ? Colors.blue.shade100
-                                    : Colors.white),
+                                    ? context.hiAccentBg
+                                    : context.hiCardSurface),
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
                               color: _isAnswerSubmitted
                                   ? (i == _effectiveCheck!.correctOptionIndex
-                                      ? Colors.green
+                                      ? context.hiSuccessFg
                                       : (i == _selectedCheckOptionIndex
-                                          ? Colors.red
-                                          : Colors.grey.shade300))
+                                          ? context.hiErrorFg
+                                          : context.hiBorderColor))
                                   : (_selectedCheckOptionIndex == i
-                                      ? Colors.blue
-                                      : Colors.grey.shade300),
+                                      ? context.hiAccentColor
+                                      : context.hiBorderColor),
                               width: _selectedCheckOptionIndex == i ? 1.5 : 1.0,
                             ),
                           ),
@@ -363,17 +417,23 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
                             children: [
                               Text(
                                 '${String.fromCharCode(65 + i)}. ',
-                                style: const TextStyle(fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: context.hiPrimaryText,
+                                ),
                               ),
                               Expanded(
-                                child: Text(_effectiveCheck!.options[i]),
+                                child: Text(
+                                  _effectiveCheck!.options[i],
+                                  style: TextStyle(color: context.hiPrimaryText),
+                                ),
                               ),
                               if (_isAnswerSubmitted && i == _effectiveCheck!.correctOptionIndex)
-                                const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                                Icon(Icons.check_circle, color: context.hiSuccessFg, size: 20),
                               if (_isAnswerSubmitted &&
                                   i == _selectedCheckOptionIndex &&
                                   i != _effectiveCheck!.correctOptionIndex)
-                                const Icon(Icons.cancel, color: Colors.red, size: 20),
+                                Icon(Icons.cancel, color: context.hiErrorFg, size: 20),
                             ],
                           ),
                         ),
@@ -402,7 +462,7 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
                         style: TextStyle(
                           fontSize: 13,
                           fontStyle: FontStyle.italic,
-                          color: _isCheckCorrect == true ? Colors.green.shade800 : Colors.red.shade800,
+                          color: _isCheckCorrect == true ? context.hiSuccessFg : context.hiErrorFg,
                         ),
                       ),
                     ],

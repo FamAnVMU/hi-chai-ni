@@ -18,6 +18,14 @@ abstract class TtsService {
 }
 
 class DefaultTtsService implements TtsService {
+  /// Global default user-configured speech rate multiplier (`0.8` / `1.0` / `1.2`),
+  /// synced from [AppSettings.speechRate] whenever settings load or change.
+  static double defaultSpeechRate = 1.0;
+
+  /// Converts an app speech-rate multiplier (`0.8 / 1.0 / 1.2`) into the
+  /// `flutter_tts` rate scale (`0.4 / 0.5 / 0.6`).
+  static double toTtsRate(double speechRate) => (speechRate * 0.5).clamp(0.2, 1.0);
+
   final FlutterTts _flutterTts;
 
   DefaultTtsService({FlutterTts? flutterTts}) : _flutterTts = flutterTts ?? FlutterTts() {
@@ -73,7 +81,8 @@ class DefaultTtsService implements TtsService {
         await _flutterTts.awaitSpeakCompletion(true);
       } catch (_) {}
       await _flutterTts.setLanguage(language);
-      await _flutterTts.setSpeechRate(rate);
+      final effectiveRate = rate == 0.5 ? toTtsRate(defaultSpeechRate) : rate;
+      await _flutterTts.setSpeechRate(effectiveRate);
       await _flutterTts.setPitch(pitch);
       await _flutterTts.setVolume(volume);
 

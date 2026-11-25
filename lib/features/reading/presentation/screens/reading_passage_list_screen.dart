@@ -169,11 +169,11 @@ class _ReadingPassageListScreenState extends State<ReadingPassageListScreen> {
                           labelStyle: TextStyle(
                             fontSize: 12,
                             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                            color: isSelected ? Colors.white : AppColors.primaryText,
+                            color: isSelected ? Colors.white : context.hiPrimaryText,
                           ),
                           backgroundColor: theme.colorScheme.surfaceContainerHighest.withAlpha(60),
                           side: BorderSide(
-                            color: isSelected ? AppColors.primaryBlueDark : AppColors.border,
+                            color: isSelected ? AppColors.primaryBlueDark : context.hiBorderColor,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(AppRadius.full),
@@ -204,16 +204,16 @@ class _ReadingPassageListScreenState extends State<ReadingPassageListScreen> {
                         child: ActionChip(
                           label: Text(topicLabel),
                           backgroundColor: isSelected
-                              ? AppColors.primaryBlueLight
+                              ? context.hiAccentBg
                               : theme.colorScheme.surface,
                           side: BorderSide(
-                            color: isSelected ? AppColors.primaryBlueDark : AppColors.border,
+                            color: isSelected ? context.hiAccentColor : context.hiBorderColor,
                             width: isSelected ? 1.5 : 1.0,
                           ),
                           labelStyle: TextStyle(
                             fontSize: 11,
                             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                            color: isSelected ? AppColors.primaryBlueDark : AppColors.secondaryText,
+                            color: isSelected ? context.hiAccentColor : context.hiSecondaryText,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(AppRadius.md),
@@ -231,7 +231,7 @@ class _ReadingPassageListScreenState extends State<ReadingPassageListScreen> {
               ],
             ),
           ),
-          const Divider(height: 1, color: AppColors.divider),
+          Divider(height: 1, color: context.hiBorderColor),
 
           // Passage List
           Expanded(
@@ -282,24 +282,26 @@ class _ReadingPassageListScreenState extends State<ReadingPassageListScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   // Top row: HSK Level Badge, Topic Chip, and Completion Status
-                                  Row(
+                                  Wrap(
+                                    spacing: AppSpacing.xs,
+                                    runSpacing: AppSpacing.xs,
+                                    crossAxisAlignment: WrapCrossAlignment.center,
                                     children: [
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                         decoration: BoxDecoration(
-                                          color: AppColors.primaryBlueLight,
+                                          color: context.hiAccentBg,
                                           borderRadius: BorderRadius.circular(AppRadius.xs),
-                                          border: Border.all(color: AppColors.secondaryBlue),
+                                          border: Border.all(color: context.hiAccentColor.withAlpha(110)),
                                         ),
                                         child: Text(
                                           'HSK ${passage.hskLevel}',
                                           style: theme.textTheme.labelSmall?.copyWith(
                                             fontWeight: FontWeight.bold,
-                                            color: AppColors.primaryBlueDark,
+                                            color: context.hiAccentColor,
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(width: AppSpacing.xs),
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                         decoration: BoxDecoration(
@@ -308,32 +310,30 @@ class _ReadingPassageListScreenState extends State<ReadingPassageListScreen> {
                                         ),
                                         child: Text(
                                           passage.topic,
+                                          overflow: TextOverflow.ellipsis,
                                           style: theme.textTheme.labelSmall?.copyWith(
-                                            color: AppColors.secondaryText,
+                                            color: context.hiSecondaryText,
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
                                       ),
-                                      const Spacer(),
-
-                                      // Completion badge if completed
                                       if (progress != null && progress.isCompleted)
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                           decoration: BoxDecoration(
-                                            color: AppColors.successContainerLight,
+                                            color: context.hiSuccessBg,
                                             borderRadius: BorderRadius.circular(AppRadius.full),
-                                            border: Border.all(color: AppColors.success.withAlpha(90)),
+                                            border: Border.all(color: context.hiSuccessFg.withAlpha(90)),
                                           ),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              const Icon(Icons.check_circle_rounded, size: 12, color: AppColors.success),
+                                              Icon(Icons.check_circle_rounded, size: 12, color: context.hiSuccessFg),
                                               const SizedBox(width: 4),
                                               Text(
                                                 'Đã đọc xong ${progress.score != null ? "(${progress.score!.toStringAsFixed(0)}%)" : ""}',
                                                 style: theme.textTheme.labelSmall?.copyWith(
-                                                  color: AppColors.success,
+                                                  color: context.hiSuccessFg,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
@@ -349,7 +349,7 @@ class _ReadingPassageListScreenState extends State<ReadingPassageListScreen> {
                                     passage.titleCn,
                                     style: theme.textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
-                                      color: AppColors.primaryText,
+                                      color: context.hiPrimaryText,
                                       fontSize: 17,
                                     ),
                                   ),
@@ -359,7 +359,7 @@ class _ReadingPassageListScreenState extends State<ReadingPassageListScreen> {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: theme.textTheme.bodySmall?.copyWith(
-                                      color: AppColors.secondaryText,
+                                      color: context.hiSecondaryText,
                                       height: 1.3,
                                     ),
                                   ),
@@ -371,29 +371,40 @@ class _ReadingPassageListScreenState extends State<ReadingPassageListScreen> {
                                   ],
 
                                   const SizedBox(height: AppSpacing.md),
-                                  const Divider(height: 1, color: AppColors.divider),
+                                  Divider(height: 1, color: context.hiBorderColor),
                                   const SizedBox(height: AppSpacing.sm),
 
                                   // Bottom Meta Row: Character Count, Estimated Time, Audio Button & Read CTA
-                                  Row(
+                                  Wrap(
+                                    spacing: AppSpacing.md,
+                                    runSpacing: AppSpacing.xs,
+                                    crossAxisAlignment: WrapCrossAlignment.center,
                                     children: [
-                                      const Icon(Icons.text_fields_rounded, size: 14, color: AppColors.secondaryText),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '${passage.wordCount} chữ Hán',
-                                        style: theme.textTheme.bodySmall?.copyWith(color: AppColors.secondaryText),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.text_fields_rounded, size: 14, color: context.hiSecondaryText),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            '${passage.wordCount} chữ Hán',
+                                            style: theme.textTheme.bodySmall?.copyWith(color: context.hiSecondaryText),
+                                          ),
+                                        ],
                                       ),
-                                      const SizedBox(width: AppSpacing.md),
-                                      const Icon(Icons.schedule_rounded, size: 14, color: AppColors.secondaryText),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '${passage.estimatedMinutes} phút',
-                                        style: theme.textTheme.bodySmall?.copyWith(color: AppColors.secondaryText),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.schedule_rounded, size: 14, color: context.hiSecondaryText),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            '${passage.estimatedMinutes} phút',
+                                            style: theme.textTheme.bodySmall?.copyWith(color: context.hiSecondaryText),
+                                          ),
+                                        ],
                                       ),
-                                      const Spacer(),
 
                                       // Direct "Nghe bài đọc" button if audio file is available
-                                      if (passage.audioUri != null && passage.audioUri!.isNotEmpty) ...[
+                                      if (passage.audioUri != null && passage.audioUri!.isNotEmpty)
                                         InkWell(
                                           onTap: () => _toggleAudio(passage),
                                           borderRadius: BorderRadius.circular(AppRadius.full),
@@ -402,9 +413,9 @@ class _ReadingPassageListScreenState extends State<ReadingPassageListScreen> {
                                             decoration: BoxDecoration(
                                               color: isAudioPlaying
                                                   ? AppColors.primaryBlueDark
-                                                  : AppColors.primaryBlueLight,
+                                                  : context.hiAccentBg,
                                               borderRadius: BorderRadius.circular(AppRadius.full),
-                                              border: Border.all(color: AppColors.secondaryBlue),
+                                              border: Border.all(color: context.hiAccentColor.withAlpha(110)),
                                             ),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.min,
@@ -412,7 +423,7 @@ class _ReadingPassageListScreenState extends State<ReadingPassageListScreen> {
                                                 Icon(
                                                   isAudioPlaying ? Icons.pause_rounded : Icons.headphones_rounded,
                                                   size: 14,
-                                                  color: isAudioPlaying ? Colors.white : AppColors.primaryBlueDark,
+                                                  color: isAudioPlaying ? Colors.white : context.hiAccentColor,
                                                 ),
                                                 const SizedBox(width: 4),
                                                 Text(
@@ -420,15 +431,13 @@ class _ReadingPassageListScreenState extends State<ReadingPassageListScreen> {
                                                   style: TextStyle(
                                                     fontSize: 11,
                                                     fontWeight: FontWeight.bold,
-                                                    color: isAudioPlaying ? Colors.white : AppColors.primaryBlueDark,
+                                                    color: isAudioPlaying ? Colors.white : context.hiAccentColor,
                                                   ),
                                                 ),
                                               ],
                                             ),
                                           ),
                                         ),
-                                        const SizedBox(width: AppSpacing.sm),
-                                      ],
 
                                       Row(
                                         mainAxisSize: MainAxisSize.min,
@@ -436,11 +445,11 @@ class _ReadingPassageListScreenState extends State<ReadingPassageListScreen> {
                                           Text(
                                             'Đọc ngay',
                                             style: theme.textTheme.labelMedium?.copyWith(
-                                              color: AppColors.primaryBlueDark,
+                                              color: context.hiAccentColor,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          const Icon(Icons.arrow_forward_ios_rounded, size: 10, color: AppColors.primaryBlueDark),
+                                          Icon(Icons.arrow_forward_ios_rounded, size: 10, color: context.hiAccentColor),
                                         ],
                                       ),
                                     ],
@@ -472,7 +481,7 @@ class _ReadingPassageListScreenState extends State<ReadingPassageListScreen> {
             Text(
               'Đang đọc dở (${(percent * 100).toInt()}%)',
               style: theme.textTheme.labelSmall?.copyWith(
-                color: AppColors.warning,
+                color: context.hiWarningFg,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -480,7 +489,7 @@ class _ReadingPassageListScreenState extends State<ReadingPassageListScreen> {
               '${progress.readingTimeSeconds}s / ${passage.estimatedMinutes}p',
               style: theme.textTheme.bodySmall?.copyWith(
                 fontSize: 10,
-                color: AppColors.secondaryText,
+                color: context.hiSecondaryText,
               ),
             ),
           ],
@@ -490,8 +499,8 @@ class _ReadingPassageListScreenState extends State<ReadingPassageListScreen> {
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
             value: percent,
-            backgroundColor: AppColors.warningContainerLight,
-            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.warning),
+            backgroundColor: context.hiWarningBg,
+            valueColor: AlwaysStoppedAnimation<Color>(context.hiWarningFg),
             minHeight: 4,
           ),
         ),

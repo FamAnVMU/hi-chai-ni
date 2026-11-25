@@ -17,10 +17,10 @@ class ContrastiveExampleCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: AppColors.cardBackground,
+          color: context.hiCardSurface,
           borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
-            color: AppColors.border,
+            color: context.hiBorderColor,
           ),
         ),
         child: Column(
@@ -30,9 +30,9 @@ class ContrastiveExampleCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
+                Icon(
                   Icons.cancel_rounded,
-                  color: AppColors.error,
+                  color: context.hiErrorFg,
                   size: 16,
                 ),
                 const SizedBox(width: AppSpacing.xs),
@@ -40,7 +40,7 @@ class ContrastiveExampleCard extends StatelessWidget {
                   child: Text(
                     example.incorrectSentence,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.error,
+                      color: context.hiErrorFg,
                       fontWeight: FontWeight.w600,
                       decoration: TextDecoration.lineThrough,
                     ),
@@ -54,9 +54,9 @@ class ContrastiveExampleCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
+                Icon(
                   Icons.check_circle_rounded,
-                  color: AppColors.success,
+                  color: context.hiSuccessFg,
                   size: 16,
                 ),
                 const SizedBox(width: AppSpacing.xs),
@@ -64,7 +64,7 @@ class ContrastiveExampleCard extends StatelessWidget {
                   child: Text(
                     example.correctSentence,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.success,
+                      color: context.hiSuccessFg,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -78,16 +78,16 @@ class ContrastiveExampleCard extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
-                color: AppColors.inputBackground,
+                color: context.hiInputSurface,
                 borderRadius: BorderRadius.circular(AppRadius.sm),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: context.hiBorderColor),
               ),
               child: Text(
                 example.explanationVi,
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontStyle: FontStyle.italic,
                   fontSize: 12,
-                  color: AppColors.secondaryText,
+                  color: context.hiSecondaryText,
                 ),
               ),
             ),

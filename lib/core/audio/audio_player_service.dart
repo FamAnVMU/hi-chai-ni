@@ -183,7 +183,8 @@ class DefaultAudioPlayerService implements AudioPlayerService {
     String? fallbackText,
   }) async {
     try {
-      _playbackSpeed = speed.clamp(0.5, 2.0);
+      final effectiveSpeed = speed == 1.0 ? DefaultTtsService.defaultSpeechRate : speed;
+      _playbackSpeed = effectiveSpeed.clamp(0.5, 2.0);
       _isLooping = loop;
 
       // Stop previous audio & TTS playback and reset position

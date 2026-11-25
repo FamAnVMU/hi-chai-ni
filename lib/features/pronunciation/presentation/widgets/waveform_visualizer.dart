@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/tokens/app_colors.dart';
-import '../../../../core/theme/tokens/app_radius.dart';
+import '../../../../core/theme/theme.dart';
 
 /// Realtime animated audio waveform visualizer responding to mic amplitude levels.
 class WaveformVisualizer extends StatelessWidget {
@@ -18,7 +17,7 @@ class WaveformVisualizer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final accent = context.hiAccentColor;
 
     final seconds = (duration.inMilliseconds / 1000).toStringAsFixed(1);
 
@@ -26,10 +25,10 @@ class WaveformVisualizer extends StatelessWidget {
       height: 90,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.cardBackground : theme.colorScheme.surfaceContainerHighest.withAlpha(90),
+        color: context.hiSecondarySurface,
         borderRadius: AppRadius.borderMd,
         border: Border.all(
-          color: isRecording ? AppColors.primaryBlueDark.withAlpha(120) : theme.colorScheme.outlineVariant,
+          color: isRecording ? accent.withAlpha(120) : theme.colorScheme.outlineVariant,
         ),
       ),
       child: Column(
@@ -55,7 +54,7 @@ class WaveformVisualizer extends StatelessWidget {
                   height: barHeight,
                   decoration: BoxDecoration(
                     color: isRecording
-                        ? (isCenter ? AppColors.primaryBlueDark : AppColors.primaryBlueDark.withAlpha(160))
+                        ? (isCenter ? accent : accent.withAlpha(160))
                         : theme.colorScheme.outlineVariant,
                     borderRadius: AppRadius.borderFull,
                   ),

@@ -5,6 +5,7 @@ import '../../../../core/database/app_database.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../dictionary/data/dictionary_repository.dart';
 import '../../../dictionary/presentation/widgets/dictionary_detail_sheet.dart';
+import '../../../settings/presentation/providers/settings_providers.dart';
 import '../../data/reading_repository.dart';
 import '../../domain/models/reading_models.dart';
 import '../widgets/reading_mode_selector.dart';
@@ -39,6 +40,9 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
   late final bool _ownsTts;
 
   ReadingDisplayMode _displayMode = ReadingDisplayMode.full;
+  bool _didInitFromSettings = false;
+  bool _userOverrodeMode = false;
+  bool _showRubyAnnotation = true;
   late final List<RubySegment> _segments;
 
   Timer? _readingTimer;
@@ -69,6 +73,20 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
     _startTimer();
     _loadProgress();
     _initAudioPlayer();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_didInitFromSettings) {
+      _didInitFromSettings = true;
+      final settings = readAppSettingsOrDefault(context);
+      _playbackSpeed = settings.speechRate;
+      _showRubyAnnotation = settings.showRubyAnnotation;
+      if (!settings.showPinyinByDefault) {
+        _displayMode = ReadingDisplayMode.hanziOnly;
+      }
+    }
   }
 
   void _initAudioPlayer() {
@@ -160,7 +178,11 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
     }
     if (mounted) setState(() => _audioStatus = AudioPlaybackStatus.playing);
     try {
-      await _ttsService.speak(widget.passage.contentCn, language: 'zh-CN');
+      await _ttsService.speak(
+        widget.passage.contentCn,
+        language: 'zh-CN',
+        rate: DefaultTtsService.toTtsRate(_playbackSpeed),
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -236,6 +258,8 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
         entry: entry,
         repository: _dictRepo,
         contextSentence: widget.passage.contentCn,
+        ttsService: _ttsService,
+        audioPlayer: _audioPlayer,
       );
     } else {
       _showQuickLookupSheet(context, segment);
@@ -262,15 +286,15 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryBlueLight,
+                      color: ctx.hiAccentBg,
                       borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
                     child: Text(
                       segment.text,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.primaryBlueDark,
+                        color: ctx.hiAccentColor,
                       ),
                     ),
                   ),
@@ -278,9 +302,9 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
                   if (segment.pinyin != null && segment.pinyin!.isNotEmpty)
                     Text(
                       segment.pinyin!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
-                        color: AppColors.secondaryText,
+                        color: ctx.hiSecondaryText,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -292,9 +316,9 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
                 ],
               ),
               const SizedBox(height: AppSpacing.md),
-              const Text(
+              Text(
                 'Ký tự này chưa có định nghĩa độc lập trong từ điển chính. Bạn có thể hỏi AI Tutor để giải thích nghĩa theo ngữ cảnh bài đọc.',
-                style: TextStyle(color: AppColors.secondaryText, height: 1.4),
+                style: TextStyle(color: ctx.hiSecondaryText, height: 1.4),
               ),
               const SizedBox(height: AppSpacing.md),
               HiButton(
@@ -352,7 +376,7 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
       builder: (ctx) => AlertDialog(
         title: Row(
           children: [
-            Icon(titleIcon, color: AppColors.primaryBlueDark),
+            Icon(titleIcon, color: ctx.hiAccentColor),
             const SizedBox(width: 8),
             Expanded(child: Text(title)),
           ],
@@ -398,8 +422,9 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final showPinyin = _displayMode == ReadingDisplayMode.full ||
+    final modeShowsPinyin = _displayMode == ReadingDisplayMode.full ||
         _displayMode == ReadingDisplayMode.hanziAndPinyin;
+    final showPinyin = modeShowsPinyin && (_userOverrodeMode || _showRubyAnnotation);
     final showTranslation = _displayMode == ReadingDisplayMode.full ||
         _displayMode == ReadingDisplayMode.hanziAndTranslation;
 
@@ -448,7 +473,10 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
                   child: ReadingModeSelector(
                     currentMode: _displayMode,
                     onModeChanged: (mode) {
-                      setState(() => _displayMode = mode);
+                      setState(() {
+                        _userOverrodeMode = true;
+                        _displayMode = mode;
+                      });
                     },
                   ),
                 ),
@@ -456,7 +484,7 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
                 // Slow Audio Player Bar (Trình phát Audio Đọc chậm)
                 _buildAudioPlayerBar(theme),
 
-                const Divider(height: 1, color: AppColors.divider),
+                Divider(height: 1, color: context.hiBorderColor),
 
                 // Main Reading & Comprehension Scroll View
                 Expanded(
@@ -470,15 +498,15 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: AppColors.primaryBlueLight,
+                              color: context.hiAccentBg,
                               borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: AppColors.secondaryBlue, width: 0.8),
+                              border: Border.all(color: context.hiAccentColor.withAlpha(110), width: 0.8),
                             ),
                             child: Text(
                               'HSK ${widget.passage.hskLevel}',
                               style: theme.textTheme.labelSmall?.copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.primaryBlueDark,
+                                color: context.hiAccentColor,
                               ),
                             ),
                           ),
@@ -602,14 +630,15 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
     final isPlaying = _audioStatus == AudioPlaybackStatus.playing;
     final maxMs = _totalDuration.inMilliseconds > 0 ? _totalDuration.inMilliseconds.toDouble() : 1.0;
     final curMs = _currentPosition.inMilliseconds.toDouble().clamp(0.0, maxMs);
+    final accent = context.hiAccentColor;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 6),
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.primaryBlueLight,
+        color: context.hiAccentBg,
         borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: AppColors.secondaryBlue),
+        border: Border.all(color: accent.withAlpha(110)),
       ),
       child: Row(
         children: [
@@ -617,7 +646,7 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
           IconButton(
             icon: const Icon(Icons.replay_5_rounded),
             iconSize: 22,
-            color: AppColors.primaryBlueDark,
+            color: accent,
             tooltip: 'Tua lại 5 giây',
             onPressed: _rewind5Seconds,
           ),
@@ -628,7 +657,7 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
               isPlaying ? Icons.pause_circle_filled_rounded : Icons.play_circle_filled_rounded,
             ),
             iconSize: 34,
-            color: AppColors.primaryBlueDark,
+            color: accent,
             tooltip: isPlaying ? 'Tạm dừng' : 'Phát audio',
             onPressed: _togglePlayAudio,
           ),
@@ -642,10 +671,10 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
                   data: SliderTheme.of(context).copyWith(
                     trackHeight: 3,
                     thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
-                    activeTrackColor: AppColors.primaryBlueDark,
-                    inactiveTrackColor: AppColors.secondaryBlue,
-                    thumbColor: AppColors.primaryBlueDark,
-                    overlayColor: AppColors.primaryBlueDark.withAlpha(30),
+                    activeTrackColor: accent,
+                    inactiveTrackColor: accent.withAlpha(70),
+                    thumbColor: accent,
+                    overlayColor: accent.withAlpha(30),
                   ),
                   child: Slider(
                     value: curMs,
@@ -666,14 +695,14 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
                         style: theme.textTheme.bodySmall?.copyWith(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.primaryBlueDark,
+                          color: accent,
                         ),
                       ),
                       Text(
                         _formatDuration(_totalDuration),
                         style: theme.textTheme.bodySmall?.copyWith(
                           fontSize: 10,
-                          color: AppColors.secondaryText,
+                          color: context.hiSecondaryText,
                         ),
                       ),
                     ],
@@ -685,17 +714,17 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
 
           const SizedBox(width: AppSpacing.xs),
 
-          // Speed Toggle: 0.75x vs 1.0x
+          // Speed Toggle
           InkWell(
             onTap: _toggleSpeed,
             borderRadius: BorderRadius.circular(AppRadius.full),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: _playbackSpeed == 0.75 ? AppColors.warningContainerLight : AppColors.cardBackground,
+                color: _playbackSpeed < 0.95 ? context.hiWarningBg : context.hiCardSurface,
                 borderRadius: BorderRadius.circular(AppRadius.full),
                 border: Border.all(
-                  color: _playbackSpeed == 0.75 ? AppColors.warning : AppColors.primaryBlueDark,
+                  color: _playbackSpeed < 0.95 ? context.hiWarningFg : accent,
                 ),
               ),
               child: Text(
@@ -703,7 +732,7 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
-                  color: _playbackSpeed == 0.75 ? AppColors.warning : AppColors.primaryBlueDark,
+                  color: _playbackSpeed < 0.95 ? context.hiWarningFg : accent,
                 ),
               ),
             ),
@@ -745,7 +774,7 @@ class _AskAiReadingSheetState extends State<_AskAiReadingSheet> {
         children: [
           Row(
             children: [
-              const Icon(Icons.auto_awesome_rounded, color: AppColors.primaryBlueDark),
+              Icon(Icons.auto_awesome_rounded, color: context.hiAccentColor),
               const SizedBox(width: 8),
               Text(
                 'Hỏi AI về Bài Đọc',

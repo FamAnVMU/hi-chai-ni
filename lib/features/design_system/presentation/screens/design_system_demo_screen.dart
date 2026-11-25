@@ -101,14 +101,13 @@ class _DesignSystemDemoScreenState extends ConsumerState<DesignSystemDemoScreen>
                       ),
                     ),
                     const SizedBox(height: AppSpacing.sm),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
+                    Wrap(
+                      spacing: AppSpacing.md,
+                      runSpacing: AppSpacing.xs,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text('学', style: AppTypography.hanziLarge(color: theme.colorScheme.primary)),
-                        const SizedBox(width: AppSpacing.md),
                         Text('xué', style: AppTypography.pinyinLarge(color: theme.colorScheme.onSurface)),
-                        const SizedBox(width: AppSpacing.lg),
                         Text('(Học / Học tập)', style: AppTypography.vietnameseMeaning(color: theme.colorScheme.onSurfaceVariant)),
                       ],
                     ),
@@ -158,8 +157,11 @@ class _DesignSystemDemoScreenState extends ConsumerState<DesignSystemDemoScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Wrap(
+                      spacing: AppSpacing.sm,
+                      runSpacing: AppSpacing.xs,
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
                           'Tương tác & Xuống dòng chuẩn',
@@ -168,26 +170,37 @@ class _DesignSystemDemoScreenState extends ConsumerState<DesignSystemDemoScreen>
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Row(
+                        Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: AppSpacing.xs,
                           children: [
-                            Text('Pinyin', style: theme.textTheme.labelSmall),
-                            Switch(
-                              value: _showPinyinInRuby,
-                              onChanged: (val) {
-                                setState(() {
-                                  _showPinyinInRuby = val;
-                                });
-                              },
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text('Pinyin', style: theme.textTheme.labelSmall),
+                                Switch(
+                                  value: _showPinyinInRuby,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      _showPinyinInRuby = val;
+                                    });
+                                  },
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: AppSpacing.xs),
-                            Text('Phồn thể', style: theme.textTheme.labelSmall),
-                            Switch(
-                              value: _showTraditionalInRuby,
-                              onChanged: (val) {
-                                setState(() {
-                                  _showTraditionalInRuby = val;
-                                });
-                              },
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text('Phồn thể', style: theme.textTheme.labelSmall),
+                                Switch(
+                                  value: _showTraditionalInRuby,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      _showTraditionalInRuby = val;
+                                    });
+                                  },
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -580,14 +593,14 @@ class _DesignSystemDemoScreenState extends ConsumerState<DesignSystemDemoScreen>
 
   Widget _buildColorGrid(bool isDark) {
     final colors = [
-      {'name': 'Primary Blue', 'color': AppColors.primaryBlueDark, 'hex': '#5B9BE6'},
+      {'name': 'Primary Blue', 'color': AppColors.primaryBlueDark, 'hex': '#3979C7'},
       {'name': 'Main Background', 'color': AppColors.mainBackground, 'hex': '#F7FAFE'},
       {'name': 'Card Background', 'color': AppColors.cardBackground, 'hex': '#FFFFFF'},
-      {'name': 'Primary Blue Light', 'color': AppColors.cardBackground, 'hex': '#EAF3FF'},
-      {'name': 'Off-white Light', 'color': AppColors.mainBackground, 'hex': '#F6FAF2'},
-      {'name': 'Success', 'color': isDark ? AppColors.successDark : AppColors.success, 'hex': isDark ? '#81C784' : '#2E7D32'},
-      {'name': 'Warning', 'color': isDark ? AppColors.warningDark : AppColors.warning, 'hex': isDark ? '#FFB74D' : '#B26A00'},
-      {'name': 'Error', 'color': isDark ? AppColors.errorDark : AppColors.errorLight, 'hex': isDark ? '#FFB4AB' : '#BA1A1A'},
+      {'name': 'Primary Blue Light', 'color': AppColors.primaryBlueLight, 'hex': '#EAF3FF'},
+      {'name': 'Off-white Light', 'color': AppColors.secondaryBackground, 'hex': '#F0F6FC'},
+      {'name': 'Success', 'color': isDark ? AppColors.successDark : AppColors.success, 'hex': isDark ? '#4ADE80' : '#22A06B'},
+      {'name': 'Warning', 'color': isDark ? AppColors.warningDark : const Color(0xFF9A6700), 'hex': isDark ? '#FBBF24' : '#9A6700'},
+      {'name': 'Error', 'color': isDark ? AppColors.errorDark : AppColors.errorLight, 'hex': isDark ? '#F87171' : '#E05D66'},
     ];
 
     return Wrap(
@@ -597,6 +610,9 @@ class _DesignSystemDemoScreenState extends ConsumerState<DesignSystemDemoScreen>
         final color = item['color'] as Color;
         final name = item['name'] as String;
         final hex = item['hex'] as String;
+        final onSwatch = color.computeLuminance() > 0.42
+            ? AppColors.primaryText
+            : Colors.white;
 
         return Container(
           width: 105,
@@ -605,7 +621,7 @@ class _DesignSystemDemoScreenState extends ConsumerState<DesignSystemDemoScreen>
             color: color,
             borderRadius: AppRadius.borderMd,
             border: Border.all(
-              color: Colors.white24,
+              color: context.hiBorderColor,
               width: 1,
             ),
           ),
@@ -615,29 +631,27 @@ class _DesignSystemDemoScreenState extends ConsumerState<DesignSystemDemoScreen>
               Container(
                 height: 12,
                 width: 12,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white,
+                  color: onSwatch,
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 name,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                  backgroundColor: Colors.white70,
+                  color: onSwatch,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
                 hex,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 9,
-                  color: Colors.black87,
-                  backgroundColor: Colors.white70,
+                  color: onSwatch,
                 ),
               ),
             ],

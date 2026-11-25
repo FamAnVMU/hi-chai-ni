@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../settings/presentation/providers/settings_providers.dart';
 import '../../data/audio_pack_manager.dart';
 import '../../data/sentence_dao.dart';
 import '../../data/sentence_repository.dart';
@@ -34,6 +36,8 @@ class _SentenceBrowserScreenState extends State<SentenceBrowserScreen> {
   List<SentenceItem> _sentences = [];
   Map<String, SentencePracticeProgress> _progressMap = {};
   bool _isLoading = true;
+  bool _showPinyin = true;
+  bool _didInitFromSettings = false;
   Timer? _debounceTimer;
 
   final TextEditingController _searchController = TextEditingController();
@@ -43,6 +47,15 @@ class _SentenceBrowserScreenState extends State<SentenceBrowserScreen> {
     super.initState();
     _selectedHskLevel = widget.initialHskLevel;
     _loadSentences();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_didInitFromSettings) {
+      _didInitFromSettings = true;
+      _showPinyin = readAppSettingsOrDefault(context).showPinyinByDefault;
+    }
   }
 
   @override
@@ -174,7 +187,7 @@ class _SentenceBrowserScreenState extends State<SentenceBrowserScreen> {
                       )
                     : null,
                 filled: true,
-                fillColor: Colors.grey.shade100,
+                fillColor: context.hiInputSurface,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
               ),
@@ -251,7 +264,12 @@ class _SentenceBrowserScreenState extends State<SentenceBrowserScreen> {
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _sentences.isEmpty
-                    ? const Center(child: Text('Không tìm thấy câu ví dụ phù hợp.', style: TextStyle(color: Colors.grey)))
+                    ? Center(
+                        child: Text(
+                          'Không tìm thấy câu ví dụ phù hợp.',
+                          style: TextStyle(color: context.hiSecondaryText),
+                        ),
+                      )
                     : ListView.builder(
                         padding: const EdgeInsets.all(16),
                         itemCount: _sentences.length,
@@ -268,156 +286,206 @@ class _SentenceBrowserScreenState extends State<SentenceBrowserScreen> {
   }
 
   Widget _buildSentenceCard(SentenceItem s, SentencePracticeProgress? p) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: p?.masteryLevel == 'mastered' ? Colors.green.shade300 : Colors.grey.shade200,
-          width: p?.masteryLevel == 'mastered' ? 1.5 : 1.0,
+    final meaning = s.translationVi.isNotEmpty ? s.translationVi : s.translationEn;
+    return Semantics(
+      container: true,
+      label: 'Câu ${s.chinese}, ${s.pinyin}, $meaning',
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 14),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: context.hiCardSurface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: p?.masteryLevel == 'mastered'
+                ? context.hiSuccessFg.withAlpha(140)
+                : context.hiBorderColor,
+            width: p?.masteryLevel == 'mastered' ? 1.5 : 1.0,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(context.isDarkMode ? 24 : 5),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withAlpha(5), blurRadius: 4, offset: const Offset(0, 2)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header Row: Level badge & Audio source badge
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header Row: Level badge & Audio source badge
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: context.hiAccentBg,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'HSK ${s.hskLevel}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 11,
+                      color: context.hiAccentColor,
+                    ),
+                  ),
                 ),
-                child: Text(
-                  'HSK ${s.hskLevel}',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.blue.shade700),
+                () {
+                  final isStudioTts = s.contributor.toLowerCase().contains('edge_tts') ||
+                      s.contributor.toLowerCase().contains('xiaoxiao') ||
+                      s.audios.any((a) => a.audioType == AudioType.studioSimulation);
+
+                  if (isStudioTts) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: context.hiAccentBg,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.graphic_eq_rounded, size: 13, color: context.hiAccentColor),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              'AI Studio (Edge TTS)',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: context.hiAccentColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else if (s.hasHumanAudio) {
+                    final speaker = s.contributor.isNotEmpty && !s.contributor.toLowerCase().contains('edge')
+                        ? s.contributor
+                        : 'Tatoeba';
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: context.hiSuccessBg,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.record_voice_over, size: 13, color: context.hiSuccessFg),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              'Người thật ($speaker)',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: context.hiSuccessFg,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: context.hiSecondarySurface,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.smart_toy_outlined, size: 13, color: context.hiSecondaryText),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              'Giọng OS TTS',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(fontSize: 11, color: context.hiSecondaryText),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                }(),
+              ],
+            ),
+
+            const SizedBox(height: 8),
+
+            // Chinese Text
+            Text(
+              s.chinese,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: context.hiPrimaryText,
+              ),
+            ),
+            const SizedBox(height: 4),
+
+            // Pinyin
+            if (_showPinyin) ...[
+              Text(
+                s.pinyin,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: context.hiAccentColor,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              () {
-                final isStudioTts = s.contributor.toLowerCase().contains('edge_tts') ||
-                    s.contributor.toLowerCase().contains('xiaoxiao') ||
-                    s.audios.any((a) => a.audioType == AudioType.studioSimulation);
-
-                if (isStudioTts) {
-                  return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.graphic_eq_rounded, size: 13, color: Colors.blue.shade700),
-                        const SizedBox(width: 4),
-                        Text(
-                          'AI Studio (Edge TTS)',
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.blue.shade800),
-                        ),
-                      ],
-                    ),
-                  );
-                } else if (s.hasHumanAudio) {
-                  final speaker = s.contributor.isNotEmpty && !s.contributor.toLowerCase().contains('edge')
-                      ? s.contributor
-                      : 'Tatoeba';
-                  return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.green.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.record_voice_over, size: 13, color: Colors.green.shade700),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Người thật ($speaker)',
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.green.shade800),
-                        ),
-                      ],
-                    ),
-                  );
-                } else {
-                  return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.smart_toy_outlined, size: 13, color: Colors.grey),
-                        SizedBox(width: 4),
-                        Text(
-                          'Giọng OS TTS',
-                          style: TextStyle(fontSize: 11, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-              }(),
+              const SizedBox(height: 6),
             ],
-          ),
 
-          const SizedBox(height: 8),
+            // Translation
+            Text(
+              meaning,
+              style: TextStyle(fontSize: 13, color: context.hiPrimaryText),
+            ),
 
-          // Chinese Text
-          Text(
-            s.chinese,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 4),
+            const SizedBox(height: 12),
+            const Divider(height: 1),
+            const SizedBox(height: 8),
 
-          // Pinyin
-          Text(
-            s.pinyin,
-            style: const TextStyle(fontSize: 13, color: Color(0xFF2563EB), fontWeight: FontWeight.w500),
-          ),
-          const SizedBox(height: 6),
-
-          // Translation
-          Text(
-            s.translationVi.isNotEmpty ? s.translationVi : s.translationEn,
-            style: const TextStyle(fontSize: 13, color: Colors.black87),
-          ),
-
-          const SizedBox(height: 12),
-          const Divider(height: 1),
-          const SizedBox(height: 8),
-
-          // Action buttons row: Luyện nghe, Shadowing, Luyện đọc
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextButton.icon(
-                icon: const Icon(Icons.headphones, size: 18),
-                label: const Text('Luyện nghe', style: TextStyle(fontSize: 12)),
-                onPressed: () => _openListening(s),
-              ),
-              TextButton.icon(
-                icon: const Icon(Icons.mic, size: 18),
-                label: const Text('Shadowing', style: TextStyle(fontSize: 12)),
-                onPressed: () => _openShadowing(s),
-              ),
-              TextButton.icon(
-                icon: const Icon(Icons.menu_book, size: 18),
-                label: const Text('Luyện đọc', style: TextStyle(fontSize: 12)),
-                onPressed: () => _openReading(s),
-              ),
-            ],
-          ),
-        ],
+            // Action buttons row: Luyện nghe, Shadowing, Luyện đọc
+            Wrap(
+              spacing: 4,
+              runSpacing: 4,
+              alignment: WrapAlignment.spaceBetween,
+              children: [
+                TextButton.icon(
+                  icon: const Icon(Icons.headphones, size: 18),
+                  label: const Text('Luyện nghe', style: TextStyle(fontSize: 12)),
+                  onPressed: () => _openListening(s),
+                ),
+                TextButton.icon(
+                  icon: const Icon(Icons.mic, size: 18),
+                  label: const Text('Shadowing', style: TextStyle(fontSize: 12)),
+                  onPressed: () => _openShadowing(s),
+                ),
+                TextButton.icon(
+                  icon: const Icon(Icons.menu_book, size: 18),
+                  label: const Text('Luyện đọc', style: TextStyle(fontSize: 12)),
+                  onPressed: () => _openReading(s),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -59,16 +59,10 @@ class ExerciseCardContainer extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.cardBackground,
+        color: context.hiCardSurface,
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.border),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0A000000),
-            blurRadius: 10,
-            offset: Offset(0, 2),
-          ),
-        ],
+        border: Border.all(color: context.hiBorderColor),
+        boxShadow: AppElevation.shadowLow(theme.brightness),
       ),
       padding: const EdgeInsets.all(AppSpacing.md),
       child: Column(
@@ -81,13 +75,13 @@ class ExerciseCardContainer extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryBlueLight,
+                  color: context.hiAccentBg,
                   borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: Text(
                   definition.type.displayName,
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: AppColors.primaryBlueDark,
+                    color: context.hiAccentColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -96,14 +90,14 @@ class ExerciseCardContainer extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppColors.inputBackground,
+                  color: context.hiInputSurface,
                   borderRadius: BorderRadius.circular(AppRadius.sm),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(color: context.hiBorderColor),
                 ),
                 child: Text(
                   'HSK ${definition.hskLevel}',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: AppColors.secondaryText,
+                    color: context.hiSecondaryText,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -117,7 +111,7 @@ class ExerciseCardContainer extends StatelessWidget {
             definition.prompt,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.bold,
-              color: AppColors.primaryText,
+              color: context.hiPrimaryText,
             ),
           ),
 
@@ -128,9 +122,9 @@ class ExerciseCardContainer extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
-                color: AppColors.inputBackground,
+                color: context.hiInputSurface,
                 borderRadius: BorderRadius.circular(AppRadius.md),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: context.hiBorderColor),
               ),
               child: Column(
                 children: [
@@ -140,7 +134,7 @@ class ExerciseCardContainer extends StatelessWidget {
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.2,
-                      color: AppColors.primaryText,
+                      color: context.hiPrimaryText,
                     ),
                   ),
                   if (definition.stimulusPinyin != null) ...[
@@ -149,7 +143,7 @@ class ExerciseCardContainer extends StatelessWidget {
                       definition.stimulusPinyin!,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: AppColors.primaryBlueDark,
+                        color: context.hiAccentColor,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -197,11 +191,11 @@ class ExerciseCardContainer extends StatelessWidget {
     final needsReview = res.needsHumanReview;
 
     final bannerColor = isCorrect
-        ? AppColors.successContainerLight
-        : (needsReview ? AppColors.warningContainerLight : AppColors.errorContainerLight);
+        ? context.hiSuccessBg
+        : (needsReview ? context.hiWarningBg : context.hiErrorBg);
     final borderColor = isCorrect
-        ? AppColors.success
-        : (needsReview ? AppColors.warning : AppColors.error);
+        ? context.hiSuccessFg
+        : (needsReview ? context.hiWarningFg : context.hiErrorFg);
 
     return Container(
       width: double.infinity,
@@ -260,7 +254,7 @@ class ExerciseCardContainer extends StatelessWidget {
           Text(
             res.feedbackVi,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: AppColors.primaryText,
+              color: context.hiPrimaryText,
             ),
           ),
         ],
