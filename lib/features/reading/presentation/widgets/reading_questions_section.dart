@@ -85,11 +85,11 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: _score! >= 70
-                      ? AppColors.successContainerLight
-                      : AppColors.errorContainerLight,
+                      ? context.hiSuccessBg
+                      : context.hiErrorBg,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: _score! >= 70 ? AppColors.success : AppColors.error,
+                    color: _score! >= 70 ? context.hiSuccessFg : context.hiErrorFg,
                     width: 1,
                   ),
                 ),
@@ -97,7 +97,7 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                   'Điểm: ${_score!.toStringAsFixed(0)}%',
                   style: theme.textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: _score! >= 70 ? AppColors.success : AppColors.error,
+                    color: _score! >= 70 ? context.hiSuccessFg : context.hiErrorFg,
                   ),
                 ),
               ),
@@ -126,14 +126,14 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryBlueLight,
+                          color: context.hiAccentBg,
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           'Câu $qIndex',
                           style: theme.textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: AppColors.primaryBlueDark,
+                            color: context.hiAccentColor,
                           ),
                         ),
                       ),
@@ -143,7 +143,7 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                           q.question,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: AppColors.primaryText,
+                            color: context.hiPrimaryText,
                           ),
                         ),
                       ),
@@ -157,30 +157,30 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                     final optText = opt.value;
                     final isSelected = selectedOption == optIndex;
 
-                    Color cardBg = AppColors.cardBackground;
-                    Color cardBorder = AppColors.border;
-                    Color textColor = AppColors.primaryText;
+                    Color cardBg = context.hiCardSurface;
+                    Color cardBorder = context.hiBorderColor;
+                    Color textColor = context.hiPrimaryText;
                     IconData? statusIcon;
                     Color? iconColor;
 
                     if (isAnswered) {
                       if (optIndex == q.answerIndex) {
-                        cardBg = AppColors.successContainerLight;
-                        cardBorder = AppColors.success;
-                        textColor = AppColors.success;
+                        cardBg = context.hiSuccessBg;
+                        cardBorder = context.hiSuccessFg;
+                        textColor = context.hiSuccessFg;
                         statusIcon = Icons.check_circle_rounded;
-                        iconColor = AppColors.success;
+                        iconColor = context.hiSuccessFg;
                       } else if (isSelected) {
-                        cardBg = AppColors.errorContainerLight;
-                        cardBorder = AppColors.error;
-                        textColor = AppColors.error;
+                        cardBg = context.hiErrorBg;
+                        cardBorder = context.hiErrorFg;
+                        textColor = context.hiErrorFg;
                         statusIcon = Icons.cancel_rounded;
-                        iconColor = AppColors.error;
+                        iconColor = context.hiErrorFg;
                       }
                     } else if (isSelected) {
-                      cardBg = AppColors.primaryBlueLight;
-                      cardBorder = AppColors.primaryBlueDark;
-                      textColor = AppColors.primaryBlueDark;
+                      cardBg = context.hiAccentBg;
+                      cardBorder = context.hiAccentColor;
+                      textColor = context.hiAccentColor;
                     }
 
                     return Padding(
@@ -215,14 +215,18 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                                     height: 18,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: isSelected ? AppColors.primaryBlueDark : Colors.transparent,
+                                      color: isSelected ? context.hiAccentColor : Colors.transparent,
                                       border: Border.all(
-                                        color: isSelected ? AppColors.primaryBlueDark : AppColors.mutedText,
+                                        color: isSelected ? context.hiAccentColor : context.hiSecondaryText,
                                         width: 2,
                                       ),
                                     ),
                                     child: isSelected
-                                        ? const Icon(Icons.check, size: 12, color: Colors.white)
+                                        ? Icon(
+                                            Icons.check,
+                                            size: 12,
+                                            color: context.isDarkMode ? AppColors.darkForestBg : Colors.white,
+                                          )
                                         : null,
                                   ),
                                 const SizedBox(width: AppSpacing.sm),
@@ -251,13 +255,11 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                     Container(
                       padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
-                        color: isCorrect
-                            ? AppColors.successContainerLight.withAlpha(120)
-                            : AppColors.warningContainerLight,
+                        color: isCorrect ? context.hiSuccessBg : context.hiWarningBg,
                         borderRadius: BorderRadius.circular(AppRadius.sm),
                         border: Border(
                           left: BorderSide(
-                            color: isCorrect ? AppColors.success : AppColors.warning,
+                            color: isCorrect ? context.hiSuccessFg : context.hiWarningFg,
                             width: 3.5,
                           ),
                         ),
@@ -270,14 +272,14 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                               Icon(
                                 isCorrect ? Icons.check_circle_rounded : Icons.info_outline_rounded,
                                 size: 16,
-                                color: isCorrect ? AppColors.success : AppColors.warning,
+                                color: isCorrect ? context.hiSuccessFg : context.hiWarningFg,
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 isCorrect ? 'Đáp án chính xác' : 'Giải thích đáp án',
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: isCorrect ? AppColors.success : AppColors.warning,
+                                  color: isCorrect ? context.hiSuccessFg : context.hiWarningFg,
                                 ),
                               ),
                             ],
@@ -291,14 +293,14 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                               margin: const EdgeInsets.only(bottom: AppSpacing.sm),
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFEF6E7),
+                                color: context.hiWarningBg,
                                 borderRadius: BorderRadius.circular(AppRadius.sm),
-                                border: Border.all(color: AppColors.warning.withAlpha(140)),
+                                border: Border.all(color: context.hiWarningFg.withAlpha(140)),
                               ),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(Icons.format_quote_rounded, size: 16, color: AppColors.warning),
+                                  Icon(Icons.format_quote_rounded, size: 16, color: context.hiWarningFg),
                                   const SizedBox(width: 6),
                                   Expanded(
                                     child: Column(
@@ -308,7 +310,7 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                                           'Dẫn chứng trích đoạn bài đọc:',
                                           style: theme.textTheme.labelSmall?.copyWith(
                                             fontWeight: FontWeight.bold,
-                                            color: AppColors.warning,
+                                            color: context.hiWarningFg,
                                           ),
                                         ),
                                         const SizedBox(height: 2),
@@ -316,7 +318,7 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                                           'Trích dẫn: "${q.citationText!}"',
                                           style: theme.textTheme.bodySmall?.copyWith(
                                             fontWeight: FontWeight.w600,
-                                            color: AppColors.primaryText,
+                                            color: context.hiPrimaryText,
                                           ),
                                         ),
                                       ],
@@ -332,7 +334,7 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                             q.explanationVi,
                             style: theme.textTheme.bodySmall?.copyWith(
                               height: 1.4,
-                              color: AppColors.primaryText,
+                              color: context.hiPrimaryText,
                             ),
                           ),
 
@@ -349,13 +351,13 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                                   _showAiExplanationDialog(context, q);
                                 }
                               },
-                              icon: const Icon(Icons.smart_toy_outlined, size: 16, color: AppColors.primaryBlueDark),
-                              label: const Text(
+                              icon: Icon(Icons.smart_toy_outlined, size: 16, color: context.hiAccentColor),
+                              label: Text(
                                 'Hỏi AI Tutor về câu này',
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryBlueDark,
+                                  color: context.hiAccentColor,
                                 ),
                               ),
                             ),
@@ -396,11 +398,11 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.smart_toy_outlined, color: AppColors.primaryBlueDark),
-            SizedBox(width: 8),
-            Text('Trợ Lý AI Đọc Hiểu'),
+            Icon(Icons.smart_toy_outlined, color: ctx.hiAccentColor),
+            const SizedBox(width: 8),
+            const Expanded(child: Text('Trợ Lý AI Đọc Hiểu')),
           ],
         ),
         content: SingleChildScrollView(
@@ -416,7 +418,7 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
               if (q.citationText != null && q.citationText!.isNotEmpty) ...[
                 Text(
                   'Dẫn chứng: "${q.citationText}"',
-                  style: const TextStyle(color: AppColors.secondaryText, fontStyle: FontStyle.italic),
+                  style: TextStyle(color: ctx.hiSecondaryText, fontStyle: FontStyle.italic),
                 ),
                 const SizedBox(height: 8),
               ],

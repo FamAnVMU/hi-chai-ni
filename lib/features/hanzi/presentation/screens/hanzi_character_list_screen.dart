@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../../../core/theme/theme.dart';
 import '../../../hanzi_writing/presentation/screens/hanzi_writing_screen.dart';
 import '../../data/hanzi_repository.dart';
 import '../../domain/models/hanzi_models.dart';
@@ -122,7 +123,7 @@ class _HanziCharacterListScreenState extends State<HanziCharacterListScreen> {
                       )
                     : null,
                 filled: true,
-                fillColor: Colors.grey.shade100,
+                fillColor: context.hiInputSurface,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -195,7 +196,7 @@ class _HanziCharacterListScreenState extends State<HanziCharacterListScreen> {
                           _filterReviewOnly
                               ? 'Chưa có chữ nào cần ôn tập hôm nay!'
                               : 'Không tìm thấy chữ Hán nào phù hợp.',
-                          style: const TextStyle(color: Colors.grey),
+                          style: TextStyle(color: context.hiSecondaryText),
                         ),
                       )
                     : GridView.builder(
@@ -220,80 +221,103 @@ class _HanziCharacterListScreenState extends State<HanziCharacterListScreen> {
   }
 
   Widget _buildCharacterCard(HanziCharacter c, HanziWritingProgress? p) {
-    return InkWell(
-      onTap: () => _openWritingScreen(c),
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: p?.masteryLevel == 'mastered'
-                ? Colors.green.shade300
-                : (p?.mistakesCount != null && p!.mistakesCount > 0
-                    ? Colors.orange.shade300
-                    : Colors.grey.shade200),
-            width: p != null ? 1.5 : 1.0,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(5),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+    final borderColor = p?.masteryLevel == 'mastered'
+        ? context.hiSuccessFg.withAlpha(140)
+        : (p?.mistakesCount != null && p!.mistakesCount > 0
+            ? context.hiWarningFg.withAlpha(140)
+            : context.hiBorderColor);
+
+    return Semantics(
+      button: true,
+      label:
+          'Chữ ${c.character}, ${c.pinyin}${c.hanviet.isNotEmpty ? ', âm Hán-Việt ${c.hanviet}' : ''}, ${c.strokeCount} nét',
+      child: InkWell(
+        onTap: () => _openWritingScreen(c),
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+          decoration: BoxDecoration(
+            color: context.hiCardSurface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: borderColor,
+              width: p != null ? 1.5 : 1.0,
             ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Character Glyph
-            Text(
-              c.character,
-              style: const TextStyle(fontSize: 34, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 2),
-            // Pinyin
-            Text(
-              c.pinyin,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF2563EB)),
-            ),
-            if (c.hanviet.isNotEmpty)
-              Text(
-                c.hanviet,
-                style: const TextStyle(fontSize: 11, color: Colors.grey),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(context.isDarkMode ? 24 : 5),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
               ),
-            const SizedBox(height: 4),
-            // Badges row
-            Row(
+            ],
+          ),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // Character Glyph
                 Text(
-                  '${c.strokeCount} nét',
-                  style: const TextStyle(fontSize: 10, color: Colors.grey),
-                ),
-                if (p != null && p.practiceCount + p.testCount > 0) ...[
-                  const SizedBox(width: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                    decoration: BoxDecoration(
-                      color: p.bestAccuracyScore >= 80 ? Colors.green.shade50 : Colors.orange.shade50,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      '${p.bestAccuracyScore.toInt()}%',
-                      style: TextStyle(
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
-                        color: p.bestAccuracyScore >= 80 ? Colors.green.shade700 : Colors.orange.shade700,
-                      ),
-                    ),
+                  c.character,
+                  style: TextStyle(
+                    fontSize: 34,
+                    fontWeight: FontWeight.bold,
+                    color: context.hiPrimaryText,
                   ),
-                ],
+                ),
+                const SizedBox(height: 2),
+                // Pinyin
+                Text(
+                  c.pinyin,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: context.hiAccentColor,
+                  ),
+                ),
+                if (c.hanviet.isNotEmpty)
+                  Text(
+                    c.hanviet,
+                    style: TextStyle(fontSize: 11, color: context.hiSecondaryText),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                const SizedBox(height: 4),
+                // Badges row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '${c.strokeCount} nét',
+                      style: TextStyle(fontSize: 10, color: context.hiSecondaryText),
+                    ),
+                    if (p != null && p.practiceCount + p.testCount > 0) ...[
+                      const SizedBox(width: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: p.bestAccuracyScore >= 80
+                              ? context.hiSuccessBg
+                              : context.hiWarningBg,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          '${p.bestAccuracyScore.toInt()}%',
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            color: p.bestAccuracyScore >= 80
+                                ? context.hiSuccessFg
+                                : context.hiWarningFg,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );

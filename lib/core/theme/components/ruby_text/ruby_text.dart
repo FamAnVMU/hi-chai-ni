@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../tokens/app_colors.dart';
 import '../../tokens/app_dimensions.dart';
 import '../../tokens/app_radius.dart';
 import '../../tokens/app_spacing.dart';
@@ -125,8 +124,7 @@ class RubyText extends StatelessWidget {
     );
 
     final defaultPinyinStyle = (pinyinStyle ?? AppTypography.pinyin()).copyWith(
-      color: pinyinStyle?.color ??
-          (isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary),
+      color: pinyinStyle?.color ?? theme.colorScheme.primary,
     );
 
     return Wrap(
@@ -210,11 +208,11 @@ class RubyText extends StatelessWidget {
     if (isInteractive || isActive) {
       final highlightColor = activeColor ??
           (isDark
-              ? AppColors.primaryBlueDark.withAlpha(50)
+              ? theme.colorScheme.primaryContainer.withAlpha(110)
               : theme.colorScheme.primaryContainer.withAlpha(180));
 
       final activeBorderColor = isActive
-          ? (isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary)
+          ? theme.colorScheme.primary
           : Colors.transparent;
 
       Widget interactiveContent = coreWidget;
@@ -232,7 +230,7 @@ class RubyText extends StatelessWidget {
               child: CircularProgressIndicator(
                 strokeWidth: 1.8,
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary,
+                  theme.colorScheme.primary,
                 ),
               ),
             ),

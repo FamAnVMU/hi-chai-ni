@@ -67,6 +67,9 @@ class AppColors {
   static const Color darkForestSurface = Color(0xFF1E293B);
   static const Color darkForestCard = Color(0xFF1E293B);
   static const Color darkForestBorder = Color(0xFF334155);
+  static const Color darkTextPrimary = Color(0xFFF8FAFC);
+  static const Color darkTextSecondary = Color(0xFF94A3B8);
+  static const Color darkInputSurface = Color(0xFF283548);
 
   // Functional Opacities
   static const Color disabledOpacityLight = Color(0x611E293B);

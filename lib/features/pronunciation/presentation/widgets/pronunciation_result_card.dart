@@ -20,7 +20,7 @@ class PronunciationResultCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final accent = context.hiAccentColor;
 
     final isRecognized = result.isRecognizedAccurately;
 
@@ -30,14 +30,18 @@ class PronunciationResultCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Row 1: Header & Confidence Chip
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: AppSpacing.xs,
+            runSpacing: AppSpacing.xs,
             children: [
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
                     isRecognized ? Icons.check_circle_rounded : Icons.info_outline_rounded,
-                    color: isRecognized ? AppColors.primaryBlueDark : Colors.orangeAccent,
+                    color: isRecognized ? accent : Colors.orangeAccent,
                     size: 20,
                   ),
                   const SizedBox(width: AppSpacing.xs),
@@ -61,7 +65,7 @@ class PronunciationResultCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: isDark ? AppColors.cardBackground : AppColors.cardBackground,
+              color: context.hiCardSurface,
               borderRadius: AppRadius.borderMd,
               border: Border.all(color: theme.colorScheme.outlineVariant),
             ),
@@ -78,11 +82,13 @@ class PronunciationResultCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      result.recognizedTranscript ?? '(Không phát hiện giọng nói)',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: isRecognized ? theme.colorScheme.onSurface : theme.colorScheme.error,
+                    Flexible(
+                      child: Text(
+                        result.recognizedTranscript ?? '(Không phát hiện giọng nói)',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: isRecognized ? theme.colorScheme.onSurface : theme.colorScheme.error,
+                        ),
                       ),
                     ),
                     if (result.overallScore != null)
@@ -90,7 +96,7 @@ class PronunciationResultCard extends StatelessWidget {
                         'Điểm ASR: ${(result.overallScore! * 100).toInt()}%',
                         style: theme.textTheme.labelMedium?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: AppColors.primaryBlueDark,
+                          color: accent,
                         ),
                       ),
                   ],
@@ -110,7 +116,7 @@ class PronunciationResultCard extends StatelessWidget {
                     label: 'Độ chuẩn thanh điệu',
                     value: '${((result.toneAccuracy ?? 0) * 100).toInt()}%',
                     icon: Icons.graphic_eq_rounded,
-                    color: AppColors.primaryBlueDark,
+                    color: accent,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
@@ -163,7 +169,7 @@ class PronunciationResultCard extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.arrow_right_rounded, size: 18, color: AppColors.primaryBlueDark),
+                  Icon(Icons.arrow_right_rounded, size: 18, color: accent),
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(fb, style: theme.textTheme.bodySmall),
@@ -219,21 +225,25 @@ class PronunciationResultCard extends StatelessWidget {
         children: [
           Icon(icon, size: 20, color: color),
           const SizedBox(width: AppSpacing.xs),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                value,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: color,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
                 ),
-              ),
-              Text(
-                label,
-                style: theme.textTheme.bodySmall?.copyWith(fontSize: 10),
-              ),
-            ],
+                Text(
+                  label,
+                  style: theme.textTheme.bodySmall?.copyWith(fontSize: 10),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
         ],
       ),

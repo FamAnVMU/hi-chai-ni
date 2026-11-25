@@ -47,7 +47,7 @@ class _GrammarListScreenState extends ConsumerState<GrammarListScreen> {
         title: const Text('Ngữ Pháp Tiếng Hán'),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: AppColors.border, height: 1.0),
+          child: Container(color: context.hiBorderColor, height: 1.0),
         ),
       ),
       body: SafeArea(
@@ -71,7 +71,7 @@ class _GrammarListScreenState extends ConsumerState<GrammarListScreen> {
                     'Phân cấp theo trình độ (HSK 1–6):',
                     style: theme.textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.secondaryText,
+                      color: context.hiSecondaryText,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -107,7 +107,7 @@ class _GrammarListScreenState extends ConsumerState<GrammarListScreen> {
                     'Phân loại theo chủ đề ngữ pháp:',
                     style: theme.textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.secondaryText,
+                      color: context.hiSecondaryText,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -221,120 +221,124 @@ class _GrammarListScreenState extends ConsumerState<GrammarListScreen> {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: InkWell(
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => GrammarDetailScreen(grammarId: item.id),
+      child: Semantics(
+        button: true,
+        label: 'Ngữ pháp HSK ${item.hskLevel}: ${item.title}, cấu trúc ${item.structure}',
+        child: InkWell(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => GrammarDetailScreen(grammarId: item.id),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            decoration: BoxDecoration(
+              color: context.hiCardSurface,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              border: Border.all(color: context.hiBorderColor),
             ),
-          );
-        },
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        child: Container(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          decoration: BoxDecoration(
-            color: AppColors.cardBackground,
-            borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(color: AppColors.border),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: isGushi
-                          ? AppColors.primaryBlueLight
-                          : AppColors.secondaryBackground,
-                      borderRadius: BorderRadius.circular(AppRadius.sm),
-                    ),
-                    child: Text(
-                      'HSK ${item.hskLevel}',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: isGushi ? AppColors.primaryBlueDark : AppColors.primaryText,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  if (item.topicNameVi.isNotEmpty) ...[
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainerHighest.withAlpha(120),
+                        color: isGushi
+                            ? context.hiAccentBg
+                            : context.hiSecondarySurface,
                         borderRadius: BorderRadius.circular(AppRadius.sm),
                       ),
                       child: Text(
-                        item.topicNameVi.split(' ')[0],
+                        'HSK ${item.hskLevel}',
                         style: theme.textTheme.labelSmall?.copyWith(
-                          fontSize: 10,
-                          color: AppColors.secondaryText,
+                          color: isGushi ? context.hiAccentColor : context.hiPrimaryText,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                     const SizedBox(width: AppSpacing.xs),
-                  ],
-                  Expanded(
-                    child: Text(
-                      item.title,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primaryText,
+                    if (item.topicNameVi.isNotEmpty) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerHighest.withAlpha(120),
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
+                        ),
+                        child: Text(
+                          item.topicNameVi.split(' ')[0],
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            fontSize: 10,
+                            color: context.hiSecondaryText,
+                          ),
+                        ),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      const SizedBox(width: AppSpacing.xs),
+                    ],
+                    Expanded(
+                      child: Text(
+                        item.title,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: context.hiPrimaryText,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
+                    Icon(statusIcon, color: statusColor, size: 18),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  item.structure,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: context.hiAccentColor,
+                    fontFamily: 'monospace',
                   ),
-                  Icon(statusIcon, color: statusColor, size: 18),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                item.structure,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryBlueDark,
-                  fontFamily: 'monospace',
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                item.explanationVi.isNotEmpty ? item.explanationVi : item.meaningVi,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.secondaryText,
+                const SizedBox(height: 4),
+                Text(
+                  item.explanationVi.isNotEmpty ? item.explanationVi : item.meaningVi,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: context.hiSecondaryText,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  Icon(Icons.verified_rounded, size: 12, color: AppColors.success),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      item.source,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Icon(Icons.verified_rounded, size: 12, color: context.hiSuccessFg),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        item.source,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: context.hiSecondaryText,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${item.examples.length} ví dụ',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: AppColors.mutedText,
+                        color: context.hiSecondaryText,
                         fontSize: 10,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${item.examples.length} ví dụ',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: AppColors.mutedText,
-                      fontSize: 10,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

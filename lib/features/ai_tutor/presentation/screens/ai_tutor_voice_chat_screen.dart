@@ -3,15 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../pronunciation/presentation/widgets/waveform_visualizer.dart';
+import '../../../settings/presentation/providers/settings_providers.dart';
+import '../../domain/models/tutor_persona.dart';
+import '../../domain/models/tutor_scenario.dart';
 import '../../domain/voice/voice_conversation_models.dart';
 import '../../domain/voice/voice_conversation_service.dart';
 import '../providers/ai_tutor_providers.dart';
+import 'ai_tutor_tab_screen.dart';
 
 /// Screen implementing AI Tutor Voice Conversation with 10 explicit operational states,
 /// real-time mic waveform, AI interruption, interim vs final transcript differentiation,
 /// mic test preflight, persona voice preview, and Firebase AI Logic Live API Preview diagnostics.
 class AiTutorVoiceChatScreen extends ConsumerStatefulWidget {
-  const AiTutorVoiceChatScreen({super.key});
+  final bool embeddedInTab;
+  final VoidCallback? onSelectPersona;
+
+  const AiTutorVoiceChatScreen({
+    super.key,
+    this.embeddedInTab = false,
+    this.onSelectPersona,
+  });
 
   @override
   ConsumerState<AiTutorVoiceChatScreen> createState() => _AiTutorVoiceChatScreenState();
@@ -142,11 +153,11 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDialogState) {
           return AlertDialog(
-            title: const Row(
+            title: Row(
               children: [
-                Icon(Icons.mic_none_rounded, color: AppColors.primaryBlueDark),
-                SizedBox(width: 8),
-                Text('Kiểm tra Microphone'),
+                Icon(Icons.mic_none_rounded, color: ctx.hiAccentColor),
+                const SizedBox(width: 8),
+                const Text('Kiểm tra Microphone'),
               ],
             ),
             content: Column(
@@ -166,8 +177,8 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
                       children: [
                         LinearProgressIndicator(
                           value: amp.clamp(0.0, 1.0),
-                          backgroundColor: Colors.grey.shade300,
-                          color: AppColors.primaryBlueDark,
+                          backgroundColor: ctx.hiSecondarySurface,
+                          color: ctx.hiAccentColor,
                           minHeight: 12,
                           borderRadius: BorderRadius.circular(6),
                         ),
@@ -251,13 +262,13 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.amber.shade50,
-                border: Border.all(color: Colors.amber.shade400),
+                color: context.hiWarningBg,
+                border: Border.all(color: context.hiWarningFg.withAlpha(140)),
                 borderRadius: AppRadius.borderSm,
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline_rounded, color: Colors.amber, size: 20),
+                  Icon(Icons.info_outline_rounded, color: context.hiWarningFg, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -265,7 +276,7 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
-                        color: Colors.amber.shade900,
+                        color: context.hiWarningFg,
                       ),
                     ),
                   ),
@@ -303,237 +314,319 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
     );
   }
 
+  void _handleSelectPersona() {
+    if (widget.onSelectPersona != null) {
+      widget.onSelectPersona!();
+    } else {
+      AiTutorTabScreen.showPersonaSelectorSheet(context, ref);
+    }
+  }
+
+  Widget _buildPersonaSelectorTrigger(
+    ThemeData theme,
+    TutorPersona persona,
+    TutorScenario scenario,
+  ) {
+    return InkWell(
+      onTap: _handleSelectPersona,
+      borderRadius: AppRadius.borderSm,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: AppDimensions.minTouchTarget),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: 14,
+                backgroundColor: context.hiAccentBg,
+                child: Text(
+                  persona.avatarLabel,
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            persona.nameZh,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(width: 2),
+                        const Icon(Icons.arrow_drop_down_rounded, size: 18),
+                      ],
+                    ),
+                    Text(
+                      scenario.titleVi,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontSize: 10,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildHeaderActions(VoiceConversationService service) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.mic_external_on_rounded),
+        tooltip: 'Kiểm tra mic',
+        onPressed: _showMicTestDialog,
+      ),
+      IconButton(
+        icon: Icon(
+          service.previewStatus.isPlaying ? Icons.stop_rounded : Icons.volume_up_outlined,
+        ),
+        tooltip: service.previewStatus.isPlaying ? 'Dừng phát giọng mẫu' : 'Nghe thử giọng mẫu',
+        onPressed: () async {
+          final messenger = ScaffoldMessenger.of(context);
+          final persona = ref.read(activePersonaProvider);
+          if (service.previewStatus.isPlaying) {
+            await service.stopPersonaVoicePreview();
+          } else {
+            await service.previewPersonaVoice(persona);
+            if (mounted && service.previewStatus.message != null) {
+              messenger.showSnackBar(
+                SnackBar(
+                  content: Text(service.previewStatus.message!),
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            }
+          }
+          if (mounted) setState(() {});
+        },
+      ),
+    ];
+  }
+
+  Widget _buildVoiceBody(
+    ThemeData theme,
+    TutorPersona persona,
+    VoiceConversationService service,
+  ) {
+    return Column(
+      children: [
+        // Informational notification banner when voice input is not supported
+        if (!service.voiceInputSupported)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 8.0),
+            color: theme.colorScheme.primary.withAlpha(20),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline_rounded, size: 16, color: theme.colorScheme.primary),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Chế độ hội thoại văn bản có hỗ trợ phát âm AI (Tính năng nhận diện giọng nói đang phát triển)',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+        // Status & Live API Preview Banner
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 6.0),
+          color: context.hiSecondarySurface,
+          child: Row(
+            children: [
+              _buildStatusChip(_currentStatus, service.voiceInputSupported),
+              const Spacer(),
+              InkWell(
+                onTap: _showLiveApiDiagnosticDialog,
+                borderRadius: AppRadius.borderSm,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: context.hiWarningBg,
+                    borderRadius: AppRadius.borderSm,
+                    border: Border.all(color: context.hiWarningFg.withAlpha(140), width: 0.8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.info_outline, size: 12, color: context.hiWarningFg),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Live API Preview',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: context.hiWarningFg,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Waveform & Amplitude Meter
+        StreamBuilder<double>(
+          stream: service.amplitudeStream,
+          initialData: 0.0,
+          builder: (context, snapshot) {
+            final amp = snapshot.data ?? 0.0;
+            final isListening = _currentStatus == VoiceConversationStatus.listening;
+            return WaveformVisualizer(
+              amplitude: amp,
+              isRecording: service.voiceInputSupported && isListening && !service.isMuted,
+              duration: Duration.zero,
+            );
+          },
+        ),
+
+        // Realtime Transcripts Scrollable Box
+        Expanded(
+          child: _transcripts.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.record_voice_over_outlined,
+                        size: 48,
+                        color: theme.colorScheme.onSurfaceVariant.withAlpha(120),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        _currentStatus == VoiceConversationStatus.idle
+                            ? 'Nhấn nút gọi để bắt đầu hội thoại với ${persona.nameZh}'
+                            : (service.voiceInputSupported
+                                ? 'Đang lắng nghe giọng nói của bạn...'
+                                : 'Chế độ hội thoại văn bản có hỗ trợ phát âm AI\n(Tính năng nhận diện giọng nói đang phát triển)'),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  itemCount: _transcripts.length,
+                  itemBuilder: (context, index) {
+                    final seg = _transcripts[index];
+                    return _buildTranscriptBubble(seg);
+                  },
+                ),
+        ),
+
+        // Speech Simulation / Input Box (enables testing and accessibility)
+        if (_currentStatus == VoiceConversationStatus.listening)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 4.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _speechInputController,
+                    style: const TextStyle(fontSize: 13),
+                    decoration: InputDecoration(
+                      hintText: 'Nhập tiếng Trung nếu cần giả lập giọng nói...',
+                      hintStyle: const TextStyle(fontSize: 12),
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      border: OutlineInputBorder(borderRadius: AppRadius.borderSm),
+                    ),
+                    onSubmitted: (val) {
+                      if (val.trim().isNotEmpty) {
+                        service.submitSpeechInput(val.trim());
+                        _speechInputController.clear();
+                      }
+                    },
+                  ),
+                ),
+                const SizedBox(width: 6),
+                IconButton(
+                  icon: const Icon(Icons.arrow_upward_rounded, size: 18),
+                  tooltip: 'Gửi tiếng nói',
+                  onPressed: () {
+                    final val = _speechInputController.text.trim();
+                    if (val.isNotEmpty) {
+                      service.submitSpeechInput(val);
+                      _speechInputController.clear();
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+
+        // Control Action Row (Start/Stop, Mute, Interrupt)
+        _buildControlBar(service),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     final persona = ref.watch(activePersonaProvider);
     final scenario = ref.watch(activeScenarioProvider);
     final service = ref.watch(voiceConversationServiceProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        titleSpacing: 0,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(
-              radius: 14,
-              backgroundColor: AppColors.primaryBlueDark.withAlpha(40),
-              child: Text(
-                persona.avatarLabel,
-                style: const TextStyle(fontSize: 14),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Hội thoại: ${persona.nameZh}',
-                  style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  scenario.titleVi,
-                  style: theme.textTheme.bodySmall?.copyWith(fontSize: 10),
-                ),
-              ],
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.mic_external_on_rounded),
-            tooltip: 'Kiểm tra mic',
-            onPressed: _showMicTestDialog,
-          ),
-          IconButton(
-            icon: Icon(
-              service.previewStatus.isPlaying ? Icons.stop_rounded : Icons.volume_up_outlined,
-            ),
-            tooltip: service.previewStatus.isPlaying ? 'Dừng phát giọng mẫu' : 'Nghe thử giọng mẫu',
-            onPressed: () async {
-              final messenger = ScaffoldMessenger.of(context);
-              if (service.previewStatus.isPlaying) {
-                await service.stopPersonaVoicePreview();
-              } else {
-                await service.previewPersonaVoice(persona);
-                if (mounted && service.previewStatus.message != null) {
-                  messenger.showSnackBar(
-                    SnackBar(
-                      content: Text(service.previewStatus.message!),
-                      duration: const Duration(seconds: 2),
-                    ),
-                  );
-                }
-              }
-              if (mounted) setState(() {});
-            },
-          ),
-        ],
-      ),
-      body: SafeArea(
+    if (widget.embeddedInTab) {
+      return SafeArea(
+        top: false,
         child: Column(
           children: [
-            // Informational notification banner when voice input is not supported
-            if (!service.voiceInputSupported)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 8.0),
-                color: theme.colorScheme.primary.withAlpha(20),
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline_rounded, size: 16, color: theme.colorScheme.primary),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Chế độ hội thoại văn bản có hỗ trợ phát âm AI (Tính năng nhận diện giọng nói đang phát triển)',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          color: theme.colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-            // Status & Live API Preview Banner
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 6.0),
-              color: isDark ? AppColors.cardBackground : theme.colorScheme.surfaceContainerHighest.withAlpha(70),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+              decoration: BoxDecoration(
+                color: context.hiCardSurface,
+                border: Border(bottom: BorderSide(color: context.hiBorderColor)),
+              ),
               child: Row(
                 children: [
-                  _buildStatusChip(_currentStatus, service.voiceInputSupported),
-                  const Spacer(),
-                  InkWell(
-                    onTap: _showLiveApiDiagnosticDialog,
-                    borderRadius: AppRadius.borderSm,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.amber.withAlpha(40),
-                        borderRadius: AppRadius.borderSm,
-                        border: Border.all(color: Colors.amber.withAlpha(120), width: 0.8),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.info_outline, size: 12, color: Colors.amber),
-                          SizedBox(width: 4),
-                          Text(
-                            'Live API Preview',
-                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.amber),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  Expanded(child: _buildPersonaSelectorTrigger(theme, persona, scenario)),
+                  ..._buildHeaderActions(service),
                 ],
               ),
             ),
-
-            // Waveform & Amplitude Meter
-            StreamBuilder<double>(
-              stream: service.amplitudeStream,
-              initialData: 0.0,
-              builder: (context, snapshot) {
-                final amp = snapshot.data ?? 0.0;
-                final isListening = _currentStatus == VoiceConversationStatus.listening;
-                return WaveformVisualizer(
-                  amplitude: amp,
-                  isRecording: service.voiceInputSupported && isListening && !service.isMuted,
-                  duration: Duration.zero,
-                );
-              },
-            ),
-
-            // Realtime Transcripts Scrollable Box
-            Expanded(
-              child: _transcripts.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.record_voice_over_outlined,
-                            size: 48,
-                            color: theme.colorScheme.onSurfaceVariant.withAlpha(120),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            _currentStatus == VoiceConversationStatus.idle
-                                ? 'Nhấn nút gọi để bắt đầu hội thoại với ${persona.nameZh}'
-                                : (service.voiceInputSupported
-                                    ? 'Đang lắng nghe giọng nói của bạn...'
-                                    : 'Chế độ hội thoại văn bản có hỗ trợ phát âm AI\n(Tính năng nhận diện giọng nói đang phát triển)'),
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    )
-                  : ListView.builder(
-                      controller: _scrollController,
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      itemCount: _transcripts.length,
-                      itemBuilder: (context, index) {
-                        final seg = _transcripts[index];
-                        return _buildTranscriptBubble(seg);
-                      },
-                    ),
-            ),
-
-            // Speech Simulation / Input Box (enables testing and accessibility)
-            if (_currentStatus == VoiceConversationStatus.listening)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 4.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _speechInputController,
-                        style: const TextStyle(fontSize: 13),
-                        decoration: InputDecoration(
-                          hintText: 'Nhập tiếng Trung nếu cần giả lập giọng nói...',
-                          hintStyle: const TextStyle(fontSize: 12),
-                          isDense: true,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                          border: OutlineInputBorder(borderRadius: AppRadius.borderSm),
-                        ),
-                        onSubmitted: (val) {
-                          if (val.trim().isNotEmpty) {
-                            service.submitSpeechInput(val.trim());
-                            _speechInputController.clear();
-                          }
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    IconButton(
-                      icon: const Icon(Icons.arrow_upward_rounded, size: 18),
-                      tooltip: 'Gửi tiếng nói',
-                      onPressed: () {
-                        final val = _speechInputController.text.trim();
-                        if (val.isNotEmpty) {
-                          service.submitSpeechInput(val);
-                          _speechInputController.clear();
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ),
-
-            // Control Action Row (Start/Stop, Mute, Interrupt)
-            _buildControlBar(service),
+            Expanded(child: _buildVoiceBody(theme, persona, service)),
           ],
         ),
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        titleSpacing: 0,
+        title: _buildPersonaSelectorTrigger(theme, persona, scenario),
+        actions: _buildHeaderActions(service),
+      ),
+      body: SafeArea(
+        child: _buildVoiceBody(theme, persona, service),
       ),
     );
   }
@@ -560,7 +653,7 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
         icon = Icons.sync;
         break;
       case VoiceConversationStatus.listening:
-        color = AppColors.primaryBlueDark;
+        color = context.hiAccentColor;
         label = voiceInputSupported ? 'Đang lắng nghe...' : 'Sẵn sàng nhập văn bản';
         icon = voiceInputSupported ? Icons.hearing : Icons.keyboard_alt_outlined;
         break;
@@ -623,7 +716,7 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
 
   Widget _buildTranscriptBubble(VoiceTranscriptSegment seg) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final settings = ref.watch(appSettingsProvider);
 
     final isUser = seg.isUser;
     final isInterim = seg.isInterim;
@@ -638,15 +731,13 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
         ),
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
         decoration: BoxDecoration(
-          color: isUser
-              ? (isDark ? AppColors.cardBackground : theme.colorScheme.primaryContainer)
-              : (isDark ? AppColors.cardBackground : Colors.white),
+          color: isUser ? context.hiAccentBg : context.hiCardSurface,
           borderRadius: AppRadius.borderMd,
           border: Border.all(
             color: isInterim
-                ? Colors.amber.withAlpha(160)
-                : (isDark ? AppColors.darkForestBorder : theme.colorScheme.outlineVariant),
-            style: isInterim ? BorderStyle.solid : BorderStyle.solid,
+                ? context.hiWarningFg
+                : context.hiBorderColor,
+            style: BorderStyle.solid,
             width: isInterim ? 1.4 : 0.8,
           ),
         ),
@@ -657,10 +748,10 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const SizedBox(
+                  SizedBox(
                     width: 8,
                     height: 8,
-                    child: CircularProgressIndicator(strokeWidth: 1.5, color: Colors.amber),
+                    child: CircularProgressIndicator(strokeWidth: 1.5, color: context.hiWarningFg),
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -668,7 +759,7 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
                     style: TextStyle(
                       fontSize: 10,
                       fontStyle: FontStyle.italic,
-                      color: Colors.amber.shade700,
+                      color: context.hiWarningFg,
                     ),
                   ),
                 ],
@@ -676,15 +767,15 @@ class _AiTutorVoiceChatScreenState extends ConsumerState<AiTutorVoiceChatScreen>
             const SizedBox(height: 2),
             RubyText.fromAnnotatedString(
               annotatedText: seg.text,
-              showPinyin: true,
+              showPinyin: settings.showPinyinByDefault && settings.showRubyAnnotation,
             ),
-            if (seg.pinyin != null && seg.pinyin!.isNotEmpty) ...[
+            if (settings.showPinyinByDefault && seg.pinyin != null && seg.pinyin!.isNotEmpty) ...[
               const SizedBox(height: 2),
               Text(
                 seg.pinyin!,
                 style: TextStyle(
                   fontSize: 11,
-                  color: isDark ? AppColors.primaryBlueDark : theme.colorScheme.primary,
+                  color: context.hiAccentColor,
                 ),
               ),
             ],

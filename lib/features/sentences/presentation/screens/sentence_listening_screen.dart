@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../settings/presentation/providers/settings_providers.dart';
 import '../../data/sentence_repository.dart';
 import '../../domain/models/sentence_models.dart';
 import '../../domain/services/sentence_audio_manager.dart';
@@ -34,6 +36,8 @@ class _SentenceListeningScreenState extends State<SentenceListeningScreen> {
 
   bool _showChinese = false;
   bool _showPinyin = false;
+  bool _showPinyinDefault = true;
+  bool _didInitFromSettings = false;
   double _speed = 1.0;
   bool _isPlaying = false;
   AudioType _audioType = AudioType.unknown;
@@ -60,8 +64,19 @@ class _SentenceListeningScreenState extends State<SentenceListeningScreen> {
     });
 
     _setupQuiz();
-    if (widget.autoPlay) {
-      _playCurrent();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_didInitFromSettings) {
+      _didInitFromSettings = true;
+      final settings = readAppSettingsOrDefault(context);
+      _showPinyinDefault = settings.showPinyinByDefault;
+      _speed = settings.speechRate;
+      if (widget.autoPlay && settings.autoPlayAudio) {
+        _playCurrent(speed: _speed);
+      }
     }
   }
 
@@ -161,7 +176,7 @@ class _SentenceListeningScreenState extends State<SentenceListeningScreen> {
     setState(() {
       _selectedOption = option;
       _showChinese = true;
-      _showPinyin = true;
+      _showPinyin = _showPinyinDefault;
     });
 
     widget.repository.recordPracticeAttempt(
@@ -248,15 +263,15 @@ class _SentenceListeningScreenState extends State<SentenceListeningScreen> {
                 width: 100,
                 height: 100,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2563EB).withAlpha(20),
+                  color: context.hiAccentColor.withAlpha(25),
                   shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0xFF2563EB), width: 2),
+                  border: Border.all(color: context.hiAccentColor, width: 2),
                 ),
                 child: Center(
                   child: Icon(
                     _isPlaying ? Icons.pause_rounded : Icons.volume_up_rounded,
                     size: 50,
-                    color: const Color(0xFF2563EB),
+                    color: context.hiAccentColor,
                   ),
                 ),
               ),
@@ -264,7 +279,7 @@ class _SentenceListeningScreenState extends State<SentenceListeningScreen> {
             const SizedBox(height: 10),
             Text(
               _isPlaying ? 'Đang phát...' : 'Nhấn để nghe lại',
-              style: const TextStyle(color: Colors.grey, fontSize: 13),
+              style: TextStyle(color: context.hiSecondaryText, fontSize: 13),
             ),
 
             const SizedBox(height: 24),
@@ -355,12 +370,12 @@ class _SentenceListeningScreenState extends State<SentenceListeningScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.hiCardSurface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: context.hiBorderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(8),
+            color: Colors.black.withAlpha(context.isDarkMode ? 24 : 8),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -375,12 +390,16 @@ class _SentenceListeningScreenState extends State<SentenceListeningScreen> {
                 ? Text(
                     s.chinese,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: context.hiPrimaryText,
+                    ),
                   )
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.visibility_off_outlined, color: Colors.grey, size: 20),
+                      Icon(Icons.visibility_off_outlined, color: context.hiSecondaryText, size: 20),
                       const SizedBox(width: 6),
                       TextButton(
                         onPressed: () => setState(() => _showChinese = true),
@@ -399,7 +418,11 @@ class _SentenceListeningScreenState extends State<SentenceListeningScreen> {
                 ? Text(
                     s.pinyin,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 16, color: Color(0xFF2563EB), fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: context.hiAccentColor,
+                      fontWeight: FontWeight.w600,
+                    ),
                   )
                 : (_showChinese
                     ? TextButton(
@@ -437,13 +460,17 @@ class _SentenceListeningScreenState extends State<SentenceListeningScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
                   color: _selectedOption == opt
-                      ? (opt == correct ? Colors.green.shade50 : Colors.red.shade50)
-                      : (_selectedOption != null && opt == correct ? Colors.green.shade50 : Colors.white),
+                      ? (opt == correct ? context.hiSuccessBg : context.hiErrorBg)
+                      : (_selectedOption != null && opt == correct
+                          ? context.hiSuccessBg
+                          : context.hiCardSurface),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: _selectedOption == opt
-                        ? (opt == correct ? Colors.green : Colors.red)
-                        : (_selectedOption != null && opt == correct ? Colors.green : Colors.grey.shade300),
+                        ? (opt == correct ? context.hiSuccessFg : context.hiErrorFg)
+                        : (_selectedOption != null && opt == correct
+                            ? context.hiSuccessFg
+                            : context.hiBorderColor),
                     width: _selectedOption != null && (opt == correct || _selectedOption == opt) ? 2 : 1,
                   ),
                 ),
@@ -456,15 +483,17 @@ class _SentenceListeningScreenState extends State<SentenceListeningScreen> {
                           fontSize: 14,
                           fontWeight: _selectedOption == opt ? FontWeight.bold : FontWeight.normal,
                           color: _selectedOption == opt
-                              ? (opt == correct ? Colors.green.shade900 : Colors.red.shade900)
-                              : Colors.black87,
+                              ? (opt == correct ? context.hiSuccessFg : context.hiErrorFg)
+                              : (_selectedOption != null && opt == correct
+                                  ? context.hiSuccessFg
+                                  : context.hiPrimaryText),
                         ),
                       ),
                     ),
                     if (_selectedOption != null && opt == correct)
-                      const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                      Icon(Icons.check_circle, color: context.hiSuccessFg, size: 20),
                     if (_selectedOption == opt && opt != correct)
-                      const Icon(Icons.cancel, color: Colors.red, size: 20),
+                      Icon(Icons.cancel, color: context.hiErrorFg, size: 20),
                   ],
                 ),
               ),

@@ -107,15 +107,17 @@ class _ListeningScreenState extends ConsumerState<ListeningScreen> {
                   padding: const EdgeInsets.all(AppSpacing.md),
                   child: Column(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: AppSpacing.sm,
+                        runSpacing: AppSpacing.sm,
                         children: [
                           IconButton(
                             icon: const Icon(Icons.replay_5_rounded),
                             tooltip: 'Lùi 5 giây',
                             onPressed: () => notifier.rewind5Seconds(),
                           ),
-                          const SizedBox(width: AppSpacing.sm),
                           CircleAvatar(
                             radius: 28,
                             backgroundColor: AppColors.primaryBlueDark,
@@ -141,7 +143,6 @@ class _ListeningScreenState extends ConsumerState<ListeningScreen> {
                                     ),
                                   ),
                           ),
-                          const SizedBox(width: AppSpacing.sm),
                           // Speed chips
                           Wrap(
                             spacing: 4,
@@ -182,18 +183,18 @@ class _ListeningScreenState extends ConsumerState<ListeningScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            color: AppColors.errorContainerLight,
+                            color: context.hiErrorBg,
                             borderRadius: BorderRadius.circular(AppRadius.xs),
-                            border: Border.all(color: AppColors.error.withAlpha(100)),
+                            border: Border.all(color: context.hiErrorFg.withAlpha(100)),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.error_outline, size: 16, color: AppColors.error),
+                              Icon(Icons.error_outline, size: 16, color: context.hiErrorFg),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
                                   playbackState.errorMessage!,
-                                  style: const TextStyle(fontSize: 12, color: AppColors.error),
+                                  style: TextStyle(fontSize: 12, color: context.hiErrorFg),
                                 ),
                               ),
                             ],
@@ -244,7 +245,7 @@ class _ListeningScreenState extends ConsumerState<ListeningScreen> {
                     const Divider(height: AppSpacing.md),
                     Text('Phiên âm (Pinyin):', style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 4),
-                    Text(activeLesson.transcriptPinyin, style: const TextStyle(fontSize: 13, height: 1.4, color: AppColors.primaryBlueDark)),
+                    Text(activeLesson.transcriptPinyin, style: TextStyle(fontSize: 13, height: 1.4, color: context.hiAccentColor)),
                     const Divider(height: AppSpacing.md),
                     Text('Bản dịch tiếng Việt:', style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 4),
@@ -284,24 +285,24 @@ class _ListeningScreenState extends ConsumerState<ListeningScreen> {
                       final optText = q.options[optIdx];
                       final isSelected = selectedOpt == optIdx;
 
-                      Color cardBg = AppColors.cardBackground;
-                      Color cardBorder = AppColors.border;
-                      Color textColor = AppColors.primaryText;
+                      Color cardBg = context.hiCardSurface;
+                      Color cardBorder = context.hiBorderColor;
+                      Color textColor = context.hiPrimaryText;
 
                       if (isSubmitted) {
                         if (optIdx == q.correctOptionIndex) {
-                          cardBg = AppColors.successContainerLight;
-                          cardBorder = AppColors.success;
-                          textColor = AppColors.success;
+                          cardBg = context.hiSuccessBg;
+                          cardBorder = context.hiSuccessFg;
+                          textColor = context.hiSuccessFg;
                         } else if (isSelected) {
-                          cardBg = AppColors.errorContainerLight;
-                          cardBorder = AppColors.error;
-                          textColor = AppColors.error;
+                          cardBg = context.hiErrorBg;
+                          cardBorder = context.hiErrorFg;
+                          textColor = context.hiErrorFg;
                         }
                       } else if (isSelected) {
-                        cardBg = AppColors.primaryBlueLight;
-                        cardBorder = AppColors.primaryBlueDark;
-                        textColor = AppColors.primaryBlueDark;
+                        cardBg = context.hiAccentBg;
+                        cardBorder = context.hiAccentColor;
+                        textColor = context.hiAccentColor;
                       }
 
                       return Padding(
@@ -329,12 +330,16 @@ class _ListeningScreenState extends ConsumerState<ListeningScreen> {
                                       shape: BoxShape.circle,
                                       color: isSelected ? cardBorder : Colors.transparent,
                                       border: Border.all(
-                                        color: isSelected ? cardBorder : AppColors.mutedText,
+                                        color: isSelected ? cardBorder : context.hiSecondaryText,
                                         width: 2,
                                       ),
                                     ),
                                     child: isSelected
-                                        ? const Icon(Icons.check, size: 14, color: Colors.white)
+                                        ? Icon(
+                                            Icons.check,
+                                            size: 14,
+                                            color: context.isDarkMode ? AppColors.darkForestBg : Colors.white,
+                                          )
                                         : null,
                                   ),
                                   const SizedBox(width: AppSpacing.md),
@@ -367,9 +372,9 @@ class _ListeningScreenState extends ConsumerState<ListeningScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
-                          color: isCorrect ? AppColors.successContainerLight : AppColors.errorContainerLight,
+                          color: isCorrect ? context.hiSuccessBg : context.hiErrorBg,
                           borderRadius: BorderRadius.circular(AppRadius.sm),
-                          border: Border.all(color: isCorrect ? AppColors.success : AppColors.error, width: 1),
+                          border: Border.all(color: isCorrect ? context.hiSuccessFg : context.hiErrorFg, width: 1),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -377,7 +382,7 @@ class _ListeningScreenState extends ConsumerState<ListeningScreen> {
                             Text(
                               isCorrect ? '✓ Chính xác!' : '✗ Chưa chính xác',
                               style: TextStyle(
-                                color: isCorrect ? AppColors.success : AppColors.error,
+                                color: isCorrect ? context.hiSuccessFg : context.hiErrorFg,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -385,7 +390,7 @@ class _ListeningScreenState extends ConsumerState<ListeningScreen> {
                             Text(
                               q.explanationVi,
                               style: theme.textTheme.bodySmall?.copyWith(
-                                color: AppColors.secondaryText,
+                                color: context.hiSecondaryText,
                               ),
                             ),
                           ],

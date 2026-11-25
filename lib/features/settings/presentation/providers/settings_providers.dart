@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../../../../core/audio/tts_service.dart';
 import '../../../../core/database/app_database.dart';
 import '../../../../core/database/dao/app_settings_dao.dart';
 import '../../../../core/theme/theme.dart';
@@ -67,6 +68,7 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
       final showRuby = map['show_ruby'] != 'false';
       final pinyinToneColors = map['pinyin_tone_colors'] != 'false';
       final speechRate = double.tryParse(map['speech_rate'] ?? '') ?? 1.0;
+      DefaultTtsService.defaultSpeechRate = speechRate;
       final autoPlay = map['auto_play_audio'] != 'false';
       final haptic = map['haptic_feedback'] != 'false';
       final lang = map['ui_language'] ?? 'vi';
@@ -125,6 +127,7 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
   }
 
   Future<void> setSpeechRate(double rate) async {
+    DefaultTtsService.defaultSpeechRate = rate;
     state = state.copyWith(speechRate: rate);
     await _persistSetting('speech_rate', rate.toString());
   }
@@ -157,6 +160,16 @@ final storageBreakdownProvider = FutureProvider.autoDispose<StorageBreakdown>((r
   final service = ref.watch(dataManagementServiceProvider);
   return await service.getStorageBreakdown();
 });
+
+/// Reads [appSettingsProvider] safely if a [ProviderScope] is present in [context],
+/// otherwise falling back to default [AppSettings] (e.g., inside isolated widget tests).
+AppSettings readAppSettingsOrDefault(BuildContext context) {
+  try {
+    return ProviderScope.containerOf(context, listen: false).read(appSettingsProvider);
+  } catch (_) {
+    return const AppSettings();
+  }
+}
 
 final backupListProvider = FutureProvider.autoDispose<List<File>>((ref) async {
   final service = ref.watch(dataManagementServiceProvider);

@@ -20,7 +20,7 @@ class ShadowingTimelineCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final accent = context.hiAccentColor;
 
     final targetSec = (result.targetDurationMs / 1000).toStringAsFixed(1);
     final userSec = (result.userDurationMs / 1000).toStringAsFixed(1);
@@ -33,21 +33,27 @@ class ShadowingTimelineCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Row 1: Header & Pacing Chip
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: AppSpacing.xs,
+            runSpacing: AppSpacing.xs,
             children: [
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
                     isOptimal ? Icons.speed_rounded : Icons.av_timer_rounded,
-                    color: isOptimal ? AppColors.primaryBlueDark : Colors.orangeAccent,
+                    color: isOptimal ? accent : Colors.orangeAccent,
                     size: 20,
                   ),
                   const SizedBox(width: AppSpacing.xs),
-                  Text(
-                    'Đối Chiếu Nhịp Độ & Timeline',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
+                  Flexible(
+                    child: Text(
+                      'Đối Chiếu Nhịp Độ & Timeline',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
@@ -64,7 +70,7 @@ class ShadowingTimelineCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: isDark ? AppColors.cardBackground : AppColors.cardBackground,
+              color: context.hiCardSurface,
               borderRadius: AppRadius.borderMd,
               border: Border.all(color: theme.colorScheme.outlineVariant),
             ),
@@ -125,7 +131,7 @@ class ShadowingTimelineCard extends StatelessWidget {
                           minHeight: 10,
                           backgroundColor: theme.colorScheme.outlineVariant,
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            isOptimal ? AppColors.primaryBlueDark : Colors.orangeAccent,
+                            isOptimal ? accent : Colors.orangeAccent,
                           ),
                         ),
                       ),
@@ -149,10 +155,10 @@ class ShadowingTimelineCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: (isOptimal ? AppColors.primaryBlueDark : Colors.orangeAccent).withAlpha(20),
+              color: (isOptimal ? accent : Colors.orangeAccent).withAlpha(20),
               borderRadius: AppRadius.borderMd,
               border: Border.all(
-                color: (isOptimal ? AppColors.primaryBlueDark : Colors.orangeAccent).withAlpha(80),
+                color: (isOptimal ? accent : Colors.orangeAccent).withAlpha(80),
               ),
             ),
             child: Row(
@@ -160,7 +166,7 @@ class ShadowingTimelineCard extends StatelessWidget {
                 Icon(
                   isOptimal ? Icons.thumb_up_alt_rounded : Icons.tune_rounded,
                   size: 20,
-                  color: isOptimal ? AppColors.primaryBlueDark : Colors.orangeAccent,
+                  color: isOptimal ? accent : Colors.orangeAccent,
                 ),
                 const SizedBox(width: AppSpacing.xs),
                 Expanded(
@@ -168,7 +174,7 @@ class ShadowingTimelineCard extends StatelessWidget {
                     result.pacingVerdict,
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: isOptimal ? theme.colorScheme.onSurface : Colors.orange[800],
+                      color: isOptimal ? theme.colorScheme.onSurface : context.hiWarningFg,
                     ),
                   ),
                 ),
@@ -185,7 +191,7 @@ class ShadowingTimelineCard extends StatelessWidget {
                   theme,
                   label: 'Trùng khớp Timeline',
                   value: '${result.timelineMatchPercent.toInt()}%',
-                  color: AppColors.primaryBlueDark,
+                  color: accent,
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),

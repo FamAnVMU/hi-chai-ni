@@ -1,13 +1,24 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/audio/audio_player_service.dart';
+import '../../../../core/audio/tts_service.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../settings/settings.dart';
 import '../../../vocabulary_srs/vocabulary_srs.dart';
 
 /// Tab 4: Spaced Repetition System (SRS SM-2) Review Screen.
 /// Connects directly to SQLite-backed SM-2 engine, supports 3D card flip,
 /// 4 rating grades with interval explanations, and offline persistence.
 class ReviewScreen extends ConsumerStatefulWidget {
-  const ReviewScreen({super.key});
+  final AudioPlayerService? audioPlayerOverride;
+  final TtsService? ttsServiceOverride;
+
+  const ReviewScreen({
+    super.key,
+    this.audioPlayerOverride,
+    this.ttsServiceOverride,
+  });
 
   @override
   ConsumerState<ReviewScreen> createState() => _ReviewScreenState();
@@ -16,6 +27,10 @@ class ReviewScreen extends ConsumerStatefulWidget {
 class _ReviewScreenState extends ConsumerState<ReviewScreen>
     with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   late final AppLifecycleListener _lifecycleListener;
+  AudioPlayerService? _audioPlayer;
+  TtsService? _ttsService;
+  bool? _localPinyinOverride;
+  String? _lastCardId;
 
   @override
   bool get wantKeepAlive => true;
@@ -36,13 +51,55 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen>
   void dispose() {
     _lifecycleListener.dispose();
     WidgetsBinding.instance.removeObserver(this);
+    if (widget.audioPlayerOverride == null) {
+      _audioPlayer?.dispose();
+    }
+    if (widget.ttsServiceOverride == null) {
+      _ttsService?.dispose();
+    }
     super.dispose();
+  }
+
+  Future<void> _autoPlayCardAudio(SrsFlashcardItem card, double speechRate) async {
+    try {
+      final audioUri = card.audioUri;
+      if (audioUri != null && audioUri.isNotEmpty) {
+        final isLocalFile = !audioUri.startsWith('http') && !audioUri.startsWith('assets/');
+        final fileExists = isLocalFile ? File(audioUri).existsSync() : true;
+        if (fileExists) {
+          _audioPlayer ??= widget.audioPlayerOverride ?? DefaultAudioPlayerService();
+          await _audioPlayer!.stop();
+          await _audioPlayer!.play(audioUri, speed: speechRate);
+          return;
+        }
+      }
+      _ttsService ??= widget.ttsServiceOverride ?? DefaultTtsService();
+      await _ttsService!.speak(
+        card.simplified,
+        language: 'zh-CN',
+        rate: DefaultTtsService.toTtsRate(speechRate),
+      );
+    } catch (_) {
+      // Ignore audio engine failures during auto-play
+    }
+  }
+
+  void _flipCardAndAutoPlay(
+    SrsFlashcardItem card, {
+    required bool wasRevealed,
+    required AppSettings settings,
+  }) {
+    ref.read(srsStudySessionProvider.notifier).flipCard();
+    if (!wasRevealed && settings.autoPlayAudio) {
+      _autoPlayCardAudio(card, settings.speechRate);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
     final theme = Theme.of(context);
+    final settings = ref.watch(appSettingsProvider);
     final sessionAsync = ref.watch(srsStudySessionProvider);
     final dueCountAsync = ref.watch(srsDueCountProvider);
 
@@ -97,6 +154,12 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen>
             final reviewedCount = session.completedReviewsCount;
             final accuracyPercent =
                 (session.accuracyRate * 100).toStringAsFixed(0);
+            if (_lastCardId != card.id) {
+              _lastCardId = card.id;
+              _localPinyinOverride = null;
+            }
+            final showPinyinOnFront =
+                _localPinyinOverride ?? (settings.showPinyinByDefault && session.isPinyinVisibleOnFront);
 
             return SingleChildScrollView(
               padding: AppSpacing.screenPadding,
@@ -109,19 +172,19 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen>
                       _buildStatCard(
                         title: 'Cần ôn hôm nay',
                         value: dueCountStr,
-                        color: AppColors.primaryBlueDark,
+                        color: context.hiAccentColor,
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       _buildStatCard(
                         title: 'Đã ôn phiên này',
                         value: reviewedCount.toString(),
-                        color: AppColors.primaryBlue,
+                        color: theme.colorScheme.secondary,
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       _buildStatCard(
                         title: 'Tỷ lệ nhớ',
                         value: '$accuracyPercent%',
-                        color: AppColors.success,
+                        color: context.hiSuccessFg,
                       ),
                     ],
                   ),
@@ -140,13 +203,18 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen>
                   FlashcardCard(
                     card: card,
                     isFlipped: session.isAnswerRevealed,
-                    showPinyinOnFront: session.isPinyinVisibleOnFront,
-                    onFlip: () => ref
-                        .read(srsStudySessionProvider.notifier)
-                        .flipCard(),
-                    onTogglePinyin: () => ref
-                        .read(srsStudySessionProvider.notifier)
-                        .togglePinyinVisibility(),
+                    showPinyinOnFront: showPinyinOnFront,
+                    onFlip: () => _flipCardAndAutoPlay(
+                      card,
+                      wasRevealed: session.isAnswerRevealed,
+                      settings: settings,
+                    ),
+                    onTogglePinyin: () {
+                      setState(() => _localPinyinOverride = !showPinyinOnFront);
+                      ref
+                          .read(srsStudySessionProvider.notifier)
+                          .togglePinyinVisibility();
+                    },
                   ),
                   const SizedBox(height: AppSpacing.lg),
 
@@ -158,9 +226,11 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen>
                       variant: HiButtonVariant.primary,
                       size: HiButtonSize.lg,
                       isFullWidth: true,
-                      onPressed: () => ref
-                          .read(srsStudySessionProvider.notifier)
-                          .flipCard(),
+                      onPressed: () => _flipCardAndAutoPlay(
+                        card,
+                        wasRevealed: session.isAnswerRevealed,
+                        settings: settings,
+                      ),
                     ),
                   ] else ...[
                     Text(

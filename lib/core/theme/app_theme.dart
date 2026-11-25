@@ -6,6 +6,7 @@ import 'tokens/app_elevation.dart';
 import 'tokens/app_radius.dart';
 import 'tokens/app_spacing.dart';
 import 'tokens/app_typography.dart';
+import 'tokens/hi_semantic_colors.dart';
 
 /// AppTheme builds Material 3 ThemeData for Clean Modern White & Light Blue aesthetic
 /// adhering strictly to the HI Chinese design language.
@@ -26,6 +27,7 @@ class AppTheme {
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.mainBackground,
       textTheme: textTheme,
+      extensions: const [HiSemanticColors.light],
 
       // AppBar
       appBarTheme: AppBarTheme(
@@ -73,6 +75,7 @@ class AppTheme {
           elevation: AppElevation.level0,
           backgroundColor: AppColors.primaryBlueDark,
           foregroundColor: Colors.white,
+          tapTargetSize: MaterialTapTargetSize.padded,
           minimumSize: const Size(
             AppDimensions.minTouchTarget,
             AppDimensions.buttonHeightMd,
@@ -88,6 +91,7 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primaryBlueDark,
           backgroundColor: AppColors.cardBackground,
+          tapTargetSize: MaterialTapTargetSize.padded,
           minimumSize: const Size(
             AppDimensions.minTouchTarget,
             AppDimensions.buttonHeightMd,
@@ -103,6 +107,7 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primaryBlueDark,
+          tapTargetSize: MaterialTapTargetSize.padded,
           minimumSize: const Size(
             AppDimensions.minTouchTarget,
             AppDimensions.buttonHeightMd,
@@ -245,6 +250,7 @@ class AppTheme {
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.darkForestBg,
       textTheme: textTheme,
+      extensions: const [HiSemanticColors.dark],
 
       // AppBar
       appBarTheme: AppBarTheme(
@@ -292,6 +298,7 @@ class AppTheme {
           elevation: AppElevation.level0,
           backgroundColor: AppColors.accentBlue,
           foregroundColor: AppColors.darkForestBg,
+          tapTargetSize: MaterialTapTargetSize.padded,
           minimumSize: const Size(
             AppDimensions.minTouchTarget,
             AppDimensions.buttonHeightMd,
@@ -306,6 +313,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: colorScheme.primary,
+          tapTargetSize: MaterialTapTargetSize.padded,
           minimumSize: const Size(
             AppDimensions.minTouchTarget,
             AppDimensions.buttonHeightMd,
@@ -319,6 +327,7 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: colorScheme.primary,
+          tapTargetSize: MaterialTapTargetSize.padded,
           minimumSize: const Size(
             AppDimensions.minTouchTarget,
             AppDimensions.buttonHeightMd,

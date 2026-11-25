@@ -368,8 +368,8 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
           preferredSize: const Size.fromHeight(4),
           child: LinearProgressIndicator(
             value: progress,
-            backgroundColor: AppColors.primaryBlueLight,
-            valueColor: const AlwaysStoppedAnimation(AppColors.primaryBlueDark),
+            backgroundColor: context.hiAccentBg,
+            valueColor: AlwaysStoppedAnimation(context.hiAccentColor),
             minHeight: 4,
           ),
         ),
@@ -392,7 +392,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
                       Text(
                         '${(progress * 100).toInt()}%',
                         style: theme.textTheme.labelMedium?.copyWith(
-                          color: AppColors.primaryBlueDark,
+                          color: context.hiAccentColor,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -413,9 +413,9 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
             // Bottom Action Bar
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
-              decoration: const BoxDecoration(
-                color: AppColors.cardBackground,
-                border: Border(top: BorderSide(color: AppColors.border)),
+              decoration: BoxDecoration(
+                color: context.hiCardSurface,
+                border: Border(top: BorderSide(color: context.hiBorderColor)),
               ),
               child: Row(
                 children: [

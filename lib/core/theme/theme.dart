@@ -8,6 +8,7 @@ export 'tokens/app_elevation.dart';
 export 'tokens/app_radius.dart';
 export 'tokens/app_spacing.dart';
 export 'tokens/app_typography.dart';
+export 'tokens/hi_semantic_colors.dart';
 
 // Theme configuration & providers
 export 'app_theme.dart';

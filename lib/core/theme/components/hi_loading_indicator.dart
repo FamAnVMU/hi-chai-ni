@@ -46,7 +46,7 @@ class HiLoadingIndicator extends StatelessWidget {
         Text(
           message!,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: AppColors.secondaryText,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
           textAlign: TextAlign.center,
         ),

@@ -29,6 +29,7 @@ class HanziCanvas extends StatelessWidget {
     controller.setCanvasSize(Size(size, size));
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    controller.syncStrokeColorForBrightness(isDark);
 
     return Center(
       child: AnimatedBuilder(
@@ -66,7 +67,7 @@ class HanziCanvas extends StatelessWidget {
               width: size,
               height: size,
               decoration: BoxDecoration(
-                color: isDark ? AppColors.cardBackground : AppColors.cardBackground,
+                color: context.hiCardSurface,
                 borderRadius: AppRadius.borderMd,
                 boxShadow: AppElevation.shadowMid(theme.brightness),
               ),
@@ -104,9 +105,9 @@ class HanziCanvas extends StatelessWidget {
                               mode: controller.mode,
                               highlightedStrokeOrder: highlightedStrokeOrder,
                               watermarkColor: isDark
-                                  ? AppColors.primaryBlueDark.withAlpha(45)
+                                  ? AppColors.accentBlue.withAlpha(65)
                                   : AppColors.primaryBlueDark.withAlpha(70),
-                              highlightStrokeColor: AppColors.primaryBlueDark,
+                              highlightStrokeColor: context.hiAccentColor,
                             ),
                           ),
                         ),
