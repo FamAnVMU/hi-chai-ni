@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hi_chinese/core/network/ai/ai_service.dart';
+import 'package:hi_chinese/core/network/ai/security/ai_credential_storage.dart';
 import 'package:hi_chinese/core/theme/theme.dart';
 import 'package:hi_chinese/core/utils/permission_helper.dart';
 import 'package:hi_chinese/features/pronunciation/pronunciation.dart';
@@ -60,6 +62,7 @@ void main() {
     return ProviderScope(
       overrides: [
         pronunciationRepositoryProvider.overrideWithValue(fakeRepo),
+        aiCredentialStorageProvider.overrideWithValue(AiCredentialStorage.inMemory()),
       ],
       child: MaterialApp(
         theme: AppTheme.lightTheme,
@@ -104,7 +107,10 @@ void main() {
       await tester.ensureVisible(micFinder);
       await tester.tap(micFinder);
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 400));
+      await tester.pump(const Duration(milliseconds: 550));
+      for (var i = 0; i < 5; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
+      }
 
       // Tap stop to stop recording and trigger analysis
       final stopFinder = find.byIcon(Icons.stop_rounded);

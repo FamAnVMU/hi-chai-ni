@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:sqflite/sqflite.dart';
@@ -59,6 +60,7 @@ class AiCredentialStorage {
   /// Factory for unit testing without platform channel dependencies.
   factory AiCredentialStorage.inMemory({
     String? initialApiKey,
+    String? initialProxyApiKey,
     String? initialProxyUrl,
     AiProviderType? initialProviderType,
     String? initialSelectedModel,
@@ -66,6 +68,9 @@ class AiCredentialStorage {
   }) {
     final map = <String, String>{};
     if (initialApiKey != null) map[_keyGeminiApiKey] = initialApiKey;
+    if (initialProxyApiKey != null) {
+      map[keyForProvider(AiProviderType.customProxy)] = initialProxyApiKey;
+    }
     if (initialProxyUrl != null) map[_keyCustomProxyUrl] = initialProxyUrl;
     if (initialProviderType != null) {
       map[_keyProviderType] = initialProviderType.name;
@@ -314,6 +319,56 @@ class AiCredentialStorage {
 
   // ==================== PROXY URL ====================
 
+  static bool _isUnsafeIpv4Bytes(Uint8List b) {
+    if (b.length != 4) return true;
+    // 127.0.0.0/8 (Loopback) or 0.0.0.0/8 (Unspecified / "this host")
+    if (b[0] == 127 || b[0] == 0) return true;
+    // 10.0.0.0/8 (RFC1918)
+    if (b[0] == 10) return true;
+    // 192.168.0.0/16 (RFC1918)
+    if (b[0] == 192 && b[1] == 168) return true;
+    // 169.254.0.0/16 (Link-local & cloud metadata)
+    if (b[0] == 169 && b[1] == 254) return true;
+    // 172.16.0.0/12 (172.16.x.x - 172.31.x.x)
+    if (b[0] == 172 && b[1] >= 16 && b[1] <= 31) return true;
+    // 100.64.0.0/10 (Carrier-Grade NAT: 100.64.x.x - 100.127.x.x)
+    if (b[0] == 100 && b[1] >= 64 && b[1] <= 127) return true;
+    return false;
+  }
+
+  static bool _isUnsafeIpv6Bytes(Uint8List b) {
+    if (b.length != 16) return true;
+    // Unspecified (::) and Loopback (::1)
+    bool first15Zero = true;
+    for (int i = 0; i < 15; i++) {
+      if (b[i] != 0) {
+        first15Zero = false;
+        break;
+      }
+    }
+    if (first15Zero && (b[15] == 0 || b[15] == 1)) return true;
+
+    // Link-local fe80::/10
+    if (b[0] == 0xfe && (b[1] & 0xc0) == 0x80) return true;
+
+    // Unique Local Address fc00::/7 (fc.. and fd..)
+    if ((b[0] & 0xfe) == 0xfc) return true;
+
+    // IPv4-mapped IPv6 ::ffff:0:0/96
+    bool isIpv4Mapped = true;
+    for (int i = 0; i < 10; i++) {
+      if (b[i] != 0) {
+        isIpv4Mapped = false;
+        break;
+      }
+    }
+    if (isIpv4Mapped && b[10] == 0xff && b[11] == 0xff) {
+      return _isUnsafeIpv4Bytes(Uint8List.sublistView(b, 12, 16));
+    }
+
+    return false;
+  }
+
   /// Checks whether a hostname or IP address is loopback, internal, link-local, or otherwise unsafe for proxying.
   static bool isUnsafeHost(String rawHost) {
     final host = rawHost.trim().toLowerCase().replaceAll(RegExp(r'^\[|\]$'), '');
@@ -321,25 +376,21 @@ class AiCredentialStorage {
     if (host == 'localhost' || host.endsWith('.local') || host.endsWith('.internal')) {
       return true;
     }
-    // Loopback IPv4 / IPv6 / Unspecified
-    if (host == '::1' || host == '::' || host == '0.0.0.0') return true;
-    if (host.startsWith('127.')) return true;
-    if (host.startsWith('0.')) return true;
-    // Private IPv4 ranges
-    // 10.0.0.0/8
-    if (host.startsWith('10.')) return true;
-    // 192.168.0.0/16
-    if (host.startsWith('192.168.')) return true;
-    // 169.254.0.0/16 (Link-local & cloud metadata)
-    if (host.startsWith('169.254.')) return true;
-    // 172.16.0.0/12 (172.16.x.x - 172.31.x.x)
-    if (RegExp(r'^172\.(1[6-9]|2[0-9]|3[0-1])\.').hasMatch(host)) return true;
-    // 100.64.0.0/10 (Carrier-Grade NAT)
-    if (RegExp(r'^100\.(6[4-9]|[7-9][0-9]|1[0-1][0-9]|12[0-7])\.').hasMatch(host)) return true;
-    // IPv6 Link-local / Unique Local Address (ULA)
-    if (host.startsWith('fe80:') || host.startsWith('fc') || host.startsWith('fd')) {
-      return true;
+
+    // Parse real IPv4 / IPv6 literals via InternetAddress to avoid blocking
+    // legitimate domains starting with "fc" or "fd" (e.g., fcloud.vn) while
+    // catching IPv6-mapped IPv4 (::ffff:127.0.0.1) and expanded ::1 forms.
+    final stripZone = host.split('%').first;
+    final addr = InternetAddress.tryParse(stripZone);
+    if (addr != null) {
+      if (addr.type == InternetAddressType.IPv4) {
+        return _isUnsafeIpv4Bytes(addr.rawAddress);
+      }
+      if (addr.type == InternetAddressType.IPv6) {
+        return _isUnsafeIpv6Bytes(addr.rawAddress);
+      }
     }
+
     return false;
   }
 

@@ -43,6 +43,16 @@ class ListeningLesson {
     required this.questions,
   });
 
+  /// Returns Chinese dialogue lines stripped of speaker labels (男：, 女：, 顾客：, 老板：)
+  /// for clean TTS fallback synthesis.
+  String get transcriptChineseOnly {
+    return transcriptZh
+        .split('\n')
+        .map((line) => line.replaceFirst(RegExp(r'^[^：:]+[：:]\s*'), '').trim())
+        .where((line) => line.isNotEmpty)
+        .join(' ');
+  }
+
   static List<ListeningLesson> get defaultLessons => const [
         ListeningLesson(
           id: 'LIS_HSK1_01_GREETING',

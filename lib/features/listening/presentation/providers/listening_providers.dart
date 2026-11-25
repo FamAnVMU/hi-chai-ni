@@ -37,6 +37,7 @@ class ListeningPlaybackState {
   final Duration position;
   final Duration totalDuration;
   final bool showTranscript;
+  final bool hasListened;
   final String? currentAudioUri;
   final String? errorMessage;
   final Map<String, int> selectedAnswers;
@@ -49,6 +50,7 @@ class ListeningPlaybackState {
     this.position = Duration.zero,
     this.totalDuration = const Duration(seconds: 30),
     this.showTranscript = false,
+    this.hasListened = false,
     this.currentAudioUri,
     this.errorMessage,
     this.selectedAnswers = const {},
@@ -65,6 +67,7 @@ class ListeningPlaybackState {
     Duration? position,
     Duration? totalDuration,
     bool? showTranscript,
+    bool? hasListened,
     String? currentAudioUri,
     String? errorMessage,
     bool clearError = false,
@@ -78,6 +81,7 @@ class ListeningPlaybackState {
       position: position ?? this.position,
       totalDuration: totalDuration ?? this.totalDuration,
       showTranscript: showTranscript ?? this.showTranscript,
+      hasListened: hasListened ?? this.hasListened,
       currentAudioUri: currentAudioUri ?? this.currentAudioUri,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       selectedAnswers: selectedAnswers ?? this.selectedAnswers,
@@ -110,22 +114,29 @@ class ListeningPlaybackNotifier extends Notifier<ListeningPlaybackState> {
     _player = _injectedPlayer ?? DefaultAudioPlayerService();
     _statusSub = _player!.statusStream.listen((status) {
       final isPlaying = status == AudioPlaybackStatus.playing;
+      final listenedNow = state.hasListened ||
+          isPlaying ||
+          status == AudioPlaybackStatus.completed;
       final total = _player!.totalDuration > Duration.zero
           ? _player!.totalDuration
           : state.totalDuration;
       state = state.copyWith(
         status: status,
         isPlaying: isPlaying,
+        hasListened: listenedNow,
         totalDuration: total,
       );
     });
 
     _posSub = _player!.positionStream.listen((pos) {
-      state = state.copyWith(position: pos);
+      state = state.copyWith(
+        position: pos,
+        hasListened: state.hasListened || pos > Duration.zero,
+      );
     });
   }
 
-  Future<void> togglePlay([String? uri]) async {
+  Future<void> togglePlay([String? uri, String? fallbackText]) async {
     _ensurePlayer();
     final targetUri = uri ?? state.currentAudioUri;
     if (state.isPlaying) {
@@ -134,29 +145,39 @@ class ListeningPlaybackNotifier extends Notifier<ListeningPlaybackState> {
       if (state.status == AudioPlaybackStatus.paused && targetUri == state.currentAudioUri && targetUri != null) {
         await resume();
       } else if (targetUri != null) {
-        await play(targetUri);
+        await play(targetUri, fallbackText: fallbackText);
       } else {
         // For unit tests / mock environments where no URI is supplied
-        state = state.copyWith(isPlaying: true, status: AudioPlaybackStatus.playing);
+        state = state.copyWith(
+          isPlaying: true,
+          hasListened: true,
+          status: AudioPlaybackStatus.playing,
+        );
       }
     }
   }
 
-  Future<void> play(String uri) async {
+  Future<void> play(String uri, {String? fallbackText}) async {
     _ensurePlayer();
     try {
       state = state.copyWith(
         currentAudioUri: uri,
         status: AudioPlaybackStatus.buffering,
+        hasListened: true,
         clearError: true,
       );
-      await _player!.play(uri, speed: state.playbackSpeed);
+      await _player!.playWithFallback(
+        uri,
+        speed: state.playbackSpeed,
+        fallbackText: fallbackText,
+      );
       final total = _player!.totalDuration > Duration.zero
           ? _player!.totalDuration
           : state.totalDuration;
       state = state.copyWith(
         status: AudioPlaybackStatus.playing,
         isPlaying: true,
+        hasListened: true,
         totalDuration: total,
         clearError: true,
       );
@@ -247,6 +268,7 @@ class ListeningPlaybackNotifier extends Notifier<ListeningPlaybackState> {
         position: Duration.zero,
         totalDuration: Duration(seconds: durationSeconds),
         isPlaying: false,
+        hasListened: false,
         status: AudioPlaybackStatus.idle,
         clearError: true,
       );

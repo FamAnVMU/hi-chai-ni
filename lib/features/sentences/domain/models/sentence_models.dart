@@ -139,11 +139,27 @@ class SentenceAudio {
     this.attribution = '',
   });
 
-  factory SentenceAudio.fromMap(Map<String, dynamic> map) {
+  factory SentenceAudio.fromMap(
+    Map<String, dynamic> map, {
+    String? fallbackSentenceId,
+  }) {
+    final audioType = AudioType.fromString(map['audio_type'] as String?);
+    final rawId = (map['id'] as String?)?.trim();
+    var audioId = (rawId != null && rawId.isNotEmpty)
+        ? rawId
+        : (map['audio_id'] as String? ?? '').trim();
+    final rawSentenceId = (map['sentence_id'] as String?)?.trim();
+    final resolvedSentenceId = (rawSentenceId != null && rawSentenceId.isNotEmpty)
+        ? rawSentenceId
+        : (fallbackSentenceId ?? '').trim();
+    if (audioId.isEmpty && resolvedSentenceId.isNotEmpty) {
+      audioId = '${resolvedSentenceId}_${audioType.name}';
+    }
+
     return SentenceAudio(
-      id: map['id'] as String? ?? '',
-      sentenceId: map['sentence_id'] as String? ?? '',
-      audioType: AudioType.fromString(map['audio_type'] as String?),
+      id: audioId,
+      sentenceId: resolvedSentenceId,
+      audioType: audioType,
       speakerName: map['speaker_name'] as String? ?? map['speaker'] as String? ?? '',
       gender: map['gender'] as String? ?? 'female',
       accent: map['accent'] as String? ?? 'zh-CN-Beijing',
@@ -325,16 +341,20 @@ class SentenceItem {
       } catch (_) {}
     }
 
-    // Parse audios
+    final sentId = json['id'] as String? ?? json['sentence_id'] as String? ?? '';
+
+    // Parse audios with parent sentence ID fallback
     List<SentenceAudio> parsedAudios = [];
     final rawAudios = json['audios'];
     if (rawAudios is List) {
       parsedAudios = rawAudios
-          .map((a) => SentenceAudio.fromMap(a as Map<String, dynamic>))
+          .map((a) => SentenceAudio.fromMap(
+                a as Map<String, dynamic>,
+                fallbackSentenceId: sentId,
+              ))
           .toList();
     }
 
-    final sentId = json['id'] as String? ?? json['sentence_id'] as String? ?? '';
     final hasHuman = json['has_human_audio'] == 1 ||
         json['has_human_audio'] == true ||
         parsedAudios.any((a) => a.audioType == AudioType.humanRecording);

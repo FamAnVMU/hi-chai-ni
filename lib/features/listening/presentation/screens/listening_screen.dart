@@ -135,7 +135,10 @@ class _ListeningScreenState extends ConsumerState<ListeningScreen> {
                                       size: 32,
                                     ),
                                     tooltip: playbackState.isPlaying ? 'Tạm dừng' : 'Phát âm thanh',
-                                    onPressed: () => notifier.togglePlay(activeLesson.audioUrl),
+                                    onPressed: () => notifier.togglePlay(
+                                      activeLesson.audioUrl,
+                                      activeLesson.transcriptChineseOnly,
+                                    ),
                                   ),
                           ),
                           const SizedBox(width: AppSpacing.sm),
@@ -204,14 +207,27 @@ class _ListeningScreenState extends ConsumerState<ListeningScreen> {
             ),
             const SizedBox(height: AppSpacing.md),
 
-            // Transcript Reveal Toggle
+            // Transcript Reveal Toggle (RISK-15: require listening or completing questions before opening)
             OutlinedButton.icon(
               icon: Icon(
                 playbackState.showTranscript ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                 size: 18,
               ),
               label: Text(playbackState.showTranscript ? 'Ẩn lời thoại (Transcript)' : 'Xem lời thoại (Transcript)'),
-              onPressed: notifier.toggleTranscript,
+              onPressed: () {
+                final allSubmitted =
+                    playbackState.submittedQuestions.length >= activeLesson.questions.length;
+                if (!playbackState.showTranscript &&
+                    !playbackState.hasListened &&
+                    !allSubmitted) {
+                  HiSnackBar.showInfo(
+                    context,
+                    'Hãy nghe đoạn audio ít nhất một lần trước khi mở lời thoại nhé!',
+                  );
+                  return;
+                }
+                notifier.toggleTranscript();
+              },
             ),
             const SizedBox(height: AppSpacing.sm),
 

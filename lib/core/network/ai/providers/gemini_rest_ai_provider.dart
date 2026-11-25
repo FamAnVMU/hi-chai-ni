@@ -39,7 +39,8 @@ class GeminiRestAiProvider implements AiProvider {
 
   @override
   Future<bool> verifyCredentials() async {
-    final apiKey = await credentialStorage.getApiKey();
+    final providerType = await credentialStorage.getProviderType();
+    final apiKey = await credentialStorage.getApiKey(provider: providerType);
     if (apiKey == null || apiKey.isEmpty) return false;
 
     try {
@@ -65,10 +66,14 @@ class GeminiRestAiProvider implements AiProvider {
     final effectiveModel = modelId ?? AiModelRegistry.modelGemini35FlashLite;
     final stopwatch = Stopwatch()..start();
 
-    final apiKey = await credentialStorage.getApiKey();
+    final providerType = await credentialStorage.getProviderType();
+    final providerLabel = providerType == AiProviderType.customProxy
+        ? 'Custom Backend Proxy'
+        : 'Google Gemini REST';
+    final apiKey = await credentialStorage.getApiKey(provider: providerType);
     if (apiKey == null || apiKey.trim().isEmpty) {
       return ConnectionTestResult.failure(
-        providerName: 'Google Gemini REST',
+        providerName: providerLabel,
         modelTested: effectiveModel,
         latencyMs: 0,
         errorType: ConnectionErrorType.emptyCredentials,
@@ -113,13 +118,13 @@ class GeminiRestAiProvider implements AiProvider {
           final candidates = data['candidates'] as List<dynamic>?;
           if (candidates != null && candidates.isNotEmpty) {
             return ConnectionTestResult.success(
-              providerName: 'Google Gemini REST',
+              providerName: providerLabel,
               modelTested: effectiveModel,
               latencyMs: latencyMs,
             );
           } else {
             return ConnectionTestResult.failure(
-              providerName: 'Google Gemini REST',
+              providerName: providerLabel,
               modelTested: effectiveModel,
               latencyMs: latencyMs,
               errorType: ConnectionErrorType.malformedResponse,
@@ -128,7 +133,7 @@ class GeminiRestAiProvider implements AiProvider {
           }
         } catch (_) {
           return ConnectionTestResult.failure(
-            providerName: 'Google Gemini REST',
+            providerName: providerLabel,
             modelTested: effectiveModel,
             latencyMs: latencyMs,
             errorType: ConnectionErrorType.malformedResponse,
@@ -141,7 +146,7 @@ class GeminiRestAiProvider implements AiProvider {
       final errorType = _classifyConnectionStatusCode(response.statusCode, sanitizedBody);
 
       return ConnectionTestResult.failure(
-        providerName: 'Google Gemini REST',
+        providerName: providerLabel,
         modelTested: effectiveModel,
         latencyMs: latencyMs,
         errorType: errorType,
@@ -150,7 +155,7 @@ class GeminiRestAiProvider implements AiProvider {
     } on TimeoutException {
       stopwatch.stop();
       return ConnectionTestResult.failure(
-        providerName: 'Google Gemini REST',
+        providerName: providerLabel,
         modelTested: effectiveModel,
         latencyMs: stopwatch.elapsedMilliseconds,
         errorType: ConnectionErrorType.timeout,
@@ -159,11 +164,11 @@ class GeminiRestAiProvider implements AiProvider {
     } on SocketException catch (e) {
       stopwatch.stop();
       return ConnectionTestResult.failure(
-        providerName: 'Google Gemini REST',
+        providerName: providerLabel,
         modelTested: effectiveModel,
         latencyMs: stopwatch.elapsedMilliseconds,
         errorType: ConnectionErrorType.networkError,
-        errorMessage: 'Lỗi mạng hoặc không thể phân giải DNS: ${e.message}',
+        errorMessage: 'Lỗi mạng hoặc không thể phân giải DNS: ${AiCredentialStorage.sanitizeSecret(e.message, apiKey)}',
       );
     } catch (e) {
       stopwatch.stop();
@@ -174,7 +179,7 @@ class GeminiRestAiProvider implements AiProvider {
           sanitizedError.toLowerCase().contains('network is unreachable');
 
       return ConnectionTestResult.failure(
-        providerName: 'Google Gemini REST',
+        providerName: providerLabel,
         modelTested: effectiveModel,
         latencyMs: stopwatch.elapsedMilliseconds,
         errorType: isNetwork ? ConnectionErrorType.networkError : ConnectionErrorType.unknown,
@@ -251,7 +256,12 @@ class GeminiRestAiProvider implements AiProvider {
             .timeout(timeout);
 
         sw.stop();
-        _handleStatusCode(httpResponse.statusCode, httpResponse.body, model);
+        _handleStatusCode(
+          httpResponse.statusCode,
+          httpResponse.body,
+          model,
+          apiKey: apiKey,
+        );
 
         final responseMap = json.decode(httpResponse.body) as Map<String, dynamic>;
         final candidates = responseMap['candidates'] as List<dynamic>?;
@@ -284,14 +294,29 @@ class GeminiRestAiProvider implements AiProvider {
           latencyMs: sw.elapsedMilliseconds,
           modelUsed: model,
         );
+      } on FormatException catch (e) {
+        final safeErr = AiCredentialStorage.sanitizeSecret(e.toString(), apiKey);
+        throw AiValidationException('Malformed JSON response from AI server: $safeErr');
+      } on AiServerException catch (e) {
+        final isRetryable5xx = e.statusCode == 500 ||
+            e.statusCode == 502 ||
+            e.statusCode == 503 ||
+            e.statusCode == 504;
+        if (!isRetryable5xx) rethrow;
+        attempt++;
+        if (attempt > maxRetries || (cancelToken?.isCancelled ?? false)) {
+          rethrow;
+        }
+        await Future<void>.delayed(Duration(milliseconds: 500 * attempt));
       } on AiException {
         rethrow;
       } on TimeoutException catch (e) {
         throw AiTimeoutException('AI request timed out after ${timeout.inSeconds}s.', duration: timeout, originalError: e);
       } catch (e) {
         attempt++;
+        final safeErr = AiCredentialStorage.sanitizeSecret(e.toString(), apiKey);
         if (attempt > maxRetries || (cancelToken?.isCancelled ?? false)) {
-          throw AiNetworkException('Network failure while communicating with Gemini API: $e', originalError: e);
+          throw AiNetworkException('Network failure while communicating with Gemini API: $safeErr', originalError: safeErr);
         }
         // Exponential backoff: 500ms -> 1000ms
         await Future<void>.delayed(Duration(milliseconds: 500 * attempt));
@@ -341,16 +366,28 @@ class GeminiRestAiProvider implements AiProvider {
       if (cancelToken?.isCancelled ?? false) {
         throw const AiCancelledException();
       }
-      throw AiNetworkException('Failed to establish streaming connection: $e', originalError: e);
+      final safeErr = AiCredentialStorage.sanitizeSecret(e.toString(), apiKey);
+      throw AiNetworkException('Failed to establish streaming connection: $safeErr', originalError: safeErr);
     }
 
     if (streamedResponse.statusCode != 200) {
-      final errorBody = await streamedResponse.stream.bytesToString();
-      _handleStatusCode(streamedResponse.statusCode, errorBody, model);
+      final errorBody = await streamedResponse.stream
+          .bytesToString()
+          .timeout(timeout);
+      _handleStatusCode(
+        streamedResponse.statusCode,
+        errorBody,
+        model,
+        apiKey: apiKey,
+      );
     }
 
     int chunkIndex = 0;
+    final idleTimeout = timeout < const Duration(seconds: 30)
+        ? timeout
+        : const Duration(seconds: 30);
     final stream = streamedResponse.stream
+        .timeout(idleTimeout)
         .transform(utf8.decoder)
         .transform(const LineSplitter());
 
@@ -422,7 +459,20 @@ class GeminiRestAiProvider implements AiProvider {
       },
       onError: (err) {
         if (!controller.isClosed) {
-          controller.addError(AiNetworkException('Stream interrupted: $err', originalError: err));
+          if (err is TimeoutException) {
+            controller.addError(
+              AiTimeoutException(
+                'Streaming idle timeout after ${idleTimeout.inSeconds}s.',
+                duration: idleTimeout,
+                originalError: err,
+              ),
+            );
+          } else {
+            final safeErr = AiCredentialStorage.sanitizeSecret(err.toString(), apiKey);
+            controller.addError(
+              AiNetworkException('Stream interrupted: $safeErr', originalError: safeErr),
+            );
+          }
           controller.close();
         }
       },
@@ -451,38 +501,51 @@ class GeminiRestAiProvider implements AiProvider {
     final customProxy = await credentialStorage.getCustomProxyUrl();
     if (customProxy != null && customProxy.trim().isNotEmpty) {
       _validateEndpointSecurity(customProxy.trim());
-      final providerType = await credentialStorage.getProviderType();
-      if (providerType == AiProviderType.customProxy) {
-        return customProxy.trim().replaceAll(RegExp(r'/+$'), '');
+    }
+    final providerType = await credentialStorage.getProviderType();
+    if (providerType == AiProviderType.customProxy) {
+      if (customProxy == null || customProxy.trim().isEmpty) {
+        throw const SecurityException('Custom Proxy URL chưa được cấu hình.');
       }
+      return customProxy.trim().replaceAll(RegExp(r'/+$'), '');
     }
     _validateEndpointSecurity(_baseUrl);
     return _baseUrl;
   }
 
   Future<String> _getApiKeyOrThrow() async {
-    final apiKey = await credentialStorage.getApiKey();
+    final providerType = await credentialStorage.getProviderType();
+    final apiKey = await credentialStorage.getApiKey(provider: providerType);
     if (apiKey == null || apiKey.isEmpty) {
       throw const AiAuthenticationException(
-        'Gemini API key is not configured. Please enter your API key in Settings.',
+        'API key is not configured. Please enter your API key in Settings.',
         statusCode: 401,
       );
     }
     return apiKey;
   }
 
-  void _handleStatusCode(int statusCode, String responseBody, String model) {
+  void _handleStatusCode(
+    int statusCode,
+    String responseBody,
+    String model, {
+    String? apiKey,
+  }) {
     if (statusCode == 200) return;
 
+    final safeBody = AiCredentialStorage.sanitizeSecret(responseBody, apiKey);
     String errorMessage = 'HTTP $statusCode';
     try {
-      final jsonMap = json.decode(responseBody) as Map<String, dynamic>;
+      final jsonMap = json.decode(safeBody) as Map<String, dynamic>;
       if (jsonMap.containsKey('error')) {
         final errorObj = jsonMap['error'] as Map<String, dynamic>;
-        errorMessage = errorObj['message'] as String? ?? errorMessage;
+        errorMessage = AiCredentialStorage.sanitizeSecret(
+          errorObj['message'] as String? ?? errorMessage,
+          apiKey,
+        );
       }
     } catch (_) {
-      errorMessage = responseBody.isNotEmpty ? responseBody : errorMessage;
+      errorMessage = safeBody.isNotEmpty ? safeBody : errorMessage;
     }
 
     switch (statusCode) {

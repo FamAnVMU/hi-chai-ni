@@ -37,6 +37,8 @@ abstract class VoiceConversationService {
     required TutorPersona persona,
     required TutorScenario scenario,
     int learnerHskLevel = 1,
+    String learnerName = 'Học viên',
+    List<String> weakSrsWords = const [],
   });
 
   Future<void> endSession();
@@ -67,6 +69,8 @@ class DefaultVoiceConversationService implements VoiceConversationService {
   TutorPersona _activePersona = TutorPersonas.qiaoqiao;
   TutorScenario _activeScenario = TutorScenarios.freeChat;
   int _learnerHskLevel = 1;
+  String _learnerName = 'Học viên';
+  List<String> _weakSrsWords = const [];
   CancelToken? _currentTurnCancelToken;
 
   PersonaVoicePreviewStatus _previewStatus = PersonaVoicePreviewStatus.initial;
@@ -326,13 +330,23 @@ class DefaultVoiceConversationService implements VoiceConversationService {
           message: 'Đang phát giọng đọc mẫu TTS (xem trước).',
         ));
 
-        await tts!.speak(
-          config.previewSampleTextZh,
-          language: config.ttsLocale ?? 'zh-CN',
-          pitch: config.ttsPitch,
-          rate: config.ttsRate,
-          voiceName: config.ttsVoiceName,
-        );
+        try {
+          await tts!.speak(
+            config.previewSampleTextZh,
+            language: config.ttsLocale ?? 'zh-CN',
+            pitch: config.ttsPitch,
+            rate: config.ttsRate,
+            voiceName: config.ttsVoiceName,
+          );
+        } finally {
+          if (_previewStatus.personaId == personaIdStr && _previewStatus.isPlaying) {
+            _setPreviewStatus(PersonaVoicePreviewStatus(
+              personaId: personaIdStr,
+              state: PersonaPreviewPlaybackState.stopped,
+              isTts: true,
+            ));
+          }
+        }
       }
     } catch (e) {
       debugPrint('[VoiceConversationService] Preview error: $e');
@@ -350,6 +364,8 @@ class DefaultVoiceConversationService implements VoiceConversationService {
     required TutorPersona persona,
     required TutorScenario scenario,
     int learnerHskLevel = 1,
+    String learnerName = 'Học viên',
+    List<String> weakSrsWords = const [],
   }) async {
     await stopPersonaVoicePreview();
 
@@ -357,6 +373,8 @@ class DefaultVoiceConversationService implements VoiceConversationService {
     _activePersona = persona;
     _activeScenario = scenario;
     _learnerHskLevel = learnerHskLevel;
+    _learnerName = learnerName;
+    _weakSrsWords = weakSrsWords;
     _isMuted = false;
     _transcripts.clear();
 
@@ -455,6 +473,8 @@ class DefaultVoiceConversationService implements VoiceConversationService {
         sessionId: sessionId,
         userText: userText.trim(),
         learnerHskLevel: _learnerHskLevel,
+        learnerName: _learnerName,
+        weakSrsWords: _weakSrsWords,
         persona: _activePersona,
         scenario: _activeScenario,
         cancelToken: _currentTurnCancelToken,

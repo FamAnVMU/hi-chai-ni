@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/services.dart';
 import '../../../../core/audio/audio_models.dart';
 import '../../../../core/audio/audio_player_service.dart';
 import '../models/sentence_models.dart';
@@ -19,13 +20,15 @@ class SentenceAudioManager {
 
   final _playbackStateController = StreamController<bool>.broadcast();
   final _audioTypeController = StreamController<AudioType>.broadcast();
+  StreamSubscription<AudioPlaybackStatus>? _playerStatusSub;
+  StreamSubscription<bool>? _ttsSpeakingSub;
 
   SentenceAudioManager({
     AudioPlayerService? audioPlayer,
     NativeTtsService? ttsService,
   })  : _audioPlayer = audioPlayer ?? DefaultAudioPlayerService(),
         _ttsService = ttsService ?? DefaultNativeTtsService() {
-    _audioPlayer.statusStream.listen((status) {
+    _playerStatusSub = _audioPlayer.statusStream.listen((status) {
       if (_currentAudioType != AudioType.nativeOsTts) {
         final playing = status == AudioPlaybackStatus.playing;
         if (_isPlaying != playing) {
@@ -37,7 +40,7 @@ class SentenceAudioManager {
       }
     });
 
-    _ttsService.isSpeakingStream.listen((speaking) {
+    _ttsSpeakingSub = _ttsService.isSpeakingStream.listen((speaking) {
       if (_currentAudioType == AudioType.nativeOsTts) {
         if (_isPlaying != speaking) {
           _isPlaying = speaking;
@@ -57,8 +60,35 @@ class SentenceAudioManager {
   Stream<bool> get isPlayingStream => _playbackStateController.stream;
   Stream<AudioType> get audioTypeStream => _audioTypeController.stream;
 
+  Future<bool> _assetExists(String path) async {
+    try {
+      final clean = path.startsWith('audio/') ? 'assets/$path' : path;
+      await rootBundle.load(clean);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<String?> _resolvePlayableUri(SentenceAudio audio) async {
+    final local = audio.localPath?.trim();
+    if (local != null && local.isNotEmpty) {
+      if (local.startsWith('assets/') || local.startsWith('audio/')) {
+        if (await _assetExists(local)) {
+          return local.startsWith('audio/') ? 'assets/$local' : local;
+        }
+      } else if (File(local).existsSync()) {
+        return local;
+      }
+    }
+    if (audio.urlRemote.trim().isNotEmpty) {
+      return audio.urlRemote.trim();
+    }
+    return null;
+  }
+
   /// Plays sentence audio based on prioritized available source:
-  /// 1. Real human audio (local file or stream)
+  /// 1. Real human audio (APK asset, local file, or stream)
   /// 2. Studio simulation audio
   /// 3. Native OS TTS fallback
   Future<void> playSentence(SentenceItem sentence, {double? speed}) async {
@@ -67,26 +97,34 @@ class SentenceAudioManager {
     // 1. Check for human audio
     final humanAudio = sentence.audios.where((a) => a.audioType == AudioType.humanRecording).firstOrNull;
     if (humanAudio != null) {
-      final localExists = humanAudio.localPath != null && File(humanAudio.localPath!).existsSync();
-      if (localExists) {
-        await _playAudioFile(humanAudio.localPath!, AudioType.humanRecording, humanAudio.speakerName);
-        return;
-      } else if (humanAudio.urlRemote.isNotEmpty) {
-        await _playAudioFile(humanAudio.urlRemote, AudioType.humanRecording, humanAudio.speakerName);
-        return;
+      final uri = await _resolvePlayableUri(humanAudio);
+      if (uri != null) {
+        try {
+          await _playAudioFile(
+            uri,
+            AudioType.humanRecording,
+            humanAudio.speakerName,
+            fallbackText: sentence.chinese,
+          );
+          return;
+        } catch (_) {}
       }
     }
 
     // 2. Check for studio simulation audio
     final studioAudio = sentence.audios.where((a) => a.audioType == AudioType.studioSimulation).firstOrNull;
     if (studioAudio != null) {
-      final localExists = studioAudio.localPath != null && File(studioAudio.localPath!).existsSync();
-      if (localExists) {
-        await _playAudioFile(studioAudio.localPath!, AudioType.studioSimulation, studioAudio.speakerName);
-        return;
-      } else if (studioAudio.urlRemote.isNotEmpty) {
-        await _playAudioFile(studioAudio.urlRemote, AudioType.studioSimulation, studioAudio.speakerName);
-        return;
+      final uri = await _resolvePlayableUri(studioAudio);
+      if (uri != null) {
+        try {
+          await _playAudioFile(
+            uri,
+            AudioType.studioSimulation,
+            studioAudio.speakerName,
+            fallbackText: sentence.chinese,
+          );
+          return;
+        } catch (_) {}
       }
     }
 
@@ -106,7 +144,12 @@ class SentenceAudioManager {
     await _ttsService.speak(chineseText, speed: spd);
   }
 
-  Future<void> _playAudioFile(String uri, AudioType type, String speaker) async {
+  Future<void> _playAudioFile(
+    String uri,
+    AudioType type,
+    String speaker, {
+    String? fallbackText,
+  }) async {
     await stop();
     _currentAudioType = type;
     _currentSpeaker = speaker;
@@ -114,7 +157,7 @@ class SentenceAudioManager {
       _audioTypeController.add(_currentAudioType);
     }
 
-    await _audioPlayer.play(uri, speed: _speed);
+    await _audioPlayer.playWithFallback(uri, speed: _speed, fallbackText: fallbackText);
   }
 
   Future<void> setSpeed(double newSpeed) async {
@@ -139,6 +182,8 @@ class SentenceAudioManager {
   }
 
   void dispose() {
+    _playerStatusSub?.cancel();
+    _ttsSpeakingSub?.cancel();
     _audioPlayer.stop();
     _ttsService.stop();
     _audioPlayer.dispose();

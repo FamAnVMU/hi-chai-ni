@@ -66,6 +66,7 @@ class DefaultAudioRecorderService implements AudioRecorderService {
   StreamSubscription<rec.Amplitude>? _amplitudeSub;
   DateTime? _recordingStartTime;
   Duration _accumulatedDuration = Duration.zero;
+  Duration _timerElapsed = Duration.zero;
 
   DefaultAudioRecorderService({
     this.hasMicrophone = true,
@@ -141,13 +142,15 @@ class DefaultAudioRecorderService implements AudioRecorderService {
     try {
       _recordingDuration = Duration.zero;
       _accumulatedDuration = Duration.zero;
+      _timerElapsed = Duration.zero;
 
       if (destinationPath != null && destinationPath.isNotEmpty) {
         _currentAudioPath = destinationPath;
       } else {
         Directory tempDir;
         try {
-          tempDir = await getTemporaryDirectory();
+          tempDir = await getTemporaryDirectory()
+              .timeout(const Duration(milliseconds: 500));
         } catch (_) {
           tempDir = Directory.systemTemp;
         }
@@ -168,23 +171,16 @@ class DefaultAudioRecorderService implements AudioRecorderService {
 
       _updateStatus(AudioRecordingStatus.recording);
 
-      // Duration tracking & periodic amplitude polling
+      // Duration tracking timer (amplitude already streamed by onAmplitudeChanged below)
       _durationTimer?.cancel();
-      _durationTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) async {
+      _durationTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
         if (_status != AudioRecordingStatus.recording) return;
-        final elapsed = DateTime.now().difference(_recordingStartTime!) + _accumulatedDuration;
-        _recordingDuration = elapsed;
+        _timerElapsed += const Duration(milliseconds: 100);
+        final wallElapsed = DateTime.now().difference(_recordingStartTime!) + _accumulatedDuration;
+        _recordingDuration = wallElapsed > _timerElapsed ? wallElapsed : _timerElapsed;
         if (!_durationController.isClosed) {
           _durationController.add(_recordingDuration);
         }
-
-        try {
-          final amp = await _recorder.getAmplitude();
-          final normalized = ((amp.current + 60.0) / 60.0).clamp(0.05, 1.0);
-          if (!_amplitudeController.isClosed) {
-            _amplitudeController.add(normalized);
-          }
-        } catch (_) {}
       });
 
       // Stream hardware amplitude
@@ -238,21 +234,14 @@ class DefaultAudioRecorderService implements AudioRecorderService {
         _recordingStartTime = DateTime.now();
         _updateStatus(AudioRecordingStatus.recording);
 
-        _durationTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) async {
+        _durationTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
           if (_status != AudioRecordingStatus.recording) return;
-          final elapsed = DateTime.now().difference(_recordingStartTime!) + _accumulatedDuration;
-          _recordingDuration = elapsed;
+          _timerElapsed += const Duration(milliseconds: 100);
+          final wallElapsed = DateTime.now().difference(_recordingStartTime!) + _accumulatedDuration;
+          _recordingDuration = wallElapsed > _timerElapsed ? wallElapsed : _timerElapsed;
           if (!_durationController.isClosed) {
             _durationController.add(_recordingDuration);
           }
-
-          try {
-            final amp = await _recorder.getAmplitude();
-            final normalized = ((amp.current + 60.0) / 60.0).clamp(0.05, 1.0);
-            if (!_amplitudeController.isClosed) {
-              _amplitudeController.add(normalized);
-            }
-          } catch (_) {}
         });
       } catch (e) {
         debugPrint('[DefaultAudioRecorderService] resumeRecording error: $e');
@@ -294,6 +283,7 @@ class DefaultAudioRecorderService implements AudioRecorderService {
 
     _currentAudioPath = null;
     _recordingDuration = Duration.zero;
+    _timerElapsed = Duration.zero;
     _updateStatus(AudioRecordingStatus.idle);
   }
 

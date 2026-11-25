@@ -86,7 +86,7 @@ class ShadowingTimelineCard extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: AppRadius.borderFull,
                         child: LinearProgressIndicator(
-                          value: 1.0,
+                          value: 1.0 / 1.5,
                           minHeight: 10,
                           backgroundColor: theme.colorScheme.outlineVariant,
                           valueColor: const AlwaysStoppedAnimation<Color>(Colors.blueAccent),

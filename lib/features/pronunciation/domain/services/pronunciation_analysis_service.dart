@@ -115,7 +115,7 @@ class DefaultPronunciationAnalysisService implements PronunciationAnalysisServic
     // 2. Validate audio byte size and duration
     int bytes = 0;
     try {
-      bytes = await file.length();
+      bytes = file.lengthSync();
     } catch (_) {}
 
     if (bytes < 300) {
@@ -180,16 +180,24 @@ class DefaultPronunciationAnalysisService implements PronunciationAnalysisServic
 
     // 3. Speech Recognition (ASR) via integrated AiProvider if available and configured
     if (aiProvider != null) {
+      var hasValidCredentials = false;
       try {
-        final hasValidCredentials = await aiProvider!.verifyCredentials();
-        if (hasValidCredentials) {
+        hasValidCredentials = await aiProvider!
+            .verifyCredentials()
+            .timeout(const Duration(seconds: 2));
+      } catch (_) {
+        hasValidCredentials = false;
+      }
+      if (hasValidCredentials) {
+        try {
           final audioBytes = await file.readAsBytes();
           final base64Audio = base64Encode(audioBytes);
 
           final prompt =
-              'Bạn là bộ máy Speech-to-Text tiếng Trung Quốc khách quan. '
-              'Nhiệm vụ: Nghe bản ghi âm và chỉ chép lại chính xác các từ hoặc chữ Hán được nói (chữ Hán giản thể). '
-              'Không giải thích, không dịch nghĩa, không thêm pinyin. '
+              'Bạn là bộ máy Speech-to-Text và phân tích thanh điệu tiếng Trung Quốc khách quan. '
+              'Mục tiêu người học đang luyện: "${target.text}" (${target.pinyin}). '
+              'Nhiệm vụ: Nghe bản ghi âm và CHỈ trả về JSON hợp lệ theo mẫu: '
+              '{"transcript":"<chữ Hán giản thể>", "detected_pinyin_tones":"<pinyin có dấu thanh>", "tone_accuracy":<0.0..1.0>, "feedback_vi":"<nhận xét ngắn tiếng Việt về thanh điệu và âm đầu/vần>"}. '
               'Nếu bản ghi không có tiếng người, ồn hoặc không nghe rõ từ tiếng Trung nào, hãy xuất chính xác: [NO_SPEECH]';
 
           final request = AiPromptRequest(
@@ -201,16 +209,22 @@ class DefaultPronunciationAnalysisService implements PronunciationAnalysisServic
               ),
             ],
             temperature: 0.0,
-            maxOutputTokens: 50,
+            maxOutputTokens: 200,
           );
 
           final response = await aiProvider!
               .generateText(request)
-              .timeout(const Duration(seconds: 12));
+              .timeout(const Duration(seconds: 20));
 
           final recognizedRaw = response.text.trim();
+          final parsedJson = _tryParseAiJson(recognizedRaw);
+          final transcriptRaw = parsedJson != null
+              ? (parsedJson['transcript']?.toString() ?? '').trim()
+              : recognizedRaw;
 
-          if (recognizedRaw.isEmpty || recognizedRaw.contains('[NO_SPEECH]')) {
+          if (transcriptRaw.isEmpty ||
+              recognizedRaw.contains('[NO_SPEECH]') ||
+              transcriptRaw.contains('[NO_SPEECH]')) {
             return PronunciationAssessmentResult(
               targetId: target.id,
               targetText: target.text,
@@ -232,24 +246,64 @@ class DefaultPronunciationAnalysisService implements PronunciationAnalysisServic
           }
 
           // Compute character match ratio against target
-          final cleanRecognized = recognizedRaw.replaceAll(RegExp(r'[^\u4e00-\u9fa5a-zA-Z]'), '');
+          final cleanRecognized = transcriptRaw.replaceAll(RegExp(r'[^\u4e00-\u9fa5a-zA-Z]'), '');
           final cleanTarget = target.text.replaceAll(RegExp(r'[^\u4e00-\u9fa5a-zA-Z]'), '');
-          final score = _calculateTranscriptSimilarity(cleanRecognized, cleanTarget);
+          final transcriptScore = _calculateTranscriptSimilarity(cleanRecognized, cleanTarget);
+
+          if (parsedJson != null) {
+            final rawTone = parsedJson['tone_accuracy'];
+            final double? parsedTone = rawTone is num
+                ? rawTone.toDouble().clamp(0.0, 1.0)
+                : double.tryParse(rawTone?.toString() ?? '')?.clamp(0.0, 1.0);
+            if (parsedTone != null) {
+              final detectedTones =
+                  (parsedJson['detected_pinyin_tones']?.toString() ?? '').trim();
+              final feedbackVi = (parsedJson['feedback_vi']?.toString() ?? '').trim();
+              final overallScore =
+                  ((transcriptScore * 0.6) + (parsedTone * 0.4)).clamp(0.0, 1.0);
+
+              return PronunciationAssessmentResult(
+                targetId: target.id,
+                targetText: target.text,
+                targetPinyin: target.pinyin,
+                recognizedTranscript: cleanRecognized,
+                overallScore: overallScore,
+                confidence: overallScore >= 0.8
+                    ? PronunciationConfidence.high
+                    : (overallScore >= 0.5
+                        ? PronunciationConfidence.medium
+                        : PronunciationConfidence.low),
+                status: PronunciationEvaluationStatus.success,
+                isAcousticallyAnalyzed: true,
+                toneAccuracy: parsedTone,
+                initialFinalAccuracy: null,
+                feedbackList: [
+                  'Đã nhận dạng ASR: "$cleanRecognized"${detectedTones.isNotEmpty ? ' ($detectedTones)' : ''}.',
+                  'Độ chính xác thanh điệu (AI Audio): ${(parsedTone * 100).toInt()}% • Độ khớp nội dung: ${(transcriptScore * 100).toInt()}%.',
+                  if (feedbackVi.isNotEmpty) feedbackVi,
+                ],
+                audioLocalPath: audioPath,
+                recordedDurationMs: duration.inMilliseconds,
+                providerId: aiProvider!.providerName,
+                timestamp: now,
+              );
+            }
+          }
 
           return PronunciationAssessmentResult(
             targetId: target.id,
             targetText: target.text,
             targetPinyin: target.pinyin,
             recognizedTranscript: cleanRecognized,
-            overallScore: score,
-            confidence: score >= 0.8 ? PronunciationConfidence.high : PronunciationConfidence.medium,
+            overallScore: transcriptScore,
+            confidence: transcriptScore >= 0.8 ? PronunciationConfidence.high : PronunciationConfidence.medium,
             status: PronunciationEvaluationStatus.success,
             isAcousticallyAnalyzed: false,
-            toneAccuracy: null, // Academic honesty: STT cannot evaluate F0 acoustic tone!
+            toneAccuracy: null, // Academic honesty: plain ASR cannot evaluate F0 acoustic tone!
             initialFinalAccuracy: null,
             feedbackList: [
               'Đã nhận dạng văn bản ASR: "$cleanRecognized".',
-              'Độ chính xác nội dung so với mục tiêu "${target.text}": ${(score * 100).toInt()}%.',
+              'Độ chính xác nội dung so với mục tiêu "${target.text}": ${(transcriptScore * 100).toInt()}%.',
               'Lưu ý: Mô hình đám mây (${aiProvider!.providerName}) chỉ nhận dạng văn bản ASR. Chưa tích hợp bộ cảm biến cao độ F0 âm học nên không chấm điểm thanh điệu giả lập.',
             ],
             audioLocalPath: audioPath,
@@ -257,7 +311,6 @@ class DefaultPronunciationAnalysisService implements PronunciationAnalysisServic
             providerId: aiProvider!.providerName,
             timestamp: now,
           );
-        }
       } on TimeoutException {
         return PronunciationAssessmentResult(
           targetId: target.id,
@@ -296,6 +349,7 @@ class DefaultPronunciationAnalysisService implements PronunciationAnalysisServic
           providerId: aiProvider?.providerName ?? providerId,
           timestamp: now,
         );
+        }
       }
     }
 
@@ -321,6 +375,23 @@ class DefaultPronunciationAnalysisService implements PronunciationAnalysisServic
       providerId: providerId,
       timestamp: now,
     );
+  }
+
+  static Map<String, dynamic>? _tryParseAiJson(String raw) {
+    var trimmed = raw.trim();
+    if (trimmed.startsWith('```')) {
+      trimmed = trimmed
+          .replaceFirst(RegExp(r'^```(?:json)?\s*'), '')
+          .replaceFirst(RegExp(r'\s*```$'), '')
+          .trim();
+    }
+    if (!trimmed.startsWith('{')) return null;
+    try {
+      final decoded = jsonDecode(trimmed);
+      return decoded is Map<String, dynamic> ? decoded : null;
+    } catch (_) {
+      return null;
+    }
   }
 
   /// Calculates character-level similarity ratio between recognized and target text.

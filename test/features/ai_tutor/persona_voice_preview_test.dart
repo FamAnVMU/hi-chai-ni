@@ -98,6 +98,8 @@ class _MockTtsService implements TtsService {
   int speakCallCount = 0;
   int stopCallCount = 0;
   bool isDisposed = false;
+  Completer<void>? speakCompleter;
+  bool _speakingActive = false;
 
   @override
   Future<bool> isLanguageAvailable(String language) async => isLanguageAvailableResult;
@@ -119,11 +121,22 @@ class _MockTtsService implements TtsService {
     lastLanguage = language;
     lastPitch = pitch;
     lastRate = rate;
+    if (speakCompleter != null && !speakCompleter!.isCompleted) {
+      _speakingActive = true;
+      try {
+        await speakCompleter!.future;
+      } finally {
+        _speakingActive = false;
+      }
+    }
   }
 
   @override
   Future<void> stop() async {
     stopCallCount++;
+    if (_speakingActive && speakCompleter != null && !speakCompleter!.isCompleted) {
+      speakCompleter!.complete();
+    }
   }
 
   @override
@@ -198,7 +211,16 @@ void main() {
     });
 
     test('1. Preview voice with TTS invokes speak with correct persona parameters', () async {
+      var sawPlayingStatus = false;
+      final sub = service.previewStatusStream.listen((s) {
+        if (s.isPlaying && s.isTts && s.personaId == 'qiaoqiao') {
+          sawPlayingStatus = true;
+        }
+      });
+
       await service.previewPersonaVoice(TutorPersonas.qiaoqiao);
+      await Future<void>.delayed(Duration.zero);
+      await sub.cancel();
 
       expect(tts.speakCallCount, 1);
       expect(tts.lastSpokenText, TutorPersonas.qiaoqiao.voiceConfig.previewSampleTextZh);
@@ -206,8 +228,8 @@ void main() {
       expect(tts.lastPitch, TutorPersonas.qiaoqiao.voiceConfig.ttsPitch);
       expect(tts.lastRate, TutorPersonas.qiaoqiao.voiceConfig.ttsRate);
 
-      expect(service.previewStatus.isPlaying, isTrue);
-      expect(service.previewStatus.isTts, isTrue);
+      expect(sawPlayingStatus, isTrue);
+      expect(service.previewStatus.isStopped, isTrue);
       expect(service.previewStatus.personaId, 'qiaoqiao');
     });
 
@@ -224,10 +246,14 @@ void main() {
     });
 
     test('3. Stop preview halts TTS and player and updates previewStatus to stopped', () async {
-      await service.previewPersonaVoice(TutorPersonas.qiaoqiao);
+      tts.speakCompleter = Completer<void>();
+      final playingFuture = service.previewStatusStream.firstWhere((s) => s.isPlaying);
+      final previewFuture = service.previewPersonaVoice(TutorPersonas.qiaoqiao);
+      await playingFuture;
       expect(service.previewStatus.isPlaying, isTrue);
 
       await service.stopPersonaVoicePreview();
+      await previewFuture;
       expect(tts.stopCallCount, greaterThanOrEqualTo(1));
       expect(service.previewStatus.isStopped, isTrue);
     });

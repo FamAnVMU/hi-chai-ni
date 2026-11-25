@@ -31,6 +31,7 @@ void main() {
       packManager = AudioPackManager(
         dao,
         storageDirectory: tempStorageDir.path,
+        simulateOfflineForTest: true,
       );
 
       // Seed 2 sample sentences for HSK 3

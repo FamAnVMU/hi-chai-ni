@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../../../core/utils/app_clock.dart';
@@ -27,6 +28,7 @@ class SentenceReadingScreen extends StatefulWidget {
 
 class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
   late final SentenceAudioManager _audioManager;
+  StreamSubscription<bool>? _playingSub;
   late final DateTime _screenOpenedAt;
   bool _isPlaying = false;
   bool _isCompleted = false;
@@ -41,7 +43,7 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
     super.initState();
     _screenOpenedAt = AppClock.now();
     _audioManager = SentenceAudioManager();
-    _audioManager.isPlayingStream.listen((playing) {
+    _playingSub = _audioManager.isPlayingStream.listen((playing) {
       if (mounted) setState(() => _isPlaying = playing);
     });
   }
@@ -63,6 +65,7 @@ class _SentenceReadingScreenState extends State<SentenceReadingScreen> {
 
   @override
   void dispose() {
+    _playingSub?.cancel();
     _audioManager.dispose();
     super.dispose();
   }

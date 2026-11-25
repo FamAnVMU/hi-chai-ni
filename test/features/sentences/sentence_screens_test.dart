@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hi_chinese/features/sentences/data/audio_pack_manager.dart';
@@ -231,7 +232,10 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: AudioPackManagerScreen(
-            packManager: AudioPackManager(mockDao),
+            packManager: AudioPackManager(
+              mockDao,
+              storageDirectory: Directory.systemTemp.path,
+            ),
           ),
         ),
       );

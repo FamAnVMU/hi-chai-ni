@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../core/audio/audio_models.dart';
 import '../../../../core/audio/audio_player_service.dart';
 import '../../../../core/audio/audio_recorder_service.dart';
+import '../../../../core/audio/audio_temp_cleaner.dart';
 import '../../data/sentence_repository.dart';
 import '../../domain/models/sentence_models.dart';
 import '../../domain/services/sentence_audio_manager.dart';
@@ -29,6 +31,11 @@ class _SentenceShadowingScreenState extends State<SentenceShadowingScreen> {
   late final AudioRecorderService _recorder;
   late final AudioPlayerService _userAudioPlayer;
 
+  StreamSubscription<bool>? _modelPlayingSub;
+  StreamSubscription<AudioRecordingStatus>? _recorderStatusSub;
+  StreamSubscription<double>? _recorderAmpSub;
+  StreamSubscription<AudioPlaybackStatus>? _userPlayerStatusSub;
+
   bool _isModelPlaying = false;
   bool _isRecording = false;
   bool _isUserAudioPlaying = false;
@@ -43,19 +50,19 @@ class _SentenceShadowingScreenState extends State<SentenceShadowingScreen> {
     _recorder = DefaultAudioRecorderService();
     _userAudioPlayer = DefaultAudioPlayerService();
 
-    _audioManager.isPlayingStream.listen((playing) {
+    _modelPlayingSub = _audioManager.isPlayingStream.listen((playing) {
       if (mounted) setState(() => _isModelPlaying = playing);
     });
 
-    _recorder.statusStream.listen((status) {
+    _recorderStatusSub = _recorder.statusStream.listen((status) {
       if (mounted) setState(() => _isRecording = status == AudioRecordingStatus.recording);
     });
 
-    _recorder.amplitudeStream.listen((amp) {
+    _recorderAmpSub = _recorder.amplitudeStream.listen((amp) {
       if (mounted) setState(() => _currentAmplitude = amp);
     });
 
-    _userAudioPlayer.statusStream.listen((status) {
+    _userPlayerStatusSub = _userAudioPlayer.statusStream.listen((status) {
       if (mounted) setState(() => _isUserAudioPlaying = status == AudioPlaybackStatus.playing);
     });
 
@@ -66,6 +73,13 @@ class _SentenceShadowingScreenState extends State<SentenceShadowingScreen> {
 
   @override
   void dispose() {
+    _modelPlayingSub?.cancel();
+    _recorderStatusSub?.cancel();
+    _recorderAmpSub?.cancel();
+    _userPlayerStatusSub?.cancel();
+    if (_recordedFilePath != null) {
+      AudioTempCleaner.deleteAudioFile(_recordedFilePath);
+    }
     _audioManager.dispose();
     _recorder.dispose();
     _userAudioPlayer.dispose();
@@ -86,6 +100,10 @@ class _SentenceShadowingScreenState extends State<SentenceShadowingScreen> {
     } else {
       await _audioManager.stop();
       await _userAudioPlayer.stop();
+      if (_recordedFilePath != null) {
+        AudioTempCleaner.deleteAudioFile(_recordedFilePath);
+        setState(() => _recordedFilePath = null);
+      }
       final granted = await _recorder.checkPermission();
       if (granted) {
         await _recorder.startRecording();

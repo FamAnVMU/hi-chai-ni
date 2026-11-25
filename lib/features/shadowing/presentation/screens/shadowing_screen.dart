@@ -5,9 +5,12 @@ import '../../../../core/audio/audio.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/permission_helper.dart';
 import '../../../pronunciation/presentation/widgets/waveform_visualizer.dart';
+import '../../domain/engine/shadowing_document_bank.dart';
 import '../../domain/models/shadowing_models.dart';
 import '../providers/shadowing_providers.dart';
 import '../widgets/shadowing_timeline_card.dart';
+
+enum _ShadowPlayTarget { none, sample, user }
 
 /// Screen dedicated to Shadowing practice (sentence & conversational level fluency training).
 class ShadowingScreen extends ConsumerStatefulWidget {
@@ -33,10 +36,13 @@ class _ShadowingScreenState extends ConsumerState<ShadowingScreen> {
   double _currentAmplitude = 0.0;
   Duration _recordingDuration = Duration.zero;
   bool _isRecording = false;
-  bool _isPlayingSample = false;
-  bool _isPlayingUserAudio = false;
+  _ShadowPlayTarget _activePlayTarget = _ShadowPlayTarget.none;
   bool _isLooping = false;
   String? _recordedFilePath;
+  final List<double> _recordedAmplitudes = [];
+
+  bool get _isPlayingSample => _activePlayTarget == _ShadowPlayTarget.sample;
+  bool get _isPlayingUserAudio => _activePlayTarget == _ShadowPlayTarget.user;
 
   @override
   void initState() {
@@ -44,8 +50,21 @@ class _ShadowingScreenState extends ConsumerState<ShadowingScreen> {
     _player = DefaultAudioPlayerService();
     _recorder = DefaultAudioRecorderService();
 
+    if (widget.initialDocumentId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref
+            .read(selectedShadowingDocumentProvider.notifier)
+            .selectDocumentById(widget.initialDocumentId!);
+      });
+    }
+
     _ampSub = _recorder.amplitudeStream.listen((amp) {
-      if (mounted) setState(() => _currentAmplitude = amp);
+      if (mounted) {
+        if (_isRecording) {
+          _recordedAmplitudes.add(amp);
+        }
+        setState(() => _currentAmplitude = amp);
+      }
     });
 
     _durSub = _recorder.durationStream.listen((dur) {
@@ -53,11 +72,9 @@ class _ShadowingScreenState extends ConsumerState<ShadowingScreen> {
     });
 
     _playStatusSub = _player.statusStream.listen((status) {
-      if (mounted) {
-        setState(() {
-          _isPlayingSample = status == AudioPlaybackStatus.playing && !_isPlayingUserAudio;
-          _isPlayingUserAudio = status == AudioPlaybackStatus.playing && _isPlayingUserAudio;
-        });
+      if (mounted &&
+          (status == AudioPlaybackStatus.completed || status == AudioPlaybackStatus.error)) {
+        setState(() => _activePlayTarget = _ShadowPlayTarget.none);
       }
     });
   }
@@ -67,6 +84,9 @@ class _ShadowingScreenState extends ConsumerState<ShadowingScreen> {
     _ampSub?.cancel();
     _durSub?.cancel();
     _playStatusSub?.cancel();
+    if (_recordedFilePath != null) {
+      AudioTempCleaner.deleteAudioFile(_recordedFilePath);
+    }
     _recorder.cancelRecording();
     _recorder.dispose();
     _player.stop();
@@ -77,17 +97,15 @@ class _ShadowingScreenState extends ConsumerState<ShadowingScreen> {
   Future<void> _handlePlaySample(ShadowingSegment segment, ShadowingPlaybackSpeed speed) async {
     if (_isPlayingSample) {
       await _player.stop();
-      setState(() => _isPlayingSample = false);
+      setState(() => _activePlayTarget = _ShadowPlayTarget.none);
     } else {
-      setState(() {
-        _isPlayingUserAudio = false;
-        _isPlayingSample = true;
-      });
-      await _player.play(
+      setState(() => _activePlayTarget = _ShadowPlayTarget.sample);
+      await _player.playWithFallback(
         segment.audioUri ?? 'sample.mp3',
         speed: speed.rate,
         loop: _isLooping,
         simulatedDuration: Duration(milliseconds: segment.durationMs),
+        fallbackText: segment.hanzi,
       );
     }
   }
@@ -110,16 +128,24 @@ class _ShadowingScreenState extends ConsumerState<ShadowingScreen> {
         final mode = ref.read(shadowingModeProvider);
         final speed = ref.read(shadowingPlaybackSpeedProvider);
 
+        if (_recordedFilePath != null) {
+          AudioTempCleaner.deleteAudioFile(_recordedFilePath);
+        }
+        _recordedAmplitudes.clear();
+
         if (mode == ShadowingMode.simultaneous) {
+          setState(() => _activePlayTarget = _ShadowPlayTarget.sample);
           // In simultaneous mode, play sample audio alongside recording
-          _player.play(
+          _player.playWithFallback(
             segment.audioUri ?? 'sample.mp3',
             speed: speed.rate,
             loop: false,
             simulatedDuration: Duration(milliseconds: segment.durationMs),
+            fallbackText: segment.hanzi,
           );
         } else {
           await _player.stop();
+          _activePlayTarget = _ShadowPlayTarget.none;
         }
 
         setState(() {
@@ -152,6 +178,7 @@ class _ShadowingScreenState extends ConsumerState<ShadowingScreen> {
       mode: mode,
       speed: speed,
       audioPath: _recordedFilePath,
+      amplitudeSamples: List<double>.of(_recordedAmplitudes),
     );
 
     ref.read(lastShadowingResultProvider.notifier).setResult(result);
@@ -167,12 +194,9 @@ class _ShadowingScreenState extends ConsumerState<ShadowingScreen> {
 
     if (_isPlayingUserAudio) {
       await _player.stop();
-      setState(() => _isPlayingUserAudio = false);
+      setState(() => _activePlayTarget = _ShadowPlayTarget.none);
     } else {
-      setState(() {
-        _isPlayingSample = false;
-        _isPlayingUserAudio = true;
-      });
+      setState(() => _activePlayTarget = _ShadowPlayTarget.user);
       await _player.play(_recordedFilePath!);
     }
   }
@@ -214,7 +238,7 @@ class _ShadowingScreenState extends ConsumerState<ShadowingScreen> {
 
       setState(() {
         _recordedFilePath = null;
-        _isPlayingUserAudio = false;
+        _activePlayTarget = _ShadowPlayTarget.none;
       });
 
       if (mounted) {
@@ -261,6 +285,39 @@ class _ShadowingScreenState extends ConsumerState<ShadowingScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // 0. Document Selector
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: List.generate(ShadowingDocumentBank.allDocuments.length, (i) {
+                    final doc = ShadowingDocumentBank.allDocuments[i];
+                    final isSelected = doc.id == document.id;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: AppSpacing.xs),
+                      child: ChoiceChip(
+                        label: Text('Bài ${i + 1} · HSK ${doc.hskLevel}'),
+                        selected: isSelected,
+                        onSelected: (selected) {
+                          if (!selected || isSelected) return;
+                          _player.stop();
+                          if (_recordedFilePath != null) {
+                            AudioTempCleaner.deleteAudioFile(_recordedFilePath);
+                          }
+                          ref.read(selectedShadowingDocumentProvider.notifier).selectDocument(doc);
+                          ref.read(selectedSegmentIndexProvider.notifier).selectIndex(0);
+                          ref.read(lastShadowingResultProvider.notifier).setResult(null);
+                          setState(() {
+                            _activePlayTarget = _ShadowPlayTarget.none;
+                            _recordedFilePath = null;
+                          });
+                        },
+                      ),
+                    );
+                  }),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+
               // 1. Document Overview & Segment Stepper
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

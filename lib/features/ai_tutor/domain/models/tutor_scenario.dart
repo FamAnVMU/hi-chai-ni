@@ -34,11 +34,29 @@ class TutorScenario {
           '我想学一下如何介绍自己。',
           '你可以考考我HSK 1的生词吗？',
         ];
-      case 'ordering_food':
+      case 'restaurant':
         return const [
           '服务员，请给我菜单。',
           '这个菜有点辣吗？',
           '请问一共多少钱？',
+        ];
+      case 'hotel_checkin':
+        return const [
+          '你好，我预订了今天的标准间。',
+          '请问Wi-Fi密码是多少？',
+          '明天早上几点有早餐？',
+        ];
+      case 'airport':
+        return const [
+          '请问去上海的柜台在哪里？',
+          '我可以选一个靠窗的座位吗？',
+          '我的行李需要托运。',
+        ];
+      case 'job_interview':
+        return const [
+          '您好，我叫小明，有三年工作经验。',
+          '我觉得我的优势是学习能力很强。',
+          '请问贵公司对这个职位有什么期待？',
         ];
       case 'asking_directions':
         return const [

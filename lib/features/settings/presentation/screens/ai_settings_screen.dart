@@ -16,12 +16,14 @@ class AiSettingsScreen extends ConsumerStatefulWidget {
 
 class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
   final TextEditingController _apiKeyController = TextEditingController();
+  final TextEditingController _proxyKeyController = TextEditingController();
   final TextEditingController _proxyUrlController = TextEditingController();
   bool _obscureKey = true;
 
   @override
   void dispose() {
     _apiKeyController.dispose();
+    _proxyKeyController.dispose();
     _proxyUrlController.dispose();
     super.dispose();
   }
@@ -114,10 +116,18 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
             const Divider(color: AppColors.divider, height: 1.0),
             _buildProviderTile(
               title: 'Firebase AI Logic',
-              subtitle: 'Đám mây • Vertex AI kèm Firebase App Check',
+              subtitle: 'Chưa hỗ trợ trên bản dựng này (yêu cầu google-services.json)',
               value: AiProviderType.firebaseAiLogic,
               current: state.providerType,
-              onSelect: () => notifier.setProviderType(AiProviderType.firebaseAiLogic),
+              isLocked: true,
+              badgeText: 'Sắp ra mắt',
+              onSelect: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Firebase AI Logic hiện chưa khả dụng. Vui lòng chọn BYOK hoặc Custom Proxy.'),
+                  ),
+                );
+              },
             ),
             const Divider(color: AppColors.divider, height: 1.0),
             _buildProviderTile(
@@ -139,58 +149,86 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
     required AiProviderType value,
     required AiProviderType current,
     required VoidCallback onSelect,
+    bool isLocked = false,
+    String? badgeText,
   }) {
     final isSelected = value == current;
     return InkWell(
       onTap: onSelect,
       borderRadius: BorderRadius.circular(8.0),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-        child: Row(
-          children: [
-            Container(
-              width: 20.0,
-              height: 20.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected ? AppColors.primaryBlueDark : AppColors.mutedText,
-                  width: 2.0,
+      child: Opacity(
+        opacity: isLocked ? 0.6 : 1.0,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+          child: Row(
+            children: [
+              Container(
+                width: 20.0,
+                height: 20.0,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isSelected ? AppColors.primaryBlueDark : AppColors.mutedText,
+                    width: 2.0,
+                  ),
+                ),
+                child: isSelected
+                    ? Center(
+                        child: Container(
+                          width: 10.0,
+                          height: 10.0,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.primaryBlueDark,
+                          ),
+                        ),
+                      )
+                    : null,
+              ),
+              const SizedBox(width: 10.0),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            title,
+                            style: TextStyle(
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                              color: isSelected ? AppColors.primaryText : AppColors.secondaryText,
+                            ),
+                          ),
+                        ),
+                        if (badgeText != null) ...[
+                          const SizedBox(width: 8.0),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                            decoration: BoxDecoration(
+                              color: AppColors.inputBackground,
+                              borderRadius: BorderRadius.circular(4.0),
+                              border: Border.all(color: AppColors.border),
+                            ),
+                            child: Text(
+                              badgeText,
+                              style: const TextStyle(fontSize: 10.0, color: AppColors.secondaryText),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(fontSize: 12.0, color: AppColors.secondaryText),
+                    ),
+                  ],
                 ),
               ),
-              child: isSelected
-                  ? Center(
-                      child: Container(
-                        width: 10.0,
-                        height: 10.0,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.primaryBlueDark,
-                        ),
-                      ),
-                    )
-                  : null,
-            ),
-            const SizedBox(width: 10.0),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                      color: isSelected ? AppColors.primaryText : AppColors.secondaryText,
-                    ),
-                  ),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(fontSize: 12.0, color: AppColors.secondaryText),
-                  ),
-                ],
-              ),
-            ),
-          ],
+              if (isLocked)
+                const Icon(Icons.lock_outline, size: 16.0, color: AppColors.mutedText),
+            ],
+          ),
         ),
       ),
     );
@@ -318,21 +356,36 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
                   ? null
                   : () async {
                       final key = _apiKeyController.text.trim();
+                      final messenger = ScaffoldMessenger.of(context);
                       if (key.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        messenger.showSnackBar(
                           const SnackBar(content: Text('Vui lòng nhập API Key trước khi lưu')),
                         );
                         return;
                       }
-                      await notifier.saveApiKey(key);
-                      _apiKeyController.clear();
-                      if (!mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Đã mã hóa và lưu khóa API an toàn!'),
-                          backgroundColor: AppColors.success,
-                        ),
-                      );
+                      try {
+                        await notifier.saveApiKey(key);
+                        _apiKeyController.clear();
+                        if (!mounted) return;
+                        messenger.showSnackBar(
+                          const SnackBar(
+                            content: Text('Đã mã hóa và lưu khóa API an toàn!'),
+                            backgroundColor: AppColors.success,
+                          ),
+                        );
+                      } catch (e) {
+                        if (!mounted) return;
+                        final safeMsg = AiCredentialStorage.sanitizeSecret(
+                          e is ArgumentError ? '${e.message}' : e.toString(),
+                          key,
+                        );
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text(safeMsg),
+                            backgroundColor: AppColors.error,
+                          ),
+                        );
+                      }
                     },
               icon: state.isSavingKey
                   ? const SizedBox(
@@ -485,17 +538,128 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
             const SizedBox(height: 12.0),
             ElevatedButton(
               onPressed: () async {
-                await notifier.saveCustomProxyUrl(_proxyUrlController.text.trim());
-                if (!mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Đã cập nhật URL Proxy')),
-                );
+                final url = _proxyUrlController.text.trim();
+                final messenger = ScaffoldMessenger.of(context);
+                try {
+                  await notifier.saveCustomProxyUrl(url);
+                  if (!mounted) return;
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('Đã cập nhật URL Proxy an toàn!'),
+                      backgroundColor: AppColors.success,
+                    ),
+                  );
+                } catch (e) {
+                  if (!mounted) return;
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text(e is ArgumentError ? '${e.message}' : e.toString()),
+                      backgroundColor: AppColors.error,
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryBlueDark,
                 foregroundColor: Colors.white,
               ),
               child: const Text('Lưu Địa Chỉ Proxy', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            const SizedBox(height: 16.0),
+            const Divider(color: AppColors.divider, height: 1.0),
+            const SizedBox(height: 16.0),
+            if (state.hasApiKey) ...[
+              Container(
+                padding: const EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                  color: AppColors.successContainerLight,
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(color: AppColors.success.withAlpha(120)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.vpn_key_outlined, color: AppColors.success, size: 18.0),
+                    const SizedBox(width: 8.0),
+                    Expanded(
+                      child: Text(
+                        'Proxy Key đã lưu: ${state.maskedApiKey ?? "********"}',
+                        style: const TextStyle(fontSize: 12.5, fontFamily: 'monospace', color: AppColors.success, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline, color: AppColors.error, size: 20.0),
+                      tooltip: 'Xóa khóa Proxy',
+                      onPressed: () => _confirmDeleteKey(context, notifier),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12.0),
+            ],
+            TextField(
+              controller: _proxyKeyController,
+              obscureText: _obscureKey,
+              style: const TextStyle(fontFamily: 'monospace', color: AppColors.primaryText),
+              decoration: InputDecoration(
+                labelText: 'Khóa xác thực Custom Proxy',
+                hintText: 'Nhập API Key / Bearer Token cho máy chủ Proxy...',
+                hintStyle: const TextStyle(color: AppColors.mutedText),
+                filled: true,
+                fillColor: AppColors.inputBackground,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscureKey ? Icons.visibility_off : Icons.visibility,
+                    color: AppColors.mutedText,
+                  ),
+                  onPressed: () => setState(() => _obscureKey = !_obscureKey),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10.0),
+            ElevatedButton.icon(
+              onPressed: state.isSavingKey
+                  ? null
+                  : () async {
+                      final key = _proxyKeyController.text.trim();
+                      final messenger = ScaffoldMessenger.of(context);
+                      if (key.isEmpty) {
+                        messenger.showSnackBar(
+                          const SnackBar(content: Text('Vui lòng nhập khóa Proxy trước khi lưu')),
+                        );
+                        return;
+                      }
+                      try {
+                        await notifier.saveApiKey(key);
+                        _proxyKeyController.clear();
+                        if (!mounted) return;
+                        messenger.showSnackBar(
+                          const SnackBar(
+                            content: Text('Đã mã hóa và lưu khóa Custom Proxy riêng biệt!'),
+                            backgroundColor: AppColors.success,
+                          ),
+                        );
+                      } catch (e) {
+                        if (!mounted) return;
+                        final safeMsg = AiCredentialStorage.sanitizeSecret(
+                          e is ArgumentError ? '${e.message}' : e.toString(),
+                          key,
+                        );
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text(safeMsg),
+                            backgroundColor: AppColors.error,
+                          ),
+                        );
+                      }
+                    },
+              icon: const Icon(Icons.save_outlined, color: Colors.white),
+              label: const Text('Lưu Khóa Proxy', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryBlueDark,
+                padding: const EdgeInsets.symmetric(vertical: 12.0),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+              ),
             ),
           ],
         ),
@@ -511,7 +675,11 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
     AiSettingsNotifier notifier,
     AiModelRegistry modelRegistry,
   ) {
-    final activeSpec = modelRegistry.getModelSpec(state.selectedModelId);
+    final restSpecs = modelRegistry.restCompatibleModelSpecs;
+    final selectedRestModel = restSpecs.any((s) => s.modelId == state.selectedModelId)
+        ? state.selectedModelId
+        : (restSpecs.isNotEmpty ? restSpecs.first.modelId : state.selectedModelId);
+    final activeSpec = modelRegistry.getModelSpec(selectedRestModel);
 
     return Card(
       color: AppColors.cardBackground,
@@ -540,10 +708,10 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
-                  value: state.selectedModelId,
+                  value: selectedRestModel,
                   isExpanded: true,
                   dropdownColor: AppColors.cardBackground,
-                  items: modelRegistry.availableModelSpecs.map((spec) {
+                  items: restSpecs.map((spec) {
                     return DropdownMenuItem<String>(
                       value: spec.modelId,
                       child: Text(

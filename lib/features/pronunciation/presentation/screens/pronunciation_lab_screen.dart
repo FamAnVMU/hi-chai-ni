@@ -9,6 +9,8 @@ import '../providers/pronunciation_providers.dart';
 import '../widgets/pronunciation_result_card.dart';
 import '../widgets/waveform_visualizer.dart';
 
+enum _PronunciationPlayTarget { none, sample, user }
+
 /// Pronunciation Lab screen dedicated to phoneme and tone level vocal training.
 class PronunciationLabScreen extends ConsumerStatefulWidget {
   final String? initialTargetId;
@@ -33,9 +35,11 @@ class _PronunciationLabScreenState extends ConsumerState<PronunciationLabScreen>
   double _currentAmplitude = 0.0;
   Duration _recordingDuration = Duration.zero;
   bool _isRecording = false;
-  bool _isPlayingUserAudio = false;
-  bool _isPlayingSample = false;
+  _PronunciationPlayTarget _activePlayTarget = _PronunciationPlayTarget.none;
   String? _recordedFilePath;
+
+  bool get _isPlayingSample => _activePlayTarget == _PronunciationPlayTarget.sample;
+  bool get _isPlayingUserAudio => _activePlayTarget == _PronunciationPlayTarget.user;
 
   @override
   void initState() {
@@ -60,11 +64,9 @@ class _PronunciationLabScreenState extends ConsumerState<PronunciationLabScreen>
     });
 
     _playStatusSub = _player.statusStream.listen((status) {
-      if (mounted) {
-        setState(() {
-          _isPlayingSample = status == AudioPlaybackStatus.playing && !_isPlayingUserAudio;
-          _isPlayingUserAudio = status == AudioPlaybackStatus.playing && _isPlayingUserAudio;
-        });
+      if (mounted &&
+          (status == AudioPlaybackStatus.completed || status == AudioPlaybackStatus.error)) {
+        setState(() => _activePlayTarget = _PronunciationPlayTarget.none);
       }
     });
   }
@@ -87,13 +89,13 @@ class _PronunciationLabScreenState extends ConsumerState<PronunciationLabScreen>
   Future<void> _handlePlaySample(PronunciationTarget target) async {
     if (_isPlayingSample) {
       await _player.stop();
-      setState(() => _isPlayingSample = false);
+      setState(() => _activePlayTarget = _PronunciationPlayTarget.none);
     } else {
-      setState(() {
-        _isPlayingUserAudio = false;
-        _isPlayingSample = true;
-      });
-      await _player.play(target.audioUri ?? 'sample.mp3');
+      setState(() => _activePlayTarget = _PronunciationPlayTarget.sample);
+      await _player.playWithFallback(
+        target.audioUri ?? 'sample.mp3',
+        fallbackText: target.text,
+      );
     }
   }
 
@@ -120,6 +122,7 @@ class _PronunciationLabScreenState extends ConsumerState<PronunciationLabScreen>
         }
         setState(() {
           _isRecording = true;
+          _activePlayTarget = _PronunciationPlayTarget.none;
           _recordedFilePath = null;
         });
         await _recorder.startRecording();
@@ -141,13 +144,22 @@ class _PronunciationLabScreenState extends ConsumerState<PronunciationLabScreen>
     final service = ref.read(pronunciationAnalysisServiceProvider);
     final repo = ref.read(pronunciationRepositoryProvider);
 
+    final effectiveDuration = _recorder.recordingDuration > _recordingDuration
+        ? _recorder.recordingDuration
+        : _recordingDuration;
+
     final result = await service.evaluatePronunciation(
       target: target,
       audioPath: _recordedFilePath!,
-      duration: _recordingDuration,
+      duration: effectiveDuration,
     );
 
     ref.read(lastPronunciationResultProvider.notifier).setResult(result);
+
+    if (result.status == PronunciationEvaluationStatus.insufficientAudio ||
+        result.status == PronunciationEvaluationStatus.failed) {
+      return;
+    }
 
     try {
       final evidenceId = await repo.recordPronunciationSession(assessment: result);
@@ -160,12 +172,9 @@ class _PronunciationLabScreenState extends ConsumerState<PronunciationLabScreen>
 
     if (_isPlayingUserAudio) {
       await _player.stop();
-      setState(() => _isPlayingUserAudio = false);
+      setState(() => _activePlayTarget = _PronunciationPlayTarget.none);
     } else {
-      setState(() {
-        _isPlayingSample = false;
-        _isPlayingUserAudio = true;
-      });
+      setState(() => _activePlayTarget = _PronunciationPlayTarget.user);
       await _player.play(_recordedFilePath!);
     }
   }
@@ -207,7 +216,7 @@ class _PronunciationLabScreenState extends ConsumerState<PronunciationLabScreen>
 
       setState(() {
         _recordedFilePath = null;
-        _isPlayingUserAudio = false;
+        _activePlayTarget = _PronunciationPlayTarget.none;
       });
 
       if (mounted) {

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../data/sentence_repository.dart';
@@ -28,6 +29,8 @@ class _SentenceListeningScreenState extends State<SentenceListeningScreen> {
   late SentenceItem _currentSentence;
   late int _currentIndex;
   late final SentenceAudioManager _audioManager;
+  StreamSubscription<bool>? _playingSub;
+  StreamSubscription<AudioType>? _audioTypeSub;
 
   bool _showChinese = false;
   bool _showPinyin = false;
@@ -48,11 +51,11 @@ class _SentenceListeningScreenState extends State<SentenceListeningScreen> {
 
     _audioManager = SentenceAudioManager();
 
-    _audioManager.isPlayingStream.listen((playing) {
+    _playingSub = _audioManager.isPlayingStream.listen((playing) {
       if (mounted) setState(() => _isPlaying = playing);
     });
 
-    _audioManager.audioTypeStream.listen((type) {
+    _audioTypeSub = _audioManager.audioTypeStream.listen((type) {
       if (mounted) setState(() => _audioType = type);
     });
 
@@ -64,6 +67,8 @@ class _SentenceListeningScreenState extends State<SentenceListeningScreen> {
 
   @override
   void dispose() {
+    _playingSub?.cancel();
+    _audioTypeSub?.cancel();
     _audioManager.dispose();
     super.dispose();
   }

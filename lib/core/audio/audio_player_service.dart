@@ -43,6 +43,35 @@ abstract class AudioPlayerService {
   void dispose();
 }
 
+/// Dispatches `fallbackText` when using [DefaultAudioPlayerService] without
+/// breaking existing [AudioPlayerService] test doubles that only override `play`.
+extension AudioPlayerServiceFallbackX on AudioPlayerService {
+  Future<void> playWithFallback(
+    String uri, {
+    double speed = 1.0,
+    bool loop = false,
+    Duration? simulatedDuration,
+    String? fallbackText,
+  }) {
+    final self = this;
+    if (self is DefaultAudioPlayerService) {
+      return self.play(
+        uri,
+        speed: speed,
+        loop: loop,
+        simulatedDuration: simulatedDuration,
+        fallbackText: fallbackText,
+      );
+    }
+    return play(
+      uri,
+      speed: speed,
+      loop: loop,
+      simulatedDuration: simulatedDuration,
+    );
+  }
+}
+
 /// Production AudioPlayer implementation powered by `just_audio`.
 /// Directly connects to native OS audio hardware (ExoPlayer on Android, AVPlayer on iOS).
 /// Supports local files, assets, downloaded content packs, and remote streams with zero simulation.
@@ -56,6 +85,7 @@ class DefaultAudioPlayerService implements AudioPlayerService {
   Duration _currentPosition = Duration.zero;
   Duration _totalDuration = Duration.zero;
   double _playbackSpeed = 1.0;
+  double _volume = 1.0;
   bool _isLooping = false;
 
   final _statusController = StreamController<AudioPlaybackStatus>.broadcast();
@@ -150,21 +180,39 @@ class DefaultAudioPlayerService implements AudioPlayerService {
     double speed = 1.0,
     bool loop = false,
     Duration? simulatedDuration,
+    String? fallbackText,
   }) async {
     try {
       _playbackSpeed = speed.clamp(0.5, 2.0);
       _isLooping = loop;
 
-      // Stop previous playback and reset position
+      // Stop previous audio & TTS playback and reset position
       await stop();
       _updateStatus(AudioPlaybackStatus.buffering);
 
       ja.AudioSource source;
-      String cleanUri = uri;
+      String cleanUri = uri.trim();
       if (cleanUri.startsWith('asset:///')) {
         cleanUri = cleanUri.replaceFirst('asset:///', '');
       } else if (cleanUri.startsWith('asset://')) {
         cleanUri = cleanUri.replaceFirst('asset://', '');
+      }
+
+      // Direct TTS playback URI (`tts:你好`)
+      if (cleanUri.startsWith('tts:')) {
+        final rawTts = cleanUri.substring(4).trim();
+        final ttsText = rawTts.isNotEmpty
+            ? rawTts
+            : ((fallbackText != null && fallbackText.trim().isNotEmpty)
+                ? fallbackText.trim()
+                : '你好');
+        await _speakWithTtsFallback(ttsText);
+        return;
+      }
+
+      // Normalize legacy relative `audio/...` paths -> `assets/audio/...`
+      if (cleanUri.startsWith('audio/')) {
+        cleanUri = 'assets/$cleanUri';
       }
 
       if (cleanUri.startsWith('assets/')) {
@@ -182,14 +230,11 @@ class DefaultAudioPlayerService implements AudioPlayerService {
         } else {
           // Graceful fallback: synthesize speech via TTS engine for missing virtual assets
           debugPrint('[DefaultAudioPlayerService] Asset not bundled: $cleanUri -> Falling back to TTS');
-          final fallbackText = _deriveTextFromAudioUri(cleanUri);
-          _updateStatus(AudioPlaybackStatus.playing);
-          await _effectiveTts.speak(
-            fallbackText,
-            language: 'zh-CN',
-            rate: (_playbackSpeed * 0.5).clamp(0.2, 1.0),
-          );
-          _updateStatus(AudioPlaybackStatus.completed);
+          final effectiveFallback =
+              (fallbackText != null && fallbackText.trim().isNotEmpty)
+                  ? fallbackText.trim()
+                  : _deriveTextFromAudioUri(cleanUri);
+          await _speakWithTtsFallback(effectiveFallback);
           return;
         }
       } else if (cleanUri.startsWith('http://') || cleanUri.startsWith('https://')) {
@@ -219,10 +264,17 @@ class DefaultAudioPlayerService implements AudioPlayerService {
       }
 
       await _player.setSpeed(_playbackSpeed);
+      await _player.setVolume(_volume);
       await _player.setLoopMode(loop ? ja.LoopMode.one : ja.LoopMode.off);
       await _player.play();
 
-      _updateStatus(AudioPlaybackStatus.playing);
+      // Do not overwrite `completed` if synchronous/fast playback already completed inside `await _player.play()`
+      if (_player.processingState != ja.ProcessingState.completed &&
+          _status != AudioPlaybackStatus.completed &&
+          _status != AudioPlaybackStatus.stopped &&
+          _status != AudioPlaybackStatus.error) {
+        _updateStatus(AudioPlaybackStatus.playing);
+      }
     } catch (e) {
       _updateStatus(AudioPlaybackStatus.error);
       if (e is AudioPlaybackException) {
@@ -236,10 +288,25 @@ class DefaultAudioPlayerService implements AudioPlayerService {
     }
   }
 
+  Future<void> _speakWithTtsFallback(String text) async {
+    _updateStatus(AudioPlaybackStatus.playing);
+    await _effectiveTts.speak(
+      text,
+      language: 'zh-CN',
+      rate: (_playbackSpeed * 0.5).clamp(0.2, 1.0),
+      volume: _volume,
+    );
+    if (_status != AudioPlaybackStatus.stopped &&
+        _status != AudioPlaybackStatus.error) {
+      _updateStatus(AudioPlaybackStatus.completed);
+    }
+  }
+
   @override
   Future<void> pause() async {
     try {
       await _player.pause();
+      await _tts?.stop();
       _updateStatus(AudioPlaybackStatus.paused);
     } catch (_) {}
   }
@@ -248,7 +315,12 @@ class DefaultAudioPlayerService implements AudioPlayerService {
   Future<void> resume() async {
     try {
       await _player.play();
-      _updateStatus(AudioPlaybackStatus.playing);
+      if (_player.processingState != ja.ProcessingState.completed &&
+          _status != AudioPlaybackStatus.completed &&
+          _status != AudioPlaybackStatus.stopped &&
+          _status != AudioPlaybackStatus.error) {
+        _updateStatus(AudioPlaybackStatus.playing);
+      }
     } catch (_) {}
   }
 
@@ -256,6 +328,7 @@ class DefaultAudioPlayerService implements AudioPlayerService {
   Future<void> stop() async {
     try {
       await _player.stop();
+      await _tts?.stop();
       _currentPosition = Duration.zero;
       if (!_positionController.isClosed) {
         _positionController.add(Duration.zero);
@@ -291,12 +364,28 @@ class DefaultAudioPlayerService implements AudioPlayerService {
     } catch (_) {}
   }
 
+  Future<void> setVolume(double volume) async {
+    _volume = volume.clamp(0.0, 1.0);
+    try {
+      await _player.setVolume(_volume);
+    } catch (_) {}
+  }
+
   /// Extracts a pronounceable Chinese text snippet from the filename for TTS fallback.
   String _deriveTextFromAudioUri(String uri) {
     final fileName = uri.split('/').last.split('.').first;
-    // Map common Pinyin syllables or filenames
+    final hasHanzi = RegExp(r'[\u4e00-\u9fa5]').hasMatch(fileName);
+    if (hasHanzi) {
+      return fileName.replaceAll(RegExp(r'^hsk\d+_'), '').replaceAll('_', ' ').trim();
+    }
+    // Avoid reading internal numeric/ID filenames like `listening_hsk1_01` or `1276691` aloud
     final clean = fileName.replaceAll('_', ' ').replaceAll(RegExp(r'\d+'), '').trim();
-    if (clean.isEmpty) return '你好';
+    if (clean.isEmpty ||
+        RegExp(r'^(hsk|listening|lesson|tat|doc|audio|vocab|dialogue|shadowing|sample)(\s+(hsk|listening|lesson|tat|doc|audio|vocab|dialogue|shadowing|sample|[a-z]{1,2}))*$',
+                caseSensitive: false)
+            .hasMatch(clean)) {
+      return '你好';
+    }
     return clean;
   }
 

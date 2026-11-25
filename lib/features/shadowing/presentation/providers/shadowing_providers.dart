@@ -31,6 +31,13 @@ class SelectedShadowingDocumentNotifier extends Notifier<ShadowingDocument> {
   void selectDocument(ShadowingDocument doc) {
     state = doc;
   }
+
+  void selectDocumentById(String id) {
+    final doc = ref.read(shadowingDocumentBankProvider).getDocumentById(id);
+    if (doc != null) {
+      state = doc;
+    }
+  }
 }
 
 final selectedShadowingDocumentProvider =
