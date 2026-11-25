@@ -202,6 +202,7 @@ class DictionaryEntry {
     List<DictionaryExample>? examples,
     bool? isSaved,
     String? customNote,
+    bool clearCustomNote = false,
   }) {
     return DictionaryEntry(
       id: id ?? this.id,
@@ -221,7 +222,7 @@ class DictionaryEntry {
       senses: senses ?? this.senses,
       examples: examples ?? this.examples,
       isSaved: isSaved ?? this.isSaved,
-      customNote: customNote ?? this.customNote,
+      customNote: clearCustomNote ? null : (customNote ?? this.customNote),
     );
   }
 

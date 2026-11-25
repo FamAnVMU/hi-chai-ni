@@ -186,12 +186,19 @@ class FakeDictionaryRepository implements DictionaryRepository {
   }
 
   @override
-  Future<DictionaryEntry?> getWordByExactHanzi(String hanzi) async {
+  Future<DictionaryEntry?> getWordByExactHanzi(
+    String hanzi, {
+    String? preferredPinyin,
+  }) async {
     return entries[hanzi];
   }
 
   @override
-  Future<List<DictionaryEntry>> search(String query, {int limit = 30}) async {
+  Future<List<DictionaryEntry>> search(
+    String query, {
+    int limit = 30,
+    bool recordHistory = false,
+  }) async {
     final res = entries.values.where((e) => e.simplified.contains(query)).take(limit).toList();
     return res;
   }
@@ -526,8 +533,8 @@ void main() {
     });
   });
 
-  group('Task 4.3 Acceptance: ReadingQuestionsSection (Instant Grading & C3 Explanation)', () {
-    testWidgets('Instant grading on tap: correct answer shows green container with checkmark', (tester) async {
+  group('Task 4.3 Acceptance: ReadingQuestionsSection (Submit-time Grading & C3 Explanation)', () {
+    testWidgets('Grading after submit: correct answer shows green container with checkmark', (tester) async {
       final questions = [
         const ReadingQuestion(
           id: 'q1',
@@ -554,8 +561,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Tap option '中国人' (Correct answer, index 0)
+      // Tap option '中国人' (must not reveal grading or auto-submit before button tap)
       await tester.tap(find.text('中国人'));
+      await tester.pumpAndSettle();
+      expect(find.byIcon(Icons.check_circle_rounded), findsNothing);
+
+      await tester.tap(find.text('Nộp bài kiểm tra đọc hiểu'));
       await tester.pumpAndSettle();
 
       // Verify checkmark icon is displayed for correct answer (both in option and explanation box)
@@ -569,7 +580,7 @@ void main() {
       expect(find.text('Hỏi AI Tutor về câu này'), findsOneWidget);
     });
 
-    testWidgets('Instant grading on tap: incorrect answer shows red with cross icon and highlights correct answer', (tester) async {
+    testWidgets('Grading after submit: incorrect answer shows red with cross icon and highlights correct answer', (tester) async {
       final questions = [
         const ReadingQuestion(
           id: 'q1',
@@ -596,8 +607,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Tap option '美国人' (Incorrect answer, index 1)
+      // Tap option '美国人' (Incorrect answer, index 1), then submit
       await tester.tap(find.text('美国人'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Nộp bài kiểm tra đọc hiểu'));
       await tester.pumpAndSettle();
 
       // Verify cancel/cross icon is displayed for wrong answer
@@ -606,7 +619,7 @@ void main() {
       // Verify check icon is displayed for the correct answer to guide the learner
       expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
 
-      // Verify Explanation box is revealed immediately
+      // Verify Explanation box is revealed on submit
       expect(find.text('Trích dẫn: "他是中国人。"'), findsOneWidget);
       expect(find.text('Trong bài có câu "他是中国人", chứng minh Lý Minh là người Trung Quốc.'), findsOneWidget);
     });
@@ -638,8 +651,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Tap an answer to reveal explanation and AI Tutor button
+      // Select an answer and submit to reveal explanation and AI Tutor button
       await tester.tap(find.text('中国人'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Nộp bài kiểm tra đọc hiểu'));
       await tester.pumpAndSettle();
 
       // Tap 'Hỏi AI Tutor về câu này'

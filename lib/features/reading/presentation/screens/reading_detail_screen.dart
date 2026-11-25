@@ -17,6 +17,7 @@ class ReadingDetailScreen extends StatefulWidget {
   final ReadingRepository? repository;
   final DictionaryRepository? dictionaryRepository;
   final AudioPlayerService? audioPlayer;
+  final TtsService? ttsService;
 
   const ReadingDetailScreen({
     super.key,
@@ -24,6 +25,7 @@ class ReadingDetailScreen extends StatefulWidget {
     this.repository,
     this.dictionaryRepository,
     this.audioPlayer,
+    this.ttsService,
   });
 
   @override
@@ -33,6 +35,8 @@ class ReadingDetailScreen extends StatefulWidget {
 class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
   late final ReadingRepository _repo;
   late final DictionaryRepository _dictRepo;
+  late final TtsService _ttsService;
+  late final bool _ownsTts;
 
   ReadingDisplayMode _displayMode = ReadingDisplayMode.full;
   late final List<RubySegment> _segments;
@@ -58,6 +62,8 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
     super.initState();
     _repo = widget.repository ?? DefaultReadingRepository(AppDatabase.instance.database);
     _dictRepo = widget.dictionaryRepository ?? DefaultDictionaryRepository(AppDatabase.instance.database);
+    _ownsTts = widget.ttsService == null;
+    _ttsService = widget.ttsService ?? DefaultTtsService();
 
     _segments = widget.passage.buildRubySegments();
     _startTimer();
@@ -124,6 +130,9 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
     if (widget.audioPlayer == null) {
       _audioPlayer?.dispose();
     }
+    if (_ownsTts) {
+      _ttsService.dispose();
+    }
     super.dispose();
   }
 
@@ -143,14 +152,42 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
     );
   }
 
+  Future<void> _playTtsPassage() async {
+    if (_audioStatus == AudioPlaybackStatus.playing) {
+      await _ttsService.stop();
+      if (mounted) setState(() => _audioStatus = AudioPlaybackStatus.stopped);
+      return;
+    }
+    if (mounted) setState(() => _audioStatus = AudioPlaybackStatus.playing);
+    try {
+      await _ttsService.speak(widget.passage.contentCn, language: 'zh-CN');
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Không thể phát audio bài đọc: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _audioStatus = AudioPlaybackStatus.idle);
+    }
+  }
+
   Future<void> _togglePlayAudio() async {
-    final uri = widget.passage.audioUri ?? 'tts:${widget.passage.contentCn}';
+    final uri = widget.passage.audioUri;
+    if (uri == null || uri.trim().isEmpty) {
+      await _playTtsPassage();
+      return;
+    }
     if (_audioStatus == AudioPlaybackStatus.playing) {
       await _audioPlayer?.pause();
     } else if (_audioStatus == AudioPlaybackStatus.paused) {
       await _audioPlayer?.resume();
     } else {
-      await _audioPlayer?.play(uri, speed: _playbackSpeed);
+      try {
+        await _audioPlayer?.play(uri, speed: _playbackSpeed);
+      } catch (_) {
+        await _playTtsPassage();
+      }
     }
   }
 
@@ -179,8 +216,11 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
     final hanzi = segment.text.trim();
     if (hanzi.isEmpty || segment.isPunctuation) return;
 
-    // Search dictionary by word
-    var entry = await _dictRepo.getWordByExactHanzi(hanzi);
+    // Prefer entry matching the tapped segment's pinyin for polyphones (RISK-11)
+    var entry = await _dictRepo.getWordByExactHanzi(
+      hanzi,
+      preferredPinyin: segment.pinyin,
+    );
     if (entry == null) {
       final searchList = await _dictRepo.search(hanzi, limit: 1);
       if (searchList.isNotEmpty) {
@@ -273,33 +313,52 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
     );
   }
 
-  Future<void> _askAiAboutSpecificWord(String word) async {
-    showDialog(
+  Future<void> _askAiWithLoading({
+    required String title,
+    required IconData titleIcon,
+    required String question,
+  }) async {
+    showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (_) => const Center(child: CircularProgressIndicator()),
     );
 
-    final explanation = await _repo.askAiAboutPassage(
-      passageText: widget.passage.contentCn,
-      userQuestion: 'Giải thích ý nghĩa và cách dùng của từ "$word" trong ngữ cảnh bài đọc này.',
-    );
+    String? explanation;
+    Object? error;
+    try {
+      explanation = await _repo.askAiAboutPassage(
+        passageText: widget.passage.contentCn,
+        userQuestion: question,
+      );
+    } catch (e) {
+      error = e;
+    } finally {
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
+    }
 
     if (!mounted) return;
-    Navigator.of(context).pop();
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Không thể kết nối AI Tutor: $error')),
+      );
+      return;
+    }
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Row(
           children: [
-            const Icon(Icons.smart_toy_outlined, color: AppColors.primaryBlueDark),
+            Icon(titleIcon, color: AppColors.primaryBlueDark),
             const SizedBox(width: 8),
-            Text('Giải thích từ "$word"'),
+            Expanded(child: Text(title)),
           ],
         ),
         content: SingleChildScrollView(
-          child: Text(explanation, style: const TextStyle(height: 1.4)),
+          child: Text(explanation ?? '', style: const TextStyle(height: 1.4)),
         ),
         actions: [
           TextButton(
@@ -311,104 +370,26 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
     );
   }
 
+  Future<void> _askAiAboutSpecificWord(String word) async {
+    await _askAiWithLoading(
+      title: 'Giải thích từ "$word"',
+      titleIcon: Icons.smart_toy_outlined,
+      question: 'Giải thích ý nghĩa và cách dùng của từ "$word" trong ngữ cảnh bài đọc này.',
+    );
+  }
+
   Future<void> _handleAskAi() async {
-    final controller = TextEditingController();
     final question = await showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(ctx).viewInsets.bottom,
-          left: AppSpacing.lg,
-          right: AppSpacing.lg,
-          top: AppSpacing.lg,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.auto_awesome_rounded, color: AppColors.primaryBlueDark),
-                const SizedBox(width: 8),
-                Text(
-                  'Hỏi AI về Bài Đọc',
-                  style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
-            TextField(
-              controller: controller,
-              maxLines: 2,
-              decoration: const InputDecoration(
-                hintText: 'Đặt câu hỏi về từ vựng, ngữ pháp hoặc văn hóa trong bài...',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Wrap(
-              spacing: 8,
-              children: [
-                ActionChip(
-                  label: const Text('Giải thích cấu trúc ngữ pháp'),
-                  onPressed: () => controller.text = 'Giải thích cấu trúc ngữ pháp tiêu biểu trong bài đọc này.',
-                ),
-                ActionChip(
-                  label: const Text('Từ vựng khó cần lưu ý'),
-                  onPressed: () => controller.text = 'Những từ vựng quan trọng nhất trong bài đọc này là gì?',
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
-            FilledButton.icon(
-              icon: const Icon(Icons.send_rounded),
-              label: const Text('Gửi câu hỏi'),
-              onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-          ],
-        ),
-      ),
+      builder: (_) => const _AskAiReadingSheet(),
     );
 
     if (question != null && question.isNotEmpty && mounted) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => const Center(child: CircularProgressIndicator()),
-      );
-
-      final explanation = await _repo.askAiAboutPassage(
-        passageText: widget.passage.contentCn,
-        userQuestion: question,
-      );
-
-      if (!mounted) return;
-      Navigator.of(context).pop();
-
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Row(
-            children: [
-              Icon(Icons.auto_awesome_rounded, color: AppColors.primaryBlueDark),
-              SizedBox(width: 8),
-              Text('Phản Hồi Từ AI Tutor'),
-            ],
-          ),
-          content: SingleChildScrollView(
-            child: Text(explanation),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Đã hiểu'),
-            ),
-          ],
-        ),
+      await _askAiWithLoading(
+        title: 'Phản Hồi Từ AI Tutor',
+        titleIcon: Icons.auto_awesome_rounded,
+        question: question,
       );
     }
   }
@@ -727,6 +708,85 @@ class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AskAiReadingSheet extends StatefulWidget {
+  const _AskAiReadingSheet();
+
+  @override
+  State<_AskAiReadingSheet> createState() => _AskAiReadingSheetState();
+}
+
+class _AskAiReadingSheetState extends State<_AskAiReadingSheet> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+        left: AppSpacing.lg,
+        right: AppSpacing.lg,
+        top: AppSpacing.lg,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.auto_awesome_rounded, color: AppColors.primaryBlueDark),
+              const SizedBox(width: 8),
+              Text(
+                'Hỏi AI về Bài Đọc',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          TextField(
+            controller: _controller,
+            maxLines: 2,
+            decoration: const InputDecoration(
+              hintText: 'Đặt câu hỏi về từ vựng, ngữ pháp hoặc văn hóa trong bài...',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Wrap(
+            spacing: 8,
+            children: [
+              ActionChip(
+                label: const Text('Giải thích cấu trúc ngữ pháp'),
+                onPressed: () =>
+                    _controller.text = 'Giải thích cấu trúc ngữ pháp tiêu biểu trong bài đọc này.',
+              ),
+              ActionChip(
+                label: const Text('Từ vựng khó cần lưu ý'),
+                onPressed: () =>
+                    _controller.text = 'Những từ vựng quan trọng nhất trong bài đọc này là gì?',
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          FilledButton.icon(
+            icon: const Icon(Icons.send_rounded),
+            label: const Text('Gửi câu hỏi'),
+            onPressed: () => Navigator.of(context).pop(_controller.text.trim()),
+          ),
+          const SizedBox(height: AppSpacing.lg),
         ],
       ),
     );

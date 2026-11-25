@@ -200,7 +200,7 @@ void main() {
       stopwatch.stop();
 
       expect(totalSeeded, equals(119044));
-      expect(stopwatch.elapsedMilliseconds, lessThan(30000)); // Should take <30s
+      expect(stopwatch.elapsedMilliseconds, lessThan(12000)); // Batch+index rebuild must finish <12s
 
       // Verify idempotency: second call should skip immediately
       final idempotentSw = Stopwatch()..start();
@@ -211,6 +211,15 @@ void main() {
 
       expect(secondCallCount, equals(119044));
       expect(idempotentSw.elapsedMilliseconds, lessThan(500)); // Should skip in <500ms
+
+      // Warm + measure FTS5 Vietnamese lookup latency (< 20ms)
+      await repository.search('mèo con');
+      final ftsSw = Stopwatch()..start();
+      final searchVi = await repository.search('mèo con');
+      ftsSw.stop();
+      expect(searchVi, isNotEmpty);
+      expect(searchVi.any((e) => e.simplified == '猫儿'), isTrue);
+      expect(ftsSw.elapsedMilliseconds, lessThan(20));
 
       // Search real non-HSK words from the 119k dictionary
       final searchResult = await repository.search('猫儿');

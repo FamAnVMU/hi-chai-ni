@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../../../core/database/dao/activity_dao.dart';
+import '../../../../core/database/dao/dao_utils.dart';
 import '../../../../core/database/dao/learner_evidence_dao.dart';
 import '../../../../core/database/database_constants.dart';
 import '../../../../core/utils/app_clock.dart';
@@ -42,30 +43,47 @@ class DefaultGrammarRepository implements GrammarRepository {
     }
   }
 
-  /// Ensure curated catalog items exist in SQLite
+  /// Ensure curated catalog items exist in SQLite (atomic batch seed, heals incomplete seeds).
   Future<void> _ensureCatalogSeeded() async {
     final count = Sqflite.firstIntValue(
-      await _db.rawQuery('SELECT COUNT(*) FROM ${DatabaseConstants.tableGrammarItems}'),
-    );
+          await _db.rawQuery('SELECT COUNT(*) FROM ${DatabaseConstants.tableGrammarItems}'),
+        ) ??
+        0;
 
-    if (count == null || count == 0) {
-      try {
-        final jsonStr = await rootBundle.loadString('assets/data/hsk_grammar_all.json');
-        final decoded = json.decode(jsonStr) as List<dynamic>;
+    try {
+      final jsonStr = await rootBundle.loadString('assets/data/hsk_grammar_all.json');
+      final decoded = json.decode(jsonStr) as List<dynamic>;
+      if (decoded.isNotEmpty) {
+        if (count >= decoded.length) {
+          return;
+        }
         final items = decoded.map((e) => Map<String, dynamic>.from(e as Map)).toList();
         await importGrammarDataset(items);
         return;
-      } catch (_) {
-        // Fallback for tests or environments where rootBundle is unavailable
       }
+    } catch (_) {
+      // Fallback for tests or environments where rootBundle is unavailable
+    }
 
+    if (count > 0) return;
+
+    Future<void> seedFallback(DatabaseExecutor exec) async {
+      final batch = exec.batch();
       for (final item in GrammarCatalog.items) {
-        await _db.insert(
+        batch.insert(
           DatabaseConstants.tableGrammarItems,
           item.toMap(),
           conflictAlgorithm: ConflictAlgorithm.ignore,
         );
       }
+      await batch.commit(noResult: true);
+    }
+
+    final db = _db;
+    if (db is Database) {
+      await db.transaction((txn) => seedFallback(txn));
+    } else {
+      await seedFallback(_db);
     }
   }
 
@@ -216,6 +234,37 @@ class DefaultGrammarRepository implements GrammarRepository {
     }
   }
 
+  static const List<String> _summaryColumns = [
+    'id',
+    'grammar_id',
+    'hsk_level',
+    'hsk_level_mapped',
+    'code',
+    'title',
+    'title_vi',
+    'pattern',
+    'structure',
+    'meaning_vi',
+    'usage_conditions_vi',
+    'sentence_position_vi',
+    'explanation_vi',
+    'source',
+    'topic_category',
+    'topic_name_vi',
+    'category_chinese',
+    'category_english',
+    'original_level',
+    'mapping_basis',
+    'is_reference_only',
+    'verification_status',
+    'license',
+    'attribution',
+    'wiki_link',
+    'tags_json',
+    'created_at',
+    'updated_at',
+  ];
+
   @override
   Future<List<GrammarItem>> getGrammarItems({
     int? hskLevel,
@@ -239,30 +288,55 @@ class DefaultGrammarRepository implements GrammarRepository {
       whereArgs.add(topicCategory);
     }
 
+    if (tag != null && tag.isNotEmpty) {
+      whereClauses.add(r"tags_json LIKE ? ESCAPE '\'");
+      whereArgs.add('%${DaoUtils.escapeLikePattern(tag)}%');
+    }
+
+    final trimmedQuery = query?.trim() ?? '';
+    final qLower = trimmedQuery.toLowerCase();
+    // Push LIKE to SQLite for ASCII & Hanzi queries (where SQLite LOWER matches Dart .toLowerCase()).
+    final canPushQueryToSql =
+        qLower.isNotEmpty && !RegExp(r'[^\x00-\x7f\u4e00-\u9fa5]').hasMatch(qLower);
+    if (canPushQueryToSql) {
+      final escaped = '%${DaoUtils.escapeLikePattern(qLower)}%';
+      whereClauses.add(r'''(
+        LOWER(COALESCE(title, title_vi, '')) LIKE ? ESCAPE '\' OR
+        LOWER(COALESCE(structure, pattern, '')) LIKE ? ESCAPE '\' OR
+        LOWER(COALESCE(meaning_vi, '')) LIKE ? ESCAPE '\' OR
+        LOWER(COALESCE(explanation_vi, '')) LIKE ? ESCAPE '\' OR
+        LOWER(COALESCE(usage_conditions_vi, '')) LIKE ? ESCAPE '\' OR
+        LOWER(COALESCE(category_chinese, '')) LIKE ? ESCAPE '\' OR
+        LOWER(COALESCE(tags_json, '')) LIKE ? ESCAPE '\'
+      )''');
+      for (int i = 0; i < 7; i++) {
+        whereArgs.add(escaped);
+      }
+    }
+
     final rows = await _db.query(
       DatabaseConstants.tableGrammarItems,
+      columns: _summaryColumns,
       where: whereClauses.isEmpty ? null : whereClauses.join(' AND '),
       whereArgs: whereArgs.isEmpty ? null : whereArgs,
       orderBy: 'hsk_level ASC, code ASC',
     );
 
-    var items = rows.map((r) => GrammarItem.fromMap(r)).toList();
+    var items = rows.map(GrammarItem.fromSummaryMap).toList();
 
-    // In-memory filter for tags & query search
     if (tag != null && tag.isNotEmpty) {
       items = items.where((it) => it.tags.contains(tag)).toList();
     }
 
-    if (query != null && query.trim().isNotEmpty) {
-      final q = query.trim().toLowerCase();
+    if (qLower.isNotEmpty && !canPushQueryToSql) {
       items = items.where((it) {
-        return it.title.toLowerCase().contains(q) ||
-            it.structure.toLowerCase().contains(q) ||
-            it.meaningVi.toLowerCase().contains(q) ||
-            it.explanationVi.toLowerCase().contains(q) ||
-            it.usageConditionsVi.toLowerCase().contains(q) ||
-            it.categoryChinese.toLowerCase().contains(q) ||
-            it.tags.any((t) => t.toLowerCase().contains(q));
+        return it.title.toLowerCase().contains(qLower) ||
+            it.structure.toLowerCase().contains(qLower) ||
+            it.meaningVi.toLowerCase().contains(qLower) ||
+            it.explanationVi.toLowerCase().contains(qLower) ||
+            it.usageConditionsVi.toLowerCase().contains(qLower) ||
+            it.categoryChinese.toLowerCase().contains(qLower) ||
+            it.tags.any((t) => t.toLowerCase().contains(qLower));
       }).toList();
     }
 
@@ -450,22 +524,62 @@ class DefaultGrammarRepository implements GrammarRepository {
 
   @override
   Future<void> importGrammarDataset(List<Map<String, dynamic>> rawItems) async {
+    if (rawItems.isEmpty) return;
     final nowUtc = DateTime.now().toUtc().toIso8601String();
+    final items = rawItems.map(GrammarItem.fromMap).toList();
+    final ids = items.map((e) => e.id).toSet().toList();
 
-    Future<void> performImport(dynamic executor) async {
-      for (final raw in rawItems) {
-        final item = GrammarItem.fromMap(raw);
-        await executor.insert(
+    Future<void> performImport(DatabaseExecutor executor) async {
+      final existingIds = <String>{};
+      for (final chunk in DaoUtils.chunkList(ids)) {
+        final placeholders = List.filled(chunk.length, '?').join(',');
+        final rows = await executor.query(
           DatabaseConstants.tableGrammarItems,
-          item.toMap(),
-          conflictAlgorithm: ConflictAlgorithm.replace,
+          columns: ['id'],
+          where: 'id IN ($placeholders)',
+          whereArgs: chunk,
         );
+        for (final r in rows) {
+          final id = r['id'] as String?;
+          if (id != null) existingIds.add(id);
+        }
+      }
 
-        // Also normalize examples into tableGrammarExamples
+      final idsWithExamples =
+          items.where((it) => it.examples.isNotEmpty).map((it) => it.id).toSet().toList();
+      for (final chunk in DaoUtils.chunkList(idsWithExamples)) {
+        final placeholders = List.filled(chunk.length, '?').join(',');
+        await executor.delete(
+          DatabaseConstants.tableGrammarExamples,
+          where: 'grammar_id IN ($placeholders)',
+          whereArgs: chunk,
+        );
+      }
+
+      final batch = executor.batch();
+      for (final item in items) {
+        final map = item.toMap();
+        if (existingIds.contains(item.id)) {
+          final updateMap = Map<String, dynamic>.from(map)..remove('created_at');
+          batch.update(
+            DatabaseConstants.tableGrammarItems,
+            updateMap,
+            where: 'id = ?',
+            whereArgs: [item.id],
+          );
+        } else {
+          existingIds.add(item.id);
+          batch.insert(
+            DatabaseConstants.tableGrammarItems,
+            map,
+            conflictAlgorithm: ConflictAlgorithm.ignore,
+          );
+        }
+
         if (item.examples.isNotEmpty) {
           int order = 0;
           for (final ex in item.examples) {
-            await executor.insert(
+            batch.insert(
               DatabaseConstants.tableGrammarExamples,
               {
                 'grammar_id': item.id,
@@ -479,11 +593,12 @@ class DefaultGrammarRepository implements GrammarRepository {
                 'order_index': order++,
                 'created_at': nowUtc,
               },
-              conflictAlgorithm: ConflictAlgorithm.replace,
+              conflictAlgorithm: ConflictAlgorithm.ignore,
             );
           }
         }
       }
+      await batch.commit(noResult: true);
     }
 
     final db = _db;

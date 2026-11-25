@@ -9,9 +9,16 @@ import '../domain/utils/pinyin_helper.dart';
 import 'offline_dictionary_loader.dart';
 
 abstract class DictionaryRepository {
-  Future<List<DictionaryEntry>> search(String query, {int limit = 30});
+  Future<List<DictionaryEntry>> search(
+    String query, {
+    int limit = 30,
+    bool recordHistory = false,
+  });
   Future<DictionaryEntry?> getWordById(String id);
-  Future<DictionaryEntry?> getWordByExactHanzi(String hanzi);
+  Future<DictionaryEntry?> getWordByExactHanzi(
+    String hanzi, {
+    String? preferredPinyin,
+  });
   Future<bool> toggleSaveWord(DictionaryEntry entry, {String? customNote});
   Future<void> updateWordNote(String vocabularyId, String? note);
   Future<List<UserSavedWord>> getSavedWords();
@@ -74,7 +81,11 @@ class DefaultDictionaryRepository implements DictionaryRepository {
   }
 
   @override
-  Future<List<DictionaryEntry>> search(String query, {int limit = 30}) async {
+  Future<List<DictionaryEntry>> search(
+    String query, {
+    int limit = 30,
+    bool recordHistory = false,
+  }) async {
     final trimmed = query.trim();
     if (trimmed.isEmpty) return [];
 
@@ -85,15 +96,17 @@ class DefaultDictionaryRepository implements DictionaryRepository {
       normalizedPinyin: normalized != trimmed.toLowerCase() ? normalized : null,
     );
 
-    final historyId = 'hist_${DateTime.now().microsecondsSinceEpoch}';
-    final searchType = PinyinHelper.containsChinese(trimmed)
-        ? 'hanzi'
-        : (PinyinHelper.isPinyinOrLatin(trimmed) ? 'pinyin' : 'meaning');
-    await _historyDao.insertHistory(
-      id: historyId,
-      query: trimmed,
-      searchType: searchType,
-    );
+    if (recordHistory) {
+      final historyId = 'hist_${DateTime.now().microsecondsSinceEpoch}';
+      final searchType = PinyinHelper.containsChinese(trimmed)
+          ? 'hanzi'
+          : (PinyinHelper.isPinyinOrLatin(trimmed) ? 'pinyin' : 'meaning');
+      await _historyDao.insertHistory(
+        id: historyId,
+        query: trimmed,
+        searchType: searchType,
+      );
+    }
 
     final vocabIds = rawResults.map((r) => r['id'] as String).toList();
     final sensesMap = await _vocabDao.getSensesByVocabularyIds(vocabIds);
@@ -119,42 +132,60 @@ class DefaultDictionaryRepository implements DictionaryRepository {
     }
 
     if (entries.length < limit) {
-      final dictRows = await _vocabDao.searchDictionaryEntries(trimmed, limit: limit - entries.length);
-      final dictIds = dictRows.map((d) => 'dict_${d['id'] ?? d['simplified']}').toList();
+      final dictRows = await _vocabDao.searchDictionaryFts(
+        trimmed,
+        limit: limit - entries.length,
+      );
+      final dictIds = dictRows.map(_normalizeDictId).toList();
       final dictSavedMap = await _savedWordsDao.getSavedWordsByIds(dictIds);
 
       for (final d in dictRows) {
-        final dId = 'dict_${d['id'] ?? d['simplified']}';
+        final dId = _normalizeDictId(d);
         if (entries.any((e) => e.simplified == d['simplified'])) continue;
 
         final savedData = dictSavedMap[dId];
-
-        entries.add(DictionaryEntry(
-          id: dId,
-          simplified: d['simplified'] as String,
-          traditional: d['traditional'] as String?,
-          pinyin: d['pinyin'] as String,
-          pinyinClean: d['pinyin_clean'] as String?,
-          hanviet: d['hanviet'] as String?,
-          hskLevel: (d['hsk_level'] as num?)?.toInt() ?? 0,
-          source: d['source'] as String? ?? 'CVDICT',
-          isSaved: savedData != null && (savedData['is_favorite'] == 1),
-          customNote: savedData?['custom_note'] as String?,
-          senses: [
-            DictionarySense(
-              id: 'sns_$dId',
-              partOfSpeech: 'từ vựng',
-              meaningVi: d['meaning_vi'] as String? ?? '',
-              meaningEn: d['meaning_en'] as String?,
-              source: d['source'] as String? ?? 'CVDICT',
-            )
-          ],
-        ));
+        entries.add(_entryFromDictionaryRow(dId, d, savedData));
       }
     }
 
     return entries;
   }
+
+  static String _normalizeDictId(Map<String, dynamic> row) {
+    final raw = (row['id'] ?? row['simplified']).toString();
+    return raw.startsWith('dict_') ? raw : 'dict_$raw';
+  }
+
+  static DictionaryEntry _entryFromDictionaryRow(
+    String dId,
+    Map<String, dynamic> row,
+    Map<String, dynamic>? savedData,
+  ) {
+    return DictionaryEntry(
+      id: dId,
+      simplified: row['simplified'] as String,
+      traditional: row['traditional'] as String?,
+      pinyin: row['pinyin'] as String,
+      pinyinClean: row['pinyin_clean'] as String?,
+      hanviet: row['hanviet'] as String?,
+      hskLevel: (row['hsk_level'] as num?)?.toInt() ?? 0,
+      source: row['source'] as String? ?? 'CVDICT',
+      isSaved: savedData != null && (savedData['is_favorite'] == 1),
+      customNote: savedData?['custom_note'] as String?,
+      senses: [
+        DictionarySense(
+          id: 'sns_$dId',
+          partOfSpeech: 'từ vựng',
+          meaningVi: row['meaning_vi'] as String? ?? '',
+          meaningEn: row['meaning_en'] as String?,
+          source: row['source'] as String? ?? 'CVDICT',
+        )
+      ],
+    );
+  }
+
+  static String _normalizePinyinKey(String raw) =>
+      PinyinHelper.removeTones(raw).toLowerCase().replaceAll(RegExp(r'\s+'), '');
 
   @override
   Future<DictionaryEntry?> getWordById(String id) async {
@@ -178,48 +209,75 @@ class DefaultDictionaryRepository implements DictionaryRepository {
     final dictRow = await _vocabDao.getDictionaryEntryById(id);
     if (dictRow == null) return null;
 
-    final dId = 'dict_${dictRow['id'] ?? dictRow['simplified']}';
+    final dId = _normalizeDictId(dictRow);
     final savedData = await _savedWordsDao.getSavedWord(dId) ?? await _savedWordsDao.getSavedWord(id);
 
-    return DictionaryEntry(
-      id: dId,
-      simplified: dictRow['simplified'] as String,
-      traditional: dictRow['traditional'] as String?,
-      pinyin: dictRow['pinyin'] as String,
-      pinyinClean: dictRow['pinyin_clean'] as String?,
-      hanviet: dictRow['hanviet'] as String?,
-      hskLevel: (dictRow['hsk_level'] as num?)?.toInt() ?? 0,
-      source: dictRow['source'] as String? ?? 'CVDICT',
-      isSaved: savedData != null && (savedData['is_favorite'] == 1),
-      customNote: savedData?['custom_note'] as String?,
-      senses: [
-        DictionarySense(
-          id: 'sns_$dId',
-          partOfSpeech: 'từ vựng',
-          meaningVi: dictRow['meaning_vi'] as String? ?? '',
-          meaningEn: dictRow['meaning_en'] as String?,
-          source: dictRow['source'] as String? ?? 'CVDICT',
-        )
-      ],
-    );
+    return _entryFromDictionaryRow(dId, dictRow, savedData);
   }
 
   @override
-  Future<DictionaryEntry?> getWordByExactHanzi(String hanzi) async {
+  Future<DictionaryEntry?> getWordByExactHanzi(
+    String hanzi, {
+    String? preferredPinyin,
+  }) async {
     final trimmed = hanzi.trim();
-    final results = await _vocabDao.searchVocabulariesAdvanced(trimmed, limit: 5);
+    if (trimmed.isEmpty) return null;
+    final preferredKey = preferredPinyin != null && preferredPinyin.trim().isNotEmpty
+        ? _normalizePinyinKey(preferredPinyin)
+        : null;
+
+    final results = await _vocabDao.searchVocabulariesAdvanced(trimmed, limit: 15);
     final match = results.where(
       (r) => (r['simplified'] == trimmed || r['traditional'] == trimmed),
-    );
+    ).toList();
 
     if (match.isNotEmpty) {
+      if (preferredKey != null) {
+        for (final row in match) {
+          final candidateKey = _normalizePinyinKey(row['pinyin'] as String? ?? '');
+          if (candidateKey == preferredKey) {
+            return getWordById(row['id'] as String);
+          }
+        }
+        // Check offline dictionary polyphones too before falling back to first vocab match.
+        final dictCandidates = await _db.query(
+          'dictionary_entries',
+          where: 'simplified = ? OR traditional = ?',
+          whereArgs: [trimmed, trimmed],
+          limit: 15,
+        );
+        for (final row in dictCandidates) {
+          final candidateKey = _normalizePinyinKey(
+            (row['pinyin_clean'] as String?) ?? (row['pinyin'] as String? ?? ''),
+          );
+          if (candidateKey == preferredKey) {
+            return getWordById(_normalizeDictId(row));
+          }
+        }
+      }
       return getWordById(match.first['id'] as String);
+    }
+
+    if (preferredKey != null) {
+      final dictCandidates = await _db.query(
+        'dictionary_entries',
+        where: 'simplified = ? OR traditional = ?',
+        whereArgs: [trimmed, trimmed],
+        limit: 15,
+      );
+      for (final row in dictCandidates) {
+        final candidateKey = _normalizePinyinKey(
+          (row['pinyin_clean'] as String?) ?? (row['pinyin'] as String? ?? ''),
+        );
+        if (candidateKey == preferredKey) {
+          return getWordById(_normalizeDictId(row));
+        }
+      }
     }
 
     final dictRow = await _vocabDao.getDictionaryEntryByHanzi(trimmed);
     if (dictRow != null) {
-      final dId = 'dict_${dictRow['id'] ?? dictRow['simplified']}';
-      return getWordById(dId);
+      return getWordById(_normalizeDictId(dictRow));
     }
 
     return null;
