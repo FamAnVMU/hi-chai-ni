@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import '../interfaces/ai_provider.dart';
 import '../models/ai_errors.dart';
 import '../models/ai_model_config.dart';
@@ -8,6 +9,8 @@ import '../models/cancel_token.dart';
 import '../models/connection_test_result.dart';
 
 /// Full-featured mock AI provider for testing, CI/CD, and offline demonstration.
+/// Test-only: NEVER instantiated by [aiProviderInstanceProvider] in production.
+@visibleForTesting
 class MockAiProvider implements AiProvider {
   @override
   String get providerName => 'mock_ai_provider';

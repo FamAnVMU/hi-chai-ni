@@ -11,6 +11,8 @@ class ShadowingEvaluator {
     required ShadowingMode mode,
     required ShadowingPlaybackSpeed speed,
     String? audioPath,
+    List<double>? amplitudeSamples,
+    List<double>? rawDbfsSamples,
   }) {
     final userMs = userDuration.inMilliseconds;
     // Base target duration adjusted by playback speed rate
@@ -39,6 +41,26 @@ class ShadowingEvaluator {
         userDurationMs: userMs,
         pacingRatio: 0.0,
         pacingVerdict: 'Thời lượng quá ngắn (< 0.4s). Hãy nói trọn vẹn câu mẫu.',
+        timelineMatchPercent: 0.0,
+        fluencyIndex: 0.0,
+        userAudioPath: audioPath,
+        mode: mode,
+        speed: speed,
+        timestamp: DateTime.now(),
+      );
+    }
+
+    if (_isSilentRecording(
+      amplitudeSamples: amplitudeSamples,
+      rawDbfsSamples: rawDbfsSamples,
+    )) {
+      return ShadowingAssessmentResult(
+        segmentId: segment.id,
+        targetDurationMs: effectiveTargetMs,
+        userDurationMs: userMs,
+        pacingRatio: 0.0,
+        pacingVerdict:
+            'Không phát hiện giọng nói rõ ràng (bản ghi quá nhỏ hoặc im lặng). Vui lòng nói gần micro hơn.',
         timelineMatchPercent: 0.0,
         fluencyIndex: 0.0,
         userAudioPath: audioPath,
@@ -80,5 +102,25 @@ class ShadowingEvaluator {
       speed: speed,
       timestamp: DateTime.now(),
     );
+  }
+
+  static bool _isSilentRecording({
+    List<double>? amplitudeSamples,
+    List<double>? rawDbfsSamples,
+  }) {
+    if (rawDbfsSamples != null && rawDbfsSamples.isNotEmpty) {
+      final peakDbfs = rawDbfsSamples.reduce((a, b) => a > b ? a : b);
+      final voicedCount = rawDbfsSamples.where((db) => db >= -45.0).length;
+      final voicedRatio = voicedCount / rawDbfsSamples.length;
+      return peakDbfs < -35.0 || voicedRatio < 0.25;
+    }
+    if (amplitudeSamples != null && amplitudeSamples.isNotEmpty) {
+      // Normalized scale [0.05 .. 1.0] from [-60 .. 0] dBFS: -35 dBFS ~= 0.417, -45 dBFS = 0.25.
+      final peak = amplitudeSamples.reduce((a, b) => a > b ? a : b);
+      final voicedCount = amplitudeSamples.where((a) => a >= 0.25).length;
+      final voicedRatio = voicedCount / amplitudeSamples.length;
+      return peak < 0.417 || voicedRatio < 0.25;
+    }
+    return false;
   }
 }

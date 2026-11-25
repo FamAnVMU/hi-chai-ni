@@ -68,6 +68,8 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
   final LearnerContextService learnerContextService;
   final LearningEvidenceValidator evidenceValidator;
 
+  int _proposalSeq = 0;
+
   AiTutorRepositoryImpl({
     required this.database,
     required this.aiService,
@@ -79,6 +81,89 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
             learnerContextService ?? const LearnerContextService(),
         evidenceValidator =
             evidenceValidator ?? const LearningEvidenceValidator();
+
+  /// Extracts partial plain Chinese text from a JSON response buffer while streaming,
+  /// preventing raw JSON syntax (`{"reply_zh": ...}`) from rendering in chat bubbles.
+  @visibleForTesting
+  static String extractStreamingReplyZh(String rawBuffer) {
+    final trimmedLeft = rawBuffer.trimLeft();
+    if (trimmedLeft.isEmpty) return '';
+
+    String stripped = trimmedLeft;
+    if (stripped.startsWith('```json')) {
+      stripped = stripped.substring(7).trimLeft();
+    } else if (stripped.startsWith('```')) {
+      stripped = stripped.substring(3).trimLeft();
+    } else if (stripped == '`' || stripped == '``' || stripped.startsWith('```j')) {
+      return '';
+    }
+
+    // If response does not appear to be JSON, stream plain text as-is.
+    if (!stripped.startsWith('{')) {
+      return rawBuffer;
+    }
+
+    final keyMatch = RegExp(r'"reply_zh"\s*:\s*"').firstMatch(stripped);
+    if (keyMatch == null) {
+      return '';
+    }
+
+    final sb = StringBuffer();
+    int i = keyMatch.end;
+    while (i < stripped.length) {
+      final ch = stripped[i];
+      if (ch == '"') {
+        break; // Closing quote of reply_zh string
+      }
+      if (ch == r'\') {
+        if (i + 1 >= stripped.length) {
+          break; // Incomplete escape at chunk boundary; wait for next chunk
+        }
+        final next = stripped[i + 1];
+        switch (next) {
+          case '"':
+          case r'\':
+          case '/':
+            sb.write(next);
+            i += 2;
+            break;
+          case 'n':
+            sb.write('\n');
+            i += 2;
+            break;
+          case 'r':
+            sb.write('\r');
+            i += 2;
+            break;
+          case 't':
+            sb.write('\t');
+            i += 2;
+            break;
+          case 'u':
+            if (i + 6 > stripped.length) {
+              return sb.toString(); // Incomplete unicode escape; wait for next chunk
+            }
+            final hex = stripped.substring(i + 2, i + 6);
+            final code = int.tryParse(hex, radix: 16);
+            if (code != null) {
+              sb.writeCharCode(code);
+              i += 6;
+            } else {
+              sb.write(next);
+              i += 2;
+            }
+            break;
+          default:
+            sb.write(next);
+            i += 2;
+        }
+      } else {
+        sb.write(ch);
+        i++;
+      }
+    }
+    return sb.toString();
+  }
 
   Future<DatabaseExecutor> _getDb() async {
     return database.isOpen ? database.database : await database.open();
@@ -100,6 +185,7 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
       'id': sessionId,
       'title': title,
       'scenario_code': scenarioCode,
+      'persona_id': personaId.name,
       'is_archived': 0,
       'created_at': nowUtc,
       'updated_at': nowUtc,
@@ -149,7 +235,10 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
   Future<void> removeLastTurn(String sessionId) async {
     final db = await _getDb();
     final chatDao = ChatDao(db);
-    await chatDao.deleteLastAssistantTurn(sessionId);
+    final recent = await chatDao.getSessionMessages(sessionId, limit: 1);
+    if (recent.isEmpty) return;
+
+    await chatDao.deleteMessage(recent.last['id'] as String);
   }
 
   @override
@@ -191,12 +280,22 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
     });
     await chatDao.touchSession(sessionId);
 
-    // 2. Build learner context from DB (runs concurrently with nothing — serial here for simplicity)
+    // 2. Resolve profile & weak SRS words from SQLite when caller uses defaults
+    final dbProfile = await learnerContextService.loadLearnerProfileAndWeakWords(db);
+    final effectiveHskLevel =
+        (learnerHskLevel == 1 && dbProfile.hskLevel > 1) ? dbProfile.hskLevel : learnerHskLevel;
+    final effectiveLearnerName =
+        (learnerName == 'Học viên' && dbProfile.learnerName != 'Học viên')
+            ? dbProfile.learnerName
+            : learnerName;
+    final effectiveWeakWords =
+        weakSrsWords.isEmpty ? dbProfile.weakSrsWords : weakSrsWords;
+
     final learnerContext = await learnerContextService.buildContext(
       db,
       sessionId: sessionId,
-      hskLevel: learnerHskLevel,
-      learnerName: learnerName,
+      hskLevel: effectiveHskLevel,
+      learnerName: effectiveLearnerName,
     );
 
     // 3. Fetch history and build prompt request with 20-message sliding window (F-08)
@@ -215,9 +314,9 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
       rawDbHistory: historyExcludingLast,
       persona: persona,
       scenario: scenario,
-      learnerHskLevel: learnerHskLevel,
-      learnerName: learnerName,
-      weakSrsWords: weakSrsWords,
+      learnerHskLevel: effectiveHskLevel,
+      learnerName: effectiveLearnerName,
+      weakSrsWords: effectiveWeakWords,
       learnerContext: learnerContext,
     );
 
@@ -234,7 +333,7 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
       sessionId: sessionId,
     );
 
-    // 6. Persist assistant reply to SQLite
+    // 6. Persist assistant reply to SQLite (including evaluation_json & follow_up_suggestions_json)
     final assistantMessageId = 'msg_${DateTime.now().millisecondsSinceEpoch}_assistant';
     await chatDao.insertMessage({
       'id': assistantMessageId,
@@ -245,6 +344,12 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
       'translation_vi': tutorResponse.replyVi,
       'audio_uri': null,
       'tokens_used': aiResponse.usageMetadata?.totalTokenCount ?? 0,
+      'evaluation_json': tutorResponse.evaluation != null
+          ? jsonEncode(tutorResponse.evaluation!.toMap())
+          : null,
+      'follow_up_suggestions_json': tutorResponse.followUpSuggestions.isNotEmpty
+          ? jsonEncode(tutorResponse.followUpSuggestions)
+          : null,
       'created_at': DateTime.now().toUtc().toIso8601String(),
     });
     await chatDao.touchSession(sessionId);
@@ -297,12 +402,22 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
           });
           await chatDao.touchSession(sessionId);
 
-          // 2. Build learner context
+          // 2. Resolve profile & weak SRS words from SQLite when caller uses defaults
+          final dbProfile = await learnerContextService.loadLearnerProfileAndWeakWords(db);
+          final effectiveHskLevel =
+              (learnerHskLevel == 1 && dbProfile.hskLevel > 1) ? dbProfile.hskLevel : learnerHskLevel;
+          final effectiveLearnerName =
+              (learnerName == 'Học viên' && dbProfile.learnerName != 'Học viên')
+                  ? dbProfile.learnerName
+                  : learnerName;
+          final effectiveWeakWords =
+              weakSrsWords.isEmpty ? dbProfile.weakSrsWords : weakSrsWords;
+
           final learnerContext = await learnerContextService.buildContext(
             db,
             sessionId: sessionId,
-            hskLevel: learnerHskLevel,
-            learnerName: learnerName,
+            hskLevel: effectiveHskLevel,
+            learnerName: effectiveLearnerName,
           );
 
           // 3. Fetch history and build request with 20-message sliding window (F-08)
@@ -320,13 +435,13 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
             rawDbHistory: historyExcludingLast,
             persona: persona,
             scenario: scenario,
-            learnerHskLevel: learnerHskLevel,
-            learnerName: learnerName,
-            weakSrsWords: weakSrsWords,
+            learnerHskLevel: effectiveHskLevel,
+            learnerName: effectiveLearnerName,
+            weakSrsWords: effectiveWeakWords,
             learnerContext: learnerContext,
           );
 
-          // 4. Stream from AI service
+          // 4. Stream from AI service, extracting only clean reply_zh deltas for UI
           final stream = aiService.streamText(
             request,
             taskType: AiTaskType.chatTutor,
@@ -334,10 +449,19 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
           );
 
           final accumulatedBuffer = StringBuffer();
+          String lastEmittedReply = '';
+          int totalTokensUsed = 0;
 
           await for (final chunk in stream) {
             accumulatedBuffer.write(chunk.text);
-            controller.add(chunk.text);
+            if (chunk.usageMetadata?.totalTokenCount != null) {
+              totalTokensUsed = chunk.usageMetadata!.totalTokenCount;
+            }
+            final extracted = extractStreamingReplyZh(accumulatedBuffer.toString());
+            if (extracted.length > lastEmittedReply.length) {
+              controller.add(extracted.substring(lastEmittedReply.length));
+              lastEmittedReply = extracted;
+            }
           }
 
           // 5. On stream completion, parse full accumulated text
@@ -347,7 +471,7 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
             sessionId: sessionId,
           );
 
-          // 6. Save assistant turn to SQLite
+          // 6. Save assistant turn to SQLite (including evaluation_json, follow_up_suggestions_json, tokens_used)
           final assistantMessageId =
               'msg_${DateTime.now().millisecondsSinceEpoch}_assistant';
           await chatDao.insertMessage({
@@ -358,7 +482,13 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
             'pinyin': tutorResponse.replyPinyin,
             'translation_vi': tutorResponse.replyVi,
             'audio_uri': null,
-            'tokens_used': 0,
+            'tokens_used': totalTokensUsed > 0 ? totalTokensUsed : tutorResponse.tokensUsed,
+            'evaluation_json': tutorResponse.evaluation != null
+                ? jsonEncode(tutorResponse.evaluation!.toMap())
+                : null,
+            'follow_up_suggestions_json': tutorResponse.followUpSuggestions.isNotEmpty
+                ? jsonEncode(tutorResponse.followUpSuggestions)
+                : null,
             'created_at': DateTime.now().toUtc().toIso8601String(),
           });
           await chatDao.touchSession(sessionId);
@@ -446,13 +576,15 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
 
       for (final proposal in valid) {
         final nowUtc = DateTime.now().toUtc().toIso8601String();
+        final effectiveScore =
+            proposal.eventType == 'error' ? 0.0 : proposal.confidence;
         await evidenceDao.appendEvidence({
-          'id': 'ev_proposal_${DateTime.now().microsecondsSinceEpoch}',
+          'id': 'ev_proposal_${DateTime.now().microsecondsSinceEpoch}_${++_proposalSeq}',
           'srs_item_id': null,
           'content_id': proposal.contentId,
           'content_type': proposal.contentType,
           'source': proposal.source,
-          'score': proposal.confidence,
+          'score': effectiveScore,
           'duration_ms': 0,
           'metadata_json': jsonEncode({
             'event_type': proposal.eventType,

@@ -301,6 +301,12 @@ class AiModelRegistry {
   /// List of all supported model specifications.
   List<AiModelSpec> get availableModelSpecs => _catalog.values.toList();
 
+  /// Model specs safe & compatible with REST API selection in AI Settings
+  /// (excludes Live-only WebSocket models and unsupported gemini-2.5-pro).
+  List<AiModelSpec> get restCompatibleModelSpecs => _catalog.values
+      .where((s) => !s.capabilities.supportsLiveApi && s.modelId != modelGemini25Pro)
+      .toList();
+
   /// List of all available model ID strings.
   List<String> get availableModels => _catalog.keys.toList();
 

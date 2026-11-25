@@ -83,7 +83,9 @@ final aiModelRegistryProvider = Provider<AiModelRegistry>((ref) {
 
 final aiProviderInstanceProvider = Provider<AiProvider>((ref) {
   final storage = ref.watch(aiCredentialStorageProvider);
-  return GeminiRestAiProvider(credentialStorage: storage);
+  final provider = GeminiRestAiProvider(credentialStorage: storage);
+  ref.onDispose(() => provider.dispose());
+  return provider;
 });
 
 final aiServiceProvider = Provider<AiService>((ref) {

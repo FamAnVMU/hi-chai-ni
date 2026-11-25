@@ -46,6 +46,64 @@ class LearnerContextService {
 
   const LearnerContextService();
 
+  /// Loads active learner display_name, current HSK level (most recently updated profile),
+  /// and up to [weakWordLimit] struggling SRS vocabulary words from SQLite.
+  Future<({int hskLevel, String learnerName, List<String> weakSrsWords})>
+      loadLearnerProfileAndWeakWords(
+    DatabaseExecutor db, {
+    int weakWordLimit = 10,
+  }) async {
+    int hskLevel = 1;
+    String learnerName = 'Học viên';
+    List<String> weakWords = const [];
+
+    try {
+      final profileRows = await db.query(
+        DatabaseConstants.tableUserProfiles,
+        columns: ['display_name', 'current_hsk_level'],
+        orderBy: 'updated_at DESC',
+        limit: 1,
+      );
+      if (profileRows.isNotEmpty) {
+        final rawName = profileRows.first['display_name'] as String?;
+        if (rawName != null && rawName.trim().isNotEmpty) {
+          learnerName = rawName.trim();
+        }
+        final rawLvl = (profileRows.first['current_hsk_level'] as num?)?.toInt();
+        if (rawLvl != null && rawLvl >= 1 && rawLvl <= 6) {
+          hskLevel = rawLvl;
+        }
+      }
+    } catch (e) {
+      debugPrint('[LearnerContextService] loadProfile error: $e');
+    }
+
+    try {
+      final srsRows = await db.rawQuery('''
+        SELECT v.simplified
+        FROM ${DatabaseConstants.tableSrsItems} s
+        INNER JOIN ${DatabaseConstants.tableVocabularies} v
+          ON v.id = s.content_id
+        WHERE s.content_type = 'vocabulary'
+          AND v.deleted_at IS NULL
+        ORDER BY s.lapses DESC, s.ease_factor ASC
+        LIMIT ?
+      ''', [weakWordLimit]);
+      weakWords = srsRows
+          .map((r) => (r['simplified'] as String? ?? '').trim())
+          .where((w) => w.isNotEmpty)
+          .toList();
+    } catch (e) {
+      debugPrint('[LearnerContextService] loadWeakSrsWords error: $e');
+    }
+
+    return (
+      hskLevel: hskLevel,
+      learnerName: learnerName,
+      weakSrsWords: weakWords,
+    );
+  }
+
   /// Builds a [LearnerContext] for the given [sessionId].
   ///
   /// Parameters:
@@ -215,8 +273,8 @@ class LearnerContextService {
           v.pinyin,
           vs.meaning_vi,
           v.hsk_level,
-          COUNT(le.id)    AS evidence_count,
-          MAX(le.created_at) AS last_evidence_at
+          COUNT(DISTINCT le.id) AS evidence_count,
+          MAX(le.created_at)    AS last_evidence_at
         FROM ${DatabaseConstants.tableVocabularies} v
         LEFT JOIN ${DatabaseConstants.tableVocabularySenses} vs
           ON vs.vocabulary_id = v.id
@@ -225,6 +283,7 @@ class LearnerContextService {
           AND le.content_type = 'vocabulary'
           AND le.source != 'ai_tutor_mention'
           AND le.score >= ?
+        WHERE v.deleted_at IS NULL
         GROUP BY v.id
         ORDER BY evidence_count DESC, last_evidence_at DESC
         LIMIT ?
@@ -410,6 +469,7 @@ class LearnerContextService {
         INNER JOIN ${DatabaseConstants.tableChatSessions} cs
           ON cs.id = cm.session_id
         WHERE cm.session_id != ?
+          AND cs.deleted_at IS NULL
           AND cm.role = 'assistant'
           AND cm.content IS NOT NULL
         ORDER BY cm.created_at DESC

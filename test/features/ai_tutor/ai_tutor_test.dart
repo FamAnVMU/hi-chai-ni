@@ -416,7 +416,8 @@ Xin chào! Hoan nghênh bạn đến Trung Quốc!
 
       mockAiProvider.customStreamChunks = [
         '{\n',
-        '  "reply_zh": "你好呀！",\n',
+        '  "reply_zh": "你好',
+        '呀！",\n',
         '  "reply_pinyin": "Nǐ hǎo ya!",\n',
         '  "reply_vi": "Chào bạn nha!",\n',
         '  "evaluation": {\n',
@@ -447,7 +448,9 @@ Xin chào! Hoan nghênh bạn đến Trung Quốc!
         streamedTokens.add(token);
       }
 
-      expect(streamedTokens.length, 15);
+      expect(streamedTokens.length, 2);
+      expect(streamedTokens.join(), '你好呀！');
+      expect(streamedTokens.any((t) => t.contains('reply_pinyin') || t.contains('{')), isFalse);
       expect(completedResponse, isNotNull);
       expect(completedResponse!.replyZh, '你好呀！');
       expect(completedResponse!.evaluation!.isCorrect, isTrue);

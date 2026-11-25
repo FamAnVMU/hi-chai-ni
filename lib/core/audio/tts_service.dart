@@ -19,7 +19,6 @@ abstract class TtsService {
 
 class DefaultTtsService implements TtsService {
   final FlutterTts _flutterTts;
-  bool _isSpeaking = false;
 
   DefaultTtsService({FlutterTts? flutterTts}) : _flutterTts = flutterTts ?? FlutterTts() {
     _initTts();
@@ -27,17 +26,8 @@ class DefaultTtsService implements TtsService {
 
   void _initTts() {
     try {
-      _flutterTts.setStartHandler(() {
-        _isSpeaking = true;
-      });
-      _flutterTts.setCompletionHandler(() {
-        _isSpeaking = false;
-      });
-      _flutterTts.setCancelHandler(() {
-        _isSpeaking = false;
-      });
+      _flutterTts.awaitSpeakCompletion(true).catchError((_) {});
       _flutterTts.setErrorHandler((msg) {
-        _isSpeaking = false;
         debugPrint('[TtsService] Error: $msg');
       });
     } catch (e) {
@@ -79,6 +69,9 @@ class DefaultTtsService implements TtsService {
   }) async {
     try {
       await _flutterTts.stop();
+      try {
+        await _flutterTts.awaitSpeakCompletion(true);
+      } catch (_) {}
       await _flutterTts.setLanguage(language);
       await _flutterTts.setSpeechRate(rate);
       await _flutterTts.setPitch(pitch);
@@ -99,10 +92,7 @@ class DefaultTtsService implements TtsService {
   @override
   Future<void> stop() async {
     try {
-      if (_isSpeaking) {
-        await _flutterTts.stop();
-        _isSpeaking = false;
-      }
+      await _flutterTts.stop();
     } catch (_) {}
   }
 

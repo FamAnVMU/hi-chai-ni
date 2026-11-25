@@ -148,12 +148,16 @@ class DefaultSentenceRepository implements SentenceRepository {
 
   Future<int> _performEnsureSeedLoaded(String assetPath) async {
     final count = await _dao.countSentences();
-    if (count > 0) {
+    final needsRepair = count > 0 && await _dao.hasCorruptedSentenceAudio();
+    if (count > 0 && !needsRepair) {
       _isSeeded = true;
       return count;
     }
 
     try {
+      if (needsRepair) {
+        await _dao.clearCorruptedSentenceAudio();
+      }
       final jsonString = await rootBundle.loadString(assetPath);
       final sentences = await Isolate.run(() {
         final data = jsonDecode(jsonString) as Map<String, dynamic>;
@@ -167,7 +171,7 @@ class DefaultSentenceRepository implements SentenceRepository {
       _isSeeded = true;
       return sentences.length;
     } catch (_) {
-      return 0;
+      return count;
     }
   }
 

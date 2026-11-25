@@ -33,6 +33,8 @@ class TutorEvaluation {
   /// Categorized error type for learning analytics and evidence collection.
   final TutorErrorCategory errorCategory;
 
+  final String? _encouragementVi;
+
   const TutorEvaluation({
     required this.isCorrect,
     required this.originalText,
@@ -40,9 +42,15 @@ class TutorEvaluation {
     this.pinyin,
     required this.explanationVi,
     this.errorCategory = TutorErrorCategory.none,
-  });
+    String? encouragementVi,
+    // ignore: prefer_initializing_formals
+  }) : _encouragementVi = encouragementVi;
 
-  String get encouragementVi => explanationVi.isNotEmpty ? explanationVi : 'Bạn đã diễn đạt rất tốt!';
+  String get encouragementVi =>
+      _encouragementVi ??
+      (isCorrect
+          ? (explanationVi.isNotEmpty ? explanationVi : 'Bạn đã diễn đạt rất tốt!')
+          : 'Bạn đã rất cố gắng diễn đạt ý tưởng của mình!');
   String get gentleFeedbackVi => explanationVi;
   String get modelCorrectionZh => correctedText ?? '';
 
@@ -53,6 +61,7 @@ class TutorEvaluation {
       'corrected_text': correctedText,
       'pinyin': pinyin,
       'explanation_vi': explanationVi,
+      if (_encouragementVi != null) 'encouragement_vi': _encouragementVi,
       'error_category': _categoryString,
     };
   }
@@ -84,6 +93,7 @@ class TutorEvaluation {
       pinyin: map['pinyin'] as String?,
       explanationVi: map['explanation_vi'] as String? ?? '',
       errorCategory: _parseCategory(map['error_category']),
+      encouragementVi: map['encouragement_vi'] as String?,
     );
   }
 

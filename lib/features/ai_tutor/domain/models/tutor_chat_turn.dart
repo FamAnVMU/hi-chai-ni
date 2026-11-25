@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'tutor_correction.dart';
 
 /// Represents a single message turn in an AI Tutor conversation.
@@ -12,6 +13,7 @@ class TutorChatTurn {
   final int tokensUsed;
   final DateTime createdAt;
   final TutorEvaluation? evaluation;
+  final List<String> followUpSuggestions;
 
   const TutorChatTurn({
     required this.id,
@@ -24,6 +26,7 @@ class TutorChatTurn {
     this.tokensUsed = 0,
     required this.createdAt,
     this.evaluation,
+    this.followUpSuggestions = const [],
   });
 
   bool get isUser => role == 'user';
@@ -39,11 +42,42 @@ class TutorChatTurn {
       'translation_vi': translationVi,
       'audio_uri': audioUri,
       'tokens_used': tokensUsed,
+      'evaluation_json': evaluation != null ? jsonEncode(evaluation!.toMap()) : null,
+      'follow_up_suggestions_json':
+          followUpSuggestions.isNotEmpty ? jsonEncode(followUpSuggestions) : null,
       'created_at': createdAt.toUtc().toIso8601String(),
     };
   }
 
   factory TutorChatTurn.fromDbMap(Map<String, dynamic> map, {TutorEvaluation? evaluation}) {
+    TutorEvaluation? parsedEval = evaluation;
+    if (parsedEval == null) {
+      final rawEval = map['evaluation_json'];
+      if (rawEval is String && rawEval.trim().isNotEmpty) {
+        try {
+          final decoded = jsonDecode(rawEval);
+          if (decoded is Map<String, dynamic>) {
+            parsedEval = TutorEvaluation.fromMap(decoded);
+          }
+        } catch (_) {}
+      } else if (rawEval is Map<String, dynamic>) {
+        parsedEval = TutorEvaluation.fromMap(rawEval);
+      }
+    }
+
+    List<String> suggestions = const [];
+    final rawSuggestions = map['follow_up_suggestions_json'];
+    if (rawSuggestions is String && rawSuggestions.trim().isNotEmpty) {
+      try {
+        final decoded = jsonDecode(rawSuggestions);
+        if (decoded is List) {
+          suggestions = decoded.map((e) => e.toString()).toList();
+        }
+      } catch (_) {}
+    } else if (rawSuggestions is List) {
+      suggestions = rawSuggestions.map((e) => e.toString()).toList();
+    }
+
     return TutorChatTurn(
       id: map['id'] as String,
       sessionId: map['session_id'] as String,
@@ -54,7 +88,8 @@ class TutorChatTurn {
       audioUri: map['audio_uri'] as String?,
       tokensUsed: (map['tokens_used'] as num?)?.toInt() ?? 0,
       createdAt: DateTime.parse(map['created_at'] as String),
-      evaluation: evaluation,
+      evaluation: parsedEval,
+      followUpSuggestions: suggestions,
     );
   }
 }

@@ -52,6 +52,7 @@ class UnifiedAudioPlaybackService {
     double speed = 1.0,
     bool loop = false,
     Duration? simulatedDuration,
+    String? fallbackText,
   }) async {
     // 1. Single-player focus: Stop previous playback immediately
     if (_player.status == AudioPlaybackStatus.playing || _player.status == AudioPlaybackStatus.paused) {
@@ -61,8 +62,13 @@ class UnifiedAudioPlaybackService {
     _speed = speed.clamp(0.5, 2.0);
     _currentlyPlayingUri = uri;
 
-    // 2. Offline file verification
-    if (!uri.startsWith('assets/') && !uri.startsWith('http://') && !uri.startsWith('https://')) {
+    // 2. Offline file verification (skip check for bundled assets, audio/, tts:, or HTTP URIs)
+    if (!uri.startsWith('assets/') &&
+        !uri.startsWith('asset://') &&
+        !uri.startsWith('audio/') &&
+        !uri.startsWith('tts:') &&
+        !uri.startsWith('http://') &&
+        !uri.startsWith('https://')) {
       final file = File(uri);
       if (!await file.exists()) {
         _statusController.add(AudioPlaybackStatus.error);
@@ -71,11 +77,12 @@ class UnifiedAudioPlaybackService {
     }
 
     // 3. Delegate to player
-    await _player.play(
+    await _player.playWithFallback(
       uri,
       speed: _speed,
       loop: loop,
       simulatedDuration: simulatedDuration,
+      fallbackText: fallbackText,
     );
   }
 
@@ -109,6 +116,9 @@ class UnifiedAudioPlaybackService {
 
   Future<void> setVolume(double volume) async {
     _volume = volume.clamp(0.0, 1.0);
+    if (_player is DefaultAudioPlayerService) {
+      await _player.setVolume(_volume);
+    }
   }
 
   void dispose() {

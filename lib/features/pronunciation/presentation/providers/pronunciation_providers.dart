@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/audio/audio.dart';
 import '../../../../core/database/app_database.dart';
+import '../../../../core/network/ai/ai_service.dart';
 import '../../data/pronunciation_repository.dart';
 import '../../domain/engine/pronunciation_item_bank.dart';
 import '../../domain/models/pronunciation_models.dart';
@@ -19,7 +20,8 @@ final pronunciationItemBankProvider = Provider<PronunciationItemBank>((ref) {
 
 /// Exposes the speech & acoustic pronunciation evaluation service.
 final pronunciationAnalysisServiceProvider = Provider<PronunciationAnalysisService>((ref) {
-  return const DefaultPronunciationAnalysisService();
+  final aiProvider = ref.watch(aiProviderInstanceProvider);
+  return DefaultPronunciationAnalysisService(aiProvider: aiProvider);
 });
 
 /// Exposes the audio recorder service.
@@ -72,7 +74,7 @@ class LastPronunciationResultNotifier extends Notifier<PronunciationAssessmentRe
 }
 
 final lastPronunciationResultProvider =
-    NotifierProvider<LastPronunciationResultNotifier, PronunciationAssessmentResult?>(
+    NotifierProvider.autoDispose<LastPronunciationResultNotifier, PronunciationAssessmentResult?>(
   LastPronunciationResultNotifier.new,
 );
 

@@ -3,8 +3,10 @@ import 'dart:io';
 import 'dart:isolate';
 import 'package:archive/archive.dart';
 import 'package:crypto/crypto.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import '../domain/models/sentence_models.dart';
 import 'sentence_dao.dart';
 
@@ -48,8 +50,10 @@ Future<int> _extractZipFileSafely(Map<String, String> params) async {
 
 class AudioPackManager {
   final SentenceDao _dao;
-  final String _storageDirectory;
+  String? _storageDirectory;
   final http.Client _client;
+  @visibleForTesting
+  final bool simulateOfflineForTest;
 
   static const String defaultCdnBase =
       'https://raw.githubusercontent.com/FamAnVMU/hi-chai-ni/main/content_packs_cdn';
@@ -58,8 +62,23 @@ class AudioPackManager {
     this._dao, {
     String? storageDirectory,
     http.Client? client,
-  })  : _storageDirectory = storageDirectory ?? 'audio_packs',
+    @visibleForTesting this.simulateOfflineForTest = false,
+    // ignore: prefer_initializing_formals
+  })  : _storageDirectory = storageDirectory,
         _client = client ?? http.Client();
+
+  Future<String> _getStorageDirectory() async {
+    if (_storageDirectory != null && _storageDirectory!.isNotEmpty) {
+      return _storageDirectory!;
+    }
+    try {
+      final supportDir = await getApplicationSupportDirectory().timeout(const Duration(seconds: 2));
+      _storageDirectory = p.join(supportDir.path, 'audio_packs');
+    } catch (_) {
+      _storageDirectory = p.join(Directory.systemTemp.path, 'hi_chinese_audio_packs');
+    }
+    return _storageDirectory!;
+  }
 
   /// Resolves expected archive SHA-256 hash from local CDN manifest if available.
   String? _resolveManifestExpectedSha256(int level) {
@@ -75,6 +94,7 @@ class AudioPackManager {
 
   /// Lists predefined audio packs for HSK 1–6
   Future<List<AudioPack>> getAvailablePacks() async {
+    final storageDir = await _getStorageDirectory();
     final packs = <AudioPack>[];
     for (int lvl = 1; lvl <= 6; lvl++) {
       if (lvl <= 2) {
@@ -89,7 +109,7 @@ class AudioPackManager {
           progress: 1.0,
         ));
       } else {
-        final packDir = Directory(p.join(_storageDirectory, 'hsk$lvl'));
+        final packDir = Directory(p.join(storageDir, 'hsk$lvl'));
         final isDownloaded = packDir.existsSync() && packDir.listSync().isNotEmpty;
 
         packs.add(AudioPack(
@@ -123,7 +143,8 @@ class AudioPackManager {
       return;
     }
 
-    final targetDir = Directory(p.join(_storageDirectory, 'hsk$level'));
+    final storageDir = await _getStorageDirectory();
+    final targetDir = Directory(p.join(storageDir, 'hsk$level'));
     if (!targetDir.existsSync()) {
       targetDir.createSync(recursive: true);
     }
@@ -135,14 +156,20 @@ class AudioPackManager {
     final zipUrl = customDownloadUrl ??
         '$defaultCdnBase/packages/audio_pack_hsk$level.zip';
 
-    final tempZipFile = File(p.join(_storageDirectory, 'temp_audio_pack_$level.zip'));
+    final tempZipFile = File(p.join(storageDir, 'temp_audio_pack_$level.zip'));
 
     try {
       final request = http.Request('GET', Uri.parse(zipUrl));
       final response = await _client.send(request);
 
       if (response.statusCode != 200) {
-        // Graceful fallback for mock/offline testing if CDN is not reachable
+        if (!simulateOfflineForTest) {
+          throw HttpException(
+            'Không thể tải gói âm thanh (HTTP ${response.statusCode})',
+            uri: Uri.parse(zipUrl),
+          );
+        }
+        // Offline test mode only: allow deterministic simulation before local fallback zip extraction
         for (int step = 1; step <= 10; step++) {
           await Future.delayed(const Duration(milliseconds: 30));
           onProgress?.call(step / 10.0);
@@ -190,10 +217,11 @@ class AudioPackManager {
         }));
       }
     } catch (e) {
-      if (e is FileSystemException && e.message.contains('Checksum Mismatch')) {
+      if (!simulateOfflineForTest ||
+          (e is FileSystemException && e.message.contains('Checksum Mismatch'))) {
         rethrow;
       }
-      // In case of network exception during testing, simulate extraction to allow offline tests
+      // Offline test mode only: progress before local zip extraction
       for (int step = 1; step <= 10; step++) {
         await Future.delayed(const Duration(milliseconds: 20));
         onProgress?.call(step / 10.0);
@@ -206,8 +234,8 @@ class AudioPackManager {
       }
     }
 
-    // If offline during local dev/tests and local CDN zip exists, extract it safely in isolate
-    if (targetDir.listSync().isEmpty) {
+    // Only extract bundled local test fixture when simulateOfflineForTest is enabled
+    if (simulateOfflineForTest && targetDir.listSync().isEmpty) {
       final localFallbackZip = File('content_packs_cdn/packages/audio_pack_hsk$level.zip');
       if (localFallbackZip.existsSync()) {
         if (targetSha256 != null && targetSha256.isNotEmpty) {
@@ -229,14 +257,18 @@ class AudioPackManager {
 
     // Update database records to downloaded ONLY when target directory actually has extracted files
     final hasExtractedFiles = targetDir.existsSync() && targetDir.listSync().isNotEmpty;
-    if (hasExtractedFiles) {
-      final sentences = await _dao.getSentencesByHskLevel(level, limit: 300);
-      for (final s in sentences) {
-        for (final a in s.audios) {
-          if (a.audioType == AudioType.humanRecording) {
-            final localPath = p.join(targetDir.path, '${a.id}.${a.fileFormat}');
-            await _dao.updateAudioLocalPath(a.id, localPath, 'downloaded');
-          }
+    if (!hasExtractedFiles) {
+      throw FileSystemException(
+        'Tải gói âm thanh thất bại: không có tệp âm thanh nào được giải nén.',
+        targetDir.path,
+      );
+    }
+    final sentences = await _dao.getSentencesByHskLevel(level, limit: 300);
+    for (final s in sentences) {
+      for (final a in s.audios) {
+        if (a.audioType == AudioType.humanRecording) {
+          final localPath = p.join(targetDir.path, '${a.id}.${a.fileFormat}');
+          await _dao.updateAudioLocalPath(a.id, localPath, 'downloaded');
         }
       }
     }
@@ -252,7 +284,8 @@ class AudioPackManager {
     // Bundled packs cannot be deleted
     if (level <= 2) return;
 
-    final targetDir = Directory(p.join(_storageDirectory, 'hsk$level'));
+    final storageDir = await _getStorageDirectory();
+    final targetDir = Directory(p.join(storageDir, 'hsk$level'));
     if (targetDir.existsSync()) {
       targetDir.deleteSync(recursive: true);
     }

@@ -6,6 +6,7 @@ import '../../../../core/network/ai/models/cancel_token.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/models/tutor_chat_turn.dart';
 import '../../domain/models/tutor_correction.dart';
+import '../../domain/models/tutor_persona.dart';
 import '../../domain/models/tutor_scenario.dart';
 import '../providers/ai_tutor_providers.dart';
 
@@ -62,6 +63,10 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
         final scenarioCode = session['scenario_code'] as String?;
         if (scenarioCode != null) {
           ref.read(activeScenarioProvider.notifier).selectScenario(TutorScenarios.fromCode(scenarioCode));
+        }
+        final personaId = session['persona_id'] as String?;
+        if (personaId != null) {
+          ref.read(activePersonaProvider.notifier).selectPersona(TutorPersonas.fromId(personaId));
         }
       } else if (mounted) {
         await _createNewSession();
@@ -205,6 +210,10 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
 
     final repo = ref.read(aiTutorRepositoryProvider);
     await repo.removeLastTurn(sessionId);
+    final remaining = await repo.getSessionTurns(sessionId);
+    if (remaining.isNotEmpty && remaining.last.isUser && remaining.last.content == lastText) {
+      await repo.removeLastTurn(sessionId);
+    }
     ref.invalidate(sessionMessagesProvider(sessionId));
 
     await _sendMessage(lastText);
@@ -342,6 +351,12 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
                           ref.read(activeScenarioProvider.notifier).selectScenario(
                                 TutorScenarios.fromCode(scenarioCode),
                               );
+                          final personaId = item['persona_id'] as String?;
+                          if (personaId != null) {
+                            ref.read(activePersonaProvider.notifier).selectPersona(
+                                  TutorPersonas.fromId(personaId),
+                                );
+                          }
                           Navigator.of(sheetContext).pop();
                         },
                       );
@@ -380,7 +395,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
           ref.invalidate(recentChatSessionsProvider);
         }
       },
-    );
+    ).whenComplete(controller.dispose);
   }
 
   void _confirmDeleteSession(String sessionId) {
@@ -516,28 +531,43 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
                       ),
             ),
 
-            // Suggested prompt chips
-            if (scenario.suggestedUserPrompts.isNotEmpty && !_isStreaming)
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 4.0),
-                child: Row(
-                  children: scenario.suggestedUserPrompts.map((prompt) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: AppSpacing.xs),
-                      child: HiChip(
-                        label: prompt,
-                        onTap: () {
-                          _textController.text = prompt;
-                          _textController.selection = TextSelection.fromPosition(
-                            TextPosition(offset: prompt.length),
-                          );
-                        },
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
+            // Suggested prompt chips (AI follow-up suggestions take priority over static scenario prompts)
+            Builder(
+              builder: (context) {
+                if (_isStreaming) return const SizedBox.shrink();
+                final turns = sessionId != null
+                    ? ref.watch(sessionMessagesProvider(sessionId)).asData?.value
+                    : null;
+                final lastFollowUps =
+                    (turns != null && turns.isNotEmpty && turns.last.isAssistant)
+                        ? turns.last.followUpSuggestions
+                        : const <String>[];
+                final promptChips = lastFollowUps.isNotEmpty
+                    ? lastFollowUps
+                    : scenario.suggestedUserPrompts;
+                if (promptChips.isEmpty) return const SizedBox.shrink();
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 4.0),
+                  child: Row(
+                    children: promptChips.map((prompt) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: AppSpacing.xs),
+                        child: HiChip(
+                          label: prompt,
+                          onTap: () {
+                            _textController.text = prompt;
+                            _textController.selection = TextSelection.fromPosition(
+                              TextPosition(offset: prompt.length),
+                            );
+                          },
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                );
+              },
+            ),
 
             // Bottom Control / Input Bar
             _buildInputBar(),
@@ -640,7 +670,7 @@ class _AiTutorTextChatScreenState extends ConsumerState<AiTutorTextChatScreen> {
           children: [
             // Hanzi + Ruby Pinyin
             RubyText.fromAnnotatedString(
-              annotatedText: turn.content.contains('[') ? turn.content : turn.content,
+              annotatedText: turn.content,
               showPinyin: true,
               onSegmentTap: (segment) {
                 if (segment.pinyin != null) {

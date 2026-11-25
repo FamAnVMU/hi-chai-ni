@@ -1,10 +1,81 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hi_chinese/core/audio/audio.dart';
 import 'package:hi_chinese/core/theme/theme.dart';
 import 'package:hi_chinese/features/listening/listening.dart';
+import '../../helpers/mock_audio_platform.dart';
+
+class _InstantFakeAudioPlayer implements AudioPlayerService {
+  final _statusCtrl = StreamController<AudioPlaybackStatus>.broadcast();
+  final _posCtrl = StreamController<Duration>.broadcast();
+  AudioPlaybackStatus _status = AudioPlaybackStatus.idle;
+
+  @override
+  AudioPlaybackStatus get status => _status;
+  @override
+  Duration get currentPosition => Duration.zero;
+  @override
+  Duration get totalDuration => const Duration(seconds: 30);
+  @override
+  double get playbackSpeed => 1.0;
+  @override
+  bool get isLooping => false;
+  @override
+  Stream<AudioPlaybackStatus> get statusStream => _statusCtrl.stream;
+  @override
+  Stream<Duration> get positionStream => _posCtrl.stream;
+
+  @override
+  Future<void> play(
+    String uri, {
+    double speed = 1.0,
+    bool loop = false,
+    Duration? simulatedDuration,
+  }) async {
+    _status = AudioPlaybackStatus.playing;
+    _statusCtrl.add(_status);
+  }
+
+  @override
+  Future<void> pause() async {
+    _status = AudioPlaybackStatus.paused;
+    _statusCtrl.add(_status);
+  }
+
+  @override
+  Future<void> resume() async {
+    _status = AudioPlaybackStatus.playing;
+    _statusCtrl.add(_status);
+  }
+
+  @override
+  Future<void> stop() async {
+    _status = AudioPlaybackStatus.stopped;
+    _statusCtrl.add(_status);
+  }
+
+  @override
+  Future<void> seek(Duration position) async {}
+  @override
+  Future<void> setPlaybackSpeed(double speed) async {}
+  @override
+  Future<void> setLooping(bool loop) async {}
+  @override
+  void dispose() {
+    _statusCtrl.close();
+    _posCtrl.close();
+  }
+}
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUpAll(() {
+    MockAudioPlatformHelper.setupMockPlatformChannels();
+  });
+
   group('Listening Domain & Repository Tests', () {
     test('1. Default lessons are well-formed and contain valid questions', () {
       final lessons = ListeningLesson.defaultLessons;
@@ -113,12 +184,17 @@ void main() {
       expect(find.text('Câu Hỏi Đọc Hiểu Nội Dung'), findsOneWidget);
     });
 
-    testWidgets('2. Tapping transcript toggle reveals Chinese transcript box', (tester) async {
+    testWidgets('2. Transcript gated before listening, then revealed after play tapped', (tester) async {
       await tester.binding.setSurfaceSize(const Size(600, 1400));
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
       await tester.pumpWidget(
         ProviderScope(
+          overrides: [
+            listeningPlaybackProvider.overrideWith(
+              () => ListeningPlaybackNotifier(player: _InstantFakeAudioPlayer()),
+            ),
+          ],
           child: MaterialApp(
             theme: AppTheme.darkTheme,
             home: const ListeningScreen(),
@@ -129,6 +205,15 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Lời thoại tiếng Trung (Hanzi):'), findsNothing);
+
+      // RISK-15: Before listening, tapping Xem lời thoại keeps transcript hidden
+      await tester.tap(find.text('Xem lời thoại (Transcript)'));
+      await tester.pumpAndSettle();
+      expect(find.text('Lời thoại tiếng Trung (Hanzi):'), findsNothing);
+
+      // Play audio first (or toggle via provider)
+      await tester.tap(find.byIcon(Icons.play_arrow_rounded));
+      await tester.pumpAndSettle();
 
       await tester.tap(find.text('Xem lời thoại (Transcript)'));
       await tester.pumpAndSettle();

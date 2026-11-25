@@ -30,21 +30,26 @@ class AiSettingsState {
     AiProviderType? providerType,
     String? selectedModelId,
     String? maskedApiKey,
+    bool clearMaskedApiKey = false,
     bool? hasApiKey,
     String? proxyUrl,
+    bool clearProxyUrl = false,
     bool? isTestingConnection,
     ConnectionTestResult? connectionTestResult,
+    bool clearConnectionResult = false,
     FirebaseConfigStatus? firebaseStatus,
     bool? isSavingKey,
   }) {
     return AiSettingsState(
       providerType: providerType ?? this.providerType,
       selectedModelId: selectedModelId ?? this.selectedModelId,
-      maskedApiKey: maskedApiKey ?? this.maskedApiKey,
+      maskedApiKey: clearMaskedApiKey ? null : (maskedApiKey ?? this.maskedApiKey),
       hasApiKey: hasApiKey ?? this.hasApiKey,
-      proxyUrl: proxyUrl ?? this.proxyUrl,
+      proxyUrl: clearProxyUrl ? null : (proxyUrl ?? this.proxyUrl),
       isTestingConnection: isTestingConnection ?? this.isTestingConnection,
-      connectionTestResult: connectionTestResult ?? this.connectionTestResult,
+      connectionTestResult: clearConnectionResult
+          ? null
+          : (connectionTestResult ?? this.connectionTestResult),
       firebaseStatus: firebaseStatus ?? this.firebaseStatus,
       isSavingKey: isSavingKey ?? this.isSavingKey,
     );
@@ -71,10 +76,21 @@ class AiSettingsNotifier extends Notifier<AiSettingsState> {
   }
 
   Future<void> _loadInitialState() async {
-    final providerType = await _storage.getProviderType();
-    final hasKey = await _storage.hasApiKey();
-    final maskedKey = await _storage.getMaskedApiKey();
-    final savedModel = await _storage.getSelectedModel();
+    var providerType = await _storage.getProviderType();
+    if (providerType == AiProviderType.firebaseAiLogic) {
+      providerType = AiProviderType.geminiRest;
+      await _storage.saveProviderType(providerType);
+    }
+
+    final hasKey = await _storage.hasApiKey(provider: providerType);
+    final maskedKey = await _storage.getMaskedApiKey(provider: providerType);
+    var savedModel = await _storage.getSelectedModel();
+    final restIds =
+        _modelRegistry.restCompatibleModelSpecs.map((s) => s.modelId).toSet();
+    if (!restIds.contains(savedModel)) {
+      savedModel = AiModelRegistry.modelGemini35FlashLite;
+      await _storage.saveSelectedModel(savedModel);
+    }
     final proxyUrl = await _storage.getCustomProxyUrl();
 
     _modelRegistry.setDefaultModel(savedModel);
@@ -83,52 +99,79 @@ class AiSettingsNotifier extends Notifier<AiSettingsState> {
       providerType: providerType,
       hasApiKey: hasKey,
       maskedApiKey: maskedKey,
+      clearMaskedApiKey: !hasKey,
       selectedModelId: savedModel,
       proxyUrl: proxyUrl,
     );
   }
 
-  /// Changes the active AI provider (BYOK, Firebase AI Logic, Custom Proxy).
+  /// Changes the active AI provider (BYOK or Custom Proxy; Firebase AI Logic is locked until configured).
   Future<void> setProviderType(AiProviderType type) async {
+    if (type == AiProviderType.firebaseAiLogic) {
+      return;
+    }
     await _storage.saveProviderType(type);
-    state = state.copyWith(providerType: type);
+    final hasKey = await _storage.hasApiKey(provider: type);
+    final maskedKey = await _storage.getMaskedApiKey(provider: type);
+    state = state.copyWith(
+      providerType: type,
+      hasApiKey: hasKey,
+      maskedApiKey: maskedKey,
+      clearMaskedApiKey: !hasKey,
+      clearConnectionResult: true,
+    );
   }
 
   /// Selects a new default model from the central registry.
   Future<void> selectModel(String modelId) async {
+    final restIds =
+        _modelRegistry.restCompatibleModelSpecs.map((s) => s.modelId).toSet();
+    if (!restIds.contains(modelId)) {
+      return;
+    }
     _modelRegistry.setDefaultModel(modelId);
     await _storage.saveSelectedModel(modelId);
     state = state.copyWith(selectedModelId: modelId);
   }
 
-  /// Securely encrypts and saves a new API key via Android KeyStore.
+  /// Securely encrypts and saves a new API key via Android KeyStore for active provider.
   Future<void> saveApiKey(String key) async {
     state = state.copyWith(isSavingKey: true);
-    await _storage.saveApiKey(key);
-    final hasKey = await _storage.hasApiKey();
-    final maskedKey = await _storage.getMaskedApiKey();
+    try {
+      await _storage.saveApiKey(key, provider: state.providerType);
+      final hasKey = await _storage.hasApiKey(provider: state.providerType);
+      final maskedKey = await _storage.getMaskedApiKey(provider: state.providerType);
 
-    state = state.copyWith(
-      hasApiKey: hasKey,
-      maskedApiKey: maskedKey,
-      isSavingKey: false,
-    );
+      state = state.copyWith(
+        hasApiKey: hasKey,
+        maskedApiKey: maskedKey,
+        clearMaskedApiKey: !hasKey,
+        clearConnectionResult: true,
+      );
+    } finally {
+      state = state.copyWith(isSavingKey: false);
+    }
   }
 
-  /// Deletes the stored API key completely from secure storage.
+  /// Deletes the stored API key completely from secure storage for active provider.
   Future<void> clearApiKey() async {
-    await _storage.clearApiKey();
+    await _storage.clearApiKey(provider: state.providerType);
     state = state.copyWith(
       hasApiKey: false,
-      maskedApiKey: null,
-      connectionTestResult: null,
+      clearMaskedApiKey: true,
+      clearConnectionResult: true,
     );
   }
 
   /// Saves a custom backend proxy URL.
   Future<void> saveCustomProxyUrl(String? url) async {
     await _storage.saveCustomProxyUrl(url);
-    state = state.copyWith(proxyUrl: url);
+    final normalized = (url == null || url.trim().isEmpty) ? null : url.trim();
+    state = state.copyWith(
+      proxyUrl: normalized,
+      clearProxyUrl: normalized == null,
+      clearConnectionResult: true,
+    );
   }
 
   /// Performs a live connection round-trip test using the selected provider & model.

@@ -303,6 +303,32 @@ class SentenceDao {
     return (res.first['cnt'] as num?)?.toInt() ?? 0;
   }
 
+  /// Detects AUD-012 corruption where sentence_audio rows were written with empty id / sentence_id.
+  Future<bool> hasCorruptedSentenceAudio() async {
+    final sentenceCnt = await countSentences();
+    if (sentenceCnt == 0) return false;
+
+    final emptyRes = await _db.rawQuery(
+      "SELECT COUNT(*) as cnt FROM ${DatabaseConstants.tableSentenceAudio} WHERE id = '' OR sentence_id = ''",
+    );
+    final emptyCnt = (emptyRes.firstOrNull?['cnt'] as num?)?.toInt() ?? 0;
+    if (emptyCnt > 0) return true;
+
+    final validRes = await _db.rawQuery(
+      "SELECT COUNT(*) as cnt FROM ${DatabaseConstants.tableSentenceAudio} WHERE id != '' AND sentence_id != ''",
+    );
+    final validCnt = (validRes.firstOrNull?['cnt'] as num?)?.toInt() ?? 0;
+    return validCnt == 0;
+  }
+
+  /// Removes corrupted sentence_audio rows with empty primary/foreign keys prior to re-seeding.
+  Future<void> clearCorruptedSentenceAudio() async {
+    await _db.delete(
+      DatabaseConstants.tableSentenceAudio,
+      where: "id = '' OR sentence_id = ''",
+    );
+  }
+
   /// Fetch sentences requiring SRS review
   Future<List<SentencePracticeProgress>> getSentencesNeedingReview({int limit = 50}) async {
     final nowIso = DateTime.now().toIso8601String();
