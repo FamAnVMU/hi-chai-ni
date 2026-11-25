@@ -67,11 +67,11 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
   void _onSearchChanged(String query) {
     _debounceTimer?.cancel();
     _debounceTimer = Timer(const Duration(milliseconds: 250), () {
-      _performSearch(query);
+      _performSearch(query, recordHistory: false);
     });
   }
 
-  Future<void> _performSearch(String query) async {
+  Future<void> _performSearch(String query, {bool recordHistory = false}) async {
     final trimmed = query.trim();
     if (trimmed.isEmpty) {
       setState(() {
@@ -88,7 +88,7 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
     });
 
     try {
-      final list = await _repository.search(trimmed, limit: 30);
+      final list = await _repository.search(trimmed, limit: 30, recordHistory: recordHistory);
       if (mounted) {
         setState(() {
           _searchResults = list;
@@ -238,7 +238,7 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
             onChanged: _onSearchChanged,
             onSubmitted: (val) {
               _debounceTimer?.cancel();
-              _performSearch(val);
+              _performSearch(val, recordHistory: true);
             },
           ),
         ),
@@ -397,7 +397,7 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
               label: Text(w),
               onPressed: () {
                 _searchController.text = w;
-                _performSearch(w);
+                _performSearch(w, recordHistory: true);
               },
             );
           }).toList(),
@@ -418,7 +418,7 @@ class _DictionaryScreenState extends State<DictionaryScreen> with SingleTickerPr
                 label: Text(h.query),
                 onPressed: () {
                   _searchController.text = h.query;
-                  _performSearch(h.query);
+                  _performSearch(h.query, recordHistory: true);
                 },
               );
             }).toList(),

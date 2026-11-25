@@ -231,8 +231,8 @@ void main() {
     });
 
     test('7. Search history recording and clearing', () async {
-      await repository.search('你好');
-      await repository.search('学习');
+      await repository.search('你好', recordHistory: true);
+      await repository.search('学习', recordHistory: true);
 
       final history = await repository.getRecentSearches();
       expect(history, isNotEmpty);

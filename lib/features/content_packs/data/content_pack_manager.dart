@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'dart:math' as math;
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
+import '../../../core/database/dao/dao_utils.dart';
 import '../../../core/database/database_constants.dart';
+import '../../curriculum/data/placement_unlock_handler.dart';
 import '../../curriculum/domain/models/content_pack_models.dart';
 
 class ContentPackManagerException implements Exception {
@@ -166,7 +169,7 @@ class ContentPackManager {
   }) async {
     try {
       final Map<String, dynamic> decoded;
-      if (rawJson.length > 20 * 1024 * 1024) {
+      if (rawJson.length > 256 * 1024) {
         decoded = await compute(_parseContentPackJson, rawJson);
       } else {
         decoded = json.decode(rawJson) as Map<String, dynamic>;
@@ -177,6 +180,7 @@ class ContentPackManager {
       int totalLessons = 0;
       int totalContentItems = 0;
       int totalKnowledgeItems = 0;
+      bool skippedAlreadyInstalled = false;
 
       final curriculumMap = decoded['curriculum'] as Map<String, dynamic>?;
       final contentItemsList = decoded['content_items'] as List<dynamic>? ?? [];
@@ -246,6 +250,7 @@ class ContentPackManager {
               [targetCurr],
             );
             totalContentItems = Sqflite.firstIntValue(contentRes) ?? 0;
+            skippedAlreadyInstalled = true;
             debugPrint('[ContentPackManager] Pack "${manifest.packId}" v${manifest.version} already installed ($totalLessons lessons, $totalContentItems items). Skipping re-import.');
             return;
           }
@@ -310,155 +315,210 @@ class ContentPackManager {
             },
           );
 
-          // Units & Lessons & Segments
+          // Units & Lessons & Segments (preloaded & batched for PERF-05)
+          final allUnitIds = <String>[];
+          final allLessonIds = <String>[];
+          final allSegmentIds = <String>[];
+          for (final u in unitsList) {
+            final uMap = u as Map<String, dynamic>;
+            allUnitIds.add(uMap['id'] as String);
+            for (final l in (uMap['lessons'] as List<dynamic>? ?? [])) {
+              final lMap = l as Map<String, dynamic>;
+              allLessonIds.add(lMap['id'] as String);
+              for (final s in (lMap['segments'] as List<dynamic>? ?? [])) {
+                allSegmentIds.add((s as Map<String, dynamic>)['id'] as String);
+              }
+            }
+          }
+
+          final existingUnits = await _queryExistingMap(
+            txn,
+            DatabaseConstants.tableCurriculumUnits,
+            ['id', 'is_locked'],
+            'id',
+            allUnitIds,
+          );
+          final existingLessons = await _queryExistingMap(
+            txn,
+            DatabaseConstants.tableCurriculumLessons,
+            ['id', 'status', 'is_locked', 'completed_at', 'credited_reason'],
+            'id',
+            allLessonIds,
+          );
+          final existingSegments = await _queryExistingIds(
+            txn,
+            DatabaseConstants.tableLessonSegments,
+            'id',
+            allSegmentIds,
+          );
+
+          final syllabusBatch = txn.batch();
           for (final u in unitsList) {
             final uMap = u as Map<String, dynamic>;
             final unitId = uMap['id'] as String;
-
-            // Preserve unit lock status if already unlocked by learner
+            final existingUnit = existingUnits[unitId];
             int isLocked = (uMap['is_locked'] == false || uMap['is_locked'] == 0) ? 0 : 1;
-            final existingUnit = await txn.query(
-              DatabaseConstants.tableCurriculumUnits,
-              columns: ['is_locked'],
-              where: 'id = ?',
-              whereArgs: [unitId],
-              limit: 1,
-            );
-            if (existingUnit.isNotEmpty) {
-              isLocked = (existingUnit.first['is_locked'] as num?)?.toInt() ?? isLocked;
+            if (existingUnit != null) {
+              isLocked = (existingUnit['is_locked'] as num?)?.toInt() ?? isLocked;
             }
-
-            await _safeUpsert(
-              txn,
-              DatabaseConstants.tableCurriculumUnits,
-              {
-                'id': unitId,
-                'curriculum_id': curriculumId,
-                'order_index': (uMap['order_index'] as num?)?.toInt() ?? 1,
-                'title_vi': uMap['title_vi'] as String? ?? '',
-                'title_zh': uMap['title_zh'] as String? ?? '',
-                'description_vi': uMap['description_vi'] as String?,
-                'icon_name': uMap['icon_name'] as String?,
-                'is_locked': isLocked,
-                'created_at': nowUtc,
-              },
-            );
+            final unitValues = {
+              'id': unitId,
+              'curriculum_id': curriculumId,
+              'order_index': (uMap['order_index'] as num?)?.toInt() ?? 1,
+              'title_vi': uMap['title_vi'] as String? ?? '',
+              'title_zh': uMap['title_zh'] as String? ?? '',
+              'description_vi': uMap['description_vi'] as String?,
+              'icon_name': uMap['icon_name'] as String?,
+              'is_locked': isLocked,
+              'created_at': nowUtc,
+            };
+            if (existingUnit != null) {
+              syllabusBatch.update(
+                DatabaseConstants.tableCurriculumUnits,
+                unitValues,
+                where: 'id = ?',
+                whereArgs: [unitId],
+              );
+            } else {
+              existingUnits[unitId] = unitValues;
+              syllabusBatch.insert(
+                DatabaseConstants.tableCurriculumUnits,
+                unitValues,
+                conflictAlgorithm: ConflictAlgorithm.ignore,
+              );
+            }
 
             final lessonsList = uMap['lessons'] as List<dynamic>? ?? [];
             for (final l in lessonsList) {
               final lMap = l as Map<String, dynamic>;
               final lessonId = lMap['id'] as String;
               final prereqs = lMap['prerequisites'] as List<dynamic>? ?? [];
+              final existingLesson = existingLessons[lessonId];
 
-              // Preserve lesson status and unlock state if existing
               String lessonStatus = lMap['status'] as String? ?? 'not_started';
               int lessonLocked = (lMap['is_locked'] == false || lMap['is_locked'] == 0) ? 0 : 1;
               String? completedAt;
               String? creditedReason;
-
-              final existingLesson = await txn.query(
-                DatabaseConstants.tableCurriculumLessons,
-                columns: ['status', 'is_locked', 'completed_at', 'credited_reason'],
-                where: 'id = ?',
-                whereArgs: [lessonId],
-                limit: 1,
-              );
-              if (existingLesson.isNotEmpty) {
-                final row = existingLesson.first;
-                lessonStatus = row['status'] as String? ?? lessonStatus;
-                lessonLocked = (row['is_locked'] as num?)?.toInt() ?? lessonLocked;
-                completedAt = row['completed_at'] as String?;
-                creditedReason = row['credited_reason'] as String?;
+              if (existingLesson != null) {
+                lessonStatus = existingLesson['status'] as String? ?? lessonStatus;
+                lessonLocked = (existingLesson['is_locked'] as num?)?.toInt() ?? lessonLocked;
+                completedAt = existingLesson['completed_at'] as String?;
+                creditedReason = existingLesson['credited_reason'] as String?;
               }
 
-              await _safeUpsert(
-                txn,
-                DatabaseConstants.tableCurriculumLessons,
-                {
-                  'id': lessonId,
-                  'unit_id': unitId,
-                  'order_index': (lMap['order_index'] as num?)?.toInt() ?? 1,
-                  'title_vi': lMap['title_vi'] as String? ?? '',
-                  'title_zh': lMap['title_zh'] as String? ?? '',
-                  'pinyin': lMap['pinyin'] as String? ?? '',
-                  'estimated_minutes': (lMap['estimated_minutes'] as num?)?.toInt() ?? 15,
-                  'is_locked': lessonLocked,
-                  'unlock_score_threshold': (lMap['unlock_score_threshold'] as num?)?.toDouble() ?? 0.8,
-                  'prerequisites_json': json.encode(prereqs),
-                  'status': lessonStatus,
-                  'completed_at': completedAt,
-                  'credited_reason': creditedReason,
-                  'created_at': nowUtc,
-                },
-              );
+              final lessonValues = {
+                'id': lessonId,
+                'unit_id': unitId,
+                'order_index': (lMap['order_index'] as num?)?.toInt() ?? 1,
+                'title_vi': lMap['title_vi'] as String? ?? '',
+                'title_zh': lMap['title_zh'] as String? ?? '',
+                'pinyin': lMap['pinyin'] as String? ?? '',
+                'estimated_minutes': (lMap['estimated_minutes'] as num?)?.toInt() ?? 15,
+                'is_locked': lessonLocked,
+                'unlock_score_threshold': (lMap['unlock_score_threshold'] as num?)?.toDouble() ?? 0.8,
+                'prerequisites_json': json.encode(prereqs),
+                'status': lessonStatus,
+                'completed_at': completedAt,
+                'credited_reason': creditedReason,
+                'created_at': nowUtc,
+              };
+              if (existingLesson != null) {
+                syllabusBatch.update(
+                  DatabaseConstants.tableCurriculumLessons,
+                  lessonValues,
+                  where: 'id = ?',
+                  whereArgs: [lessonId],
+                );
+              } else {
+                existingLessons[lessonId] = lessonValues;
+                syllabusBatch.insert(
+                  DatabaseConstants.tableCurriculumLessons,
+                  lessonValues,
+                  conflictAlgorithm: ConflictAlgorithm.ignore,
+                );
+              }
 
               final segmentsList = lMap['segments'] as List<dynamic>? ?? [];
               for (final s in segmentsList) {
                 final sMap = s as Map<String, dynamic>;
                 final segId = sMap['id'] as String;
-                final refId = sMap['content_ref_id'] as String?;
+                final refId = (sMap['content_ref_id'] as String?)?.trim();
 
                 if (refId != null && refId.isNotEmpty) {
                   refToLessons.putIfAbsent(refId, () => []).add(lessonId);
                 }
 
-                await _safeUpsert(
-                  txn,
-                  DatabaseConstants.tableLessonSegments,
-                  {
-                    'id': segId,
-                    'lesson_id': lessonId,
-                    'step_order': (sMap['step_order'] as num?)?.toInt() ?? 1,
-                    'segment_type': sMap['segment_type'] as String? ?? 'vocabulary',
-                    'title': sMap['title'] as String? ?? '',
-                    'content_ref_id': refId,
-                    'created_at': nowUtc,
-                  },
-                );
+                final segValues = {
+                  'id': segId,
+                  'lesson_id': lessonId,
+                  'step_order': (sMap['step_order'] as num?)?.toInt() ?? 1,
+                  'segment_type': sMap['segment_type'] as String? ?? 'vocabulary',
+                  'title': sMap['title'] as String? ?? '',
+                  'content_ref_id': refId,
+                  'created_at': nowUtc,
+                };
+                if (existingSegments.contains(segId)) {
+                  syllabusBatch.update(
+                    DatabaseConstants.tableLessonSegments,
+                    segValues,
+                    where: 'id = ?',
+                    whereArgs: [segId],
+                  );
+                } else {
+                  existingSegments.add(segId);
+                  syllabusBatch.insert(
+                    DatabaseConstants.tableLessonSegments,
+                    segValues,
+                    conflictAlgorithm: ConflictAlgorithm.ignore,
+                  );
+                }
               }
             }
           }
+          await syllabusBatch.commit(noResult: true);
         }
 
         final targetCurrId = curriculumId ?? 'curr_${manifest.packId}';
 
-        // 5. Normalized Content Items & Knowledge Registry Ingestion
+        // 5. Normalized Content Items & Knowledge Registry Ingestion (preloaded & batched)
+        final parsedItems = <({
+          String contentId,
+          String curriculumId,
+          int hskLevel,
+          String knowledgeType,
+          String title,
+          String rawContentJson,
+          String objectivesJson,
+          String? sourceReference,
+          String auditStatus,
+          String contentVersion,
+          String metadataJson,
+          Map<String, dynamic> parsedContent,
+          List<String> linkedLessons,
+        })>[];
+
+        final contentRowIds = <String>[];
+        final allSimplified = <String>[];
+        final allVocabKnowIds = <String>[];
+        final allCandidateSenseIds = <String>[];
+        final allGramIds = <String>[];
+        final allGramCodes = <String>[];
+        final allGramKnowIds = <String>[];
+        final allLinkedLessonIds = <String>{};
+
         for (final item in contentItemsList) {
           if (item is! Map<String, dynamic>) continue;
-          final contentId = item['content_id'] as String;
+          final contentId = (item['content_id'] as String).trim();
           final knowledgeType = item['knowledge_type'] as String? ?? 'vocabulary';
           final hskLevel = (item['hsk_level'] as num?)?.toInt() ?? manifest.hskLevel;
           final objs = item['objectives'] as List<dynamic>? ?? [];
-          final linkedLessons = refToLessons[contentId] ?? [];
+          final linkedLessons = (refToLessons[contentId] ?? const <String>[]).toSet().toList();
+          allLinkedLessonIds.addAll(linkedLessons);
 
           final rawContentJson = item['content_json'] is String
               ? item['content_json'] as String
               : json.encode(item['content_json'] ?? {});
 
-          // Upsert CMS content item
-          await _safeUpsert(
-            txn,
-            DatabaseConstants.tableContentItems,
-            {
-              'id': 'ci_$contentId',
-              'content_id': contentId,
-              'curriculum_id': item['curriculum_id'] as String? ?? targetCurrId,
-              'hsk_level': hskLevel,
-              'knowledge_type': knowledgeType,
-              'title': item['title'] as String? ?? '',
-              'content_json': rawContentJson,
-              'objectives_json': json.encode(objs),
-              'source_reference': item['source_reference'] as String?,
-              'audit_status': item['audit_status'] as String? ?? 'verified',
-              'content_version': item['content_version'] as String? ?? manifest.version,
-              'metadata_json': json.encode(item['metadata'] ?? {}),
-              'created_at': nowUtc,
-              'updated_at': nowUtc,
-            },
-          );
-          totalContentItems++;
-
-          // Parse and normalize into core relational tables & knowledge_registry
           Map<String, dynamic> parsedContent = {};
           try {
             parsedContent = item['content_json'] is Map<String, dynamic>
@@ -468,8 +528,128 @@ class ContentPackManager {
             debugPrint('[ContentPackManager] Lỗi phân tích content_json cho item $contentId: $e\n$stack');
           }
 
+          contentRowIds.add('ci_$contentId');
           if (knowledgeType == 'vocabulary' && parsedContent['words'] is List) {
-            final words = parsedContent['words'] as List<dynamic>;
+            for (final w in parsedContent['words'] as List<dynamic>) {
+              if (w is! Map<String, dynamic>) continue;
+              final simplified = w['simplified'] as String? ?? '';
+              if (simplified.isEmpty) continue;
+              allSimplified.add(simplified);
+              allVocabKnowIds.add('KNOW_VOCAB_$simplified');
+              allCandidateSenseIds.add('sense_${simplified}_1');
+            }
+          } else if (knowledgeType == 'grammar' && parsedContent['points'] is List) {
+            int order = 1;
+            for (final p in parsedContent['points'] as List<dynamic>) {
+              if (p is! Map<String, dynamic>) continue;
+              allGramCodes.add('GRAM_${contentId}_$order');
+              allGramIds.add('gram_${contentId}_$order');
+              allGramKnowIds.add('KNOW_GRAMMAR_${contentId}_$order');
+              order++;
+            }
+          }
+
+          parsedItems.add((
+            contentId: contentId,
+            curriculumId: item['curriculum_id'] as String? ?? targetCurrId,
+            hskLevel: hskLevel,
+            knowledgeType: knowledgeType,
+            title: item['title'] as String? ?? '',
+            rawContentJson: rawContentJson,
+            objectivesJson: json.encode(objs),
+            sourceReference: item['source_reference'] as String?,
+            auditStatus: item['audit_status'] as String? ?? 'verified',
+            contentVersion: item['content_version'] as String? ?? manifest.version,
+            metadataJson: json.encode(item['metadata'] ?? {}),
+            parsedContent: parsedContent,
+            linkedLessons: linkedLessons,
+          ));
+        }
+
+        final existingContentIds = await _queryExistingIds(
+          txn,
+          DatabaseConstants.tableContentItems,
+          'id',
+          contentRowIds,
+        );
+        final (:vocabById, :vocabBySimplified) = await _preloadVocabularies(txn, allSimplified);
+
+        final probeVocabIds = <String>{
+          ...vocabById.keys,
+          ...allSimplified.map((s) => 'vocab_$s'),
+        }.toList();
+        final (:existingSenseIds, :senseIdByVocabId) = await _preloadVocabularySenses(
+          txn,
+          probeVocabIds,
+          allCandidateSenseIds,
+        );
+
+        final (:vocabKnowById, :vocabKnowByCanonical) = await _preloadKnowledge(
+          txn,
+          entityType: 'vocabulary',
+          ids: allVocabKnowIds,
+          canonicalIds: allSimplified,
+        );
+        final existingGramIds = await _queryExistingIds(
+          txn,
+          DatabaseConstants.tableGrammarItems,
+          'id',
+          allGramIds,
+        );
+        final (vocabKnowById: gramKnowById, vocabKnowByCanonical: gramKnowByCanonical) =
+            await _preloadKnowledge(
+          txn,
+          entityType: 'grammar',
+          ids: allGramKnowIds,
+          canonicalIds: allGramCodes,
+        );
+        final existingLinkIds = await _queryExistingIds(
+          txn,
+          DatabaseConstants.tableLessonKnowledgeItems,
+          'id',
+          allLinkedLessonIds.toList(),
+          filterColumn: 'lesson_id',
+        );
+
+        final dataBatch = txn.batch();
+
+        for (final entry in parsedItems) {
+          final ciRowId = 'ci_${entry.contentId}';
+          final ciValues = {
+            'id': ciRowId,
+            'content_id': entry.contentId,
+            'curriculum_id': entry.curriculumId,
+            'hsk_level': entry.hskLevel,
+            'knowledge_type': entry.knowledgeType,
+            'title': entry.title,
+            'content_json': entry.rawContentJson,
+            'objectives_json': entry.objectivesJson,
+            'source_reference': entry.sourceReference,
+            'audit_status': entry.auditStatus,
+            'content_version': entry.contentVersion,
+            'metadata_json': entry.metadataJson,
+            'created_at': nowUtc,
+            'updated_at': nowUtc,
+          };
+          if (existingContentIds.contains(ciRowId)) {
+            dataBatch.update(
+              DatabaseConstants.tableContentItems,
+              ciValues,
+              where: 'id = ?',
+              whereArgs: [ciRowId],
+            );
+          } else {
+            existingContentIds.add(ciRowId);
+            dataBatch.insert(
+              DatabaseConstants.tableContentItems,
+              ciValues,
+              conflictAlgorithm: ConflictAlgorithm.ignore,
+            );
+          }
+          totalContentItems++;
+
+          if (entry.knowledgeType == 'vocabulary' && entry.parsedContent['words'] is List) {
+            final words = entry.parsedContent['words'] as List<dynamic>;
             int order = 1;
             for (final w in words) {
               if (w is! Map<String, dynamic>) continue;
@@ -481,69 +661,63 @@ class ContentPackManager {
               final example = w['example_sentence'] as String? ?? '';
               final audioUri = w['audio_uri'] as String? ?? '';
 
-              final vocabId = 'vocab_$simplified';
-              final senseId = 'sense_${simplified}_1';
-              final knowId = 'KNOW_VOCAB_$simplified';
+              // AUD-010: Prefer canonical VOC_* row over creating a duplicate vocab_<simplified>.
+              final existingVocab = vocabBySimplified[simplified] ?? vocabById['vocab_$simplified'];
+              final vocabId = existingVocab != null
+                  ? existingVocab['id'] as String
+                  : 'vocab_$simplified';
+              final existingLevel = existingVocab != null
+                  ? ((existingVocab['hsk_level'] as num?)?.toInt() ?? entry.hskLevel)
+                  : entry.hskLevel;
+              // Level-drift guard: preserve lower-level owner metadata when higher-level pack re-lists the word.
+              final ownedByLowerLevel = existingVocab != null && existingLevel < entry.hskLevel;
 
-              // 1. Insert/update vocabulary without cascade delete
-              final existingVocab = await txn.query(
-                DatabaseConstants.tableVocabularies,
-                columns: ['id', 'hsk_level'],
-                where: 'id = ?',
-                whereArgs: [vocabId],
-                limit: 1,
-              );
-              // Level-drift guard: a word already owned by a LOWER HSK level (e.g. 对 in HSK 2)
-              // must keep its original level, pinyin and meaning when a higher-level pack
-              // (e.g. HSK 4) re-lists it. Otherwise SRS review filtered by hsk_level loses the card.
-              final existingLevel = existingVocab.isNotEmpty
-                  ? (existingVocab.first['hsk_level'] as int? ?? hskLevel)
-                  : hskLevel;
-              final ownedByLowerLevel = existingVocab.isNotEmpty && existingLevel < hskLevel;
               if (ownedByLowerLevel) {
-                // Keep canonical lower-level data; only link the knowledge item to the new lesson below.
-              } else if (existingVocab.isNotEmpty) {
-                await txn.update(
+                // Keep canonical lower-level vocabulary & sense untouched.
+              } else if (existingVocab != null) {
+                dataBatch.update(
                   DatabaseConstants.tableVocabularies,
                   {
                     'simplified': simplified,
                     'traditional': simplified,
                     'pinyin': pinyin,
-                    'hsk_level': hskLevel,
+                    'hsk_level': entry.hskLevel,
                     'audio_uri': audioUri,
                     'updated_at': nowUtc,
                   },
                   where: 'id = ?',
                   whereArgs: [vocabId],
                 );
+                existingVocab['hsk_level'] = entry.hskLevel;
               } else {
-                await txn.insert(
+                final newVocab = <String, dynamic>{
+                  'id': vocabId,
+                  'simplified': simplified,
+                  'traditional': simplified,
+                  'pinyin': pinyin,
+                  'hsk_level': entry.hskLevel,
+                  'audio_uri': audioUri,
+                  'created_at': nowUtc,
+                  'updated_at': nowUtc,
+                };
+                vocabBySimplified[simplified] = newVocab;
+                vocabById[vocabId] = newVocab;
+                dataBatch.insert(
                   DatabaseConstants.tableVocabularies,
-                  {
-                    'id': vocabId,
-                    'simplified': simplified,
-                    'traditional': simplified,
-                    'pinyin': pinyin,
-                    'hsk_level': hskLevel,
-                    'audio_uri': audioUri,
-                    'created_at': nowUtc,
-                    'updated_at': nowUtc,
-                  },
+                  newVocab,
+                  conflictAlgorithm: ConflictAlgorithm.ignore,
                 );
               }
 
-              // 2. Insert/update sense
-              final existingSense = await txn.query(
-                DatabaseConstants.tableVocabularySenses,
-                columns: ['id'],
-                where: 'id = ?',
-                whereArgs: [senseId],
-                limit: 1,
-              );
+              // 2. Insert/update sense on the canonical vocabulary_id
+              final defaultSenseId =
+                  vocabId == 'vocab_$simplified' ? 'sense_${simplified}_1' : 'sense_${vocabId}_1';
+              final targetSenseId = senseIdByVocabId[vocabId] ?? defaultSenseId;
+              final senseExists = existingSenseIds.contains(targetSenseId);
               if (ownedByLowerLevel) {
-                // Preserve the lower-level sense (see level-drift guard above).
-              } else if (existingSense.isNotEmpty) {
-                await txn.update(
+                // Preserve lower-level sense.
+              } else if (senseExists) {
+                dataBatch.update(
                   DatabaseConstants.tableVocabularySenses,
                   {
                     'part_of_speech': pos,
@@ -552,13 +726,15 @@ class ContentPackManager {
                     'updated_at': nowUtc,
                   },
                   where: 'id = ?',
-                  whereArgs: [senseId],
+                  whereArgs: [targetSenseId],
                 );
               } else {
-                await txn.insert(
+                existingSenseIds.add(targetSenseId);
+                senseIdByVocabId.putIfAbsent(vocabId, () => targetSenseId);
+                dataBatch.insert(
                   DatabaseConstants.tableVocabularySenses,
                   {
-                    'id': senseId,
+                    'id': targetSenseId,
                     'vocabulary_id': vocabId,
                     'part_of_speech': pos,
                     'meaning_vi': meaningVi,
@@ -568,22 +744,17 @@ class ContentPackManager {
                     'created_at': nowUtc,
                     'updated_at': nowUtc,
                   },
+                  conflictAlgorithm: ConflictAlgorithm.ignore,
                 );
               }
 
               // 3. Register in Knowledge Registry
-              final existingKnow = await txn.query(
-                DatabaseConstants.tableKnowledgeRegistry,
-                columns: ['id'],
-                where: 'id = ? OR (entity_type = ? AND canonical_id = ?)',
-                whereArgs: [knowId, 'vocabulary', simplified],
-                limit: 1,
-              );
-              String activeKnowId = knowId;
-              if (existingKnow.isNotEmpty) {
-                activeKnowId = existingKnow.first['id'] as String;
+              final knowId = 'KNOW_VOCAB_$simplified';
+              final matchedKnowId = vocabKnowById[knowId] ?? vocabKnowByCanonical[simplified];
+              final activeKnowId = matchedKnowId ?? knowId;
+              if (matchedKnowId != null) {
                 if (!ownedByLowerLevel) {
-                  await txn.update(
+                  dataBatch.update(
                     DatabaseConstants.tableKnowledgeRegistry,
                     {
                       'title': simplified,
@@ -595,13 +766,15 @@ class ContentPackManager {
                   );
                 }
               } else {
-                await txn.insert(
+                vocabKnowById[knowId] = knowId;
+                vocabKnowByCanonical[simplified] = knowId;
+                dataBatch.insert(
                   DatabaseConstants.tableKnowledgeRegistry,
                   {
                     'id': knowId,
                     'entity_type': 'vocabulary',
                     'canonical_id': simplified,
-                    'hsk_level': hskLevel,
+                    'hsk_level': entry.hskLevel,
                     'title': simplified,
                     'is_deprecated': 0,
                     'replaced_by_id': null,
@@ -616,17 +789,10 @@ class ContentPackManager {
               }
 
               // 4. Link to lessons
-              for (final lessonId in linkedLessons) {
+              for (final lessonId in entry.linkedLessons) {
                 final linkId = 'lki_${lessonId}_$activeKnowId';
-                final existingLink = await txn.query(
-                  DatabaseConstants.tableLessonKnowledgeItems,
-                  columns: ['id'],
-                  where: 'id = ?',
-                  whereArgs: [linkId],
-                  limit: 1,
-                );
-                if (existingLink.isNotEmpty) {
-                  await txn.update(
+                if (existingLinkIds.contains(linkId)) {
+                  dataBatch.update(
                     DatabaseConstants.tableLessonKnowledgeItems,
                     {
                       'role': 'instruction',
@@ -637,7 +803,8 @@ class ContentPackManager {
                     whereArgs: [linkId],
                   );
                 } else {
-                  await txn.insert(
+                  existingLinkIds.add(linkId);
+                  dataBatch.insert(
                     DatabaseConstants.tableLessonKnowledgeItems,
                     {
                       'id': linkId,
@@ -648,13 +815,14 @@ class ContentPackManager {
                       'is_mandatory': 1,
                       'created_at': nowUtc,
                     },
+                    conflictAlgorithm: ConflictAlgorithm.ignore,
                   );
                 }
               }
               order++;
             }
-          } else if (knowledgeType == 'grammar' && parsedContent['points'] is List) {
-            final points = parsedContent['points'] as List<dynamic>;
+          } else if (entry.knowledgeType == 'grammar' && entry.parsedContent['points'] is List) {
+            final points = entry.parsedContent['points'] as List<dynamic>;
             int order = 1;
             for (final p in points) {
               if (p is! Map<String, dynamic>) continue;
@@ -664,70 +832,49 @@ class ContentPackManager {
               final posEx = p['positive_example'] as String? ?? '';
               final conEx = p['contrastive_example'] as String? ?? '';
 
-              final gramCode = 'GRAM_${contentId}_$order';
-              final gramId = 'gram_${contentId}_$order';
-              final knowId = 'KNOW_GRAMMAR_${contentId}_$order';
+              final gramCode = 'GRAM_${entry.contentId}_$order';
+              final gramId = 'gram_${entry.contentId}_$order';
+              final knowId = 'KNOW_GRAMMAR_${entry.contentId}_$order';
 
               // 1. Insert/update grammar without cascade delete
-              final existingGram = await txn.query(
-                DatabaseConstants.tableGrammarItems,
-                columns: ['id'],
-                where: 'id = ?',
-                whereArgs: [gramId],
-                limit: 1,
-              );
-              if (existingGram.isNotEmpty) {
-                await txn.update(
+              final gramValues = {
+                'id': gramId,
+                'hsk_level': entry.hskLevel,
+                'code': gramCode,
+                'pattern': structure,
+                'title_vi': title,
+                'explanation_vi': explanation,
+                'examples_json': json.encode(posEx.isNotEmpty ? [posEx] : []),
+                'title': title,
+                'structure': structure,
+                'meaning_vi': explanation,
+                'contrastive_examples_json': json.encode(conEx.isNotEmpty ? [conEx] : []),
+                'updated_at': nowUtc,
+              };
+              if (existingGramIds.contains(gramId)) {
+                dataBatch.update(
                   DatabaseConstants.tableGrammarItems,
-                  {
-                    'hsk_level': hskLevel,
-                    'code': gramCode,
-                    'pattern': structure,
-                    'title_vi': title,
-                    'explanation_vi': explanation,
-                    'examples_json': json.encode(posEx.isNotEmpty ? [posEx] : []),
-                    'title': title,
-                    'structure': structure,
-                    'meaning_vi': explanation,
-                    'contrastive_examples_json': json.encode(conEx.isNotEmpty ? [conEx] : []),
-                    'updated_at': nowUtc,
-                  },
+                  gramValues,
                   where: 'id = ?',
                   whereArgs: [gramId],
                 );
               } else {
-                await txn.insert(
+                existingGramIds.add(gramId);
+                dataBatch.insert(
                   DatabaseConstants.tableGrammarItems,
                   {
-                    'id': gramId,
-                    'hsk_level': hskLevel,
-                    'code': gramCode,
-                    'pattern': structure,
-                    'title_vi': title,
-                    'explanation_vi': explanation,
-                    'examples_json': json.encode(posEx.isNotEmpty ? [posEx] : []),
-                    'title': title,
-                    'structure': structure,
-                    'meaning_vi': explanation,
-                    'contrastive_examples_json': json.encode(conEx.isNotEmpty ? [conEx] : []),
+                    ...gramValues,
                     'created_at': nowUtc,
-                    'updated_at': nowUtc,
                   },
+                  conflictAlgorithm: ConflictAlgorithm.ignore,
                 );
               }
 
               // 2. Register in Knowledge Registry
-              final existingKnowGram = await txn.query(
-                DatabaseConstants.tableKnowledgeRegistry,
-                columns: ['id'],
-                where: 'id = ? OR (entity_type = ? AND canonical_id = ?)',
-                whereArgs: [knowId, 'grammar', gramCode],
-                limit: 1,
-              );
-              String activeGramId = knowId;
-              if (existingKnowGram.isNotEmpty) {
-                activeGramId = existingKnowGram.first['id'] as String;
-                await txn.update(
+              final matchedGramKnowId = gramKnowById[knowId] ?? gramKnowByCanonical[gramCode];
+              final activeGramId = matchedGramKnowId ?? knowId;
+              if (matchedGramKnowId != null) {
+                dataBatch.update(
                   DatabaseConstants.tableKnowledgeRegistry,
                   {
                     'title': title,
@@ -738,13 +885,15 @@ class ContentPackManager {
                   whereArgs: [activeGramId],
                 );
               } else {
-                await txn.insert(
+                gramKnowById[knowId] = knowId;
+                gramKnowByCanonical[gramCode] = knowId;
+                dataBatch.insert(
                   DatabaseConstants.tableKnowledgeRegistry,
                   {
                     'id': knowId,
                     'entity_type': 'grammar',
                     'canonical_id': gramCode,
-                    'hsk_level': hskLevel,
+                    'hsk_level': entry.hskLevel,
                     'title': title,
                     'is_deprecated': 0,
                     'replaced_by_id': null,
@@ -759,17 +908,10 @@ class ContentPackManager {
               }
 
               // 3. Link to lessons
-              for (final lessonId in linkedLessons) {
+              for (final lessonId in entry.linkedLessons) {
                 final linkId = 'lki_${lessonId}_$activeGramId';
-                final existingLink = await txn.query(
-                  DatabaseConstants.tableLessonKnowledgeItems,
-                  columns: ['id'],
-                  where: 'id = ?',
-                  whereArgs: [linkId],
-                  limit: 1,
-                );
-                if (existingLink.isNotEmpty) {
-                  await txn.update(
+                if (existingLinkIds.contains(linkId)) {
+                  dataBatch.update(
                     DatabaseConstants.tableLessonKnowledgeItems,
                     {
                       'role': 'instruction',
@@ -780,7 +922,8 @@ class ContentPackManager {
                     whereArgs: [linkId],
                   );
                 } else {
-                  await txn.insert(
+                  existingLinkIds.add(linkId);
+                  dataBatch.insert(
                     DatabaseConstants.tableLessonKnowledgeItems,
                     {
                       'id': linkId,
@@ -791,6 +934,7 @@ class ContentPackManager {
                       'is_mandatory': 1,
                       'created_at': nowUtc,
                     },
+                    conflictAlgorithm: ConflictAlgorithm.ignore,
                   );
                 }
               }
@@ -798,6 +942,7 @@ class ContentPackManager {
             }
           }
         }
+        await dataBatch.commit(noResult: true);
 
         // 6. Level Exit Exam
         if (exitExamMap != null) {
@@ -827,6 +972,10 @@ class ContentPackManager {
         });
       } else {
         await executeInTransaction(_db);
+      }
+
+      if (!skippedAlreadyInstalled) {
+        await _applyLatePlacementUnlock(manifest.hskLevel);
       }
 
       return ContentPackInstallResult.success(
@@ -1014,5 +1163,210 @@ class ContentPackManager {
     ''');
 
     return danglingLinks.isEmpty;
+  }
+
+  Future<Set<String>> _queryExistingIds(
+    DatabaseExecutor executor,
+    String table,
+    String selectColumn,
+    List<String> keys, {
+    String? filterColumn,
+  }) async {
+    final result = <String>{};
+    if (keys.isEmpty) return result;
+    final col = filterColumn ?? selectColumn;
+    for (final chunk in DaoUtils.chunkList(keys.toSet().toList())) {
+      final placeholders = List.filled(chunk.length, '?').join(',');
+      final rows = await executor.query(
+        table,
+        columns: [selectColumn],
+        where: '$col IN ($placeholders)',
+        whereArgs: chunk,
+      );
+      for (final row in rows) {
+        final v = row[selectColumn] as String?;
+        if (v != null) result.add(v);
+      }
+    }
+    return result;
+  }
+
+  Future<Map<String, Map<String, dynamic>>> _queryExistingMap(
+    DatabaseExecutor executor,
+    String table,
+    List<String> columns,
+    String keyColumn,
+    List<String> keys,
+  ) async {
+    final result = <String, Map<String, dynamic>>{};
+    if (keys.isEmpty) return result;
+    for (final chunk in DaoUtils.chunkList(keys.toSet().toList())) {
+      final placeholders = List.filled(chunk.length, '?').join(',');
+      final rows = await executor.query(
+        table,
+        columns: columns,
+        where: '$keyColumn IN ($placeholders)',
+        whereArgs: chunk,
+      );
+      for (final row in rows) {
+        final k = row[keyColumn] as String?;
+        if (k != null) {
+          result[k] = Map<String, dynamic>.from(row);
+        }
+      }
+    }
+    return result;
+  }
+
+  Future<({Map<String, Map<String, dynamic>> vocabById, Map<String, Map<String, dynamic>> vocabBySimplified})>
+      _preloadVocabularies(DatabaseExecutor executor, List<String> simplifiedList) async {
+    final vocabById = <String, Map<String, dynamic>>{};
+    final vocabBySimplified = <String, Map<String, dynamic>>{};
+    final unique = simplifiedList.toSet().toList();
+    if (unique.isEmpty) {
+      return (vocabById: vocabById, vocabBySimplified: vocabBySimplified);
+    }
+
+    for (final chunk in DaoUtils.chunkList(unique)) {
+      final placeholders = List.filled(chunk.length, '?').join(',');
+      final rows = await executor.rawQuery('''
+        SELECT id, simplified, hsk_level
+        FROM ${DatabaseConstants.tableVocabularies}
+        WHERE simplified IN ($placeholders)
+        ORDER BY CASE WHEN SUBSTR(id, 1, 4) = 'VOC_' THEN 0 ELSE 1 END, id ASC
+      ''', chunk);
+      for (final raw in rows) {
+        final row = Map<String, dynamic>.from(raw);
+        final id = row['id'] as String;
+        final simp = row['simplified'] as String? ?? '';
+        vocabById[id] = row;
+        if (simp.isNotEmpty) {
+          vocabBySimplified.putIfAbsent(simp, () => row);
+        }
+      }
+    }
+    return (vocabById: vocabById, vocabBySimplified: vocabBySimplified);
+  }
+
+  Future<({Set<String> existingSenseIds, Map<String, String> senseIdByVocabId})> _preloadVocabularySenses(
+    DatabaseExecutor executor,
+    List<String> vocabIds,
+    List<String> senseIds,
+  ) async {
+    final existingSenseIds = <String>{};
+    final senseIdByVocabId = <String, String>{};
+    for (final chunk in DaoUtils.chunkList(vocabIds.toSet().toList())) {
+      final placeholders = List.filled(chunk.length, '?').join(',');
+      final rows = await executor.query(
+        DatabaseConstants.tableVocabularySenses,
+        columns: ['id', 'vocabulary_id'],
+        where: 'vocabulary_id IN ($placeholders)',
+        whereArgs: chunk,
+        orderBy: 'order_index ASC, id ASC',
+      );
+      for (final row in rows) {
+        final id = row['id'] as String;
+        final vid = row['vocabulary_id'] as String?;
+        existingSenseIds.add(id);
+        if (vid != null) {
+          senseIdByVocabId.putIfAbsent(vid, () => id);
+        }
+      }
+    }
+    for (final chunk in DaoUtils.chunkList(senseIds.toSet().toList())) {
+      final placeholders = List.filled(chunk.length, '?').join(',');
+      final rows = await executor.query(
+        DatabaseConstants.tableVocabularySenses,
+        columns: ['id', 'vocabulary_id'],
+        where: 'id IN ($placeholders)',
+        whereArgs: chunk,
+      );
+      for (final row in rows) {
+        final id = row['id'] as String;
+        final vid = row['vocabulary_id'] as String?;
+        existingSenseIds.add(id);
+        if (vid != null) {
+          senseIdByVocabId.putIfAbsent(vid, () => id);
+        }
+      }
+    }
+    return (existingSenseIds: existingSenseIds, senseIdByVocabId: senseIdByVocabId);
+  }
+
+  Future<({Map<String, String> vocabKnowById, Map<String, String> vocabKnowByCanonical})> _preloadKnowledge(
+    DatabaseExecutor executor, {
+    required String entityType,
+    required List<String> ids,
+    required List<String> canonicalIds,
+  }) async {
+    final byId = <String, String>{};
+    final byCanonical = <String, String>{};
+    for (final chunk in DaoUtils.chunkList(ids.toSet().toList())) {
+      final placeholders = List.filled(chunk.length, '?').join(',');
+      final rows = await executor.query(
+        DatabaseConstants.tableKnowledgeRegistry,
+        columns: ['id', 'canonical_id'],
+        where: 'id IN ($placeholders)',
+        whereArgs: chunk,
+      );
+      for (final row in rows) {
+        final id = row['id'] as String;
+        final can = row['canonical_id'] as String? ?? '';
+        byId[id] = id;
+        if (can.isNotEmpty) byCanonical.putIfAbsent(can, () => id);
+      }
+    }
+    for (final chunk in DaoUtils.chunkList(canonicalIds.toSet().toList(), chunkSize: 400)) {
+      final placeholders = List.filled(chunk.length, '?').join(',');
+      final rows = await executor.query(
+        DatabaseConstants.tableKnowledgeRegistry,
+        columns: ['id', 'canonical_id'],
+        where: 'entity_type = ? AND canonical_id IN ($placeholders)',
+        whereArgs: [entityType, ...chunk],
+      );
+      for (final row in rows) {
+        final id = row['id'] as String;
+        final can = row['canonical_id'] as String? ?? '';
+        byId[id] = id;
+        if (can.isNotEmpty) byCanonical.putIfAbsent(can, () => id);
+      }
+    }
+    return (vocabKnowById: byId, vocabKnowByCanonical: byCanonical);
+  }
+
+  /// AUD-023: Re-applies placement / exit-exam level unlocks when higher-level packs
+  /// (HSK 3-6) are downloaded after placement testing or level advancement.
+  Future<void> _applyLatePlacementUnlock(int installedHskLevel) async {
+    int maxRecommendedLevel = 0;
+    bool hasCompletedPlacement = false;
+
+    try {
+      final profileRows = await _db.rawQuery(
+        'SELECT MAX(current_hsk_level) AS max_lvl FROM ${DatabaseConstants.tableUserProfiles}',
+      );
+      final profileLvl = (profileRows.firstOrNull?['max_lvl'] as num?)?.toInt() ?? 0;
+      maxRecommendedLevel = math.max(maxRecommendedLevel, profileLvl);
+    } catch (_) {}
+
+    try {
+      final sessionRows = await _db.query(
+        DatabaseConstants.tablePlacementTestSessions,
+        columns: ['recommended_level'],
+        where: "status = 'completed' AND recommended_level IS NOT NULL",
+        orderBy: 'completed_at DESC, updated_at DESC',
+        limit: 1,
+      );
+      if (sessionRows.isNotEmpty) {
+        hasCompletedPlacement = true;
+        final placementLvl = (sessionRows.first['recommended_level'] as num?)?.toInt() ?? 0;
+        maxRecommendedLevel = math.max(maxRecommendedLevel, placementLvl);
+      }
+    } catch (_) {}
+
+    if (maxRecommendedLevel > 0 &&
+        installedHskLevel <= maxRecommendedLevel &&
+        (hasCompletedPlacement || maxRecommendedLevel > 1)) {
+      await PlacementUnlockHandler(_db).unlockForRecommendedLevel(maxRecommendedLevel);
+    }
   }
 }

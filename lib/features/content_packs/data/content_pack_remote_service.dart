@@ -86,9 +86,9 @@ class ContentPackRemoteService {
         title: 'Giáo trình chuẩn HSK 3 (Trực tuyến)',
         description: '300 từ vựng trung cấp, 20 bài học, luyện đọc hiểu và phản xạ giao tiếp tự nhiên.',
         version: '1.0.0',
-        sizeBytes: 350000,
+        sizeBytes: 352199,
         downloadUrl: '$cdnBaseUrl/hsk3_pack_v1.json',
-        sha256Checksum: '',
+        sha256Checksum: '419cd2ccca3fd7dce24b78437b9b4dfb51271bed6e7d05fde3d20cac4d6703ec',
         isBundled: false,
       ),
       const RemoteContentPackInfo(

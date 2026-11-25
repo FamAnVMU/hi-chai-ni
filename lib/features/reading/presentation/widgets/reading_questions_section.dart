@@ -109,7 +109,7 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
           final qIndex = entry.key + 1;
           final q = entry.value;
           final selectedOption = _userAnswers[q.id];
-          final isAnswered = selectedOption != null || _hasSubmitted;
+          final isAnswered = _hasSubmitted;
           final isCorrect = selectedOption == q.answerIndex;
 
           return Padding(
@@ -196,13 +196,13 @@ class _ReadingQuestionsSectionState extends State<ReadingQuestionsSection> {
                         ),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(AppRadius.sm),
-                          onTap: () {
-                            setState(() {
-                              _userAnswers[q.id] = optIndex;
-                              _calculateScore();
-                            });
-                            widget.onSubmitted(_userAnswers, _score ?? 100.0);
-                          },
+                          onTap: _hasSubmitted
+                              ? null
+                              : () {
+                                  setState(() {
+                                    _userAnswers[q.id] = optIndex;
+                                  });
+                                },
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                             child: Row(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/audio/audio_player_service.dart';
+import '../../../../core/audio/tts_service.dart';
 import '../../../../core/network/ai/ai.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../hanzi/hanzi.dart';
@@ -15,12 +16,14 @@ class DictionaryDetailSheet extends StatefulWidget {
   final DictionaryEntry entry;
   final DictionaryRepository repository;
   final String? contextSentence;
+  final TtsService? ttsService;
 
   const DictionaryDetailSheet({
     super.key,
     required this.entry,
     required this.repository,
     this.contextSentence,
+    this.ttsService,
   });
 
   static Future<void> show(
@@ -28,6 +31,7 @@ class DictionaryDetailSheet extends StatefulWidget {
     required DictionaryEntry entry,
     required DictionaryRepository repository,
     String? contextSentence,
+    TtsService? ttsService,
   }) {
     return showModalBottomSheet(
       context: context,
@@ -37,6 +41,7 @@ class DictionaryDetailSheet extends StatefulWidget {
         entry: entry,
         repository: repository,
         contextSentence: contextSentence,
+        ttsService: ttsService,
       ),
     );
   }
@@ -53,34 +58,43 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
   bool _isAiAuthError = false;
   bool _isLoadingAi = false;
   final AudioPlayerService _audioPlayer = DefaultAudioPlayerService();
+  late final TtsService _ttsService;
+  late final bool _ownsTts;
 
   @override
   void initState() {
     super.initState();
     _entry = widget.entry;
+    _ownsTts = widget.ttsService == null;
+    _ttsService = widget.ttsService ?? DefaultTtsService();
   }
 
   @override
   void dispose() {
     _audioPlayer.dispose();
+    if (_ownsTts) {
+      _ttsService.dispose();
+    }
     super.dispose();
   }
 
-  Future<void> _handlePlayAudio() async {
-    if (_entry.audioUri == null || _entry.audioUri!.isEmpty) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Chưa có audio phát âm cho từ này.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      return;
-    }
+  Future<void> _speakTtsFallback() async {
+    await _ttsService.speak(_entry.simplified, language: 'zh-CN');
+  }
 
+  Future<void> _handlePlayAudio() async {
     setState(() => _isAudioPlaying = true);
     try {
-      await _audioPlayer.play(_entry.audioUri!);
+      final uri = _entry.audioUri;
+      if (uri == null || uri.isEmpty) {
+        await _speakTtsFallback();
+        return;
+      }
+      try {
+        await _audioPlayer.play(uri);
+      } catch (_) {
+        await _speakTtsFallback();
+      }
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -94,11 +108,11 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
 
   Future<void> _handleToggleSave() async {
     final newSaved = await widget.repository.toggleSaveWord(_entry);
+    if (!mounted) return;
     setState(() {
       _entry = _entry.copyWith(isSaved: newSaved);
     });
 
-    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(newSaved ? 'Đã lưu vào danh sách từ vựng' : 'Đã bỏ lưu từ vựng'),
@@ -108,35 +122,24 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
   }
 
   Future<void> _handleEditNote() async {
-    final controller = TextEditingController(text: _entry.customNote ?? '');
     final result = await showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Ghi chú cho "${_entry.simplified}"'),
-        content: TextField(
-          controller: controller,
-          maxLines: 3,
-          decoration: const InputDecoration(
-            hintText: 'Nhập ghi chú cá nhân (ngữ cảnh, lưu ý...).',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(null),
-            child: const Text('Hủy'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
-            child: const Text('Lưu ghi chú'),
-          ),
-        ],
+      builder: (_) => _EditWordNoteDialog(
+        word: _entry.simplified,
+        initialNote: _entry.customNote ?? '',
       ),
     );
 
     if (result != null) {
-      await widget.repository.updateWordNote(_entry.id, result.isEmpty ? null : result);
+      final normalized = result.isEmpty ? null : result;
+      await widget.repository.updateWordNote(_entry.id, normalized);
+      if (!mounted) return;
       setState(() {
-        _entry = _entry.copyWith(customNote: result.isEmpty ? null : result, isSaved: true);
+        _entry = _entry.copyWith(
+          customNote: normalized,
+          clearCustomNote: normalized == null,
+          isSaved: true,
+        );
       });
     }
   }
@@ -763,6 +766,59 @@ class _DictionaryDetailSheetState extends State<DictionaryDetailSheet> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _EditWordNoteDialog extends StatefulWidget {
+  final String word;
+  final String initialNote;
+
+  const _EditWordNoteDialog({
+    required this.word,
+    required this.initialNote,
+  });
+
+  @override
+  State<_EditWordNoteDialog> createState() => _EditWordNoteDialogState();
+}
+
+class _EditWordNoteDialogState extends State<_EditWordNoteDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialNote);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Ghi chú cho "${widget.word}"'),
+      content: TextField(
+        controller: _controller,
+        maxLines: 3,
+        decoration: const InputDecoration(
+          hintText: 'Nhập ghi chú cá nhân (ngữ cảnh, lưu ý...).',
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(null),
+          child: const Text('Hủy'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(_controller.text.trim()),
+          child: const Text('Lưu ghi chú'),
+        ),
+      ],
     );
   }
 }

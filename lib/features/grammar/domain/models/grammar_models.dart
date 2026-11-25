@@ -371,6 +371,52 @@ class GrammarItem {
     );
   }
 
+  /// Lightweight factory for list browsing/filtering (skips decoding heavy JSON columns).
+  factory GrammarItem.fromSummaryMap(Map<String, dynamic> map) {
+    final id = map['id'] as String? ?? '';
+    final hskLevel = map['hsk_level'] as int? ?? 1;
+    final code = map['code'] as String? ?? id;
+    List<String> tags = const [];
+    final rawTags = map['tags_json'] ?? map['tags'];
+    if (rawTags is String && rawTags.isNotEmpty) {
+      try {
+        final decoded = json.decode(rawTags);
+        if (decoded is List) tags = decoded.map((e) => e.toString()).toList();
+      } catch (_) {}
+    } else if (rawTags is List) {
+      tags = rawTags.map((e) => e.toString()).toList();
+    }
+
+    return GrammarItem(
+      id: id,
+      hskLevel: hskLevel,
+      code: code,
+      title: map['title'] as String? ?? map['title_vi'] as String? ?? '',
+      structure: map['structure'] as String? ?? map['pattern'] as String? ?? '',
+      meaningVi: map['meaning_vi'] as String? ?? '',
+      usageConditionsVi: map['usage_conditions_vi'] as String? ?? '',
+      sentencePositionVi: map['sentence_position_vi'] as String? ?? '',
+      explanationVi: map['explanation_vi'] as String? ?? map['explanation'] as String? ?? '',
+      source: map['source'] as String? ?? 'HSK Standard Course',
+      grammarId: map['grammar_id'] as String? ?? id,
+      topicCategory: map['topic_category'] as String? ?? 'other',
+      topicNameVi: map['topic_name_vi'] as String? ?? '',
+      categoryChinese: map['category_chinese'] as String? ?? '',
+      categoryEnglish: map['category_english'] as String? ?? '',
+      originalLevel: map['original_level'] as String? ?? '',
+      hskLevelMapped: map['hsk_level_mapped'] as int? ?? hskLevel,
+      mappingBasis: map['mapping_basis'] as String? ?? '',
+      isReferenceOnly: (map['is_reference_only'] == 1 || map['is_reference_only'] == true),
+      verificationStatus: map['verification_status'] as String? ?? 'verified_open_source',
+      license: map['license'] as String? ?? '',
+      attribution: map['attribution'] as String? ?? '',
+      wikiLink: map['wiki_link'] as String?,
+      tags: tags,
+      createdAt: DateTime.tryParse(map['created_at'] as String? ?? '') ?? DateTime.now().toUtc(),
+      updatedAt: DateTime.tryParse(map['updated_at'] as String? ?? '') ?? DateTime.now().toUtc(),
+    );
+  }
+
   Map<String, dynamic> toMap() => {
         'id': id,
         'grammar_id': grammarId.isNotEmpty ? grammarId : id,

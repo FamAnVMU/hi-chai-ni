@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../core/database/app_database.dart';
 import '../../../../core/theme/theme.dart';
@@ -26,6 +27,7 @@ class QuickDictionarySheet extends StatefulWidget {
 
 class _QuickDictionarySheetState extends State<QuickDictionarySheet> {
   final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
   List<DictionaryEntry> _results = [];
   bool _isLoading = false;
   String _searchedKeyword = '';
@@ -42,19 +44,27 @@ class _QuickDictionarySheetState extends State<QuickDictionarySheet> {
     final word = widget.initialWord?.trim();
     if (word != null && word.isNotEmpty) {
       _searchController.text = word;
-      _performSearch(word);
+      _performSearch(word, recordHistory: false);
     } else {
-      _performSearch('你好'); // Pre-populate with common greeting as sample
+      _performSearch('你好', recordHistory: false); // Sample lookup must not pollute history
     }
   }
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _searchController.dispose();
     super.dispose();
   }
 
-  Future<void> _performSearch(String query) async {
+  void _onSearchChanged(String val) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 250), () {
+      _performSearch(val, recordHistory: false);
+    });
+  }
+
+  Future<void> _performSearch(String query, {bool recordHistory = false}) async {
     final trimmed = query.trim();
     if (trimmed.isEmpty) {
       if (mounted) {
@@ -74,7 +84,11 @@ class _QuickDictionarySheetState extends State<QuickDictionarySheet> {
 
     try {
       if (_repository != null) {
-        final entries = await _repository!.search(trimmed, limit: 25);
+        final entries = await _repository!.search(
+          trimmed,
+          limit: 25,
+          recordHistory: recordHistory,
+        );
         if (mounted) {
           setState(() {
             _results = entries;
@@ -191,8 +205,11 @@ class _QuickDictionarySheetState extends State<QuickDictionarySheet> {
                   ),
                   contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
                 ),
-                onChanged: (val) => _performSearch(val),
-                onSubmitted: (val) => _performSearch(val),
+                onChanged: _onSearchChanged,
+                onSubmitted: (val) {
+                  _debounce?.cancel();
+                  _performSearch(val, recordHistory: true);
+                },
               ),
             ),
 
@@ -260,21 +277,23 @@ class _QuickDictionarySheetState extends State<QuickDictionarySheet> {
                                       color: theme.colorScheme.onSurfaceVariant,
                                     ),
                                   ),
-                                  const Spacer(),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primaryBlueDark.withAlpha(isDark ? 60 : 35),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      'HSK ${item.hskLevel}',
-                                      style: theme.textTheme.labelSmall?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: isDark ? AppColors.primaryBlueDark : AppColors.primaryBlueDark,
+                                  if (item.hskLevel > 0) ...[
+                                    const Spacer(),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primaryBlueDark.withAlpha(isDark ? 60 : 35),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        'HSK ${item.hskLevel}',
+                                        style: theme.textTheme.labelSmall?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: isDark ? AppColors.primaryBlueDark : AppColors.primaryBlueDark,
+                                        ),
                                       ),
                                     ),
-                                  ),
+                                  ],
                                 ],
                               ),
                               subtitle: primarySense != null

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -91,13 +92,8 @@ class AppStartupNotifier extends Notifier<AppStartupState> {
     try {
       final assetBundle = bundle ?? rootBundle;
 
-      // Bước 1: Khởi tạo môi trường ứng dụng & dọn dẹp âm thanh tạm thời cũ (F-30)
+      // Bước 1: Khởi tạo môi trường ứng dụng
       debugPrint('[AppStartup] 1/10: Khởi tạo môi trường ứng dụng...');
-      try {
-        await AudioTempCleaner.cleanupTempAudioFiles();
-      } catch (e) {
-        debugPrint('[AppStartup] AudioTempCleaner non-fatal warning: $e');
-      }
 
       // Bước 2: Mở database
       state = state.copyWith(
@@ -208,6 +204,16 @@ class AppStartupNotifier extends Notifier<AppStartupState> {
         isReady: true,
         error: null,
         statusMessage: 'Hệ thống sẵn sàng',
+      );
+
+      // OPT-07: Non-blocking cleanup of expired temporary audio files after startup ready.
+      unawaited(
+        AudioTempCleaner.cleanupTempAudioFiles(
+          olderThan: const Duration(hours: 2),
+        ).catchError((Object e) {
+          debugPrint('[AppStartup] AudioTempCleaner non-fatal warning: $e');
+          return 0;
+        }),
       );
     } catch (e, stackTrace) {
       debugPrint('[AppStartup] Initialization error: $e\n$stackTrace');

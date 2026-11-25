@@ -102,9 +102,8 @@ class DefaultReadingRepository implements ReadingRepository {
     final progressId = 'prog_${passageId}_${DateTime.now().millisecondsSinceEpoch}';
 
     await _db.transaction((txn) async {
-      // 1. Upsert reading progress
-      await txn.insert(
-        'reading_progress',
+      // 1. Upsert reading progress via DAO (preserves row id)
+      await _readingDao.saveProgress(
         {
           'id': progressId,
           'passage_id': passageId,
@@ -117,7 +116,7 @@ class DefaultReadingRepository implements ReadingRepository {
           'created_at': nowUtc,
           'updated_at': nowUtc,
         },
-        conflictAlgorithm: ConflictAlgorithm.replace,
+        txn: txn,
       );
 
       // 2. If completed, persist to learner_evidence and feed daily streak

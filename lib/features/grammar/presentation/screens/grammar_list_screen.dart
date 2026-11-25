@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
@@ -7,11 +8,33 @@ import 'grammar_detail_screen.dart';
 
 /// Screen listing Chinese grammar points with dual-mode HSK level & topic filtering,
 /// real-time search, and learner mastery progress status.
-class GrammarListScreen extends ConsumerWidget {
+class GrammarListScreen extends ConsumerStatefulWidget {
   const GrammarListScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<GrammarListScreen> createState() => _GrammarListScreenState();
+}
+
+class _GrammarListScreenState extends ConsumerState<GrammarListScreen> {
+  Timer? _searchDebounce;
+
+  @override
+  void dispose() {
+    _searchDebounce?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 250), () {
+      if (mounted) {
+        ref.read(grammarSearchQueryProvider.notifier).setQuery(query);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final grammarListAsync = ref.watch(grammarListProvider);
     final progressMapAsync = ref.watch(grammarProgressMapProvider);
@@ -39,7 +62,7 @@ class GrammarListScreen extends ConsumerWidget {
                   HiTextField(
                     hintText: 'Tìm ngữ pháp (把, 比, 了, 着, 在, vì sao...)...',
                     prefixIcon: const Icon(Icons.search_rounded),
-                    onChanged: (q) => ref.read(grammarSearchQueryProvider.notifier).setQuery(q),
+                    onChanged: _onSearchChanged,
                   ),
                   const SizedBox(height: AppSpacing.sm),
 

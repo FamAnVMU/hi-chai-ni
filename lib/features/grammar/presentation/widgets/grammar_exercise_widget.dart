@@ -149,10 +149,12 @@ class _GrammarExerciseWidgetState extends State<GrammarExerciseWidget> {
                           color: isSelected ? AppColors.primaryBlueDark : theme.colorScheme.outline,
                         ),
                         const SizedBox(width: AppSpacing.sm),
-                        Text(
-                          opt,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: isSelected ? FontWeight.bold : null,
+                        Expanded(
+                          child: Text(
+                            opt,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: isSelected ? FontWeight.bold : null,
+                            ),
                           ),
                         ),
                       ],
