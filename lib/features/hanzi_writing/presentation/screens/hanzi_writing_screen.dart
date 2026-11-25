@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/audio/tts_service.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../home/presentation/providers/home_providers.dart';
 import '../providers/hanzi_writing_providers.dart';
 import '../widgets/hanzi_canvas.dart';
 import '../widgets/hanzi_canvas_controller.dart';
@@ -11,10 +13,16 @@ import '../widgets/writing_toolbar.dart';
 /// stroke order evaluation, and customizable tracing/freeform modes.
 class HanziWritingScreen extends ConsumerStatefulWidget {
   final String? initialCharacter;
+  final List<String>? wordCharacters;
+  final String? wordTitle;
+  final Object? repository;
 
   const HanziWritingScreen({
     super.key,
     this.initialCharacter,
+    this.wordCharacters,
+    this.wordTitle,
+    this.repository,
   });
 
   @override
@@ -23,6 +31,7 @@ class HanziWritingScreen extends ConsumerStatefulWidget {
 
 class _HanziWritingScreenState extends ConsumerState<HanziWritingScreen> {
   late final HanziCanvasController _canvasController;
+  DefaultTtsService? _tts;
   int? _highlightedStrokeOrder;
   DateTime _sessionStartTime = DateTime.now();
 
@@ -81,6 +90,7 @@ class _HanziWritingScreenState extends ConsumerState<HanziWritingScreen> {
             evaluation: result,
             durationMs: durationMs,
           );
+          ref.invalidate(homeDashboardProvider);
           if (mounted) {
             HiSnackBar.showSuccess(
               context,
@@ -223,11 +233,17 @@ class _HanziWritingScreenState extends ConsumerState<HanziWritingScreen> {
                     IconButton.filledTonal(
                       icon: const Icon(Icons.volume_up_rounded),
                       tooltip: 'Nghe phát âm',
-                      onPressed: () {
-                        HiSnackBar.showSuccess(
-                          context,
-                          'Phát âm: $character ($pinyin)',
-                        );
+                      onPressed: () async {
+                        try {
+                          _tts ??= DefaultTtsService();
+                          await _tts!.speak(character, language: 'zh-CN');
+                        } catch (_) {}
+                        if (context.mounted) {
+                          HiSnackBar.showSuccess(
+                            context,
+                            'Phát âm: $character ($pinyin)',
+                          );
+                        }
                       },
                     ),
                   ],

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/network/ai/ai_service.dart';
+import '../../../../core/network/ai/models/ai_request.dart';
 import '../../../../core/theme/theme.dart';
 
 class AiTutorHelperSheet extends ConsumerStatefulWidget {
@@ -27,33 +29,96 @@ class _AiTutorHelperSheetState extends ConsumerState<AiTutorHelperSheet> {
   bool _isLoading = false;
   String? _aiResponse;
 
-  void _onSelectChip(String query) {
+  Future<void> _onSelectChip(String query) async {
     setState(() {
       _selectedQuery = query;
       _isLoading = true;
     });
 
-    // Provide immediate helpful pedagogical guidance
-    Future.delayed(const Duration(milliseconds: 300), () {
-      if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-        if (query == 'Giải thích dễ hiểu hơn') {
-          _aiResponse = '💡 Trợ giảng phân tích: Trong "${widget.topicTitle}", hãy nhớ quy tắc ngữ cảnh thực tế: ${_getPedagogicalTip(widget.topicTitle)}. Học sinh Việt Nam thường có phản xạ dịch từng chữ theo tiếng Việt, nhưng tiếng Trung luôn ưu tiên trật tự: Thời gian / Địa điểm trước Động từ.';
-        } else if (query == 'Cho thêm 2 ví dụ') {
-          _aiResponse = '📝 2 ví dụ mở rộng từ trợ giảng:\n1. 昨天我去学校。(Hôm qua tôi đã đến trường - Trạng từ thời gian đứng trước).\n2. 他在教室学习。(Anh ấy học ở phòng học - Trạng từ nơi chốn đứng trước).';
-        } else {
-          _aiResponse = '🤖 Trợ giảng giải đáp: Đối với nội dung "${widget.topicTitle}", bạn đang làm rất tốt! Hãy tiếp tục luyện tập các bài tập trong giáo trình để củng cố phản xạ tự nhiên.';
+    final contextualPrompt = StringBuffer()
+      ..writeln('Bạn là trợ giảng tiếng Trung AI của Hi Chinese.')
+      ..writeln('Yêu cầu: $query')
+      ..writeln('Chủ đề bài học: ${widget.topicTitle}');
+    if (widget.topicContext != null && widget.topicContext!.isNotEmpty) {
+      contextualPrompt.writeln('Ngữ cảnh: ${widget.topicContext}');
+    }
+    if (widget.exercisePrompt != null && widget.exercisePrompt!.isNotEmpty) {
+      contextualPrompt.writeln('Câu hỏi đang làm: ${widget.exercisePrompt}');
+    }
+    if (widget.userWrongAnswer != null && widget.userWrongAnswer!.isNotEmpty) {
+      contextualPrompt.writeln('Đáp án học viên vừa chọn nhầm: ${widget.userWrongAnswer}');
+    }
+    contextualPrompt.writeln(
+      'Hãy trả lời ngắn gọn, dễ hiểu bằng tiếng Việt kèm ví dụ chữ Hán và Pinyin chuẩn.',
+    );
+
+    if (widget.isOnline) {
+      try {
+        final aiService = ref.read(aiServiceProvider);
+        final hasCredentials = await aiService.verifyCredentials();
+        if (hasCredentials) {
+          final response = await aiService.generateText(
+            AiPromptRequest.singlePrompt(contextualPrompt.toString()),
+          );
+          if (mounted && response.text.trim().isNotEmpty) {
+            setState(() {
+              _isLoading = false;
+              _aiResponse = response.text.trim();
+            });
+            return;
+          }
         }
-      });
+      } catch (_) {
+        // Fall through cleanly to local grammar/context helper when offline or API unavailable
+      }
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _isLoading = false;
+      _aiResponse = _buildLocalContextualExplanation(query);
     });
+  }
+
+  String _buildLocalContextualExplanation(String query) {
+    final topic = widget.topicTitle;
+    final wrongAns = widget.userWrongAnswer;
+    final exercise = widget.exercisePrompt;
+    final contextNote = widget.topicContext;
+
+    if (query == 'Giải thích dễ hiểu hơn') {
+      final base =
+          '💡 Giải thích trọng tâm "$topic": ${_getPedagogicalTip(topic)}.';
+      if (wrongAns != null && wrongAns.isNotEmpty) {
+        return '$base\n• Lưu ý lỗi chọn "$wrongAns": hãy đối chiếu vị trí từ loại (Chủ ngữ → Thời gian/Địa điểm → Động từ/Tính từ → Tân ngữ) thay vì dịch từng từ tiếng Việt.';
+      }
+      if (contextNote != null && contextNote.isNotEmpty) {
+        return '$base\n• Gợi ý ngữ cảnh: $contextNote';
+      }
+      return base;
+    }
+
+    if (query == 'Cho thêm 2 ví dụ') {
+      return '📝 Gợi ý luyện đặt câu cho "$topic":\n'
+          '• Công thức kiểm tra nhanh: Xác định chủ thể → hành động/tính chất → kết quả.\n'
+          '${exercise != null && exercise.isNotEmpty ? "• Đối chiếu bài hiện tại: $exercise\n" : ""}'
+          '• Bạn có thể cấu hình Gemini API Key trong Cài đặt để AI sinh thêm hàng loạt ví dụ mở rộng theo chủ đề "$topic".';
+    }
+
+    return '🤖 Trợ giảng (Chế độ ngoại tuyến): Với "$topic", hãy đọc to câu mẫu kèm Pinyin để nhớ nhịp ngữ điệu trước khi làm lại bài tập.${wrongAns != null && wrongAns.isNotEmpty ? ' Kiểm tra lại lựa chọn "$wrongAns" nhé.' : ''}';
   }
 
   String _getPedagogicalTip(String topic) {
     if (topic.contains('是')) {
-      return '"是" dùng để liên kết 2 danh từ hoặc cụm danh từ (A là B), không đi trực tiếp với tính từ';
+      return '"是" dùng để liên kết hai danh từ hoặc cụm danh từ (A 是 B = A là B), không dùng trực tiếp trước tính từ đơn';
     }
-    return 'người bản xứ luôn dùng ngữ điệu tự nhiên và trật tự ngữ pháp chặt chẽ';
+    if (topic.contains('了')) {
+      return '"了" dùng để biểu thị sự hoàn thành của hành động (đặt sau động từ) hoặc sự thay đổi trạng thái (đặt cuối câu)';
+    }
+    if (topic.contains('把')) {
+      return 'Câu chữ "把" nhấn mạnh sự tác động làm thay đổi vị trí/trạng thái của đối tượng: Chủ ngữ + 把 + Tân ngữ + Động từ + Thành phần khác';
+    }
+    return 'hãy chú ý trật tự câu tiếng Trung (Thời gian/Địa điểm đặt trước động từ) và vai trò từng hư từ trong ngữ cảnh cụ thể';
   }
 
   @override

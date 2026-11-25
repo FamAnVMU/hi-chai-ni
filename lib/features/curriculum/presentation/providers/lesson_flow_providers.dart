@@ -3,7 +3,12 @@ import '../../domain/models/lesson_flow_state.dart';
 import '../../domain/engine/adaptive_exercise_sampler.dart';
 import '../../domain/engine/mastery_engine.dart';
 import '../../../../core/database/app_database.dart';
-import '../../../vocabulary_srs/presentation/providers/srs_providers.dart' show hasCompletedLessonsProvider;
+import '../../../home/presentation/providers/home_providers.dart';
+import '../../../profile/presentation/providers/profile_providers.dart';
+import '../../../roadmap/presentation/providers/roadmap_providers.dart';
+import '../../../vocabulary_srs/presentation/providers/srs_providers.dart'
+    show hasCompletedLessonsProvider, srsDueCountProvider;
+import 'curriculum_providers.dart';
 
 final adaptiveExerciseSamplerProvider = Provider<AdaptiveExerciseSampler>((ref) {
   return const AdaptiveExerciseSampler();
@@ -43,7 +48,10 @@ class LessonFlowNotifier extends Notifier<LessonFlowState> {
     state = state.copyWith(userAnswers: updated);
   }
 
-  Future<ExerciseEvaluationResult> submitPractice(List<Map<String, dynamic>> questions) async {
+  Future<ExerciseEvaluationResult> submitPractice(
+    List<Map<String, dynamic>> questions, {
+    int durationMs = 0,
+  }) async {
     final sampler = ref.read(adaptiveExerciseSamplerProvider);
     final masteryEngine = ref.read(masteryEngineProvider);
 
@@ -82,10 +90,11 @@ class LessonFlowNotifier extends Notifier<LessonFlowState> {
     }
 
     // Record attempt in MasteryEngine & Learning Data Pipeline
-    await masteryEngine.recordLessonAttempt(
+    final masteryResult = await masteryEngine.recordLessonAttempt(
       lessonId: state.lessonId,
       scorePercent: result.scorePercent,
       questionResults: enrichedQuestions,
+      durationMs: durationMs,
     );
 
     if (ref.mounted) {
@@ -93,7 +102,9 @@ class LessonFlowNotifier extends Notifier<LessonFlowState> {
         userAnswers: mergedAnswers,
         lastScorePercent: result.scorePercent,
         isCompleted: result.isPassed,
+        masteryResult: masteryResult,
       );
+      _invalidateCrossTabProviders(result.isPassed);
     }
 
     return result;
@@ -103,6 +114,8 @@ class LessonFlowNotifier extends Notifier<LessonFlowState> {
   /// (e.g. via Exit Exam completion or when masteryCheck has no standalone questions).
   ///
   /// Anti-cheating & Educational Measurement Integrity (F-05):
+  /// - Case 0: If [submitPractice] already recorded [state.masteryResult], return it directly
+  ///   so 6-step completion never writes duplicate activity/evidence rows.
   /// - Case 1: If empirical assessment score exists (`state.lastScorePercent != null`),
   ///   record it faithfully. Preserves exact actual score (including 0.0).
   /// - Case 2: If no mastery exam was taken (`state.lastScorePercent == null`),
@@ -110,7 +123,16 @@ class LessonFlowNotifier extends Notifier<LessonFlowState> {
   /// - Case 3: Sanitize invalid numbers (NaN, infinite, negative, or > 1.0) by clamping to [0.0, 1.0].
   Future<MasteryUpdateResult> completeLesson({
     double defaultScorePercent = 0.85,
+    List<Map<String, dynamic>>? questionResults,
+    int durationMs = 0,
   }) async {
+    if (state.masteryResult != null) {
+      if (ref.mounted) {
+        _invalidateCrossTabProviders(state.masteryResult!.isPassed);
+      }
+      return state.masteryResult!;
+    }
+
     final masteryEngine = ref.read(masteryEngineProvider);
 
     double candidateScore;
@@ -130,20 +152,39 @@ class LessonFlowNotifier extends Notifier<LessonFlowState> {
     final result = await masteryEngine.recordLessonAttempt(
       lessonId: state.lessonId,
       scorePercent: scoreToRecord,
+      questionResults: questionResults,
+      durationMs: durationMs,
     );
 
     if (ref.mounted) {
       state = state.copyWith(
         isCompleted: result.isPassed,
         lastScorePercent: scoreToRecord,
+        masteryResult: result,
       );
-
-      if (result.isPassed) {
-        ref.invalidate(hasCompletedLessonsProvider);
-      }
+      _invalidateCrossTabProviders(result.isPassed);
     }
 
     return result;
+  }
+
+  void _tryInvalidate(void Function() fn) {
+    try {
+      fn();
+    } catch (_) {}
+  }
+
+  void _invalidateCrossTabProviders(bool isPassed) {
+    _tryInvalidate(() => ref.invalidate(hasCompletedLessonsProvider));
+    _tryInvalidate(() => ref.invalidate(homeDashboardProvider));
+    _tryInvalidate(() => ref.invalidate(userProfileProvider));
+    _tryInvalidate(() => ref.invalidate(srsDueCountProvider));
+    _tryInvalidate(() => ref.invalidate(curriculumUnitsProvider));
+    _tryInvalidate(() => ref.invalidate(curriculumUnitsWithLessonsProvider));
+    _tryInvalidate(() => ref.invalidate(allCurriculumLessonsProvider));
+    _tryInvalidate(() => ref.invalidate(curriculumLessonsProvider));
+    _tryInvalidate(() => ref.invalidate(lessonDetailProvider));
+    _tryInvalidate(() => ref.invalidate(adaptiveRoadmapProvider));
   }
 }
 

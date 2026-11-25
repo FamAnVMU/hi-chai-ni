@@ -137,14 +137,11 @@ class PracticeScoringEngine {
       );
     }
 
-    final normResponse = _normalize(response);
-    final acceptable = <String>{};
-    if (definition.blankAnswer != null) acceptable.add(_normalize(definition.blankAnswer!));
-    for (final a in definition.acceptableAnswers) {
-      acceptable.add(_normalize(a));
-    }
+    final acceptable = <String>[];
+    if (definition.blankAnswer != null) acceptable.add(definition.blankAnswer!);
+    acceptable.addAll(definition.acceptableAnswers);
 
-    final isCorrect = acceptable.contains(normResponse);
+    final isCorrect = acceptable.any((target) => _matchesAnswer(response, target));
     final primaryTarget = definition.blankAnswer ?? definition.acceptableAnswers.firstOrNull ?? '';
 
     return ScoringResult(
@@ -265,12 +262,14 @@ class PracticeScoringEngine {
       );
     }
 
-    // Step 1: Deterministic check against exact target & acceptable list
+    // Step 1: Deterministic check against exact target & acceptable list (including spaceless/toneless Pinyin tolerance)
     final normResponse = _normalize(response);
-    final targetNorm = _normalize(definition.targetSentence ?? '');
-    final acceptable = definition.acceptableAnswers.map(_normalize).toSet();
+    final exactCandidates = <String>[
+      if (definition.targetSentence != null) definition.targetSentence!,
+      ...definition.acceptableAnswers,
+    ];
 
-    if (normResponse == targetNorm || acceptable.contains(normResponse)) {
+    if (exactCandidates.any((target) => _matchesAnswer(response, target))) {
       return ScoringResult(
         isCorrect: true,
         score: 1.0,
@@ -358,5 +357,43 @@ class PracticeScoringEngine {
         .replaceAll('！', '')
         .replaceAll('？', '')
         .replaceAll('、', '');
+  }
+
+  static final RegExp _toneDiacriticRegex = RegExp(
+    r'[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜńňǹ]',
+    caseSensitive: false,
+  );
+
+  bool _matchesAnswer(String input, String target) {
+    final normInput = _normalize(input);
+    final normTarget = _normalize(target);
+    if (normInput == normTarget) return true;
+    // Allow toneless/spaceless Pinyin only when learner did not supply conflicting tone diacritics
+    if (!_toneDiacriticRegex.hasMatch(normInput)) {
+      final looseInput = _normalizePinyinLoose(normInput);
+      final looseTarget = _normalizePinyinLoose(normTarget);
+      if (looseInput.isNotEmpty && looseInput == looseTarget) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  String _normalizePinyinLoose(String normalized) {
+    const map = <String, String>{
+      'ā': 'a', 'á': 'a', 'ǎ': 'a', 'à': 'a',
+      'ē': 'e', 'é': 'e', 'ě': 'e', 'è': 'e',
+      'ī': 'i', 'í': 'i', 'ǐ': 'i', 'ì': 'i',
+      'ō': 'o', 'ó': 'o', 'ǒ': 'o', 'ò': 'o',
+      'ū': 'u', 'ú': 'u', 'ǔ': 'u', 'ù': 'u',
+      'ǖ': 'v', 'ǘ': 'v', 'ǚ': 'v', 'ǜ': 'v', 'ü': 'v',
+      'ń': 'n', 'ň': 'n', 'ǹ': 'n',
+    };
+    final buf = StringBuffer();
+    for (final rune in normalized.runes) {
+      final ch = String.fromCharCode(rune);
+      buf.write(map[ch] ?? ch);
+    }
+    return buf.toString();
   }
 }

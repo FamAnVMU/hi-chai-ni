@@ -1,5 +1,8 @@
+import 'dart:convert';
+import 'dart:isolate';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../hanzi/data/hanzi_dao.dart';
 import '../../../hanzi/domain/models/hanzi_models.dart';
 import '../models/stroke_models.dart';
@@ -9,8 +12,47 @@ import '../models/stroke_models.dart';
 class HanziStrokeBank {
   final HanziDao? _hanziDao;
   static final Map<String, HanziStrokeData> _dynamicCache = {};
+  static Future<void>? _seedFuture;
+  static bool _isSeedChecked = false;
 
   const HanziStrokeBank([this._hanziDao]);
+
+  Future<void> _ensureSeedLoaded() async {
+    final dao = _hanziDao;
+    if (dao == null || _isSeedChecked) return;
+    if (_seedFuture != null) {
+      await _seedFuture;
+      return;
+    }
+
+    _seedFuture = () async {
+      try {
+        final existingCount = await dao.countCharacters();
+        if (existingCount > 0) {
+          _isSeedChecked = true;
+          return;
+        }
+        final jsonStr = await rootBundle.loadString('assets/data/hanzi_stroke_data.json');
+        final characters = await Isolate.run(() {
+          final data = jsonDecode(jsonStr) as Map<String, dynamic>;
+          final rawChars = data['characters'] as List<dynamic>;
+          return rawChars
+              .map((item) => HanziCharacter.fromJson(item as Map<String, dynamic>))
+              .toList();
+        });
+        if (characters.isNotEmpty) {
+          await dao.insertCharactersBatch(characters);
+        }
+        _isSeedChecked = true;
+      } catch (_) {
+        // Leave _isSeedChecked false when bundle is unavailable in isolated unit tests
+      } finally {
+        _seedFuture = null;
+      }
+    }();
+
+    await _seedFuture;
+  }
 
   static final Map<String, HanziStrokeData> _verifiedBank = {
     // 1. 一 (1 stroke: 横)
@@ -283,6 +325,7 @@ class HanziStrokeBank {
 
     // 3. Shared HanziDao database lookup
     if (_hanziDao != null) {
+      await _ensureSeedLoaded();
       final hanziChar = await _hanziDao.getCharacter(char);
       if (hanziChar != null) {
         final strokeData = _convertFromHanziCharacter(hanziChar);
@@ -430,17 +473,24 @@ class HanziStrokeBank {
   /// List of verified characters available immediately without DB access.
   List<String> get availableCharacters => _verifiedBank.keys.toList();
 
-  /// Retrieves available characters from shared Hanzi database.
+  /// Retrieves available characters from shared Hanzi database and pre-populates cache metadata.
   Future<List<String>> getAvailableCharactersAsync({
     int limit = 100,
     int offset = 0,
     int? hskLevel,
   }) async {
     if (_hanziDao != null) {
+      await _ensureSeedLoaded();
       final list = hskLevel != null
           ? await _hanziDao.getCharactersByHskLevel(hskLevel, limit: limit, offset: offset)
           : await _hanziDao.getCharactersByHskLevel(1, limit: limit, offset: offset);
       if (list.isNotEmpty) {
+        for (final c in list) {
+          if (!_verifiedBank.containsKey(c.character) &&
+              !_dynamicCache.containsKey(c.character)) {
+            _dynamicCache[c.character] = _convertFromHanziCharacter(c);
+          }
+        }
         return list.map((c) => c.character).toList();
       }
     }

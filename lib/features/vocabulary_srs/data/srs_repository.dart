@@ -252,7 +252,8 @@ class SrsRepository {
              v.id AS vocab_id, v.simplified, v.traditional, v.pinyin, v.hsk_level, v.stroke_count, v.radicals, v.audio_uri,
              vs.part_of_speech, vs.meaning_vi, vs.example_cn, vs.example_pinyin, vs.example_vi
       FROM ${DatabaseConstants.tableSrsItems} s
-      INNER JOIN ${DatabaseConstants.tableVocabularies} v ON s.content_id = v.id
+      INNER JOIN ${DatabaseConstants.tableVocabularies} v
+        ON (s.content_id = v.id OR s.content_id = v.simplified)
       LEFT JOIN ${DatabaseConstants.tableVocabularySenses} vs ON vs.id = (
         SELECT vs2.id
         FROM ${DatabaseConstants.tableVocabularySenses} vs2
@@ -261,6 +262,7 @@ class SrsRepository {
         LIMIT 1
       )
       WHERE $whereClause
+      GROUP BY s.id
       ORDER BY s.due_at ASC
       LIMIT $limit
     ''';
@@ -396,19 +398,24 @@ class SrsRepository {
     final asOfUtc = (asOf ?? now).toUtc().toIso8601String();
     int count = 0;
 
-    if (hskLevel != null && contentType == 'vocabulary') {
+    if (contentType == 'vocabulary') {
+      final levelFilter = hskLevel != null ? 'AND v.hsk_level = ?' : '';
+      final args = hskLevel != null
+          ? [contentType, asOfUtc, hskLevel]
+          : [contentType, asOfUtc];
       final result = await _db.rawQuery(
         '''
         SELECT COUNT(DISTINCT s.id) as count 
         FROM ${DatabaseConstants.tableSrsItems} s
-        INNER JOIN ${DatabaseConstants.tableVocabularies} v ON (s.content_id = v.id OR s.content_id = v.simplified)
+        INNER JOIN ${DatabaseConstants.tableVocabularies} v
+          ON (s.content_id = v.id OR s.content_id = v.simplified)
         WHERE s.content_type = ? 
           AND s.due_at <= ? 
           AND s.deleted_at IS NULL 
           AND v.deleted_at IS NULL 
-          AND v.hsk_level = ?
+          $levelFilter
         ''',
-        [contentType, asOfUtc, hskLevel],
+        args,
       );
       count = (result.first['count'] as num?)?.toInt() ?? 0;
     } else {

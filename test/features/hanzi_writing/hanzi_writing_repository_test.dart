@@ -103,5 +103,34 @@ void main() {
       expect(metadataJson.length, lessThan(1000));
       expect(metadataJson.contains('base64'), isFalse);
     });
+
+    test('3. recordWritingSession upserts hanzi_writing_progress mastery row', () async {
+      const evalPass = WritingEvaluationResult(
+        strokeOrderAccuracy: 1.0,
+        correctStrokeCount: 2,
+        totalStandardStrokes: 2,
+        userDrawnStrokesCount: 2,
+        isTracingMode: false,
+        strokeFeedbackList: ['Nét 1 chuẩn', 'Nét 2 chuẩn'],
+        overallVerdict: 'Hoàn hảo!',
+        hasStandardStrokeData: true,
+      );
+
+      await repository.recordWritingSession(
+        character: '十',
+        evaluation: evalPass,
+        durationMs: 6000,
+      );
+
+      final progressRows = await db.query(
+        DatabaseConstants.tableHanziWritingProgress,
+        where: 'character = ?',
+        whereArgs: ['十'],
+      );
+      expect(progressRows, hasLength(1));
+      expect(progressRows.first['test_count'], equals(1));
+      expect(progressRows.first['mastery_level'], equals('mastered'));
+      expect((progressRows.first['best_accuracy_score'] as num).toDouble(), closeTo(100.0, 0.01));
+    });
   });
 }

@@ -29,39 +29,77 @@ class CurriculumRepository {
     return maps.map((m) => CurriculumUnit.fromMap(m)).toList();
   }
 
+  static int _exitEviSeq = 0;
+
   Future<List<CurriculumUnit>> getUnitsWithLessons(String curriculumId) async {
-    final unitMaps = await _curriculumDao.getUnitsByCurriculumId(curriculumId);
-    if (unitMaps.isEmpty) return [];
+    final rows = await _curriculumDao.getLessonsSummaryByCurriculumId(curriculumId);
+    if (rows.isEmpty) return [];
 
-    final masteryMap = <String, double>{};
-    try {
-      final masteryRows = await _db.query(
-        DatabaseConstants.tableCurriculumMastery,
-        columns: ['item_id', 'score'],
-      );
-      for (final r in masteryRows) {
-        final itemId = r['item_id'] as String?;
-        if (itemId != null) {
-          masteryMap[itemId] = (r['score'] as num?)?.toDouble() ?? 0.0;
-        }
-      }
-    } catch (_) {}
+    final unitOrder = <String>[];
+    final unitRowsById = <String, Map<String, dynamic>>{};
+    final lessonsByUnitId = <String, List<CurriculumLesson>>{};
 
-    final results = <CurriculumUnit>[];
-    for (final uMap in unitMaps) {
-      final unitId = uMap['id'] as String;
-      final lessonMaps = await _curriculumDao.getLessonsByUnitId(unitId);
-      final lessons = <CurriculumLesson>[];
-      for (final lMap in lessonMaps) {
-        final lessonId = lMap['id'] as String;
-        final segmentMaps = await _curriculumDao.getSegmentsByLessonId(lessonId);
-        final segments = segmentMaps.map((s) => LessonSegment.fromMap(s)).toList();
-        final score = masteryMap[lessonId] ?? 0.0;
-        lessons.add(CurriculumLesson.fromMap(lMap, segments: segments, masteryScore: score));
+    for (final row in rows) {
+      final unitId = row['unit_id'] as String?;
+      if (unitId == null) continue;
+
+      if (!unitRowsById.containsKey(unitId)) {
+        unitOrder.add(unitId);
+        unitRowsById[unitId] = {
+          'id': unitId,
+          'curriculum_id': row['curriculum_id'] ?? curriculumId,
+          'order_index': row['unit_order_index'] ?? 0,
+          'title_vi': row['unit_title_vi'] ?? '',
+          'title_zh': row['unit_title_zh'] ?? '',
+          'description_vi': row['unit_description_vi'],
+          'icon_name': row['unit_icon_name'],
+          'is_locked': row['unit_is_locked'] ?? 0,
+        };
+        lessonsByUnitId[unitId] = <CurriculumLesson>[];
       }
-      results.add(CurriculumUnit.fromMap(uMap, lessons: lessons));
+
+      final lessonId = row['lesson_id'] as String?;
+      if (lessonId != null) {
+        final normalizedLesson = <String, dynamic>{
+          'id': lessonId,
+          'unit_id': unitId,
+          'order_index': row['lesson_order_index'] ?? 0,
+          'title_vi': row['lesson_title_vi'] ?? '',
+          'title_zh': row['lesson_title_zh'] ?? '',
+          'pinyin': row['lesson_pinyin'] ?? '',
+          'estimated_minutes': row['lesson_estimated_minutes'] ?? 15,
+          'is_locked': row['lesson_is_locked'] ?? 1,
+          'unlock_score_threshold': row['lesson_unlock_score_threshold'] ?? 0.8,
+          'prerequisites_json': row['lesson_prerequisites_json'],
+          'status': row['lesson_status'] ?? 'not_started',
+          'completed_at': row['lesson_completed_at'],
+          'credited_reason': row['lesson_credited_reason'],
+        };
+        final score = (row['mastery_score'] as num?)?.toDouble() ?? 0.0;
+        lessonsByUnitId[unitId]!.add(
+          CurriculumLesson.fromMap(
+            normalizedLesson,
+            segments: const [],
+            masteryScore: score,
+          ),
+        );
+      }
     }
-    return results;
+
+    return unitOrder
+        .map(
+          (unitId) => CurriculumUnit.fromMap(
+            unitRowsById[unitId]!,
+            lessons: lessonsByUnitId[unitId] ?? const [],
+          ),
+        )
+        .toList();
+  }
+
+  /// Fetches segments (with resolved `content_payload`) for a single lesson on demand.
+  Future<List<LessonSegment>> getLessonSegments(String lessonId) async {
+    final segmentMaps = await _curriculumDao.getSegmentsByLessonId(lessonId);
+    return segmentMaps.map((s) => LessonSegment.fromMap(s)).toList();
   }
 
   Future<List<CurriculumLesson>> getLessons(String unitId) async {
@@ -178,10 +216,11 @@ class CurriculumRepository {
       }
 
       // 2. Persist to learning_activities (sustains Home streak)
+      final seq = ++_exitEviSeq;
       await executor.insert(
         DatabaseConstants.tableLearningActivities,
         {
-          'id': 'act_exit_exam_${hskLevel}_${DateTime.now().millisecondsSinceEpoch}',
+          'id': 'act_exit_exam_${hskLevel}_${now.microsecondsSinceEpoch}_$seq',
           'activity_type': 'exit_exam',
           'duration_seconds': durationSeconds > 0 ? durationSeconds : 60,
           'items_count': itemsCount,
@@ -196,7 +235,7 @@ class CurriculumRepository {
       await executor.insert(
         DatabaseConstants.tableLearnerEvidence,
         {
-          'id': 'evi_exit_exam_${hskLevel}_${DateTime.now().millisecondsSinceEpoch}',
+          'id': 'EVI_EXIT_${now.microsecondsSinceEpoch}_${seq}_hsk$hskLevel',
           'srs_item_id': null,
           'content_id': itemId,
           'content_type': 'exit_exam',
@@ -216,15 +255,44 @@ class CurriculumRepository {
         conflictAlgorithm: ConflictAlgorithm.ignore,
       );
 
-      // 4. If passed, unlock next level
+      // 4. If passed, promote user profile / goal and unlock next level
       if (isPassed) {
+        final nextLevel = (hskLevel + 1).clamp(1, 6);
         try {
-          final unlockHandler = PlacementUnlockHandler(executor);
-          await unlockHandler.unlockForRecommendedLevel(
-            hskLevel + 1,
-            startingLessonOrder: 1,
+          await executor.rawUpdate(
+            '''
+            UPDATE ${DatabaseConstants.tableUserProfiles}
+            SET current_hsk_level = CASE
+                  WHEN COALESCE(current_hsk_level, 1) < ? THEN ?
+                  ELSE COALESCE(current_hsk_level, 1)
+                END,
+                updated_at = ?
+            ''',
+            [nextLevel, nextLevel, nowIso],
+          );
+          await executor.rawUpdate(
+            '''
+            UPDATE ${DatabaseConstants.tableLearnerGoals}
+            SET target_hsk_level = CASE
+                  WHEN target_hsk_level < ? THEN ?
+                  ELSE target_hsk_level
+                END,
+                updated_at = ?
+            WHERE is_active = 1
+            ''',
+            [nextLevel, nextLevel, nowIso],
           );
         } catch (_) {}
+
+        if (hskLevel < 6) {
+          try {
+            final unlockHandler = PlacementUnlockHandler(executor);
+            await unlockHandler.unlockForRecommendedLevel(
+              nextLevel,
+              startingLessonOrder: 1,
+            );
+          } catch (_) {}
+        }
       }
     }
 

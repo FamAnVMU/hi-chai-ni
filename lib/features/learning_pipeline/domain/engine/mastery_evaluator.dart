@@ -59,7 +59,7 @@ class MasteryEvaluator {
           // Verify spaced interval if available in metadata
           final newInterval = (ev.metadata['new_interval'] as num?)?.toInt() ?? 0;
           final quality = (ev.metadata['quality'] as num?)?.toInt() ?? 0;
-          if (newInterval >= 5 || quality >= 4) {
+          if (newInterval >= 6 && quality >= 4) {
             successfulRetentions++;
           } else {
             successfulApplications++;

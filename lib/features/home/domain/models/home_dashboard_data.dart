@@ -9,7 +9,10 @@ enum ActivityType {
   hanziWriting,
   pronunciationShadowing,
   reading,
-  dictionary;
+  dictionary,
+  practice,
+  exitExam,
+  placementTest;
 
   String get labelVi {
     switch (this) {
@@ -27,6 +30,12 @@ enum ActivityType {
         return 'Đọc hiểu ngữ cảnh';
       case ActivityType.dictionary:
         return 'Tra cứu từ điển';
+      case ActivityType.practice:
+        return 'Luyện tập tổng hợp';
+      case ActivityType.exitExam:
+        return 'Kiểm tra cấp độ HSK';
+      case ActivityType.placementTest:
+        return 'Kiểm tra xếp lớp';
     }
   }
 
@@ -35,12 +44,14 @@ enum ActivityType {
       case 'srs_review':
       case 'srs_flashcard':
       case 'srs':
+      case 'vocabulary_srs':
         return ActivityType.srsReview;
       case 'ai_tutor':
       case 'ai_chat':
       case 'tutor':
         return ActivityType.aiTutor;
       case 'lesson':
+      case 'lesson_completion':
       case 'curriculum':
         return ActivityType.lesson;
       case 'hanzi_writing':
@@ -48,10 +59,22 @@ enum ActivityType {
         return ActivityType.hanziWriting;
       case 'shadowing':
       case 'pronunciation':
+      case 'listening':
         return ActivityType.pronunciationShadowing;
       case 'reading':
       case 'passage':
         return ActivityType.reading;
+      case 'dictionary':
+        return ActivityType.dictionary;
+      case 'practice':
+      case 'grammar':
+      case 'writing':
+        return ActivityType.practice;
+      case 'exit_exam':
+        return ActivityType.exitExam;
+      case 'cat_placement_test':
+      case 'placement_test':
+        return ActivityType.placementTest;
       default:
         return ActivityType.lesson;
     }

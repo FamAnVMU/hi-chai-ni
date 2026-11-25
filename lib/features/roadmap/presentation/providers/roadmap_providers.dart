@@ -5,7 +5,7 @@ import '../../domain/models/roadmap_models.dart';
 
 /// Provider for the [RoadmapRepository]
 final roadmapRepositoryProvider = Provider<RoadmapRepository>((ref) {
-  final db = AppDatabase.instance.database;
+  final db = ref.watch(appDatabaseProvider).database;
   return DefaultRoadmapRepository(db);
 });
 

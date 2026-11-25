@@ -8,6 +8,7 @@ class HomeQuickActionsGrid extends StatelessWidget {
   final VoidCallback onNavigateReview;
   final VoidCallback onNavigateAiTutor;
   final bool hasCompletedLessons;
+  final bool hasSrsCards;
 
   const HomeQuickActionsGrid({
     super.key,
@@ -15,11 +16,13 @@ class HomeQuickActionsGrid extends StatelessWidget {
     required this.onNavigateReview,
     required this.onNavigateAiTutor,
     this.hasCompletedLessons = false,
+    this.hasSrsCards = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final canReview = hasCompletedLessons || hasSrsCards;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,11 +52,11 @@ class HomeQuickActionsGrid extends StatelessWidget {
               child: _buildActionTile(
                 context: context,
                 icon: Icons.psychology_rounded,
-                iconColor: hasCompletedLessons ? AppColors.warning : AppColors.secondaryText,
+                iconColor: canReview ? AppColors.warning : AppColors.secondaryText,
                 title: 'Ôn tập thẻ',
-                subtitle: hasCompletedLessons ? 'Thuật toán SM-2' : 'Chưa có bài học',
+                subtitle: canReview ? 'Thuật toán SM-2' : 'Chưa có bài học',
                 onTap: () {
-                  if (!hasCompletedLessons) {
+                  if (!canReview) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text(

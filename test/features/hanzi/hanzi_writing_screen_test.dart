@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hi_chinese/features/hanzi/data/hanzi_repository.dart';
 import 'package:hi_chinese/features/hanzi/domain/models/hanzi_models.dart';
 import 'package:hi_chinese/features/hanzi/presentation/screens/hanzi_character_list_screen.dart';
-import 'package:hi_chinese/features/hanzi/presentation/screens/hanzi_writing_screen.dart';
+import 'package:hi_chinese/features/hanzi_writing/hanzi_writing.dart';
 
 class FakeHanziRepository implements HanziRepository {
   final Map<String, HanziCharacter> _chars = {};
@@ -106,46 +107,39 @@ void main() {
       fakeRepo = FakeHanziRepository();
     });
 
-    testWidgets('HanziWritingScreen renders character glyph, pinyin, and mode tabs', (tester) async {
+    testWidgets('Unified HanziWritingScreen renders character glyph, pinyin, and writing mode controls', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: HanziWritingScreen(
-            initialCharacter: '你',
-            wordCharacters: const ['你', '好'],
-            wordTitle: '你好',
-            repository: fakeRepo,
+        const ProviderScope(
+          child: MaterialApp(
+            home: HanziWritingScreen(
+              initialCharacter: '十',
+            ),
           ),
         ),
       );
 
       await tester.pumpAndSettle();
 
-      // Verify header contents
-      expect(find.text('你'), findsWidgets);
-      expect(find.text('nǐ'), findsOneWidget);
-      expect(find.text('(nhĩ)'), findsOneWidget);
-      expect(find.text('HSK 1'), findsOneWidget);
+      // Verify header contents from unified hanzi_writing screen
+      expect(find.text('Luyện Viết Chữ Hán'), findsOneWidget);
+      expect(find.text('十'), findsWidgets);
+      expect(find.text('shí'), findsOneWidget);
+      expect(find.text('2 nét'), findsOneWidget);
 
-      // Verify mode tabs
-      expect(find.text('Học viết'), findsOneWidget);
-      expect(find.text('Luyện tập'), findsOneWidget);
-      expect(find.text('Kiểm tra'), findsOneWidget);
-
-      // Switch to Practice Mode
-      await tester.tap(find.text('Luyện tập'));
-      await tester.pumpAndSettle();
-
-      expect(find.byTooltip('Gợi ý nét'), findsOneWidget);
-      expect(find.byTooltip('Xóa nét trước'), findsOneWidget);
-      expect(find.byTooltip('Viết lại từ đầu'), findsOneWidget);
+      // Verify writing mode controls
+      expect(find.text('Tô mẫu'), findsOneWidget);
+      expect(find.text('Tự viết'), findsOneWidget);
+      expect(find.byType(HanziCanvas), findsOneWidget);
     });
 
     testWidgets('HanziCharacterListScreen displays character card and search input', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: HanziCharacterListScreen(
-            repository: fakeRepo,
-            initialHskLevel: 1,
+        ProviderScope(
+          child: MaterialApp(
+            home: HanziCharacterListScreen(
+              repository: fakeRepo,
+              initialHskLevel: 1,
+            ),
           ),
         ),
       );

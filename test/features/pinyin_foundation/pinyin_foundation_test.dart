@@ -174,5 +174,38 @@ void main() {
       final vocabSkill = intermediateResult.skillScores[CatSkill.vocabulary]!;
       expect(vocabSkill.accuracyRate, 0.85); // Vocabulary score is NOT modified
     });
+
+    test('Test C - Every PinyinItem is mapped to an exercise and listenInputPinyin normalizes spaces', () {
+      final units = repository.getUnits();
+      final itemIds = <String>{};
+      final mappedExerciseItemIds = <String>{};
+
+      for (final unit in units) {
+        for (final lesson in unit.lessons) {
+          for (final item in lesson.items) {
+            itemIds.add(item.id);
+          }
+          for (final ex in lesson.exercises) {
+            final targetId = ex.metadata['item_id'];
+            if (targetId is String && targetId.isNotEmpty) {
+              mappedExerciseItemIds.add(targetId);
+            }
+          }
+        }
+      }
+
+      expect(itemIds.length, equals(42));
+      for (final id in itemIds) {
+        expect(mappedExerciseItemIds, contains(id), reason: 'Missing exercise metadata for $id');
+      }
+
+      const engine = PinyinExerciseEngine();
+      final xiexieEx = repository
+          .getLessonById('pinyin_lesson_6_1')!
+          .exercises
+          .firstWhere((e) => e.id == 'p_ex_6_1_1');
+      expect(engine.evaluate(exercise: xiexieEx, submission: 'xiè xie').isCorrect, isTrue);
+      expect(engine.evaluate(exercise: xiexieEx, submission: 'xiexie').isCorrect, isFalse);
+    });
   });
 }

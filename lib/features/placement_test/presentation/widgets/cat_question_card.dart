@@ -1,4 +1,9 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../../../../core/audio/audio_recorder_service.dart';
+import '../../../../core/audio/tts_service.dart';
+import '../../../../core/audio/unified_audio_playback_service.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/models/cat_item.dart';
 import '../../domain/models/cat_skill.dart';
@@ -20,23 +25,150 @@ class CatQuestionCard extends StatefulWidget {
 
 class _CatQuestionCardState extends State<CatQuestionCard> {
   final TextEditingController _textController = TextEditingController();
+  late List<int> _shuffledIndices;
   int? _selectedOptionIndex;
-  bool _isSpeakingSimulated = false;
+  bool _isSpeakingActive = false;
+  bool _hasRecordedAttempt = false;
+  String? _recordingStatusText;
+  DefaultTtsService? _tts;
+  AudioRecorderService? _recorder;
+
+  @override
+  void initState() {
+    super.initState();
+    _shuffledIndices = _buildShuffledIndices(widget.item);
+  }
+
+  List<int> _buildShuffledIndices(CatItem item) {
+    final indices = List<int>.generate(item.options.length, (i) => i);
+    if (indices.length > 1) {
+      indices.shuffle(math.Random(item.id.hashCode));
+    }
+    return indices;
+  }
 
   @override
   void didUpdateWidget(covariant CatQuestionCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.item.id != widget.item.id) {
       _textController.clear();
+      _shuffledIndices = _buildShuffledIndices(widget.item);
       _selectedOptionIndex = null;
-      _isSpeakingSimulated = false;
+      _isSpeakingActive = false;
+      _hasRecordedAttempt = false;
+      _recordingStatusText = null;
     }
   }
 
   @override
   void dispose() {
     _textController.dispose();
+    _recorder?.dispose();
     super.dispose();
+  }
+
+  String _extractSpokenFallback(CatItem item) {
+    const itemAudioText = <String, String>{
+      'TONE_001': 'mā, mà',
+      'TONE_002': 'mí, mǐ',
+      'PIN_001': '妈',
+      'PIN_002': '你',
+      'PIN_003': '好',
+      'LIST_001': '谢谢',
+      'LIST_002': '请问，洗手间在哪里？',
+      'LIST_003': '服务员，请给我两双筷子。',
+    };
+    if (itemAudioText.containsKey(item.id)) {
+      return itemAudioText[item.id]!;
+    }
+    if (item.correctAnswerText != null && item.correctAnswerText!.trim().isNotEmpty) {
+      return item.correctAnswerText!.trim();
+    }
+    if (item.annotatedPrompt != null && item.annotatedPrompt!.isNotEmpty) {
+      return item.annotatedPrompt!.replaceAll(RegExp(r'\[[^\]]*\]'), '').trim();
+    }
+    final zhMatches =
+        RegExp(r'[\u4e00-\u9fff]+').allMatches(item.explanationVi).map((m) => m.group(0)!).toList();
+    if (zhMatches.isNotEmpty) {
+      return zhMatches.join('，');
+    }
+    return item.prompt;
+  }
+
+  Future<void> _playItemAudio(CatItem item) async {
+    final uri = item.audioUri;
+    if (uri != null && uri.isNotEmpty) {
+      try {
+        if (uri.startsWith('assets/')) {
+          // Verify asset exists before invoking audio plugin
+          await rootBundle.load(uri);
+        }
+        await UnifiedAudioPlaybackService.instance.playAudio(uri);
+        return;
+      } catch (_) {
+        // Fall through cleanly to TTS synthesis if audio asset is missing offline
+      }
+    }
+
+    final text = _extractSpokenFallback(item);
+    try {
+      _tts ??= DefaultTtsService();
+      await _tts!.speak(text, language: 'zh-CN');
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Không thể phát âm thanh lúc này.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _toggleSpeakingRecording(CatItem item) async {
+    if (_isSpeakingActive) {
+      String? recordedPath;
+      try {
+        recordedPath = await _recorder?.stopRecording();
+      } catch (_) {
+        recordedPath = null;
+      }
+      if (!mounted) return;
+      setState(() {
+        _isSpeakingActive = false;
+        _hasRecordedAttempt = true;
+        _recordingStatusText = recordedPath != null
+            ? 'Đã lưu bản ghi âm. Vui lòng tự đánh giá hoặc gửi kiểm tra bên dưới.'
+            : 'Đã hoàn tất lượt đọc thử. Vui lòng chọn mức tự đánh giá bên dưới.';
+      });
+      return;
+    }
+
+    setState(() {
+      _isSpeakingActive = true;
+      _recordingStatusText = 'Đang chuẩn bị micro...';
+    });
+
+    try {
+      _recorder ??= DefaultAudioRecorderService();
+      await _recorder!.startRecording();
+      if (mounted) {
+        setState(() {
+          _recordingStatusText = 'Đang ghi âm... Hãy đọc to câu mẫu rồi nhấn dừng.';
+        });
+      }
+    } catch (_) {
+      // Simulator / desktop without mic hardware: still allow reference audio + honest self-assessment
+      if (mounted) {
+        setState(() {
+          _isSpeakingActive = false;
+          _hasRecordedAttempt = true;
+          _recordingStatusText =
+              'Thiết bị chưa sẵn sàng micro. Hãy nghe phát âm mẫu và tự đánh giá bên dưới.';
+        });
+      }
+    }
   }
 
   @override
@@ -104,15 +236,7 @@ class _CatQuestionCardState extends State<CatQuestionCard> {
                   IconButton.filled(
                     icon: const Icon(Icons.volume_up_rounded),
                     tooltip: 'Nghe lại phát âm',
-                    onPressed: () {
-                      // Audio trigger (handled via AudioService / TTS)
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Đang phát âm thanh bài kiểm tra...'),
-                          duration: Duration(seconds: 1),
-                        ),
-                      );
-                    },
+                    onPressed: () => _playItemAudio(item),
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
@@ -130,18 +254,19 @@ class _CatQuestionCardState extends State<CatQuestionCard> {
           ],
 
           // Formats:
-          // A. Multiple Choice & Stroke Order
+          // A. Multiple Choice & Stroke Order (shuffled deterministically, preserving original index)
           if (item.options.isNotEmpty) ...[
-            ...List.generate(item.options.length, (index) {
-              final optionText = item.options[index];
-              final isSelected = _selectedOptionIndex == index;
+            ...List.generate(_shuffledIndices.length, (displayPos) {
+              final originalIndex = _shuffledIndices[displayPos];
+              final optionText = item.options[originalIndex];
+              final isSelected = _selectedOptionIndex == originalIndex;
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                 child: InkWell(
                   onTap: () {
-                    setState(() => _selectedOptionIndex = index);
-                    widget.onAnswerSubmitted(index);
+                    setState(() => _selectedOptionIndex = originalIndex);
+                    widget.onAnswerSubmitted(originalIndex);
                   },
                   borderRadius: AppRadius.borderMd,
                   child: Container(
@@ -169,7 +294,7 @@ class _CatQuestionCardState extends State<CatQuestionCard> {
                               ? AppColors.primaryBlueDark
                               : AppColors.inputBackground,
                           child: Text(
-                            String.fromCharCode(65 + index), // A, B, C, D
+                            String.fromCharCode(65 + displayPos), // A, B, C, D
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: isSelected ? Colors.white : AppColors.secondaryText,
                               fontWeight: FontWeight.bold,
@@ -227,38 +352,72 @@ class _CatQuestionCardState extends State<CatQuestionCard> {
                 borderRadius: AppRadius.borderMd,
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Icon(
-                    _isSpeakingSimulated ? Icons.mic_rounded : Icons.mic_none_rounded,
-                    color: _isSpeakingSimulated ? Colors.redAccent : AppColors.primaryBlueDark,
-                    size: AppDimensions.iconXl,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        _isSpeakingActive ? Icons.mic_rounded : Icons.mic_none_rounded,
+                        color: _isSpeakingActive ? Colors.redAccent : AppColors.primaryBlueDark,
+                        size: AppDimensions.iconXl,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      IconButton.outlined(
+                        icon: const Icon(Icons.volume_up_rounded),
+                        tooltip: 'Nghe phát âm mẫu',
+                        onPressed: () => _playItemAudio(item),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    _isSpeakingSimulated ? 'Đang gửi bản ghi âm...' : 'Nhấn micro và đọc to câu trên',
+                    _recordingStatusText ??
+                        'Nhấn ghi âm để đọc to câu trên, nghe mẫu để đối chiếu và tự đánh giá trung thực',
                     style: theme.textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    'Bản ghi âm sẽ được lưu và chuyển trạng thái "Chờ kiểm tra"',
-                    style: theme.textTheme.bodySmall?.copyWith(color: AppColors.secondaryText),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacing.md),
                   HiButton(
-                    text: _isSpeakingSimulated ? 'Đã ghi nhận (Chờ kiểm tra)' : 'Bắt đầu phát âm',
-                    variant: HiButtonVariant.primary,
-                    onPressed: _isSpeakingSimulated
-                        ? null
-                        : () {
-                            setState(() => _isSpeakingSimulated = true);
-                            Future.delayed(const Duration(milliseconds: 1000), () {
-                              if (mounted) {
-                                widget.onAnswerSubmitted('speech_sample_recorded');
-                              }
-                            });
-                          },
+                    text: _isSpeakingActive ? 'Dừng ghi âm' : 'Bắt đầu ghi âm',
+                    icon: Icon(_isSpeakingActive ? Icons.stop_rounded : Icons.mic_rounded),
+                    variant: _isSpeakingActive ? HiButtonVariant.secondary : HiButtonVariant.primary,
+                    onPressed: () => _toggleSpeakingRecording(item),
                   ),
+                  if (_hasRecordedAttempt || !_isSpeakingActive) ...[
+                    const SizedBox(height: AppSpacing.md),
+                    Text(
+                      'Tự đánh giá khả năng đọc của bạn:',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    HiButton(
+                      text: 'Đọc đúng & rõ thanh điệu',
+                      variant: HiButtonVariant.primary,
+                      onPressed: _isSpeakingActive
+                          ? null
+                          : () => widget.onAnswerSubmitted('passed'),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    HiButton(
+                      text: 'Gửi bản ghi chờ kiểm tra',
+                      variant: HiButtonVariant.secondary,
+                      onPressed: _isSpeakingActive
+                          ? null
+                          : () => widget.onAnswerSubmitted('speech_sample_recorded'),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    HiButton(
+                      text: 'Chưa đọc được câu này',
+                      variant: HiButtonVariant.secondary,
+                      onPressed: _isSpeakingActive
+                          ? null
+                          : () => widget.onAnswerSubmitted(false),
+                    ),
+                  ],
                 ],
               ),
             ),

@@ -5,6 +5,8 @@ import '../models/roadmap_models.dart';
 class AdaptiveRoadmapContext {
   final LearnerGoal goal;
   final int currentLevel;
+  final CurriculumLevel? levelData;
+  final Map<int, CurriculumLevel> levelsByHsk;
   final Map<String, LessonProgress> progressMap;
   final Map<SkillDimension, double> skillMasteryScores;
   final List<String> identifiedKnowledgeGaps;
@@ -15,6 +17,8 @@ class AdaptiveRoadmapContext {
   const AdaptiveRoadmapContext({
     required this.goal,
     required this.currentLevel,
+    this.levelData,
+    this.levelsByHsk = const {},
     this.progressMap = const {},
     this.skillMasteryScores = const {},
     this.identifiedKnowledgeGaps = const [],
@@ -31,16 +35,16 @@ class AdaptiveRoadmapEngine {
 
   /// Computes updated lesson statuses and generates bounded, reasoned recommendations.
   LearnerRoadmapState generateRoadmap(AdaptiveRoadmapContext context) {
-    final level = CurriculumCatalog.getLevel(context.currentLevel);
+    final level = context.levelData ?? CurriculumCatalog.getLevel(context.currentLevel);
     final allLessons = level.allLessons;
 
     // 1. Compute updated lesson progress & unlocked availability
-    final updatedProgressMap = <String, LessonProgress>{};
+    final updatedProgressMap = <String, LessonProgress>{...context.progressMap};
 
     for (final lesson in allLessons) {
       final existing = context.progressMap[lesson.id];
 
-      if (existing != null && (existing.isCompleted || existing.status == LessonStatus.skipped)) {
+      if (existing != null && (existing.isCompleted || existing.status == RoadmapLessonStatus.skipped)) {
         updatedProgressMap[lesson.id] = existing;
         continue;
       }
@@ -52,10 +56,10 @@ class AdaptiveRoadmapEngine {
       });
 
       final newStatus = prerequisitesMet
-          ? (existing?.status == LessonStatus.inProgress
-              ? LessonStatus.inProgress
-              : LessonStatus.available)
-          : LessonStatus.locked;
+          ? (existing?.status == RoadmapLessonStatus.inProgress
+              ? RoadmapLessonStatus.inProgress
+              : RoadmapLessonStatus.available)
+          : RoadmapLessonStatus.locked;
 
       updatedProgressMap[lesson.id] = (existing ??
               LessonProgress(
@@ -105,10 +109,10 @@ class AdaptiveRoadmapEngine {
     }
 
     // 3. Generate candidate recommendations
-    final candidates = <CurriculumLesson>[];
+    final candidates = <RoadmapLesson>[];
     for (final lesson in allLessons) {
       final prog = updatedProgressMap[lesson.id];
-      if (prog != null && (prog.isAvailable || prog.status == LessonStatus.inProgress)) {
+      if (prog != null && (prog.isAvailable || prog.status == RoadmapLessonStatus.inProgress)) {
         candidates.add(lesson);
       }
     }
@@ -189,6 +193,7 @@ class AdaptiveRoadmapEngine {
       lessonProgressMap: updatedProgressMap,
       skillMasteryMap: synthesizedMastery,
       recommendations: boundedRecommendations,
+      levelsByHsk: context.levelsByHsk,
     );
   }
 }

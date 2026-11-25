@@ -107,7 +107,9 @@ class HomeLessonAccessCard extends StatelessWidget {
 
           // Primary Call-to-Action Button
           HiButton(
-            text: hasStarted ? 'Vào học ngay' : 'Bắt đầu Bài 1 – HSK 1',
+            text: hasStarted
+                ? 'Vào học ngay'
+                : 'Bắt đầu Bài 1 – HSK ${rm?.currentHskLevel ?? 1}',
             icon: const Icon(Icons.play_arrow_rounded),
             variant: HiButtonVariant.primary,
             size: HiButtonSize.md,

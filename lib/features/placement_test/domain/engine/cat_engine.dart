@@ -127,11 +127,13 @@ class CatEngine {
 
     if (!isSkipped && isCorrect != null) {
       final p = calculateProbability(newTheta, activeItem.difficulty, activeItem.discrimination);
+      final safeP = p.clamp(1e-6, 1.0 - 1e-6);
       final x = isCorrect ? 1.0 : 0.0;
-      final info = calculateInformation(newTheta, activeItem.difficulty, activeItem.discrimination);
+      final info = activeItem.discrimination * activeItem.discrimination * safeP * (1.0 - safeP);
+      final denom = (activeItem.discrimination * safeP * (1.0 - safeP)).clamp(1e-6, double.infinity);
 
       // Bounded theta adjustment step $\Delta\theta$
-      final step = ((x - p) / (activeItem.discrimination * p * (1.0 - p))).clamp(-0.6, 0.6);
+      final step = ((x - safeP) / denom).clamp(-0.6, 0.6);
       newTheta = (newTheta + step).clamp(-3.0, 3.0);
 
       // Cumulative Fisher information update
@@ -169,11 +171,17 @@ class CatEngine {
       );
     }
 
-    // 4. Evaluate stopping rule for current skill
+    // 4. Evaluate stopping rule for current skill using per-skill Fisher SE
+    final currentSkillResponses =
+        updatedResponses.where((r) => r.skill == currentSkill).toList();
+    final currentSkillEstimate = _estimateSkillAbility(
+      currentSkillResponses,
+      initialTheta: newTheta,
+    );
     final shouldStopCurrentSkill = isSkipped || _evaluateSkillStopRule(
       currentSkill: currentSkill,
       skillItemCount: updatedSkillCounts[currentSkill] ?? 0,
-      skillSe: newSe,
+      skillSe: currentSkillEstimate.standardError,
       responses: updatedResponses,
       blueprint: activeBlueprint,
     );
@@ -346,8 +354,13 @@ class CatEngine {
       final correctCount = assessedResponses.where((r) => r.isCorrect == true).length;
       final accuracy = assessedResponses.isEmpty ? 0.0 : correctCount / assessedResponses.length;
 
-      // Calculate skill specific theta
-      double skillTheta = overallTheta;
+      // Calculate independent per-skill MAP theta & Fisher SE
+      final skillEstimate = _estimateSkillAbility(
+        assessedResponses,
+        initialTheta: overallTheta,
+      );
+      final double skillTheta = skillEstimate.theta;
+      final double skillSe = skillEstimate.standardError;
       final subMetrics = <String, dynamic>{};
 
       if (skill == CatSkill.listening) {
@@ -386,9 +399,9 @@ class CatEngine {
       }
 
       String confLabel = 'Trung bình';
-      if (overallStandardError <= 0.35) {
+      if (skillSe <= 0.45) {
         confLabel = 'Cao';
-      } else if (overallStandardError >= 0.70) {
+      } else if (skillSe >= 0.90) {
         confLabel = 'Thấp';
       }
 
@@ -396,7 +409,7 @@ class CatEngine {
         skill: skill,
         isAssessed: true,
         estimatedTheta: skillTheta,
-        standardError: overallStandardError,
+        standardError: skillSe,
         accuracyRate: accuracy,
         itemsAttempted: attempted.length,
         itemsCorrect: correctCount,
@@ -449,5 +462,55 @@ class CatEngine {
       completedAt: completedAt,
       blueprintVersion: effectiveBlueprintVersion,
     );
+  }
+
+  /// Estimates per-skill latent ability theta & Fisher standard error using MAP Newton-Raphson.
+  ({double theta, double standardError}) _estimateSkillAbility(
+    List<CatResponseRecord> responses, {
+    double initialTheta = 0.0,
+  }) {
+    final scored = responses.where((r) => !r.isSkipped && r.isCorrect != null).toList();
+    const double priorMean = 0.0;
+    const double priorVariance = 2.25; // sigma = 1.5
+    const double priorInfo = 1.0 / priorVariance;
+
+    if (scored.isEmpty) {
+      return (theta: initialTheta.clamp(-3.0, 3.0), standardError: 1.5);
+    }
+
+    final avgDiff =
+        scored.fold<double>(0.0, (sum, r) => sum + r.itemDifficulty) / scored.length;
+    final correctRate =
+        scored.where((r) => r.isCorrect == true).length / scored.length;
+    double theta = (avgDiff + (correctRate - 0.5) * 2.0).clamp(-3.0, 3.0);
+
+    for (int iter = 0; iter < 8; iter++) {
+      double grad = -(theta - priorMean) / priorVariance;
+      double info = priorInfo;
+
+      for (final r in scored) {
+        final a = CatItemBank.getItemById(r.itemId)?.discrimination ?? 1.0;
+        final p = calculateProbability(theta, r.itemDifficulty, a);
+        final safeP = p.clamp(1e-6, 1.0 - 1e-6);
+        final x = r.isCorrect == true ? 1.0 : 0.0;
+        grad += a * (x - safeP);
+        info += a * a * safeP * (1.0 - safeP);
+      }
+
+      final delta = (grad / info.clamp(1e-6, double.infinity)).clamp(-0.8, 0.8);
+      theta = (theta + delta).clamp(-3.0, 3.0);
+      if (delta.abs() < 1e-3) break;
+    }
+
+    double totalInfo = priorInfo;
+    for (final r in scored) {
+      final a = CatItemBank.getItemById(r.itemId)?.discrimination ?? 1.0;
+      final p = calculateProbability(theta, r.itemDifficulty, a);
+      final safeP = p.clamp(1e-6, 1.0 - 1e-6);
+      totalInfo += a * a * safeP * (1.0 - safeP);
+    }
+    final se =
+        (1.0 / math.sqrt(totalInfo.clamp(priorInfo, double.infinity))).clamp(0.2, 1.5);
+    return (theta: theta, standardError: se);
   }
 }

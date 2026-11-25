@@ -10,12 +10,12 @@ import '../../../dictionary/dictionary.dart';
 import '../../../grammar/grammar.dart';
 import '../../../hanzi_writing/hanzi_writing.dart';
 import '../../../listening/listening.dart';
+import '../../../pinyin_foundation/presentation/screens/pinyin_overview_screen.dart';
 import '../../../placement_test/placement_test.dart';
 import '../../../practice/practice.dart';
 import '../../../pronunciation/pronunciation.dart';
 import '../../../reading/reading.dart';
-import '../../../roadmap/roadmap.dart'
-    hide CurriculumUnit, CurriculumLesson, LessonStatus;
+import '../../../roadmap/roadmap.dart';
 import '../../../shadowing/shadowing.dart';
 
 class LearningScreen extends ConsumerStatefulWidget {
@@ -137,6 +137,22 @@ class _LearningScreenState extends ConsumerState<LearningScreen>
               ),
               const SizedBox(height: AppSpacing.sm),
             ],
+            const SizedBox(height: AppSpacing.sm),
+
+            _buildFeatureBanner(
+              context: context,
+              icon: Icons.record_voice_over_rounded,
+              title: 'Nền tảng Pinyin & Thanh điệu',
+              subtitle: 'Làm chủ bảng âm, 4 thanh điệu và quy tắc biến điệu chuẩn',
+              buttonText: 'Học Pinyin',
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const PinyinOverviewScreen(),
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: AppSpacing.sm),
 
             _buildFeatureBanner(

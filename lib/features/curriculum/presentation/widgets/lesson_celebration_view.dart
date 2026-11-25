@@ -21,12 +21,13 @@ class LessonCelebrationView extends StatelessWidget {
   final int? totalCards;
   final int? maxCombo;
   final int? totalAttempts;
+  final bool isSubmitting;
 
   const LessonCelebrationView({
     super.key,
     this.lesson,
-    this.xpGained = 25,
-    this.streakDays = 3,
+    this.xpGained = 0,
+    this.streakDays = 0,
     this.accuracyRate,
     this.nextLessonTitle,
     this.onContinue,
@@ -35,13 +36,15 @@ class LessonCelebrationView extends StatelessWidget {
     this.totalCards,
     this.maxCombo,
     this.totalAttempts,
+    this.isSubmitting = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final effectiveNextTitle = nextLessonTitle ?? 'Bài tiếp theo';
-    final effectiveAction = onContinue ?? onFinish ?? () {};
+    final isPassed = accuracyRate == null || accuracyRate! >= 0.8;
+    final hasNextTitle = isPassed && nextLessonTitle != null && nextLessonTitle!.trim().isNotEmpty;
+    final effectiveAction = isSubmitting ? null : (onContinue ?? onFinish ?? () {});
 
     return TweenAnimationBuilder<double>(
       duration: const Duration(milliseconds: 600),
@@ -292,61 +295,62 @@ class LessonCelebrationView extends StatelessWidget {
 
               const SizedBox(height: AppSpacing.md),
 
-              // Status Card: Next Lesson Unlocked
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.md,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.successContainerLight,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: AppColors.success.withValues(alpha: 0.35),
-                    width: 1.5,
+              // Status Card: Next Lesson Unlocked (only when passed & next lesson title provided)
+              if (hasNextTitle)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.md,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.successContainerLight,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: AppColors.success.withValues(alpha: 0.35),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: const BoxDecoration(
+                          color: AppColors.success,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.check_rounded,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '✓ Đã mở khóa: ${nextLessonTitle!}',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.success,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            const Text(
+                              'Sẵn sàng cho bài học tiếp theo trên lộ trình của bạn',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFF1B6B46),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: const BoxDecoration(
-                        color: AppColors.success,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.check_rounded,
-                        color: Colors.white,
-                        size: 16,
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '✓ Đã mở khóa: $effectiveNextTitle',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.success,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          const Text(
-                            'Sẵn sàng cho bài học tiếp theo trên lộ trình của bạn',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF1B6B46),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
 
               const SizedBox(height: AppSpacing.xl),
 
@@ -356,6 +360,7 @@ class LessonCelebrationView extends StatelessWidget {
                 size: HiButtonSize.lg,
                 isFullWidth: true,
                 variant: HiButtonVariant.primary,
+                isLoading: isSubmitting,
                 onPressed: effectiveAction,
               ),
 

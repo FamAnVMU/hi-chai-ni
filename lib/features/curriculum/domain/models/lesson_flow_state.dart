@@ -1,3 +1,5 @@
+import '../engine/mastery_engine.dart';
+
 enum LessonStep {
   warmup(stepIndex: 0, titleVi: 'Khởi động'),
   vocabulary(stepIndex: 1, titleVi: 'Từ vựng mới'),
@@ -25,6 +27,7 @@ class LessonFlowState {
   final Map<String, dynamic> userAnswers;
   final double? lastScorePercent;
   final bool isCompleted;
+  final MasteryUpdateResult? masteryResult;
 
   const LessonFlowState({
     required this.lessonId,
@@ -33,6 +36,7 @@ class LessonFlowState {
     this.userAnswers = const {},
     this.lastScorePercent,
     this.isCompleted = false,
+    this.masteryResult,
   });
 
   factory LessonFlowState.initial({required String lessonId}) {
@@ -47,7 +51,7 @@ class LessonFlowState {
   bool get isAtLastStep => currentStep == LessonStep.masteryCheck;
 
   LessonFlowState nextStep() {
-    if (isAtLastStep) return this;
+    if (isAtLastStep || !canProceed) return this;
     final nextIndex = currentStep.stepIndex + 1;
     return copyWith(
       currentStep: LessonStep.fromIndex(nextIndex),
@@ -71,6 +75,7 @@ class LessonFlowState {
     Map<String, dynamic>? userAnswers,
     double? lastScorePercent,
     bool? isCompleted,
+    MasteryUpdateResult? masteryResult,
   }) {
     return LessonFlowState(
       lessonId: lessonId ?? this.lessonId,
@@ -79,6 +84,7 @@ class LessonFlowState {
       userAnswers: userAnswers ?? this.userAnswers,
       lastScorePercent: lastScorePercent ?? this.lastScorePercent,
       isCompleted: isCompleted ?? this.isCompleted,
+      masteryResult: masteryResult ?? this.masteryResult,
     );
   }
 }

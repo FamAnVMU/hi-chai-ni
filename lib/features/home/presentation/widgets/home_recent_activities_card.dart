@@ -145,6 +145,12 @@ class HomeRecentActivitiesCard extends StatelessWidget {
         return Icons.chrome_reader_mode_rounded;
       case ActivityType.dictionary:
         return Icons.menu_book_rounded;
+      case ActivityType.practice:
+        return Icons.quiz_rounded;
+      case ActivityType.exitExam:
+        return Icons.workspace_premium_rounded;
+      case ActivityType.placementTest:
+        return Icons.fact_check_rounded;
     }
   }
 
@@ -164,6 +170,12 @@ class HomeRecentActivitiesCard extends StatelessWidget {
         return Colors.amber;
       case ActivityType.dictionary:
         return Colors.indigoAccent;
+      case ActivityType.practice:
+        return Colors.green;
+      case ActivityType.exitExam:
+        return Colors.deepOrange;
+      case ActivityType.placementTest:
+        return Colors.cyan;
     }
   }
 }
