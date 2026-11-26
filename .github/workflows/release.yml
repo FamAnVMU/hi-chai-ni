@@ -19,26 +19,26 @@ jobs:
       - name: Create GitHub Release with Assets
         uses: softprops/action-gh-release@v2
         with:
-          name: HI Chinese ${{ github.ref_name }} – Nền Tảng Tự Học HSK Hoàn Chỉnh (HSK 1–6)
+          name: HI Chinese ${{ github.ref_name }} – Kiểm Toán Toàn Diện, Dark Mode & Tối Ưu Hóa Hệ Thống
           draft: false
           prerelease: false
           body: |
-            ## 🌟 HI Chinese ${{ github.ref_name }} – Nền Tảng Tự Học HSK Hoàn Chỉnh (Offline-First)
+            ## 🌟 HI Chinese ${{ github.ref_name }} – Bản Phát Hành Kiểm Toán Toàn Diện (Offline-First)
 
-            Bản phát hành chính thức của **HI Chinese** dành riêng cho hệ điều hành Android, mở rộng toàn diện học liệu HSK 1 đến HSK 6.
-            
+            Bản phát hành **HI Chinese ${{ github.ref_name }}** hoàn tất toàn bộ 4 giai đoạn kiểm toán kỹ thuật, nâng cấp schema SQLite `v21`, đồng bộ sư phạm HSK 1–6, bảo mật AI Tutor & âm thanh thực tế, cùng hệ thống giao diện Dark Mode chuẩn tương phản WCAG.
+
             ### 🚀 Điểm Nhấn Phiên Bản ${{ github.ref_name }}
-            - **Mở Rộng Học Liệu HSK 4–6:** Tích hợp 3 gói Content Pack chuẩn hóa (`hsk4_pack_v1.json`, `hsk5_pack_v1.json`, `hsk6_pack_v1.json`) với đầy đủ 6 chặng sư phạm, 116 bài học mới, điểm ngữ pháp và bài thi tốt nghiệp từng cấp.
-            - **Làm Giàu Ngữ Liệu Song Ngữ Trung – Việt (OER):** Làm giàu câu ví dụ chuẩn từ Tatoeba Project (CC BY 2.0 FR) và từ điển Hán-Việt CVDICT (CC BY-SA 4.0), loại bỏ bản dịch máy chưa kiểm chứng.
-            - **Bảo Vệ Tiến Độ Người Học Tuyệt Đối (Zero Progress Loss):** Cơ chế bảo vệ Level-Drift Guard ngăn chặn lệch cấp độ từ vựng khi nâng cấp, bảo toàn 100% dữ liệu SRS, streak và tiến độ bài học đã hoàn thành.
-            - **Offline-First & CDN Tối Ưu:** HSK 1–2 nạp sẵn; HSK 3–6 hỗ trợ tải về theo nhu cầu qua CDN bảo mật với mã băm Canonical SHA-256 đối soát chặt chẽ.
-            - **Split-ABI APKs (< 45MB):** Tối ưu hóa kích thước cài đặt, chia riêng theo kiến trúc vi xử lý (arm64-v8a và armeabi-v7a).
+            - **Core Data, FTS5 & Bảo Toàn Dữ Liệu (`Wave 1 & 2`):** Nâng cấp SQLite `v21` với chỉ mục tìm kiếm toàn văn FTS5 cho từ điển 119k mục, khử trùng lặp từ vựng/SRS, sửa toàn vẹn gói học liệu HSK 1–6 và tính streak chính xác theo múi giờ người dùng.
+            - **Sư Phạm, Lộ Trình & Kiểm Tra Đầu Vào (`Wave 2`):** Chuẩn hóa mô hình Gamified Micro-Learning, bài thi tốt nghiệp từng cấp HSK, cân bằng đáp án đọc hiểu và mở khóa CAT chính xác.
+            - **AI Tutor, Bảo Mật & Âm Thanh (`Wave 2`):** Cô lập xác thực BYOK vs Custom Proxy, chống SSRF, stream hội thoại JSON sạch với gợi ý tiếp theo, loại bỏ file MP3 câm và kích hoạt fallback TTS tự nhiên.
+            - **Dark Mode, A11y 48dp & Settings (`Wave 3`):** Bảng màu ngữ nghĩa Sáng/Tối phủ trên 25+ màn hình, nối 4 công tắc Cài đặt (`showPinyinByDefault`, `showRubyAnnotation`, `speechRate`, `autoPlayAudio`) và gộp thanh tiêu đề AI Tutor.
+            - **Kiểm Thử Toàn Diện (`Phase 4`):** Đạt `0` lỗi `flutter analyze` và `852/852` bài test tự động PASS (gồm `asset_integrity_audit_test.dart` và `end_to_end_audit_regression_test.dart`).
 
             ### 📦 Danh Sách Tệp APK Cài Đặt (Release APKs)
-            - **`hi-chinese-v1.0.14-arm64-v8a.apk`** (44.1 MB): Dành cho hầu hết thiết bị Android 64-bit hiện đại (khuyên dùng).
-            - **`hi-chinese-v1.0.14-armeabi-v7a.apk`** (42.0 MB): Dành cho thiết bị Android 32-bit đời cũ hoặc máy cấu hình phổ thông.
-            - **`app-release.apk`** (44.1 MB): Bản dựng Release tiêu chuẩn (arm64-v8a).
+            - **`hi-chinese-v1.0.17-arm64-v8a.apk`**: Dành cho hầu hết thiết bị Android 64-bit hiện đại (khuyên dùng).
+            - **`hi-chinese-v1.0.17-armeabi-v7a.apk`**: Dành cho thiết bị Android 32-bit đời cũ hoặc máy cấu hình phổ thông.
+            - **`app-release.apk`**: Bản dựng Release tiêu chuẩn (arm64-v8a).
           files: |
-            release-apk/hi-chinese-v1.0.14-arm64-v8a.apk
-            release-apk/hi-chinese-v1.0.14-armeabi-v7a.apk
+            release-apk/hi-chinese-v1.0.17-arm64-v8a.apk
+            release-apk/hi-chinese-v1.0.17-armeabi-v7a.apk
             release-apk/app-release.apk
